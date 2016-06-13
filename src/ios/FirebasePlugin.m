@@ -5,13 +5,6 @@
 @import FirebaseMessaging;
 
 
-@interface FirebasePlugin : CDVPlugin {
-    // Member variables go here.
-}
-
-- (void)coolMethod:(CDVInvokedUrlCommand*)command;
-@end
-
 @implementation FirebasePlugin
 
 - (void)pluginInitialize {
@@ -56,6 +49,19 @@
     NSLog(@"Disconnected from FCM");
 }
 
+- (void)getRegistrationId:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
+
+    if ([[FIRInstanceID instanceID] token]) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
+                        [[FIRInstanceID instanceID] token];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:
+                        @"FCM is not connected, or token is not yet available."];
+    }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)tokenRefreshNotification:(NSNotification *)notification {
     // Note that this callback will be fired everytime a new token is generated, including the first
     // time. So if you need to retrieve the token as soon as it is available this is where that
@@ -77,20 +83,6 @@
             NSLog(@"Connected to FCM.");
         }
     }];
-}
-
-- (void)coolMethod:(CDVInvokedUrlCommand*)command
-{
-    CDVPluginResult* pluginResult = nil;
-    NSString* echo = [command.arguments objectAtIndex:0];
-    
-    if (echo != nil && [echo length] > 0) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:echo];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
-    }
-    
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 /*
