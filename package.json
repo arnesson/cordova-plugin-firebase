@@ -1,0 +1,30 @@
+{
+  "author": {
+    "name": "Robert Arnesson"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arnesson/cordova-plugin-firebase"
+  },
+  "name": "cordova-plugin-firebase",
+  "version": "0.0.1",
+  "description": "Cordova plugin for Google Firebase",
+  "cordova": {
+    "id": "cordova-plugin-firebase",
+    "platforms": [
+      "android",
+      "ios",
+      "browser"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "cordova-browser",
+    "firebase",
+    "push",
+    "notifications"
+  ]
+}

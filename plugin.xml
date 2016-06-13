@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-firebase" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>firebase</name>
+
+	<js-module name="firebase" src="www/firebase.js">
+		<clobbers target="cordova.plugins.firebase" />
+	</js-module>
+
+	<platform name="android">
+		<config-file parent="/*" target="res/xml/config.xml">
+			<feature name="firebase"><param name="android-package" value="cordova-plugin-firebase.FirebasePlugin" /></feature>
+		</config-file>
+		<config-file parent="/*" target="AndroidManifest.xml"></config-file>
+		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
+	</platform>
+
+	<platform name="ios">
+		<config-file parent="/*" target="config.xml">
+			<feature name="firebase">
+				<param name="ios-package" value="FirebasePlugin" />
+				<param name="onload" value="true" />
+			</feature>
+		</config-file>
+		<source-file src="src/ios/FirebasePlugin.m" />
+		<source-file src="src/ios/GoogleService-Info.plist" target-dir="../../" />
+		<header-file src="src/ios/Firebase/Firebase.h" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleInterchangeUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleSymbolUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
+		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
+	</platform>
+
+	<hook src="scripts/after_prepare.js" type="after_prepare" />
+</plugin>
