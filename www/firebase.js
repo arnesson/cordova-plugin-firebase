@@ -1,4 +1,4 @@
-cordova.define("cordova-plugin-firebase.firebase", function(require, exports, module) {
+cordova.define("cordova-plugin-firebase.FirebasePlugin", function(require, exports, module) {
 	var exec = require('cordova/exec');
 
 	exports.getRegistrationId = function(success, error) {

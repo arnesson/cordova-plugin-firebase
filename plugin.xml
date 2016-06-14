@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="cordova-plugin-firebase" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
-	<name>firebase</name>
+	<name>Google Firebase Plugin</name>
 
-	<js-module name="firebase" src="www/firebase.js">
-		<clobbers target="cordova.plugins.firebase" />
+	<js-module name="FirebasePlugin" src="www/firebase.js">
+		<clobbers target="FirebasePlugin" />
 	</js-module>
 
 	<platform name="android">
 		<config-file parent="/*" target="res/xml/config.xml">
-			<feature name="firebase"><param name="android-package" value="cordova-plugin-firebase.FirebasePlugin" /></feature>
+			<feature name="FirebasePlugin"><param name="android-package" value="cordova-plugin-firebase.FirebasePlugin" /></feature>
 		</config-file>
 		<config-file parent="/*" target="AndroidManifest.xml"></config-file>
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
@@ -16,7 +16,7 @@
 
 	<platform name="ios">
 		<config-file parent="/*" target="config.xml">
-			<feature name="firebase">
+			<feature name="FirebasePlugin">
 				<param name="ios-package" value="FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
