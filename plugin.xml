@@ -21,9 +21,14 @@
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
+		
+		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
+
 		<source-file src="src/ios/GoogleService-Info.plist" target-dir="../../" />
+		
 		<header-file src="src/ios/Firebase/Firebase.h" />
+		
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleInterchangeUtilities.framework" />

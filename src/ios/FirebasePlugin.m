@@ -1,3 +1,4 @@
+#import "FirebasePlugin.h"
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
 #import "Firebase.h"
@@ -10,7 +11,6 @@
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     
-    // Add notification listener for tracking app activity with FB Events
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidFinishLaunching:)
                                                  name:UIApplicationDidFinishLaunchingNotification object:nil];
@@ -28,15 +28,13 @@
 }
 
 - (void) applicationDidFinishLaunching:(NSNotification *) notification {
-    NSDictionary* launchOptions = notification.userInfo;
-    
     UIUserNotificationType allNotificationTypes =
     (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
     UIUserNotificationSettings *settings =
     [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     [[UIApplication sharedApplication] registerForRemoteNotifications];
-
+    
     [FIRApp configure];
 }
 
@@ -54,7 +52,7 @@
 
     if ([[FIRInstanceID instanceID] token]) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
-                        [[FIRInstanceID instanceID] token];
+                        [[FIRInstanceID instanceID] token]];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:
                         @"FCM is not connected, or token is not yet available."];
