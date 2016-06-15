@@ -1,4 +1,4 @@
-package cordova-plugin-firebase;
+package org.apache.cordova.firebase;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
