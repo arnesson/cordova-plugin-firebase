@@ -10,7 +10,18 @@
 		<config-file parent="/*" target="res/xml/config.xml">
 			<feature name="FirebasePlugin"><param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" /></feature>
 		</config-file>
-		<config-file parent="/*" target="AndroidManifest.xml"></config-file>
+		<config-file parent="/*" target="AndroidManifest.xml">
+			<service android:name=".FirebasePluginMessagingService">
+			    <intent-filter>
+			        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+			    </intent-filter>
+			</service>
+			<service android:name=".FirebasePluginInstanceIDService">
+			    <intent-filter>
+			        <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+			    </intent-filter>
+			</service>
+		</config-file>
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
 
 		<framework src="com.google.firebase:firebase-messaging:9.0.+"/>
