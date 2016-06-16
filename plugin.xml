@@ -24,7 +24,10 @@
 		</config-file>
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
 
-		<framework src="com.google.firebase:firebase-messaging:9.0.+"/>
+		<source-file src="src/android/build-extras.gradle" target-dir="../../" />
+
+		<framework src="com.google.firebase:firebase-core:9.0.2" />
+		<framework src="com.google.firebase:firebase-messaging:9.0.2" />
 	</platform>
 
 	<platform name="ios">
@@ -34,14 +37,14 @@
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		
+
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
 
 		<source-file src="src/ios/GoogleService-Info.plist" target-dir="../../" />
-		
+
 		<header-file src="src/ios/Firebase/Firebase.h" />
-		
+
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleInterchangeUtilities.framework" />
