@@ -9,4 +9,3 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 In android studio -> sdk manager, make sure to have the following installed:
 * Android SDK Build Tools
 * Google Repository
-* Google Play services
