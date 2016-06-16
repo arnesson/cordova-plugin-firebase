@@ -6,9 +6,19 @@
 		<clobbers target="FirebasePlugin" />
 	</js-module>
 
+	<engines>
+        <engine name="cordova-browser" version=">=4.0.0" />
+        <engine name="cordova-android" version=">=4.0.0" />
+        <engine name="cordova-ios" version=">=4.0.0" />
+    </engines>
+
 	<platform name="android">
 		<config-file parent="/*" target="res/xml/config.xml">
-			<feature name="FirebasePlugin"><param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" /></feature>
+			<feature name="FirebasePlugin">
+				<param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" />
+				<param name="onload" value="true" />
+			</feature>
+			<preference name="android-minSdkVersion" value="15" />
 		</config-file>
 		<config-file parent="/*" target="AndroidManifest.xml">
 			<service android:name=".FirebasePluginMessagingService">
