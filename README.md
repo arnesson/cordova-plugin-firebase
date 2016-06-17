@@ -6,7 +6,7 @@ This plugin is under development! The primary goal for this plugin is to impleme
 Angular implementation is maintained in the [angular-cordova](https://github.com/arnesson/angular-cordova) project ([source](https://github.com/arnesson/angular-cordova/blob/master/src/plugins/3rdparty/firebase.js))
 
 ## Installation
-Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your projects config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
+Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your project's config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
 ```
 <plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase">
     <variable name="AD_UNIT_ID_FOR_BANNER_TEST" value="ca-app-pub-1234567890123456/1234567890" />
