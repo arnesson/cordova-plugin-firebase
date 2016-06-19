@@ -48,6 +48,7 @@
 				</intent-filter>
 			</service>
 		</config-file>
+		<source-file src="src/android/google-services.json" target-dir="." />
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
 		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
 		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
@@ -64,7 +65,9 @@
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		
+
+		<source-file src="src/ios/GoogleService-Info.plist" target-dir="../../" />
+
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
 

@@ -84,3 +84,50 @@ try {
 
     fs.writeFileSync("platforms/ios/" + name + "/GoogleService-Info.plist", contents)
 } catch(err) {}
+
+try {
+    var contents = {
+      "project_info": {
+        "project_number": String(GCM_SENDER_ID),
+        "firebase_url": DATABASE_URL,
+        "project_id": PROJECT_ID,
+        "storage_bucket": STORAGE_BUCKET
+      },
+      "client": [
+        {
+          "client_info": {
+            "mobilesdk_app_id": GOOGLE_APP_ID,
+            "android_client_info": {
+              "package_name": BUNDLE_ID
+            }
+          },
+          "oauth_client": [
+            {
+              "client_id": REVERSED_CLIENT_ID,
+              "client_type": 3
+            }
+          ],
+          "api_key": [
+            {
+              "current_key": API_KEY
+            }
+          ],
+          "services": {
+            "analytics_service": {
+              "status": IS_ANALYTICS_ENABLED ? 2 : 1
+            },
+            "appinvite_service": {
+              "status": IS_APPINVITE_ENABLED ? 2 : 1,
+              "other_platform_oauth_client": []
+            },
+            "ads_service": {
+              "status": IS_ADS_ENABLED ? 2 : 1,
+            }
+          }
+        }
+      ],
+      "configuration_version": "1"
+    }
+
+    fs.writeFileSync("platforms/android/google-services.json", JSON.stringify(contents))
+} catch(err) {}
