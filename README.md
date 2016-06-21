@@ -27,5 +27,3 @@ Add and configure the plugin in your app's config.xml, see sample below. You can
     <variable name="DATABASE_URL" value="https://project-id.firebaseio.com" />
 </plugin>
 ```
-## Support
-<a href="https://flattr.com/submit/auto?fid=g3ozze&url=https%3A%2F%2Fgithub.com%2Farnesson%2Fcordova-plugin-firebase" target="_blank"><img src="https://button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
