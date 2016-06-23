@@ -9,7 +9,7 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 
 1. Ensure you have the latest version of the Android Support Repositry installed.
 2. Install plugin using the following command:
-`cordova plugin add https://github.com/Chuckv01/cordova-plugin-firebase.git --variable AD_UNIT_ID_FOR_BANNER_TEST="toBeFilledInLater" --variable AD_UNIT_ID_FOR_INTERSTITIAL_TEST="toBeFilledInLater" --variable CLIENT_ID="toBeFilledInLater" --variable REVERSED_CLIENT_ID="toBeFilledInLater" --variable API_KEY="toBeFilledInLater" --variable GCM_SENDER_ID="toBeFilledInLater" --variable BUNDLE_ID="toBeFilledInLater" --variable PROJECT_ID="toBeFilledInLater" --variable STORAGE_BUCKET="toBeFilledInLater" --variable GOOGLE_APP_ID="toBeFilledInLater" --variable DATABASE_URL="toBeFilledInLater"`
+`cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --variable AD_UNIT_ID_FOR_BANNER_TEST="toBeFilledInLater" --variable AD_UNIT_ID_FOR_INTERSTITIAL_TEST="toBeFilledInLater" --variable CLIENT_ID="toBeFilledInLater" --variable REVERSED_CLIENT_ID="toBeFilledInLater" --variable API_KEY="toBeFilledInLater" --variable GCM_SENDER_ID="toBeFilledInLater" --variable BUNDLE_ID="toBeFilledInLater" --variable PROJECT_ID="toBeFilledInLater" --variable STORAGE_BUCKET="toBeFilledInLater" --variable GOOGLE_APP_ID="toBeFilledInLater" --variable DATABASE_URL="toBeFilledInLater"`
 
 3. Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your project's config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
 
