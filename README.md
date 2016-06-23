@@ -27,3 +27,16 @@ Add and configure the plugin in your app's config.xml, see sample below. You can
     <variable name="DATABASE_URL" value="https://project-id.firebaseio.com" />
 </plugin>
 ```
+
+## Methods
+
+### getRegistrationId
+
+Get the device id (token), which is used to send push notifications to this device.
+```
+window.FirebasePlugin.getRegistrationId(function(token) {
+    console.log(token);
+}, function(error) {
+    console.error(error);
+});
+```
