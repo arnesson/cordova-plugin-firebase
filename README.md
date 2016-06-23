@@ -9,7 +9,7 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 
 1. Ensure you have the latest version of the Android Support Repositry installed:
 
-
+![image tag](images/android_support_library.md)
 
 
 Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your project's config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
