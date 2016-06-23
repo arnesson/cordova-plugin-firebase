@@ -35,8 +35,7 @@ Add and configure the plugin in your app's config.xml, see sample below. You can
 Get the device id (token)
 ```
 window.FirebasePlugin.getRegistrationId(function(token) {
-    // send this token to your server and use
-    // it to push notifications to this device
+    // save this in your backend and use it to push notifications to this device
     console.log(token);
 }, function(error) {
     console.error(error);
