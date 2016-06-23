@@ -6,6 +6,12 @@ This plugin is under development! The primary goal for this plugin is to impleme
 Angular implementation is maintained in the [angular-cordova](https://github.com/arnesson/angular-cordova) project ([source](https://github.com/arnesson/angular-cordova/blob/master/src/plugins/3rdparty/firebase.js))
 
 ## Installation
+
+1. Ensure you have the latest version of the Android Support Repositry installed:
+
+
+
+
 Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your project's config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
 ```
 <plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase">
