@@ -132,10 +132,8 @@ try {
 
     //put app id in string.xml for firebase analytics
     var strings = fs.readFileSync("platforms/android/res/values/strings.xml", 'utf8');
-    result = strings.replace(/^.*google_app_id.*$/mg, "");
-    //result = strings.replace(/^\s*[\r\n]/gm, "");
+    var result = strings.replace(/^.*google_app_id.*$/mg, "");
     result = result.replace(new RegExp('<string name="google_app_id">GOOGLE_APP_ID</string>', "g"), '<string name="google_app_id">'+GOOGLE_APP_ID+'</string>');
-    
     fs.writeFileSync("platforms/android/res/values/strings.xml", result, 'utf8');
     
 } catch(err) {}
