@@ -135,4 +135,4 @@ try {
     var result = strings.replace(new RegExp('GOOGLE_APP_ID', "g"), GOOGLE_APP_ID);
     fs.writeFileSync("platforms/android/res/values/strings.xml", result, 'utf8');
     
-} catch(err) {console.log(err);}
+} catch(err) {}
