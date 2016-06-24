@@ -1,6 +1,7 @@
 package org.apache.cordova.firebase;
 
 import android.util.Log;
+import android.content.Context;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -34,7 +35,8 @@ public class FirebasePlugin extends CordovaPlugin {
     }
     
     private void startAnalytics(CallbackContext callbackContext) {
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Context context=this.cordova.getActivity().getApplicationContext(); 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         callbackContext.success("tracker started");
     }
 }
