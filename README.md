@@ -34,7 +34,9 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 ```
 
 ### iOS Only
+
 Make sure you add the GoogleService-Info.plist to your build target:
+
 1. Go to Build Phases > Copy Bundle Resources
 2. Press the "+" button
 3. Add Other
