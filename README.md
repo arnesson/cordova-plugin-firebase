@@ -7,7 +7,7 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 
 ## Installation
 
-1. Ensure you have the latest version of the Android Support Repositry installed.
+1. Ensure you have the latest version of the Android Support Repositry installed (should be at least version 33).
 2. Install plugin using the following command:
 `cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --variable ANDROID_AD_UNIT_ID_FOR_BANNER_TEST="toBeFilledInLater" --variable ANDROID_AD_UNIT_ID_FOR_INTERSTITIAL_TEST="toBeFilledInLater" --variable ANDROID_CLIENT_ID="toBeFilledInLater" --variable ANDROID_REVERSED_CLIENT_ID="toBeFilledInLater" --variable ANDROID_API_KEY="toBeFilledInLater" --variable ANDROID_GCM_SENDER_ID="toBeFilledInLater" --variable ANDROID_BUNDLE_ID="toBeFilledInLater" --variable ANDROID_PROJECT_ID="toBeFilledInLater" --variable ANDROID_STORAGE_BUCKET="toBeFilledInLater" --variable ANDROID_GOOGLE_APP_ID="toBeFilledInLater" --variable ANDROID_DATABASE_URL="toBeFilledInLater" --variable IOS_AD_UNIT_ID_FOR_BANNER_TEST="toBeFilledInLater" --variable IOS_AD_UNIT_ID_FOR_INTERSTITIAL_TEST="toBeFilledInLater" --variable IOS_CLIENT_ID="toBeFilledInLater" --variable IOS_REVERSED_CLIENT_ID="toBeFilledInLater" --variable IOS_API_KEY="toBeFilledInLater" --variable IOS_GCM_SENDER_ID="toBeFilledInLater" --variable IOS_BUNDLE_ID="toBeFilledInLater" --variable IOS_PROJECT_ID="toBeFilledInLater" --variable IOS_STORAGE_BUCKET="toBeFilledInLater" --variable IOS_GOOGLE_APP_ID="toBeFilledInLater" --variable IOS_DATABASE_URL="toBeFilledInLater"`
 
