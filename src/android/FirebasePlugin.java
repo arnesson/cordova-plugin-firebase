@@ -35,10 +35,6 @@ public class FirebasePlugin extends CordovaPlugin {
     
     private void startAnalytics(CallbackContext callbackContext) {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        if (mFirebaseAnalytics) {
-            callbackContext.success("tracker started");
-        } else {
-            callbackContext.error("tracker not started");
-        }
+        callbackContext.success("tracker started");
     }
 }
