@@ -2,6 +2,7 @@ package org.apache.cordova.firebase;
 
 import android.util.Log;
 import android.content.Context;
+import android.os.Bundle;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -25,7 +26,10 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("startAnalytics")) {
             this.startAnalytics(callbackContext);
             return true;
-        }
+        } else if (action.equals("logEvent")) {
+            this.logEvent(callbackContext, args.getString(0), args.getString(1));
+            return true;
+        } 
         return false;
     }
 
@@ -38,5 +42,13 @@ public class FirebasePlugin extends CordovaPlugin {
         Context context=this.cordova.getActivity().getApplicationContext(); 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
         callbackContext.success("tracker started");
+    }
+
+    private void logEvent(CallbackContext callbackContext, String key, String value) {
+        Bundle params = new Bundle();
+        params.putString(key, value);
+        mFirebaseAnalytics.logEvent(key, params);
+        callbackContext.success("event logged");
+        Log.d("FirebaseAnalytics", "Event logged");
     }
 }
