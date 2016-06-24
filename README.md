@@ -33,7 +33,7 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 </plugin>
 ```
 
-### iOS Only
+### iOS Steps
 
 Make sure you add the GoogleService-Info.plist to your build target:
 
