@@ -129,9 +129,4 @@ try {
       "configuration_version": "1"
     }
     fs.writeFileSync("platforms/android/google-services.json", JSON.stringify(contents))
-
-    //put app id in string.xml for firebase analytics
-    //var strings = fs.readFileSync("platforms/android/res/values/strings.xml", 'utf8');
-    //strings = strings.replace(/^.*google_app_id.*$/mg, '<string name="google_app_id">'+GOOGLE_APP_ID+'</string>');
-    //fs.writeFileSync("platforms/android/res/values/strings.xml", strings, 'utf8');
 } catch(err) {}
