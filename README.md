@@ -33,7 +33,14 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 </plugin>
 ```
 
-Run cordova prepare
+### iOS Only
+Make sure you add the GoogleService-Info.plist to your build target:
+1. Go to Build Phases > Copy Bundle Resources
+2. Press the "+" button
+3. Add Other
+4. Go to iOS > 'Your Project Name' and select GoogleService-Info.plist
+5. Check the box to 'Copy items if needed' and choose 'Create Folder Resources'
+
 
 ## Methods
 
