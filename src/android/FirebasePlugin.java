@@ -22,7 +22,7 @@ public class FirebasePlugin extends CordovaPlugin {
             this.getRegistrationId(callbackContext);
             return true;
         } else if (action.equals("startAnalytics")) {
-            this.startTracker(callbackContext);
+            this.startAnalytics(callbackContext);
             return true;
         }
         return false;
