@@ -53,7 +53,7 @@ window.FirebasePlugin.getRegistrationId(function(token) {
 
 Starts Firebase Analytics
 ```
-window.FirebasePlugin.startAnalytics({
+window.FirebasePlugin.startAnalytics(function(){
     console.log("Firebase analytics started");
 }, function(error) {
     console.error("Firebase analytics not started.");
