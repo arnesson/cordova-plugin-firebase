@@ -33,7 +33,7 @@ public class FirebasePlugin extends CordovaPlugin {
         callbackContext.success(refreshedToken);
     }
     
-    private void startTracker(CallbackContext callbackContext) {
+    private void startAnalytics(CallbackContext callbackContext) {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         if (mFirebaseAnalytics) {
             callbackContext.success("tracker started");
