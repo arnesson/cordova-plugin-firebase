@@ -83,7 +83,7 @@ try {
 "</plist>\n"
 
     fs.writeFileSync("platforms/ios/" + name + "/GoogleService-Info.plist", contents)
-} catch(err) {console.log(err);}
+} catch(err) {}
 
 try {
     var contents = {
@@ -129,4 +129,10 @@ try {
       "configuration_version": "1"
     }
     fs.writeFileSync("platforms/android/google-services.json", JSON.stringify(contents))
-} catch(err) {console.log(err)}
+
+    //put app id in string.xml for firebase analytics
+    var strings = fs.readFileSync("platforms/android/res/values/strings.xml", 'utf8');
+    var result = strings.replace(new RegExp('GOOGLE_APP_ID', "g"), GOOGLE_APP_ID);
+    fs.writeFileSync("platforms/android/res/values/strings.xml", result, 'utf8');
+    
+} catch(err) {console.log(err);}
