@@ -18,6 +18,9 @@
       "browser"
     ]
   },
+  dependencies: [
+    "xmldom": "0.1.16"
+  ],
   "keywords": [
     "ecosystem:cordova",
     "cordova-android",
