@@ -37,7 +37,7 @@
 			</feature>
 		</config-file>
 		<config-file parent="/*" target="res/values/strings.xml">
-			<string name="google_app_id">GOOGLE_APP_ID</string>
+			<string name="google_app_id">$GOOGLE_APP_ID</string>
 		</config-file>
 		<config-file parent="/*" target="AndroidManifest.xml">
 			<service android:name=".FirebasePluginMessagingService">
