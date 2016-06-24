@@ -83,7 +83,7 @@ try {
 "</plist>\n"
 
     fs.writeFileSync("platforms/ios/" + name + "/GoogleService-Info.plist", contents)
-} catch(err) {}
+} catch(err) {console.log(err);}
 
 try {
     var contents = {
@@ -128,6 +128,5 @@ try {
       ],
       "configuration_version": "1"
     }
-
     fs.writeFileSync("platforms/android/google-services.json", JSON.stringify(contents))
-} catch(err) {}
+} catch(err) {console.log(err)}
