@@ -12,7 +12,6 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 `cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --variable AD_UNIT_ID_FOR_BANNER_TEST="toBeFilledInLater" --variable AD_UNIT_ID_FOR_INTERSTITIAL_TEST="toBeFilledInLater" --variable CLIENT_ID="toBeFilledInLater" --variable REVERSED_CLIENT_ID="toBeFilledInLater" --variable API_KEY="toBeFilledInLater" --variable GCM_SENDER_ID="toBeFilledInLater" --variable BUNDLE_ID="toBeFilledInLater" --variable PROJECT_ID="toBeFilledInLater" --variable STORAGE_BUCKET="toBeFilledInLater" --variable GOOGLE_APP_ID="toBeFilledInLater" --variable DATABASE_URL="toBeFilledInLater" --save`
 
 3. Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your project's config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
-
 ```
 <plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase">
     <variable name="AD_UNIT_ID_FOR_BANNER_TEST" value="ca-app-pub-1234567890123456/1234567890" />
@@ -34,7 +33,7 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 </plugin>
 ```
 
-4. Run cordova prepare
+Run cordova prepare
 
 ## Methods
 
