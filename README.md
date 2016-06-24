@@ -54,10 +54,9 @@ window.FirebasePlugin.getRegistrationId(function(token) {
 Starts Firebase Analytics
 ```
 window.FirebasePlugin.startAnalytics({
-    // save this in your backend and use it to push notifications to this device
-    console.log("success");
+    console.log("Firebase analytics started");
 }, function(error) {
-    console.error(error);
+    console.error("Firebase analytics not started.");
 });
 ```
 
