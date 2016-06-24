@@ -38,10 +38,14 @@ public class FirebasePlugin extends CordovaPlugin {
         callbackContext.success(refreshedToken);
     }
     
-    private void startAnalytics(CallbackContext callbackContext) {
-        Context context=this.cordova.getActivity().getApplicationContext(); 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-        callbackContext.success("tracker started");
+    private void startAnalytics(final CallbackContext callbackContext) {
+        final Context context = this.cordova.getActivity().getApplicationContext();
+        this.cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+                callbackContext.success("tracker started");
+            }
+        });
     }
 
     private void logEvent(CallbackContext callbackContext, String key, String value) {
