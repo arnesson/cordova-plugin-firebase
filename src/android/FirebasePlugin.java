@@ -43,7 +43,7 @@ public class FirebasePlugin extends CordovaPlugin {
         this.cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-                callbackContext.success("tracker started");
+                callbackContext.success("Analytics started");
             }
         });
     }
@@ -52,7 +52,6 @@ public class FirebasePlugin extends CordovaPlugin {
         Bundle params = new Bundle();
         params.putString(key, value);
         mFirebaseAnalytics.logEvent(key, params);
-        callbackContext.success("event logged");
-        Log.d("FirebaseAnalytics", "Event logged");
+        callbackContext.success("Event logged");
     }
 }
