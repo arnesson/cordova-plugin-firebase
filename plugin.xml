@@ -88,7 +88,7 @@
 			</feature>
         	</config-file>
 
-		<resource-file src="src/ios/GoogleService-Info.plist" target="GoogleService-Info.plist" />
+		<resource-file src="src/ios/GoogleService-Info.plist" target="../GoogleService-Info.plist" />
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
 		<header-file src="src/ios/Firebase/Firebase.h" />
