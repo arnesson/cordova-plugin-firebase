@@ -6,27 +6,17 @@ This plugin is under development! The primary goal for this plugin is to impleme
 Angular implementation is maintained in the [angular-cordova](https://github.com/arnesson/angular-cordova) project ([source](https://github.com/arnesson/angular-cordova/blob/master/src/plugins/3rdparty/firebase.js))
 
 ## Installation
-Add and configure the plugin in your app's config.xml, see sample below. You can get the values needed by downloading your project's config file from the Firebase Console, see https://support.google.com/firebase/answer/7015592.
+Install the plugin by adding it your project's config.xml
 ```
-<plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase">
-    <variable name="AD_UNIT_ID_FOR_BANNER_TEST" value="ca-app-pub-1234567890123456/1234567890" />
-    <variable name="AD_UNIT_ID_FOR_INTERSTITIAL_TEST" value="ca-app-pub-1234567890123456/1234567890" />
-    <variable name="CLIENT_ID" value="123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com" />
-    <variable name="REVERSED_CLIENT_ID" value="com.googleusercontent.apps.123456789012-abcdefghijklmnopqrstuvwxyz123456" />
-    <variable name="API_KEY" value="abcdefghijklmnopqrstuvwxyz1234-abcdefgh" />
-    <variable name="GCM_SENDER_ID" value="123456789012" />
-    <variable name="BUNDLE_ID" value="my.bundle.id" />
-    <variable name="PROJECT_ID" value="project-id" />
-    <variable name="STORAGE_BUCKET" value="project-id.appspot.com" />
-    <variable name="IS_ADS_ENABLED" value="true" />
-    <variable name="IS_ANALYTICS_ENABLED" value="false" />
-    <variable name="IS_APPINVITE_ENABLED" value="false" />
-    <variable name="IS_GCM_ENABLED" value="true" />
-    <variable name="IS_SIGNIN_ENABLED" value="true" />
-    <variable name="GOOGLE_APP_ID" value="1:123456789012:ios:abcdefghijklmnop" />
-    <variable name="DATABASE_URL" value="https://project-id.firebaseio.com" />
-</plugin>
+<plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase" />
 ```
+or by running
+```
+cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --save
+```
+Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project. See https://support.google.com/firebase/answer/7015592 for details.
+Whenever cordova prepare is triggered the configuration files are copied to the right place in the ios and android app.
+
 
 ## Methods
 

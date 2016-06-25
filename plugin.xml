@@ -4,23 +4,6 @@
 
 	<license>MIT</license>
 
-	<preference name="AD_UNIT_ID_FOR_BANNER_TEST" />
-	<preference name="AD_UNIT_ID_FOR_INTERSTITIAL_TEST" />
-	<preference name="CLIENT_ID" />
-	<preference name="REVERSED_CLIENT_ID" />
-	<preference name="API_KEY" />
-	<preference name="GCM_SENDER_ID" />
-	<preference name="BUNDLE_ID" />
-	<preference name="PROJECT_ID" />
-	<preference name="STORAGE_BUCKET" />
-	<preference name="IS_ADS_ENABLED" default="false" />
-	<preference name="IS_ANALYTICS_ENABLED" default="false" />
-	<preference name="IS_APPINVITE_ENABLED" default="false" />
-	<preference name="IS_GCM_ENABLED" default="false" />
-	<preference name="IS_SIGNIN_ENABLED" default="false" />
-	<preference name="GOOGLE_APP_ID" />
-	<preference name="DATABASE_URL" />
-
 	<js-module name="FirebasePlugin" src="www/firebase.js">
 		<clobbers target="FirebasePlugin" />
 	</js-module>
@@ -56,6 +39,8 @@
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.firebase:firebase-core:9.0.2" />
 		<framework src="com.google.firebase:firebase-messaging:9.0.2" />
+		<framework src="com.google.firebase:firebase-crash:9.0.2" />
+		<framework src="com.google.firebase:firebase-config:9.0.2" />
 	</platform>
 
 	<platform name="ios">
@@ -72,7 +57,7 @@
 		<source-file src="src/ios/FirebasePlugin.m" />
 
 		<header-file src="src/ios/Firebase/Firebase.h" />
-		
+
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleInterchangeUtilities.framework" />
