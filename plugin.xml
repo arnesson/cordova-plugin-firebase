@@ -4,22 +4,39 @@
 
 	<license>MIT</license>
 
-	<preference name="AD_UNIT_ID_FOR_BANNER_TEST" />
-	<preference name="AD_UNIT_ID_FOR_INTERSTITIAL_TEST" />
-	<preference name="CLIENT_ID" />
-	<preference name="REVERSED_CLIENT_ID" />
-	<preference name="API_KEY" />
-	<preference name="GCM_SENDER_ID" />
-	<preference name="BUNDLE_ID" />
-	<preference name="PROJECT_ID" />
-	<preference name="STORAGE_BUCKET" />
-	<preference name="IS_ADS_ENABLED" default="false" />
-	<preference name="IS_ANALYTICS_ENABLED" default="false" />
-	<preference name="IS_APPINVITE_ENABLED" default="false" />
-	<preference name="IS_GCM_ENABLED" default="false" />
-	<preference name="IS_SIGNIN_ENABLED" default="false" />
-	<preference name="GOOGLE_APP_ID" />
-	<preference name="DATABASE_URL" />
+	<preference name="ANDROID_AD_UNIT_ID_FOR_BANNER_TEST" />
+	<preference name="ANDROID_AD_UNIT_ID_FOR_INTERSTITIAL_TEST" />
+	<preference name="ANDROID_CLIENT_ID" />
+	<preference name="ANDROID_REVERSED_CLIENT_ID" />
+	<preference name="ANDROID_API_KEY" />
+	<preference name="ANDROID_GCM_SENDER_ID" />
+	<preference name="ANDROID_BUNDLE_ID" />
+	<preference name="ANDROID_PROJECT_ID" />
+	<preference name="ANDROID_STORAGE_BUCKET" />
+	<preference name="ANDROID_IS_ADS_ENABLED" default="false" />
+	<preference name="ANDROID_IS_ANALYTICS_ENABLED" default="false" />
+	<preference name="ANDROID_IS_APPINVITE_ENABLED" default="false" />
+	<preference name="ANDROID_IS_GCM_ENABLED" default="false" />
+	<preference name="ANDROID_IS_SIGNIN_ENABLED" default="false" />
+	<preference name="ANDROID_GOOGLE_APP_ID" />
+	<preference name="ANDROID_DATABASE_URL" />
+
+	<preference name="IOS_AD_UNIT_ID_FOR_BANNER_TEST" />
+	<preference name="IOS_AD_UNIT_ID_FOR_INTERSTITIAL_TEST" />
+	<preference name="IOS_CLIENT_ID" />
+	<preference name="IOS_REVERSED_CLIENT_ID" />
+	<preference name="IOS_API_KEY" />
+	<preference name="IOS_GCM_SENDER_ID" />
+	<preference name="IOS_BUNDLE_ID" />
+	<preference name="IOS_PROJECT_ID" />
+	<preference name="IOS_STORAGE_BUCKET" />
+	<preference name="IOS_IS_ADS_ENABLED" default="false" />
+	<preference name="IOS_IS_ANALYTICS_ENABLED" default="false" />
+	<preference name="IOS_IS_APPINVITE_ENABLED" default="false" />
+	<preference name="IOS_IS_GCM_ENABLED" default="false" />
+	<preference name="IOS_IS_SIGNIN_ENABLED" default="false" />
+	<preference name="IOS_GOOGLE_APP_ID" />
+	<preference name="IOS_DATABASE_URL" />
 
 	<js-module name="FirebasePlugin" src="www/firebase.js">
 		<clobbers target="FirebasePlugin" />
@@ -36,6 +53,9 @@
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
+		<config-file parent="/*" target="res/values/strings.xml">
+			<string name="google_app_id">$ANDROID_GOOGLE_APP_ID</string>
+		</config-file>
 		<config-file parent="/*" target="AndroidManifest.xml">
 			<service android:name=".FirebasePluginMessagingService">
 				<intent-filter>
@@ -49,28 +69,28 @@
 			</service>
 		</config-file>
 		<source-file src="src/android/google-services.json" target-dir="." />
-		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
-		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
-		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
- 
+		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase//FirebasePlugin" />
+		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
+		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
+		
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.firebase:firebase-core:9.0.2" />
 		<framework src="com.google.firebase:firebase-messaging:9.0.2" />
+		<framework src="com.google.firebase:firebase-crash:9.0.2" />
+		<framework src="com.google.firebase:firebase-config:9.0.2" />
 	</platform>
 
 	<platform name="ios">
-		<config-file parent="/*" target="config.xml">
+        	<config-file target="config.xml" parent="/*">
 			<feature name="FirebasePlugin">
 				<param name="ios-package" value="FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
-		</config-file>
+        	</config-file>
 
-		<source-file src="src/ios/GoogleService-Info.plist" target-dir="../../" />
-
+		<resource-file src="src/ios/GoogleService-Info.plist" target="Resources/GoogleService-Info.plist" />
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
-
 		<header-file src="src/ios/Firebase/Firebase.h" />
 		
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
@@ -80,6 +100,8 @@
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
+		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 	</platform>
 
 	<hook src="scripts/after_prepare.js" type="after_prepare" />

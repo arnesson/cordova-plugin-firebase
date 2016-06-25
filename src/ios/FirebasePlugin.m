@@ -27,6 +27,33 @@
                                                  name:UIApplicationDidEnterBackgroundNotification object:nil];
 }
 
+- (void)startAnalytics:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult;
+        [FIRApp configure];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
+            @"Analytics started"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)logEvent:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult;
+        NSString* key = [command.arguments objectAtIndex:0];
+        NSString* value = [command.arguments objectAtIndex:1];
+        
+        [FIRAnalytics logEventWithName:kFIREventSelectContent parameters:@{
+            kFIRParameterContentType:key,
+            kFIRParameterItemID:value
+        }];
+        
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
+            @"Event logged"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
 - (void) applicationDidFinishLaunching:(NSNotification *) notification {
     UIUserNotificationType allNotificationTypes =
     (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
@@ -34,8 +61,6 @@
     [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     [[UIApplication sharedApplication] registerForRemoteNotifications];
-    
-    [FIRApp configure];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)application {

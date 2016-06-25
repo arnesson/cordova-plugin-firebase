@@ -1,0 +1,13 @@
+framework module FirebaseCrash {
+
+  export *
+
+  umbrella header "FirebaseCrash.h"
+
+  header "FIRCrashLog.h"
+
+  link framework "CoreTelephony"
+  link framework "SystemConfiguration"
+
+  link "c++"
+}

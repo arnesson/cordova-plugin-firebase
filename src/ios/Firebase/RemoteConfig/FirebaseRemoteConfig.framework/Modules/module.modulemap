@@ -1,0 +1,11 @@
+framework module FirebaseRemoteConfig {
+
+  export *
+
+  umbrella header "FirebaseRemoteConfig.h"
+
+  header "FIRRemoteConfig.h"
+
+  link "sqlite3"
+  link "z"
+}
