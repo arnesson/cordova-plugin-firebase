@@ -76,6 +76,8 @@
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.firebase:firebase-core:9.0.2" />
 		<framework src="com.google.firebase:firebase-messaging:9.0.2" />
+		<framework src="com.google.firebase:firebase-crash:9.0.2" />
+		<framework src="com.google.firebase:firebase-config:9.0.2" />
 	</platform>
 
 	<platform name="ios">
@@ -98,6 +100,8 @@
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
+		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 	</platform>
 
 	<hook src="scripts/after_prepare.js" type="after_prepare" />
