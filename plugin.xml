@@ -49,9 +49,9 @@
 			</service>
 		</config-file>
 		<source-file src="src/android/google-services.json" target-dir="." />
-		<source-file src="src/android/FirebasePlugin.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
-		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
-		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/cordova-plugin-firebase/FirebasePlugin" />
+		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
+		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
+		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
  
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.firebase:firebase-core:9.0.2" />
@@ -66,7 +66,7 @@
 			</feature>
 		</config-file>
 
-		<source-file src="src/ios/GoogleService-Info.plist" target-dir="../../" />
+		<resource-file src="src/ios/GoogleService-Info.plist" target="Resources/GoogleService-Info.plist" />
 
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
@@ -80,6 +80,8 @@
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
+		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 	</platform>
 
 	<hook src="scripts/after_prepare.js" type="after_prepare" />
