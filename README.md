@@ -49,17 +49,7 @@ Angular implementation is maintained in the [angular-cordova](https://github.com
 </plugin>
 ```
 
-After filling in the values in config.xml run `cordova prepare`.
-
-### iOS Steps
-
-Make sure you add the GoogleService-Info.plist to your build target:
-
-1. Go to Build Phases > Copy Bundle Resources
-2. Press the "+" button
-3. Add Other
-4. Go to iOS > 'Your Project Name' and select GoogleService-Info.plist
-5. Check the box to 'Copy items if needed' and choose 'Create Folder Resources'
+<b>After filling in the values in config.xml run `cordova prepare`.</b>
 
 
 ## Methods
