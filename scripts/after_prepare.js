@@ -84,7 +84,7 @@ try {
 "</dict>\n" +
 "</plist>\n"
 
-    fs.writeFileSync("platforms/ios/" + name + "/GoogleService-Info.plist", contents)
+    fs.writeFileSync("platforms/ios/" + name + "/Resources/GoogleService-Info.plist", contents)
 } catch(err) {}
 
 //android
