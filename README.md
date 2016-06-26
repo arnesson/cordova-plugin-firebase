@@ -6,11 +6,11 @@ This plugin is under development! The primary goal for this plugin is to impleme
 Angular implementation is maintained in the [angular-cordova](https://github.com/arnesson/angular-cordova) project ([source](https://github.com/arnesson/angular-cordova/blob/master/src/plugins/3rdparty/firebase.js))
 
 ## Installation
-Install the plugin by adding it your project's config.xml
+Install the plugin by adding it your project's config.xml:
 ```
 <plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase" />
 ```
-or by running
+or by running:
 ```
 cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --save
 ```
