@@ -1,7 +1,7 @@
 # cordova-plugin-firebase
 Cordova plugin for Google Firebase
 
-This plugin is under development! The primary goal for this plugin is to implement FCM for cross platform push notifications. Other parts of the SDK will follow later.
+This plugin is under development! The primary goal for this plugin is to implement Analytics and FCM for cross platform push notifications. Other parts of the SDK will follow later.
 
 Angular implementation is maintained in the [angular-cordova](https://github.com/arnesson/angular-cordova) project ([source](https://github.com/arnesson/angular-cordova/blob/master/src/plugins/3rdparty/firebase.js))
 
@@ -22,7 +22,7 @@ Whenever cordova prepare is triggered the configuration files are copied to the 
 
 ### getRegistrationId
 
-Get the device id (token)
+Get the device id (token):
 ```
 window.FirebasePlugin.getRegistrationId(function(token) {
     // save this in your backend and use it to push notifications to this device
@@ -30,4 +30,11 @@ window.FirebasePlugin.getRegistrationId(function(token) {
 }, function(error) {
     console.error(error);
 });
+```
+
+### logEvent
+
+Log an event using Analytics:
+```
+window.FirebasePlugin.logEvent("pageLoad", "Dashboard");
 ```

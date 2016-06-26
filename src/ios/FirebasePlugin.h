@@ -3,4 +3,5 @@
 
 @interface FirebasePlugin : CDVPlugin
 - (void)getRegistrationId:(CDVInvokedUrlCommand*)command;
+- (void)logEvent:(CDVInvokedUrlCommand*)command;
 @end
