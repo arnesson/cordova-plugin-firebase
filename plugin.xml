@@ -4,39 +4,7 @@
 
 	<license>MIT</license>
 
-	<preference name="ANDROID_AD_UNIT_ID_FOR_BANNER_TEST" />
-	<preference name="ANDROID_AD_UNIT_ID_FOR_INTERSTITIAL_TEST" />
-	<preference name="ANDROID_CLIENT_ID" />
-	<preference name="ANDROID_REVERSED_CLIENT_ID" />
-	<preference name="ANDROID_API_KEY" />
-	<preference name="ANDROID_GCM_SENDER_ID" />
-	<preference name="ANDROID_BUNDLE_ID" />
-	<preference name="ANDROID_PROJECT_ID" />
-	<preference name="ANDROID_STORAGE_BUCKET" />
-	<preference name="ANDROID_IS_ADS_ENABLED" default="false" />
-	<preference name="ANDROID_IS_ANALYTICS_ENABLED" default="false" />
-	<preference name="ANDROID_IS_APPINVITE_ENABLED" default="false" />
-	<preference name="ANDROID_IS_GCM_ENABLED" default="false" />
-	<preference name="ANDROID_IS_SIGNIN_ENABLED" default="false" />
 	<preference name="ANDROID_GOOGLE_APP_ID" />
-	<preference name="ANDROID_DATABASE_URL" />
-
-	<preference name="IOS_AD_UNIT_ID_FOR_BANNER_TEST" />
-	<preference name="IOS_AD_UNIT_ID_FOR_INTERSTITIAL_TEST" />
-	<preference name="IOS_CLIENT_ID" />
-	<preference name="IOS_REVERSED_CLIENT_ID" />
-	<preference name="IOS_API_KEY" />
-	<preference name="IOS_GCM_SENDER_ID" />
-	<preference name="IOS_BUNDLE_ID" />
-	<preference name="IOS_PROJECT_ID" />
-	<preference name="IOS_STORAGE_BUCKET" />
-	<preference name="IOS_IS_ADS_ENABLED" default="false" />
-	<preference name="IOS_IS_ANALYTICS_ENABLED" default="false" />
-	<preference name="IOS_IS_APPINVITE_ENABLED" default="false" />
-	<preference name="IOS_IS_GCM_ENABLED" default="false" />
-	<preference name="IOS_IS_SIGNIN_ENABLED" default="false" />
-	<preference name="IOS_GOOGLE_APP_ID" />
-	<preference name="IOS_DATABASE_URL" />
 
 	<js-module name="FirebasePlugin" src="www/firebase.js">
 		<clobbers target="FirebasePlugin" />
