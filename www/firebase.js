@@ -1,7 +1,7 @@
 var exec = require('cordova/exec');
 
-exports.getRegistrationId = function(success, error) {
-    exec(success, error, "FirebasePlugin", "getRegistrationId", []);
+exports.getInstanceId = function(success, error) {
+    exec(success, error, "FirebasePlugin", "getInstanceId", []);
 };
 
 exports.logEvent = function(key, value, success, error) {

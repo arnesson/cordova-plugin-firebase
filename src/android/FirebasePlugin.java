@@ -30,8 +30,8 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("getRegistrationId")) {
-            this.getRegistrationId(callbackContext);
+        if (action.equals("getInstanceId")) {
+            this.getInstanceId(callbackContext);
             return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getString(1));
@@ -40,7 +40,7 @@ public class FirebasePlugin extends CordovaPlugin {
         return false;
     }
 
-    private void getRegistrationId(CallbackContext callbackContext) {
+    private void getInstanceId(CallbackContext callbackContext) {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         callbackContext.success(refreshedToken);
     }

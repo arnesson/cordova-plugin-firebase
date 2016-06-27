@@ -20,11 +20,11 @@ Whenever cordova prepare is triggered the configuration files are copied to the 
 
 ## Methods
 
-### getRegistrationId
+### getInstanceId
 
 Get the device id (token):
 ```
-window.FirebasePlugin.getRegistrationId(function(token) {
+window.FirebasePlugin.getInstanceId(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
 }, function(error) {

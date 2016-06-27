@@ -48,7 +48,7 @@
     NSLog(@"Disconnected from FCM");
 }
 
-- (void)getRegistrationId:(CDVInvokedUrlCommand *)command {
+- (void)getInstanceId:(CDVInvokedUrlCommand *)command {
     CDVPluginResult *pluginResult;
 
     if ([[FIRInstanceID instanceID] token]) {

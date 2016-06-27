@@ -2,6 +2,6 @@
 #import "AppDelegate.h"
 
 @interface FirebasePlugin : CDVPlugin
-- (void)getRegistrationId:(CDVInvokedUrlCommand*)command;
+- (void)getInstanceId:(CDVInvokedUrlCommand*)command;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 @end
