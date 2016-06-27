@@ -19,6 +19,9 @@
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
+		<config-file parent="/*" target="res/values/strings.xml">
+		    <string name="google_app_id">@string/google_app_id</string>
+		</config-file>
 		<config-file parent="/*" target="AndroidManifest.xml">
 			<service android:name=".FirebasePluginMessagingService">
 				<intent-filter>
