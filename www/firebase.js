@@ -4,6 +4,18 @@ exports.getInstanceId = function(success, error) {
     exec(success, error, "FirebasePlugin", "getInstanceId", []);
 };
 
+exports.grantPermission = function(success, error) {
+    exec(success, error, "FirebasePlugin", "grantPermission", []);
+};
+
+exports.unsubscribe = function(topic, success, error) {
+    exec(success, error, "FirebasePlugin", "unsubscribe", [topic]);
+};
+
+exports.unsubscribe = function(topic, success, error) {
+    exec(success, error, "FirebasePlugin", "unsubscribe", [topic]);
+};
+
 exports.logEvent = function(key, value, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [key, value]);
 };

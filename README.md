@@ -32,6 +32,27 @@ window.FirebasePlugin.getInstanceId(function(token) {
 });
 ```
 
+### grantPermission (iOS only)
+
+Grant permission to recieve push notifications (will trigger prompt):
+```
+window.FirebasePlugin.grantPermission();
+```
+
+### subscribe
+
+Subscribe to a topic:
+```
+window.FirebasePlugin.subscribe("/topics/example");
+```
+
+### unsubscribe
+
+Unsubscribe from a topic:
+```
+window.FirebasePlugin.unsubscribe("/topics/example");
+```
+
 ### logEvent
 
 Log an event using Analytics:

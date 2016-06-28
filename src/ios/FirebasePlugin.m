@@ -28,14 +28,9 @@
                                                  name:UIApplicationDidEnterBackgroundNotification object:nil];
 }
 
-- (void) applicationDidFinishLaunching:(NSNotification *) notification {
-    UIUserNotificationType allNotificationTypes =
-    (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
-    UIUserNotificationSettings *settings =
-    [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
-    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+- (void) applicationDidFinishLaunching:(NSNotification *) notification {    
     [[UIApplication sharedApplication] registerForRemoteNotifications];
-    
+
     [FIRApp configure];
 }
 
@@ -58,6 +53,41 @@
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:
                         @"FCM is not connected, or token is not yet available."];
     }
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)grantPermission:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
+
+    UIUserNotificationType allNotificationTypes =
+    (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
+    UIUserNotificationSettings *settings =
+    [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)subscribe:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
+    
+    NSString* topic = [command.arguments objectAtIndex:0];
+    
+    [[FIRMessaging messaging] subscribeToTopic: topic];
+    
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)unsubscribe:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
+    
+    NSString* topic = [command.arguments objectAtIndex:0];
+    
+    [[FIRMessaging messaging] unsubscribeFromTopic: topic];
+    
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 

@@ -35,6 +35,12 @@ public class FirebasePlugin extends CordovaPlugin {
         if (action.equals("getInstanceId")) {
             this.getInstanceId(callbackContext);
             return true;
+        } else if (action.equals("subscribe")) {
+            this.subscribe(callbackContext, args.getString(0));
+            return true;
+        } else if (action.equals("unsubscribe")) {
+            this.unsubscribe(callbackContext, args.getString(0));
+            return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getString(1));
             return true;
@@ -43,8 +49,18 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void getInstanceId(CallbackContext callbackContext) {
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        callbackContext.success(refreshedToken);
+        String token = FirebaseInstanceId.getInstance().getToken();
+        callbackContext.success(token);
+    }
+
+    private void subscribe(CallbackContext callbackContext, String topic) {
+        FirebaseInstanceId.getInstance().subscribeToTopic(topic);
+        callbackContext.success();
+    }
+
+    private void unsubscribe(CallbackContext callbackContext, String topic) {
+        FirebaseInstanceId.getInstance().unsubscribeFromTopic(topic);
+        callbackContext.success();
     }
 
     private void logEvent(CallbackContext callbackContext, String key, String value) {
