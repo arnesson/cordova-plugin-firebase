@@ -18,7 +18,9 @@ var name = getValue(config, "name")
 try {
 	var contents = fs.readFileSync("GoogleService-Info.plist").toString();
     fs.writeFileSync("platforms/ios/" + name + "/Resources/GoogleService-Info.plist", contents)
-} catch(err) {}
+} catch(err) {
+  process.stdout.write(err);
+}
 
 try {
 	var contents = fs.readFileSync("google-services.json").toString();
@@ -37,4 +39,6 @@ try {
     strings = strings.replace(new RegExp('<string name="google_app_id">([^<]+?)</string>', "i"), '<string name="google_app_id">' + json.client[0].client_info.mobilesdk_app_id + '</string>')
 
     fs.writeFileSync("platforms/android/res/values/strings.xml", strings);
-} catch(err) {}
+} catch(err) {
+  process.stdout.write(err);
+}
