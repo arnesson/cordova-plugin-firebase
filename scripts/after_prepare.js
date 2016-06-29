@@ -19,7 +19,7 @@ try {
 	var contents = fs.readFileSync("GoogleService-Info.plist").toString();
     fs.writeFileSync("platforms/ios/" + name + "/Resources/GoogleService-Info.plist", contents)
 } catch(err) {
-//  process.stdout.write(err);
+  process.stdout.write(err);
 }
 
 try {
@@ -30,7 +30,10 @@ try {
     var strings = fs.readFileSync("platforms/android/res/values/strings.xml").toString();
 
     // strip non-default value
-    strings = strings.replace(new RegExp('<string name="google_app_id">([^@<]+?)</string>', "i"), '')
+    strings = strings.replace(new RegExp('<string name="google_app_id">([^\@<]+?)</string>˜', "i"), '')
+
+    // strip non-default value
+    strings = strings.replace(new RegExp('<string name="google_api_key">([^\@<]+?)</string>˜', "i"), '')
 
     // strip empty lines
     strings = strings.replace(new RegExp('(\r\n|\n|\r)[ \t]*(\r\n|\n|\r)', "gm"), '$1')
@@ -38,17 +41,10 @@ try {
     // replace the default value
     strings = strings.replace(new RegExp('<string name="google_app_id">([^<]+?)</string>', "i"), '<string name="google_app_id">' + json.client[0].client_info.mobilesdk_app_id + '</string>')
 
-
-    // strip non-default value
-    strings = strings.replace(new RegExp('<string name="google_api_key">([^@<]+?)</string>', "i"), '')
-
-    // strip empty lines
-    strings = strings.replace(new RegExp('(\r\n|\n|\r)[ \t]*(\r\n|\n|\r)', "gm"), '$1')
-
     // replace the default value
-    strings = strings.replace(new RegExp('<string name="google_api_key">([^<]+?)</string>', "i"), '<string name="google_app_id">' + json.client[0].api_key.current_key + '</string>')
+    strings = strings.replace(new RegExp('<string name="google_api_key">([^<]+?)</string>', "i"), '<string name="google_app_id">' + json.client[0].api_key[0].current_key + '</string>')
 
     fs.writeFileSync("platforms/android/res/values/strings.xml", strings);
 } catch(err) {
-//  process.stdout.write(err);
+  process.stdout.write(err);
 }
