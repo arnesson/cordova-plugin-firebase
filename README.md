@@ -43,14 +43,14 @@ window.FirebasePlugin.grantPermission();
 
 Subscribe to a topic:
 ```
-window.FirebasePlugin.subscribe("/topics/example");
+window.FirebasePlugin.subscribe("/example");
 ```
 
 ### unsubscribe
 
 Unsubscribe from a topic:
 ```
-window.FirebasePlugin.unsubscribe("/topics/example");
+window.FirebasePlugin.unsubscribe("/example");
 ```
 
 ### logEvent

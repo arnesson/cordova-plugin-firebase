@@ -1,4 +1,4 @@
-package org.apache.cordova.firebase;
+package org.apache.cordova.firebase.FirebasePlugin;
 
 import android.util.Log;
 
@@ -8,7 +8,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 public class FirebasePluginInstanceIDService extends FirebaseInstanceIdService {
 
-    private static final String TAG = "FirebasePluginInstanceIDService";
+    private static final String TAG = "FirebasePlugin";
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
