@@ -1,4 +1,4 @@
-package org.apache.cordova.firebase;
+package org.apache.cordova.firebase.FirebasePlugin;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,6 +12,7 @@ import org.json.JSONException;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 public class FirebasePlugin extends CordovaPlugin {
@@ -26,6 +27,8 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 Log.d(TAG, "Starting Firebase plugin");
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+                FirebaseMessaging.getInstance().subscribeToTopic("android");
+                FirebaseMessaging.getInstance().subscribeToTopic("all");
             }
         });
     }
@@ -54,12 +57,12 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void subscribe(CallbackContext callbackContext, String topic) {
-        FirebaseInstanceId.getInstance().subscribeToTopic(topic);
+        FirebaseMessaging.getInstance().subscribeToTopic(topic);
         callbackContext.success();
     }
 
     private void unsubscribe(CallbackContext callbackContext, String topic) {
-        FirebaseInstanceId.getInstance().unsubscribeFromTopic(topic);
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
         callbackContext.success();
     }
 

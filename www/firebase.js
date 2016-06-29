@@ -8,8 +8,8 @@ exports.grantPermission = function(success, error) {
     exec(success, error, "FirebasePlugin", "grantPermission", []);
 };
 
-exports.unsubscribe = function(topic, success, error) {
-    exec(success, error, "FirebasePlugin", "unsubscribe", [topic]);
+exports.subscribe = function(topic, success, error) {
+    exec(success, error, "FirebasePlugin", "subscribe", [topic]);
 };
 
 exports.unsubscribe = function(topic, success, error) {
