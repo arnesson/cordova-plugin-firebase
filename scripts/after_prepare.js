@@ -30,10 +30,10 @@ try {
     var strings = fs.readFileSync("platforms/android/res/values/strings.xml").toString();
 
     // strip non-default value
-    strings = strings.replace(new RegExp('<string name="google_app_id">([^\@<]+?)</string>˜', "i"), '')
+    strings = strings.replace(new RegExp('<string name="google_app_id">([^\@<]+?)</string>', "i"), '')
 
     // strip non-default value
-    strings = strings.replace(new RegExp('<string name="google_api_key">([^\@<]+?)</string>˜', "i"), '')
+    strings = strings.replace(new RegExp('<string name="google_api_key">([^\@<]+?)</string>', "i"), '')
 
     // strip empty lines
     strings = strings.replace(new RegExp('(\r\n|\n|\r)[ \t]*(\r\n|\n|\r)', "gm"), '$1')
@@ -46,5 +46,5 @@ try {
 
     fs.writeFileSync("platforms/android/res/values/strings.xml", strings);
 } catch(err) {
-  process.stdout.write(err);
+    process.stdout.write(err);
 }
