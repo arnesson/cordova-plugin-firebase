@@ -22,7 +22,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		</config-file>
 		<config-file parent="/*" target="res/values/strings.xml">
 		    <string name="google_app_id">@string/google_app_id</string>
-				<string name="google_api_key">@string/google_api_key</string>
 		</config-file>
 		<config-file parent="/*" target="AndroidManifest.xml">
 			<service android:name=".FirebasePluginMessagingService">
