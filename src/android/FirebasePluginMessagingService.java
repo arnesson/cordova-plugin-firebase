@@ -1,4 +1,4 @@
-package org.apache.cordova.firebase.FirebasePlugin;
+package org.apache.cordova.firebase;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
