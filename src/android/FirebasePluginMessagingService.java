@@ -52,9 +52,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Body/Text: " + text);
 
         // TODO: Add option to developer to configure if show notification when app on foreground
-        if (text != null && title != null) {
+        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title)) {
             sendNotification(id, title, text, remoteMessage.getData());
-        }
+         }
     }
 
     private void sendNotification(int id, String title, String messageBody, Map<String, String> data) {
