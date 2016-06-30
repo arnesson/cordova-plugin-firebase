@@ -4,6 +4,10 @@ exports.getInstanceId = function(success, error) {
     exec(success, error, "FirebasePlugin", "getInstanceId", []);
 };
 
+exports.onNotificationOpen = function(success, error) {
+    exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
+};
+
 exports.grantPermission = function(success, error) {
     exec(success, error, "FirebasePlugin", "grantPermission", []);
 };
