@@ -14,7 +14,21 @@ or by running:
 ```
 cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --save
 ```
-Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project. See https://support.google.com/firebase/answer/7015592 for details.
+Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
+
+```
+- My Project/
+    platforms/
+    plugins/
+    www/
+    config.xml
+    google-services.json       <--
+    GoogleService-Info.plist   <--
+    ...
+```
+
+See https://support.google.com/firebase/answer/7015592 for details how to download the files from firebase.
+
 Whenever cordova prepare is triggered the configuration files are copied to the right place in the ios and android app.
 
 
