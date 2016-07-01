@@ -16,32 +16,34 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	<platform name="android">
 		<config-file parent="/*" target="res/xml/config.xml">
 			<feature name="FirebasePlugin">
-				<param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin.FirebasePlugin" />
+				<param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		<config-file parent="/*" target="res/values/strings.xml">
-		    <string name="google_app_id">@string/google_app_id</string>
+		<config-file parent="/resources" target="res/values/strings.xml">
+			<string name="google_app_id">@string/google_app_id</string>
 		</config-file>
-		<config-file parent="/*" target="res/values/strings.xml">
+		<config-file parent="/resources" target="res/values/strings.xml">
 			<string name="google_api_key">@string/google_api_key</string>
 		</config-file>
-		<config-file parent="/*" target="AndroidManifest.xml">
-			<service android:name=".FirebasePluginMessagingService">
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+			<service android:name="org.apache.cordova.firebase.FirebasePluginMessagingService">
 				<intent-filter>
 					<action android:name="com.google.firebase.MESSAGING_EVENT"/>
 				</intent-filter>
 			</service>
-			<service android:name=".FirebasePluginInstanceIDService">
+			<service android:name="org.apache.cordova.firebase.FirebasePluginInstanceIDService">
 				<intent-filter>
 					<action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
 				</intent-filter>
 			</service>
+			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"></receiver>
 		</config-file>
 		<source-file src="src/android/google-services.json" target-dir="." />
-		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
-		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
-		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase/FirebasePlugin" />
+		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase" />
+		<source-file src="src/android/OnNotificationOpenReceiver.java" target-dir="src/org/apache/cordova/firebase" />
+		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase" />
+		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.firebase:firebase-core:9.0.2" />

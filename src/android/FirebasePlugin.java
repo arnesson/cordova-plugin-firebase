@@ -1,6 +1,7 @@
-package org.apache.cordova.firebase.FirebasePlugin;
+package org.apache.cordova.firebase;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.os.Bundle;
 
@@ -9,16 +10,22 @@ import org.apache.cordova.CallbackContext;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.lang.ref.WeakReference;
+import java.util.Set;
 
 
 public class FirebasePlugin extends CordovaPlugin {
 
     private FirebaseAnalytics mFirebaseAnalytics;
     private final String TAG = "FirebasePlugin";
+
+    private static WeakReference<CallbackContext> callbackContext;
 
     @Override
     protected void pluginInitialize() {
@@ -44,6 +51,9 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("unsubscribe")) {
             this.unsubscribe(callbackContext, args.getString(0));
             return true;
+        } else if (action.equals("onNotificationOpen")) {
+            this.registerOnNotificationOpen(callbackContext);
+            return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getString(1));
             return true;
@@ -51,25 +61,86 @@ public class FirebasePlugin extends CordovaPlugin {
         return false;
     }
 
-    private void getInstanceId(CallbackContext callbackContext) {
-        String token = FirebaseInstanceId.getInstance().getToken();
-        callbackContext.success(token);
+    private void registerOnNotificationOpen(final CallbackContext callbackContext) {
+        FirebasePlugin.callbackContext = new WeakReference<CallbackContext>(callbackContext);
     }
 
-    private void subscribe(CallbackContext callbackContext, String topic) {
-        FirebaseMessaging.getInstance().subscribeToTopic(topic);
-        callbackContext.success();
+    public static void onNotificationOpen(Bundle bundle) {
+        final CallbackContext callbackContext = FirebasePlugin.callbackContext.get();
+        if (callbackContext != null && bundle != null) {
+            JSONObject json = new JSONObject();
+            Set<String> keys = bundle.keySet();
+            for (String key : keys) {
+                try {
+                    json.put(key, bundle.get(key));
+                } catch (JSONException e) {
+                    callbackContext.error(e.getMessage());
+                    return;
+                }
+            }
+
+            callbackContext.success(json);
+        }
     }
 
-    private void unsubscribe(CallbackContext callbackContext, String topic) {
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
-        callbackContext.success();
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        FirebasePlugin.onNotificationOpen(intent.getExtras());
     }
 
-    private void logEvent(CallbackContext callbackContext, String key, String value) {
-        Bundle params = new Bundle();
+    private void getInstanceId(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String token = FirebaseInstanceId.getInstance().getToken();
+                    callbackContext.success(token);
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void subscribe(final CallbackContext callbackContext, final String topic) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseMessaging.getInstance().subscribeToTopic(topic);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void unsubscribe(final CallbackContext callbackContext, final String topic) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void logEvent(final CallbackContext callbackContext, final String key, final String value) {
+        final Bundle params = new Bundle();
         params.putString(key, value);
-        mFirebaseAnalytics.logEvent(key, params);
-        callbackContext.success();
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    mFirebaseAnalytics.logEvent(key, params);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
     }
 }

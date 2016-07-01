@@ -1,4 +1,4 @@
-package org.apache.cordova.firebase.FirebasePlugin;
+package org.apache.cordova.firebase;
 
 import android.util.Log;
 
