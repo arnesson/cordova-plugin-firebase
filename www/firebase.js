@@ -23,3 +23,7 @@ exports.unsubscribe = function(topic, success, error) {
 exports.logEvent = function(key, value, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [key, value]);
 };
+
+exports.setDefaults = function (defaults, success, error) {
+    exec(success, error, "FirebasePlugin", "setDefaults", [defaults]);
+};

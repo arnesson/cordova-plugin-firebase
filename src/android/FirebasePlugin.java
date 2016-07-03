@@ -2,9 +2,11 @@ package org.apache.cordova.firebase;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Base64;
 import android.util.Log;
 import android.os.Bundle;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
@@ -17,6 +19,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -56,6 +61,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getString(1));
+            return true;
+        } else if (action.equals("setDefaults")) {
+            this.setDefaults(callbackContext, args.getJSONObject(0));
             return true;
         }
         return false;
@@ -142,5 +150,47 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
+    }
+
+    private void setDefaults(final CallbackContext callbackContext, final JSONObject defaults) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseRemoteConfig.getInstance().setDefaults(defaultsToMap(defaults));
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private static Map<String, Object> defaultsToMap(JSONObject object) throws JSONException {
+        final Map<String, Object> map = new HashMap<String, Object>();
+
+        for (Iterator<String> keys = object.keys(); keys.hasNext(); ) {
+            String key = keys.next();
+            Object value = object.get(key);
+
+            if (value instanceof Integer) {
+                //setDefaults() should take Longs
+                value = new Long((Integer) value);
+            } else if (value instanceof JSONArray) {
+                JSONArray array = (JSONArray) value;
+                if (array.length() == 1 && array.get(0) instanceof String) {
+                    //parse byte[] as Base64 String
+                    value = Base64.decode(array.getString(0), Base64.DEFAULT);
+                } else {
+                    //parse byte[] as numeric array
+                    byte[] bytes = new byte[array.length()];
+                    for (int i = 0; i < array.length(); i++)
+                        bytes[i] = (byte) array.getInt(i);
+                    value = bytes;
+                }
+            }
+
+            map.put(key, value);
+        }
+        return map;
     }
 }
