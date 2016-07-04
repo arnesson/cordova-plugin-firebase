@@ -174,7 +174,8 @@ var defaults = {
     mDouble: 3.14,
     mBoolean: true,
     // map "mBase64" to a Remote Config byte array represented by a Base64 string
-    mBase64: "SGVsbG8gV29ybGQ=",
+    // Note: the Base64 string is in an array in order to differentiate from a string config value
+    mBase64: ["SGVsbG8gV29ybGQ="],
     // map "mBytes" to a Remote Config byte array represented by a numeric array
     mBytes: [0xFF, 0x00]
 }
