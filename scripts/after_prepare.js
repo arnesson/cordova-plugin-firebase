@@ -12,14 +12,25 @@ var getValue = function(config, name) {
     }
 }
 
+function fileExists(path) {
+  try  {
+    return fs.statSync(path).isFile();
+  }
+  catch (e) {
+    return false;
+  }
+}
+
 var config = fs.readFileSync("config.xml").toString()
 var name = getValue(config, "name")
 
-try {
-	var contents = fs.readFileSync("GoogleService-Info.plist").toString();
-    fs.writeFileSync("platforms/ios/" + name + "/Resources/GoogleService-Info.plist", contents)
-} catch(err) {
-  process.stdout.write(err);
+if(fileExists("GoogleService-Info.plist")){
+  try {
+  	var contents = fs.readFileSync("GoogleService-Info.plist").toString();
+      fs.writeFileSync("platforms/ios/" + name + "/Resources/GoogleService-Info.plist", contents)
+  } catch(err) {
+    process.stdout.write(err);
+  }
 }
 
 try {
