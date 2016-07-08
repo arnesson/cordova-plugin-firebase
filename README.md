@@ -74,7 +74,7 @@ Log an event using Analytics:
 window.FirebasePlugin.logEvent("pageLoad", "Dashboard");
 ```
 
-### fetch
+### fetch (Android only)
 
 Fetch Remote Config parameter values for your app:
 ```
@@ -83,7 +83,7 @@ window.FirebasePlugin.fetch();
 window.FirebasePlugin.fetch(600);
 ```
 
-### activateFetched
+### activateFetched (Android only)
 
 Activate the Remote Config fetched config:
 ```
@@ -96,7 +96,7 @@ window.FirebasePlugin.activateFetched(function(activated) {
 });
 ```
 
-### getValue
+### getValue (Android only)
 
 Retrieve a Remote Config value:
 ```
@@ -113,7 +113,7 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 });
 ```
 
-### getByteArray
+### getByteArray (Android only)
 
 Retrieve a Remote Config byte array:
 ```
@@ -136,7 +136,7 @@ window.FirebasePlugin.getByteArray("key", "namespace", function(bytes) {
 });
 ```
 
-### getInfo
+### getInfo (Android only)
 
 Get the current state of the FirebaseRemoteConfig singleton object:
 ```
@@ -152,7 +152,7 @@ window.FirebasePlugin.getInfo(function(info) {
 });
 ```
 
-### setConfigSettings
+### setConfigSettings (Android only)
 
 Change the settings for the FirebaseRemoteConfig object's operations:
 ```
@@ -162,7 +162,7 @@ var settings = {
 window.FirebasePlugin.setConfigSettings(settings);
 ```
 
-### setDefaults
+### setDefaults (Android only)
 
 Set defaults in the Remote Config:
 ```
