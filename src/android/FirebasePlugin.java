@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.util.Base64;
 import android.util.Log;
 import android.os.Bundle;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,11 +32,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
+
 
 public class FirebasePlugin extends CordovaPlugin {
 
     private FirebaseAnalytics mFirebaseAnalytics;
     private final String TAG = "FirebasePlugin";
+    protected static final String KEY = "badge";
 
     private static WeakReference<CallbackContext> callbackContext;
 
@@ -55,6 +60,12 @@ public class FirebasePlugin extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action.equals("getInstanceId")) {
             this.getInstanceId(callbackContext);
+            return true;
+        } else if (action.equals("setBadgeNumber")) {
+            this.setBadgeNumber(callbackContext, args.getInt(0));
+            return true;
+        } else if (action.equals("getBadgeNumber")) {
+            this.getBadgeNumber(callbackContext);
             return true;
         } else if (action.equals("subscribe")) {
             this.subscribe(callbackContext, args.getString(0));
@@ -138,6 +149,38 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    private void setBadgeNumber(final CallbackContext callbackContext, int number) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    Context context = cordova.getActivity();
+                    SharedPreferences.Editor editor = context.getSharedPreferences(KEY, Context.MODE_PRIVATE).edit();
+                    editor.putInt(KEY, number);
+                    editor.apply();
+                    ShortcutBadger.applyCount(context, number);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void getBadgeNumber(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    Context context = cordova.getActivity();
+                    SharedPreferences settings = context.getSharedPreferences(KEY, Context.MODE_PRIVATE);
+                    int number = settings.getInt(KEY, 0);
+                    callbackContext.success(number);
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
     private void subscribe(final CallbackContext callbackContext, final String topic) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -155,7 +198,6 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-
                     FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
                     callbackContext.success();
                 } catch (Exception e) {

@@ -12,6 +12,14 @@ exports.grantPermission = function(success, error) {
     exec(success, error, "FirebasePlugin", "grantPermission", []);
 };
 
+exports.setBadgeNumber = function(number, success, error) {
+    exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
+};
+
+exports.getBadgeNumber = function(success, error) {
+    exec(success, error, "FirebasePlugin", "getBadgeNumber", []);
+};
+
 exports.subscribe = function(topic, success, error) {
     exec(success, error, "FirebasePlugin", "subscribe", [topic]);
 };

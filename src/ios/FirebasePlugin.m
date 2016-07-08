@@ -69,6 +69,24 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
+    int number    = [[command.arguments objectAtIndex:0] intValue];
+
+    [self.commandDelegate runInBackground:^{
+        [self.app setApplicationIconBadgeNumber:number];
+
+        [self sendPluginResult:CDVCommandStatus_OK callbackId:command.callbackId];
+    }];
+}
+
+- (void)getBadgeNumber:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        long badge = [self.app applicationIconBadgeNumber];
+
+        [self sendPluginResult:CDVCommandStatus_OK messageAsLong:badge callbackId:command.callbackId];
+    }];
+}
+
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
     CDVPluginResult *pluginResult;
     
