@@ -149,7 +149,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void setBadgeNumber(final CallbackContext callbackContext, int number) {
+    private void setBadgeNumber(final CallbackContext callbackContext, final int number) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
