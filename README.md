@@ -6,13 +6,15 @@ This plugin is under development! The primary goal for this plugin is to impleme
 Angular implementation is maintained in the [angular-cordova](https://github.com/arnesson/angular-cordova) project ([source](https://github.com/arnesson/angular-cordova/blob/master/src/plugins/3rdparty/firebase.js))
 
 ## Installation
+See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
+
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="https://github.com/arnesson/cordova-plugin-firebase" />
+<plugin name="cordova-plugin-firebase" spec="0.1.8" />
 ```
 or by running:
 ```
-cordova plugin add https://github.com/arnesson/cordova-plugin-firebase.git --save
+cordova plugin add cordova-plugin-firebase --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
