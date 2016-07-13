@@ -113,6 +113,9 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     public static void onNotificationOpen(Bundle bundle) {
+        if(FirebasePlugin.callbackContext == null ){
+            return;
+        }
         final CallbackContext callbackContext = FirebasePlugin.callbackContext.get();
         if (callbackContext != null && bundle != null) {
             JSONObject json = new JSONObject();
