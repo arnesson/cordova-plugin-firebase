@@ -57,15 +57,13 @@
 }
 
 - (void)grantPermission:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
-
     UIUserNotificationType allNotificationTypes =
     (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
     UIUserNotificationSettings *settings =
     [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
 
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -90,30 +88,25 @@
 }
 
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
-    
     NSString* topic = [NSString stringWithFormat:@"/topic/%@", [command.arguments objectAtIndex:0]];
     
     [[FIRMessaging messaging] subscribeToTopic: topic];
     
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)unsubscribe:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
-    
     NSString* topic = [NSString stringWithFormat:@"/topic/%@", [command.arguments objectAtIndex:0]];
     
     [[FIRMessaging messaging] unsubscribeFromTopic: topic];
     
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-        CDVPluginResult *pluginResult;
         NSString* key = [command.arguments objectAtIndex:0];
         NSString* value = [command.arguments objectAtIndex:1];
         
@@ -122,7 +115,7 @@
             kFIRParameterItemID:value
         }];
         
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
