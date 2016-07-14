@@ -70,24 +70,21 @@
 }
 
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
     int number    = [[command.arguments objectAtIndex:0] intValue];
 
     [self.commandDelegate runInBackground:^{
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
 
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
 - (void)getBadgeNumber:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
-
     [self.commandDelegate runInBackground:^{
         long badge = [[UIApplication sharedApplication] applicationIconBadgeNumber];
 
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:badge];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:badge];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
