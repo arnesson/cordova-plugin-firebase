@@ -75,7 +75,8 @@
     [self.commandDelegate runInBackground:^{
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
 
-        [self sendPluginResult:CDVCommandStatus_OK callbackId:command.callbackId];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
@@ -83,7 +84,8 @@
     [self.commandDelegate runInBackground:^{
         long badge = [[UIApplication sharedApplication] applicationIconBadgeNumber];
 
-        [self sendPluginResult:CDVCommandStatus_OK messageAsLong:badge callbackId:command.callbackId];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsLong:badge];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
