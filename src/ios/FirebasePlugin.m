@@ -70,6 +70,7 @@
 }
 
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
     int number    = [[command.arguments objectAtIndex:0] intValue];
 
     [self.commandDelegate runInBackground:^{
@@ -81,6 +82,8 @@
 }
 
 - (void)getBadgeNumber:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
+
     [self.commandDelegate runInBackground:^{
         long badge = [[UIApplication sharedApplication] applicationIconBadgeNumber];
 
