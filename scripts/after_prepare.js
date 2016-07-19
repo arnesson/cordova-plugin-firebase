@@ -21,10 +21,19 @@ function fileExists(path) {
   }
 }
 
+function directoryExists(path) {
+  try  {
+    return fs.statSync(path).isDirectory();
+  }
+  catch (e) {
+    return false;
+  }
+}
+
 var config = fs.readFileSync("config.xml").toString()
 var name = getValue(config, "name")
 
-if(fileExists("GoogleService-Info.plist")){
+if(fileExists("GoogleService-Info.plist") && directoryExists("platforms/ios/")){
   try {
   	var contents = fs.readFileSync("GoogleService-Info.plist").toString();
       fs.writeFileSync("platforms/ios/" + name + "/Resources/GoogleService-Info.plist", contents)
@@ -33,7 +42,7 @@ if(fileExists("GoogleService-Info.plist")){
   }
 }
 
-if(fileExists("google-services.json")){
+if(fileExists("google-services.json") && directoryExists("platforms/android/")){
 	try {
 		var contents = fs.readFileSync("google-services.json").toString();
 	    fs.writeFileSync("platforms/android/google-services.json", contents);
