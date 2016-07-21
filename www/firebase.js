@@ -28,8 +28,8 @@ exports.unsubscribe = function(topic, success, error) {
     exec(success, error, "FirebasePlugin", "unsubscribe", [topic]);
 };
 
-exports.logEvent = function(key, value, success, error) {
-    exec(success, error, "FirebasePlugin", "logEvent", [key, value]);
+exports.logEvent = function(name, params, success, error) {
+    exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
 
 exports.activateFetched = function (success, error) {

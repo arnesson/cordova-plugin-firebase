@@ -73,7 +73,7 @@ window.FirebasePlugin.unsubscribe("example");
 
 Log an event using Analytics:
 ```
-window.FirebasePlugin.logEvent("pageLoad", "Dashboard");
+window.FirebasePlugin.logEvent("page_view", {page: "dashboard"});
 ```
 
 ### fetch (Android only)

@@ -77,7 +77,7 @@ public class FirebasePlugin extends CordovaPlugin {
             this.registerOnNotificationOpen(callbackContext);
             return true;
         } else if (action.equals("logEvent")) {
-            this.logEvent(callbackContext, args.getString(0), args.getString(1));
+            this.logEvent(callbackContext, args.getString(0), args.getJSONObject(1));
             return true;
         } else if (action.equals("activateFetched")) {
             this.activateFetched(callbackContext);
@@ -210,13 +210,19 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void logEvent(final CallbackContext callbackContext, final String key, final String value) {
-        final Bundle params = new Bundle();
-        params.putString(key, value);
+    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params) {
+        final Bundle bundle = new Bundle();
+        Iterator iter = params.keys();
+        while(iter.hasNext()){
+            String key = (String)iter.next();
+            String value = params.getString(key);
+            bundle.putString(key, value);
+        }
+
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    mFirebaseAnalytics.logEvent(key, params);
+                    mFirebaseAnalytics.logEvent(name, bundle);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());

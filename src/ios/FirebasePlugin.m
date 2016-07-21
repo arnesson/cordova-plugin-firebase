@@ -107,13 +107,10 @@
 
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-        NSString* key = [command.arguments objectAtIndex:0];
-        NSString* value = [command.arguments objectAtIndex:1];
+        NSString* name = [command.arguments objectAtIndex:0];
+        NSDictionary* parameters = [command.arguments objectAtIndex:1];
         
-        [FIRAnalytics logEventWithName:kFIREventSelectContent parameters:@{
-            kFIRParameterContentType:key,
-            kFIRParameterItemID:value
-        }];
+        [FIRAnalytics logEventWithName:name parameters:parameters];
         
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
