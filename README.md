@@ -46,11 +46,43 @@ window.FirebasePlugin.getInstanceId(function(token) {
 });
 ```
 
+### onNotificationOpen (Android only)
+
+Register notification callback: 
+```
+window.FirebasePlugin.onNotificationOpen(function(success) {
+    console.error(success);
+}, function(error) {
+    console.error(error);
+});
+```
+
 ### grantPermission (iOS only)
 
 Grant permission to recieve push notifications (will trigger prompt):
 ```
 window.FirebasePlugin.grantPermission();
+```
+
+### setBadgeNumber
+
+Set a number on the icon badge:
+```
+window.FirebasePlugin.setBadgeNumber(3);
+```
+
+Set 0 to clear the badge
+```
+window.FirebasePlugin.setBadgeNumber(0);
+```
+
+### getBadgeNumber
+
+Get icon badge number:
+```
+window.FirebasePlugin.getBadgeNumber(function(n) {
+    console.log(n);
+});
 ```
 
 ### subscribe
