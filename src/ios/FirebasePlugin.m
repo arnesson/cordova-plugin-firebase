@@ -88,7 +88,7 @@
 }
 
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
-    NSString* topic = [NSString stringWithFormat:@"/topic/%@", [command.arguments objectAtIndex:0]];
+    NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
     
     [[FIRMessaging messaging] subscribeToTopic: topic];
     
@@ -97,7 +97,7 @@
 }
 
 - (void)unsubscribe:(CDVInvokedUrlCommand *)command {
-    NSString* topic = [NSString stringWithFormat:@"/topic/%@", [command.arguments objectAtIndex:0]];
+    NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
     
     [[FIRMessaging messaging] unsubscribeFromTopic: topic];
     
