@@ -210,7 +210,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params) {
+    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params) throws JSONException {
         final Bundle bundle = new Bundle();
         Iterator iter = params.keys();
         while(iter.hasNext()){
