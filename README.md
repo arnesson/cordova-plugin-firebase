@@ -8,7 +8,7 @@ See npm package for versions - https://www.npmjs.com/package/cordova-plugin-fire
 
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="0.1.9" />
+<plugin name="cordova-plugin-firebase" spec="0.1.10" />
 ```
 or by running:
 ```
