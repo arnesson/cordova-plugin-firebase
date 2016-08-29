@@ -215,8 +215,13 @@ public class FirebasePlugin extends CordovaPlugin {
         Iterator iter = params.keys();
         while(iter.hasNext()){
             String key = (String)iter.next();
-            String value = params.getString(key);
-            bundle.putString(key, value);
+            Object value = params.get(key);
+
+            if (value instanceof Integer || value instanceof Double) {
+                bundle.putFloat(key, ((Number)value).floatValue());
+            } else {
+                bundle.putString(key, value.toString());
+            }
         }
 
         cordova.getThreadPool().execute(new Runnable() {
