@@ -10,10 +10,12 @@
 @implementation FirebasePlugin
 
 CDVInvokedUrlCommand *onNotificationOpenCommand = nil;
-NSMutableArray *onNotificationOpenBuffer = [[NSMutableArray alloc] init];
+NSMutableArray *onNotificationOpenBuffer;
 
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
+    
+    onNotificationOpenBuffer = [NSMutableArray new];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidFinishLaunching:)
