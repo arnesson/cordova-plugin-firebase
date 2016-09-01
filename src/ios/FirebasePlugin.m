@@ -107,9 +107,13 @@ NSMutableArray *onNotificationOpenBuffer = [[NSMutableArray alloc] init];
 - (void)onNotificationOpen:(CDVInvokedUrlCommand *)command {
     onNotificationOpenCommand = command;
 
-    for (NSDictionary *userInfo in onNotificationOpenBuffer) {
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    if ([onNotificationOpenBuffer count]) {
+        for (NSDictionary *userInfo in onNotificationOpenBuffer) {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+
+        [onNotificationOpenBuffer removeAllObjects];
     }
 }
 
@@ -159,7 +163,7 @@ NSMutableArray *onNotificationOpenBuffer = [[NSMutableArray alloc] init];
 
     if (onNotificationOpenCommand != nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:onNotificationOpenCommand.callbackId];
     } else {
         // buffer messages until a callback has been registered
         [onNotificationOpenBuffer addObject:userInfo];
