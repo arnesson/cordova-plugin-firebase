@@ -45,6 +45,7 @@ window.FirebasePlugin.getInstanceId(function(token) {
     console.error(error);
 });
 ```
+Note that token will be null if it has not been established yet
 
 ### onNotificationOpen (Android only)
 
