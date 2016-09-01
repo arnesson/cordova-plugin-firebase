@@ -9,6 +9,9 @@
 
 @implementation FirebasePlugin
 
+CDVInvokedUrlCommand *onNotificationOpenCommand = nil;
+NSMutableArray *onNotificationOpenBuffer = [[NSMutableArray alloc] init];
+
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     
@@ -46,13 +49,9 @@
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
     CDVPluginResult *pluginResult;
 
-    if ([[FIRInstanceID instanceID] token]) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
-                        [[FIRInstanceID instanceID] token]];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:
-                        @"FCM is not connected, or token is not yet available."];
-    }
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
+                    [[FIRInstanceID instanceID] token]];
+
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -105,6 +104,15 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)onNotificationOpen:(CDVInvokedUrlCommand *)command {
+    onNotificationOpenCommand = command;
+
+    for (NSDictionary *userInfo in onNotificationOpenBuffer) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* name = [command.arguments objectAtIndex:0];
@@ -126,8 +134,6 @@
     
     // Connect to FCM since connection may have failed when attempted before having a token.
     [self connectToFcm];
-    
-    // TODO: If necessary send token to appliation server.
 }
 
 - (void)connectToFcm {
@@ -140,19 +146,26 @@
     }];
 }
 
-/*
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  // If you are receiving a notification message while your app is in the background,
-  // this callback will not be fired till the user taps on the notification launching the application.
-  // TODO: Handle data of notification
+    // If you are receiving a notification message while your app is in the background,
+    // this callback will not be fired till the user taps on the notification launching the application.
 
-  // Print message ID.
-  NSLog(@"Message ID: %@", userInfo[@"gcm.message_id"]);
+    // Print message ID.
+    NSLog(@"Message ID: %@", userInfo[@"gcm.message_id"]);
 
-  // Pring full message.
-  NSLog(@"%@", userInfo);
+    // Pring full message.
+    NSLog(@"%@", userInfo);
+
+    if (onNotificationOpenCommand != nil) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } else {
+        // buffer messages until a callback has been registered
+        [onNotificationOpenBuffer addObject:userInfo];
+    }
+
+    completionHandler(UIBackgroundFetchResultNoData);
 }
-*/
 
 @end
