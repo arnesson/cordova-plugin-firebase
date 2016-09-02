@@ -34,8 +34,6 @@ NSMutableArray *onNotificationOpenBuffer;
 }
 
 - (void) applicationDidFinishLaunching:(NSNotification *) notification {    
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
-
     [FIRApp configure];
 }
 
@@ -58,11 +56,20 @@ NSMutableArray *onNotificationOpenBuffer;
 }
 
 - (void)grantPermission:(CDVInvokedUrlCommand *)command {
-    UIUserNotificationType allNotificationTypes =
+    UIUserNotificationType notificationTypes =
     (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
-    UIUserNotificationSettings *settings =
-    [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
-    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+    if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:notificationTypes categories:nil];
+        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    } else {
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+    }
+#else
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+#endif
 
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
