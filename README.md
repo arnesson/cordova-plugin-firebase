@@ -12,7 +12,7 @@ Install the plugin by adding it your project's config.xml:
 ```
 or by running:
 ```
-cordova plugin add cordova-plugin-firebase --save
+cordova plugin add cordova-plugin-firebase@0.1.10 --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
