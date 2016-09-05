@@ -9,13 +9,13 @@
 
 @implementation FirebasePlugin
 
-CDVInvokedUrlCommand *onNotificationOpenCommand = nil;
-NSMutableArray *onNotificationOpenBuffer;
+@synthesize notificationCallbackId;
+@synthesize notificationBuffer;
 
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     
-    onNotificationOpenBuffer = [NSMutableArray new];
+    self.notificationBuffer = [NSMutableArray new];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidFinishLaunching:)
@@ -114,15 +114,16 @@ NSMutableArray *onNotificationOpenBuffer;
 }
 
 - (void)onNotificationOpen:(CDVInvokedUrlCommand *)command {
-    onNotificationOpenCommand = command;
+    self.notificationCallbackId = command.callbackId;
 
-    if ([onNotificationOpenBuffer count]) {
-        for (NSDictionary *userInfo in onNotificationOpenBuffer) {
+    if ([self.notificationBuffer count]) {
+        for (NSDictionary *userInfo in self.notificationBuffer) {
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
+            [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
 
-        [onNotificationOpenBuffer removeAllObjects];
+        [self.notificationBuffer removeAllObjects];
     }
 }
 
@@ -170,12 +171,13 @@ NSMutableArray *onNotificationOpenBuffer;
     // Pring full message.
     NSLog(@"%@", userInfo);
 
-    if (onNotificationOpenCommand != nil) {
+    if (self.notificationCallbackId != nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:onNotificationOpenCommand.callbackId];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notificationCallbackId];
     } else {
         // buffer messages until a callback has been registered
-        [onNotificationOpenBuffer addObject:userInfo];
+        [self.notificationBuffer addObject:userInfo];
     }
 
     completionHandler(UIBackgroundFetchResultNoData);

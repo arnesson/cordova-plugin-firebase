@@ -10,4 +10,8 @@
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)onNotificationOpen:(CDVInvokedUrlCommand*)command;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
+
+@property (nonatomic, copy) NSString *notificationCallbackId;
+@property (nonatomic, copy) NSMutableArray *notificationBuffer;
+
 @end
