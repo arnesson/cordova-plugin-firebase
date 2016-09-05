@@ -44,7 +44,7 @@ exports.fetch = function (cacheExpirationSeconds, success, error) {
         error = success;
         success = cacheExpirationSeconds;
     }
-    exec(success, error, "FirebasePlugin", "activateFetched", args);
+    exec(success, error, "FirebasePlugin", "fetch", args);
 };
 
 exports.getByteArray = function (key, namespace, success, error) {
