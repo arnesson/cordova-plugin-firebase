@@ -77,6 +77,10 @@ exports.setConfigSettings = function (settings, success, error) {
     exec(success, error, "FirebasePlugin", "setConfigSettings", [settings]);
 };
 
+exports.setUserProperty = function(name, value, success, error) {
+    exec(success, error, "FirebasePlugin", "setUserProperty", [name, value]);
+};
+
 exports.setDefaults = function (defaults, namespace, success, error) {
     var args = [defaults];
     if (typeof namespace === 'string') {

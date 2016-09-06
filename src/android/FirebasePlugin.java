@@ -104,6 +104,9 @@ public class FirebasePlugin extends CordovaPlugin {
             if (args.length() > 1) this.setDefaults(callbackContext, args.getJSONObject(0), args.getString(1));
             else this.setDefaults(callbackContext, args.getJSONObject(0), null);
             return true;
+        } else if (action.equals("setUserProperty")) {
+            this.setUserProperty(callbackContext, args.getString(0), args.getString(1));
+            return true;
         }
         return false;
     }
@@ -356,6 +359,19 @@ public class FirebasePlugin extends CordovaPlugin {
                         FirebaseRemoteConfig.getInstance().setDefaults(defaultsToMap(defaults));
                     else
                         FirebaseRemoteConfig.getInstance().setDefaults(defaultsToMap(defaults), namespace);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void setUserProperty(final CallbackContext callbackContext, final String name, final String value) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    mFirebaseAnalytics.setUserProperty(name, value);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
