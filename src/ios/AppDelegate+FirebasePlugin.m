@@ -66,16 +66,7 @@
 
     // Pring full message.
     NSLog(@"%@", data);
-    /*
-    if (self.notificationCallbackId != nil) {
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notificationCallbackId];
-    } else {
-        // buffer messages until a callback has been registered
-        [self.notificationBuffer addObject:data];
-    }
-    */
+
     [FirebasePlugin.firebasePlugin sendNotification:data];
 
     completionHandler(UIBackgroundFetchResultNoData);

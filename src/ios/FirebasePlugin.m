@@ -42,10 +42,16 @@ static FirebasePlugin *firebasePlugin;
         [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+#pragma GCC diagnostic pop
     }
 #else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+#pragma GCC diagnostic pop
 #endif
 
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -95,7 +101,7 @@ static FirebasePlugin *firebasePlugin;
 
     if (self.notificationBuffer != nil && [self.notificationBuffer count]) {
         for (NSDictionary *data in self.notificationBuffer) {
-            [self.sendNotification data:data]
+            [self sendNotification:data];
         }
         [self.notificationBuffer removeAllObjects];
     }
