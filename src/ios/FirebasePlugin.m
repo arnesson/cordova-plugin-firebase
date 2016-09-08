@@ -6,12 +6,13 @@
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
 
-@interface NSMutableArray (Stack)
+@interface NSMutableArray (Stack) {
+    @private int _size;
+}
+
 - (id)initWithSize:(int)size;
 - (id)pop;
 - (void)push:(id)obj;
-
-@private int _size;
 
 @end
 
@@ -26,7 +27,7 @@
 }
 
 - (id)pop {
-    id obj = [[[self lastObject] retain] autorelease];
+    id obj = [self objectAtIndex:self.count - 1];
     if (obj) {
         [self removeLastObject];
     }
@@ -165,6 +166,29 @@ static FirebasePlugin *firebasePlugin;
         NSDictionary* parameters = [command.arguments objectAtIndex:1];
         
         [FIRAnalytics logEventWithName:name parameters:parameters];
+        
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)setUserId:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSString* id = [command.arguments objectAtIndex:0];
+        
+        [FIRAnalytics setUserID:id];
+        
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)setUserProperty:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSString* name = [command.arguments objectAtIndex:0];
+        NSString* value = [command.arguments objectAtIndex:1];
+        
+        [FIRAnalytics setUserPropertyString:value forName:name];
         
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];

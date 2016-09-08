@@ -47,7 +47,7 @@ window.FirebasePlugin.getInstanceId(function(token) {
 ```
 Note that token will be null if it has not been established yet
 
-### onNotificationOpen (Android only)
+### onNotificationOpen
 
 Register notification callback: 
 ```
@@ -105,6 +105,20 @@ window.FirebasePlugin.unsubscribe("example");
 Log an event using Analytics:
 ```
 window.FirebasePlugin.logEvent("page_view", {page: "dashboard"});
+```
+
+### setUserId
+
+Set a user id for use in Analytics:
+```
+window.FirebasePlugin.setUserId("user_id");
+```
+
+### setUserProperty
+
+Set a user property for use in Analytics:
+```
+window.FirebasePlugin.setUserProperty("name", "value");
 ```
 
 ### fetch (Android only)

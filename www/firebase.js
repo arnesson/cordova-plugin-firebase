@@ -32,6 +32,14 @@ exports.logEvent = function(name, params, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
 
+exports.setUserId = function(id, success, error) {
+    exec(success, error, "FirebasePlugin", "setUserId", [id]);
+};
+
+exports.setUserProperty = function(name, value, success, error) {
+    exec(success, error, "FirebasePlugin", "setUserProperty", [name, value]);
+};
+
 exports.activateFetched = function (success, error) {
     exec(success, error, "FirebasePlugin", "activateFetched", []);
 };
@@ -75,10 +83,6 @@ exports.getInfo = function (success, error) {
 
 exports.setConfigSettings = function (settings, success, error) {
     exec(success, error, "FirebasePlugin", "setConfigSettings", [settings]);
-};
-
-exports.setUserProperty = function(name, value, success, error) {
-    exec(success, error, "FirebasePlugin", "setUserProperty", [name, value]);
 };
 
 exports.setDefaults = function (defaults, namespace, success, error) {

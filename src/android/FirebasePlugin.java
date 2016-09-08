@@ -79,6 +79,12 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getJSONObject(1));
             return true;
+        } else if (action.equals("setUserId")) {
+            this.setUserId (callbackContext, args.getString(0));
+            return true;
+        } else if (action.equals("setUserProperty")) {
+            this.setUserProperty(callbackContext, args.getString(0), args.getString(1));
+            return true;
         } else if (action.equals("activateFetched")) {
             this.activateFetched(callbackContext);
             return true;
@@ -103,9 +109,6 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("setDefaults")) {
             if (args.length() > 1) this.setDefaults(callbackContext, args.getJSONObject(0), args.getString(1));
             else this.setDefaults(callbackContext, args.getJSONObject(0), null);
-            return true;
-        } else if (action.equals("setUserProperty")) {
-            this.setUserProperty(callbackContext, args.getString(0), args.getString(1));
             return true;
         }
         return false;
@@ -239,6 +242,32 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    private void setUserId(final CallbackContext callbackContext, final String id) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    mFirebaseAnalytics.setUserId(id);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void setUserProperty(final CallbackContext callbackContext, final String name, final String value) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    mFirebaseAnalytics.setUserProperty(name, value);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
     private void activateFetched(final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -359,19 +388,6 @@ public class FirebasePlugin extends CordovaPlugin {
                         FirebaseRemoteConfig.getInstance().setDefaults(defaultsToMap(defaults));
                     else
                         FirebaseRemoteConfig.getInstance().setDefaults(defaultsToMap(defaults), namespace);
-                    callbackContext.success();
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
-                }
-            }
-        });
-    }
-
-    private void setUserProperty(final CallbackContext callbackContext, final String name, final String value) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    mFirebaseAnalytics.setUserProperty(name, value);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());

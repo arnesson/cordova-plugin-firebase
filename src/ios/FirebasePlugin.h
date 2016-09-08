@@ -12,6 +12,8 @@
 - (void)onNotificationOpen:(CDVInvokedUrlCommand*)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
+- (void)setUserId:(CDVInvokedUrlCommand*)command;
+- (void)setUserProperty:(CDVInvokedUrlCommand*)command;
 
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSMutableArray *notificationStack;
