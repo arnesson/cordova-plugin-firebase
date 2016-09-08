@@ -6,11 +6,46 @@
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
 
+@interface NSMutableArray (Stack)
+- (id)initWithSize:(int)size;
+- (id)pop;
+- (void)push:(id)obj;
+
+@private int _size;
+
+@end
+
+@implementation NSMutableArray (Stack)
+
+- (id)initWithSize:(int)size {
+    self = [super init];
+    if (self) {
+        _size = size;
+    }
+    return self;
+}
+
+- (id)pop {
+    id obj = [[[self lastObject] retain] autorelease];
+    if (obj) {
+        [self removeLastObject];
+    }
+    return obj;
+}
+
+- (void)push:(id)obj {
+    [self addObject: obj];
+    if (_size && [self count] >= _size) {
+        [self removeLastObject];
+    }
+}
+
+@end
 
 @implementation FirebasePlugin
 
 @synthesize notificationCallbackId;
-@synthesize notificationBuffer;
+@synthesize notificationStack;
 
 static FirebasePlugin *firebasePlugin;
 
@@ -21,6 +56,13 @@ static FirebasePlugin *firebasePlugin;
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
+}
+
+- (NSMutableArray *)notificationStack {
+    if (!self.notificationStack) {
+        self.notificationStack = [[NSMutableArray alloc] initWithSize:10];
+    }
+    return self.notificationStack;
 }
 
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
@@ -58,7 +100,7 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
-    int number    = [[command.arguments objectAtIndex:0] intValue];
+    int number = [[command.arguments objectAtIndex:0] intValue];
 
     [self.commandDelegate runInBackground:^{
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
@@ -98,11 +140,11 @@ static FirebasePlugin *firebasePlugin;
 - (void)onNotificationOpen:(CDVInvokedUrlCommand *)command {
     self.notificationCallbackId = command.callbackId;
 
-    if (self.notificationBuffer != nil && [self.notificationBuffer count]) {
-        for (NSDictionary *userInfo in self.notificationBuffer) {
+    if (self.notificationStack != nil && [self.notificationStack count]) {
+        for (NSDictionary *userInfo in self.notificationStack) {
             [self sendNotification:userInfo];
         }
-        [self.notificationBuffer removeAllObjects];
+        [self.notificationStack removeAllObjects];
     }
 }
 
@@ -112,12 +154,8 @@ static FirebasePlugin *firebasePlugin;
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notificationCallbackId];
     } else {
-        // buffer messages until a callback has been registered
-        if (self.notificationBuffer == nil) {
-            self.notificationBuffer = [NSMutableArray new];
-        }
-
-        [self.notificationBuffer addObject:userInfo];
+        // stack notifications until a callback has been registered
+        [self.notificationStack addObject:userInfo];
     }
 }
 

@@ -14,6 +14,6 @@
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 
 @property (nonatomic, copy) NSString *notificationCallbackId;
-@property (nonatomic, copy) NSMutableArray *notificationBuffer;
+@property (nonatomic, copy) NSMutableArray *notificationStack;
 
 @end
