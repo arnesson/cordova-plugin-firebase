@@ -33,24 +33,23 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)grantPermission:(CDVInvokedUrlCommand *)command {
-    UIUserNotificationType notificationTypes =
-    (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
-
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
     if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        UIUserNotificationType notificationTypes =
+        (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
         UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:notificationTypes categories:nil];
         [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
 #pragma GCC diagnostic pop
     }
 #else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:notificationTypes];
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
 #pragma GCC diagnostic pop
 #endif
 
@@ -100,16 +99,16 @@ static FirebasePlugin *firebasePlugin;
     self.notificationCallbackId = command.callbackId;
 
     if (self.notificationBuffer != nil && [self.notificationBuffer count]) {
-        for (NSDictionary *data in self.notificationBuffer) {
-            [self sendNotification:data];
+        for (NSDictionary *userInfo in self.notificationBuffer) {
+            [self sendNotification:userInfo];
         }
         [self.notificationBuffer removeAllObjects];
     }
 }
 
-- (void)sendNotification:(NSDictionary *)data {
+- (void)sendNotification:(NSDictionary *)userInfo {
     if (self.notificationCallbackId != nil) {
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notificationCallbackId];
     } else {
@@ -118,7 +117,7 @@ static FirebasePlugin *firebasePlugin;
             self.notificationBuffer = [NSMutableArray new];
         }
 
-        [self.notificationBuffer addObject:data];
+        [self.notificationBuffer addObject:userInfo];
     }
 }
 

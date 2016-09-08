@@ -56,20 +56,17 @@
     }];
 }
 
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)data
-    fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     // If you are receiving a notification message while your app is in the background,
     // this callback will not be fired till the user taps on the notification launching the application.
 
     // Print message ID.
-    NSLog(@"Message ID: %@", data[@"gcm.message_id"]);
+    NSLog(@"Message ID: %@", userInfo[@"gcm.message_id"]);
 
     // Pring full message.
-    NSLog(@"%@", data);
+    NSLog(@"%@", userInfo);
 
-    [FirebasePlugin.firebasePlugin sendNotification:data];
-
-    completionHandler(UIBackgroundFetchResultNoData);
+    [FirebasePlugin.firebasePlugin sendNotification:userInfo];
 }
 
 @end
