@@ -1,36 +1,31 @@
 #import "AppDelegate+FirebasePlugin.h"
 #import "FirebasePlugin.h"
 #import "Firebase.h"
-
+#import <objc/runtime.h>
 
 @implementation AppDelegate (FirebasePlugin)
 
-- (void)load {    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationDidFinishLaunching:)
-                                                 name:UIApplicationDidFinishLaunchingNotification object:nil];
++ (void)load {
+    Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
+    Method swizzled = class_getInstanceMethod(self, @selector(application:swizzledDidFinishLaunchingWithOptions:));
+    method_exchangeImplementations(original, swizzled);
+}
+
+- (BOOL)application:(UIApplication *)application swizzledDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
+    
+    [FIRApp configure];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationDidBecomeActive:)
-                                                 name:UIApplicationDidBecomeActiveNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationDidEnterBackground:)
-                                                 name:UIApplicationDidEnterBackgroundNotification object:nil];
+    return YES;
 }
 
-- (void) applicationDidFinishLaunching:(NSNotification *) notification {    
-    [FIRApp configure];
-}
-
-- (void)applicationDidBecomeActive:(NSNotification *)application {
+- (void)applicationDidBecomeActive:(UIApplication *)application {
     [self connectToFcm];
 }
 
-- (void)applicationDidEnterBackground:(NSNotification *)application {
+- (void)applicationDidEnterBackground:(UIApplication *)application {
     [[FIRMessaging messaging] disconnect];
     NSLog(@"Disconnected from FCM");
 }
