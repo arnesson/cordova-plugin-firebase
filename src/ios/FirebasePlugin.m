@@ -6,48 +6,13 @@
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
 
-@interface NSMutableArray (Stack) {
-    @private int _size;
-}
-
-- (id)initWithSize:(int)size;
-- (id)pop;
-- (void)push:(id)obj;
-
-@end
-
-@implementation NSMutableArray (Stack)
-
-- (id)initWithSize:(int)size {
-    self = [super init];
-    if (self) {
-        _size = size;
-    }
-    return self;
-}
-
-- (id)pop {
-    id obj = [self objectAtIndex:self.count - 1];
-    if (obj) {
-        [self removeLastObject];
-    }
-    return obj;
-}
-
-- (void)push:(id)obj {
-    [self addObject: obj];
-    if (_size && [self count] >= _size) {
-        [self removeLastObject];
-    }
-}
-
-@end
 
 @implementation FirebasePlugin
 
 @synthesize notificationCallbackId;
 @synthesize notificationStack;
 
+static int * const kNotificationStackSize = 10;
 static FirebasePlugin *firebasePlugin;
 
 + (FirebasePlugin *) firebasePlugin {
@@ -61,7 +26,7 @@ static FirebasePlugin *firebasePlugin;
 
 - (NSMutableArray *)notificationStack {
     if (!self.notificationStack) {
-        self.notificationStack = [[NSMutableArray alloc] initWithSize:10];
+        self.notificationStack = [[NSMutableArray alloc] init];
     }
     return self.notificationStack;
 }
@@ -157,6 +122,10 @@ static FirebasePlugin *firebasePlugin;
     } else {
         // stack notifications until a callback has been registered
         [self.notificationStack addObject:userInfo];
+
+        if ([self.notificationStack count] >= kNotificationStackSize) {
+            [self.notificationStack removeLastObject];
+        }
     }
 }
 
