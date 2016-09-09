@@ -12,7 +12,7 @@
 @synthesize notificationCallbackId;
 @synthesize notificationStack;
 
-static int * const kNotificationStackSize = 10;
+static NSInteger const kNotificationStackSize = 10;
 static FirebasePlugin *firebasePlugin;
 
 + (FirebasePlugin *) firebasePlugin {
@@ -22,13 +22,6 @@ static FirebasePlugin *firebasePlugin;
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
-}
-
-- (NSMutableArray *)notificationStack {
-    if (!self.notificationStack) {
-        self.notificationStack = [[NSMutableArray alloc] init];
-    }
-    return self.notificationStack;
 }
 
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
@@ -120,6 +113,10 @@ static FirebasePlugin *firebasePlugin;
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notificationCallbackId];
     } else {
+        if (!self.notificationStack) {
+            self.notificationStack = [[NSMutableArray alloc] init];
+        }
+        
         // stack notifications until a callback has been registered
         [self.notificationStack addObject:userInfo];
 

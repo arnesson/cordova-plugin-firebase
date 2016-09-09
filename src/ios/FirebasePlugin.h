@@ -16,6 +16,6 @@
 - (void)setUserProperty:(CDVInvokedUrlCommand*)command;
 
 @property (nonatomic, copy) NSString *notificationCallbackId;
-@property (nonatomic, copy) NSMutableArray *notificationStack;
+@property (nonatomic, retain) NSMutableArray *notificationStack;
 
 @end
