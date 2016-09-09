@@ -29,9 +29,9 @@ Download your Firebase configuration files, GoogleService-Info.plist for ios and
 
 See https://support.google.com/firebase/answer/7015592 for details how to download the files from firebase.
 
-This plugin uses a hook (after prepare) that copies the configuration files to the right place, namely platforms/ios/<My Project>/Resources for ios and platforms/android for android.
+This plugin uses a hook (after prepare) that copies the configuration files to the right place, namely platforms/ios/\<My Project\>/Resources for ios and platforms/android for android.
 
-Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
+**Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
 
 ### Notes about PhoneGap Build
 
