@@ -1,8 +1,6 @@
 # cordova-plugin-firebase
 Cordova plugin for Google Firebase
 
-This plugin is under development! The primary goal for this plugin is to implement Analytics and FCM for cross platform push notifications. Other parts of the SDK will follow later.
-
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
@@ -63,6 +61,14 @@ window.FirebasePlugin.onNotificationOpen(function(notification) {
     console.error(error);
 });
 ```
+Notification flow:
+
+1. App is in foreground:
+    1. User receives the notification data in the JavaScript callback without any notification on the device itself (this is the normal behaviour of push notifications, it is up to you, the developer, to notify the user)
+2. App is in background:
+    1. User receives the notification message in its device notification bar
+    2. User taps the notification and the app opens
+    3. User receives the notification data in the JavaScript callback
 
 ### grantPermission (iOS only)
 
