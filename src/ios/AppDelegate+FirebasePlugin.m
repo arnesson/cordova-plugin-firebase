@@ -47,6 +47,8 @@
             NSLog(@"Unable to connect to FCM. %@", error);
         } else {
             NSLog(@"Connected to FCM.");
+            NSString *refreshedToken = [[FIRInstanceID instanceID] token];
+            NSLog(@"InstanceID token: %@", refreshedToken);
         }
     }];
 }
@@ -54,14 +56,16 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     // If you are receiving a notification message while your app is in the background,
     // this callback will not be fired till the user taps on the notification launching the application.
-
-    // Print message ID.
-    NSLog(@"Message ID: %@", userInfo[@"gcm.message_id"]);
-
+    NSDictionary *mutableUserInfo = [userInfo mutableCopy];
+    
+    NSNumber* tap = application.applicationState == UIApplicationStateActive ? @(NO) : @(YES);
+    
+    [mutableUserInfo setValue:tap forKey:@"tap"];
+    
     // Pring full message.
-    NSLog(@"%@", userInfo);
-
-    [FirebasePlugin.firebasePlugin sendNotification:userInfo];
+    NSLog(@"%@", mutableUserInfo);
+    
+    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
 @end
