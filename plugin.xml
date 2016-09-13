@@ -5,15 +5,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<license>MIT</license>
 
-	<js-module name="FirebasePlugin" src="www/firebase.js">
-		<clobbers target="FirebasePlugin" />
-	</js-module>
-
 	<engines>
 		<engine name="cordova" version=">=3.2.0" />
 	</engines>
 
 	<platform name="android">
+		<js-module name="FirebasePlugin" src="www/firebase.js">
+			<clobbers target="FirebasePlugin" />
+		</js-module>
 		<config-file parent="/*" target="res/xml/config.xml">
 			<feature name="FirebasePlugin">
 				<param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" />
@@ -53,6 +52,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</platform>
 
 	<platform name="ios">
+		<js-module name="FirebasePlugin" src="www/firebase.js">
+			<clobbers target="FirebasePlugin" />
+		</js-module>
 		<config-file parent="/*" target="config.xml">
 			<feature name="FirebasePlugin">
 				<param name="ios-package" value="FirebasePlugin" />
@@ -78,6 +80,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
+	</platform>
+
+	<platform name="browser">
+		<js-module name="FirebasePlugin" src="www/firebase-browser.js">
+			<clobbers target="FirebasePlugin" />
+		</js-module>
 	</platform>
 
 	<hook src="scripts/after_prepare.js" type="after_prepare" />
