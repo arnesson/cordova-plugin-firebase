@@ -47,10 +47,7 @@ static FirebasePlugin *firebasePlugin;
       completionHandler:^(BOOL granted, NSError * _Nullable error) {
       }
     ];
-
-    // For iOS 10 display notification (sent via APNS)
     [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-
 # elif defined(__IPHONE_8_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
     if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         UIUserNotificationType notificationTypes =

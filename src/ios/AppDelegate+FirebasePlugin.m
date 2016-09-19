@@ -15,12 +15,22 @@
 @end
 #endif
 
+#define kApplicationInBackgroundKey @"applicationInBackground"
+
 @implementation AppDelegate (FirebasePlugin)
 
 + (void)load {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
     Method swizzled = class_getInstanceMethod(self, @selector(application:swizzledDidFinishLaunchingWithOptions:));
     method_exchangeImplementations(original, swizzled);
+}
+
+- (void)setApplicationInBackground:(NSNumber *)applicationInBackground {
+    objc_setAssociatedObject(self, kApplicationInBackgroundKey, applicationInBackground, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)applicationInBackground {
+    return objc_getAssociatedObject(self, kApplicationInBackgroundKey);
 }
 
 - (BOOL)application:(UIApplication *)application swizzledDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -35,10 +45,12 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [self connectToFcm];
+    self.applicationInBackground = @(NO);
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     [[FIRMessaging messaging] disconnect];
+    self.applicationInBackground = @(YES);
     NSLog(@"Disconnected from FCM");
 }
 
@@ -70,9 +82,7 @@
     // this callback will not be fired till the user taps on the notification launching the application.
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
     
-    NSNumber* tap = application.applicationState == UIApplicationStateActive ? @(NO) : @(YES);
-    
-    [mutableUserInfo setValue:tap forKey:@"tap"];
+    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
     
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
@@ -86,9 +96,7 @@
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
     
-    NSNumber* tap = application.applicationState == UIApplicationStateActive ? @(NO) : @(YES);
-    
-    [mutableUserInfo setValue:tap forKey:@"tap"];
+    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
     
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
