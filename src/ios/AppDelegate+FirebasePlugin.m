@@ -3,6 +3,18 @@
 #import "Firebase.h"
 #import <objc/runtime.h>
 
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+@import UserNotifications;
+#endif
+
+// Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices
+// running iOS 10 and above. Implement FIRMessagingDelegate to receive data message via FCM for
+// devices running iOS 10 and above.
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+@interface AppDelegate () <UNUserNotificationCenterDelegate, FIRMessagingDelegate>
+@end
+#endif
+
 @implementation AppDelegate (FirebasePlugin)
 
 + (void)load {
