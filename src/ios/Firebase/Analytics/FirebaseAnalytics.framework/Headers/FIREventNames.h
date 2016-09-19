@@ -83,6 +83,16 @@ static NSString *const kFIREventAppOpen = @"app_open";
 /// </ul>
 static NSString *const kFIREventBeginCheckout = @"begin_checkout";
 
+/// Earn Virtual Currency event. This event tracks the awarding of virtual currency in your app. Log
+/// this along with {@link kFIREventSpendVirtualCurrency} to better understand your virtual economy.
+/// Params:
+///
+/// <ul>
+///     <li>{@link kFIRParameterVirtualCurrencyName} (NSString)</li>
+///     <li>{@link kFIRParameterValue} (signed 64-bit integer or double as NSNumber)</li>
+/// </ul>
+static NSString *const kFIREventEarnVirtualCurrency = @"earn_virtual_currency";
+
 /// E-Commerce Purchase event. This event signifies that an item was purchased by a user. Note:
 /// This is different from the in-app purchase event, which is reported automatically for App
 /// Store-based apps. Note: If you supply the {@link kFIRParameterValue} parameter, you must also

@@ -74,4 +74,14 @@
                       storageBucket:(NSString *)storageBucket
                   deepLinkURLScheme:(NSString *)deepLinkURLScheme;
 
+/**
+ * Initializes a customized instance of FIROptions from the file at the given plist file path.
+ * For example,
+ * NSString *filePath =
+ *     [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
+ * FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+ * Returns nil if the plist file does not exist or is invalid.
+ */
+- (instancetype)initWithContentsOfFile:(NSString *)plistPath;
+
 @end

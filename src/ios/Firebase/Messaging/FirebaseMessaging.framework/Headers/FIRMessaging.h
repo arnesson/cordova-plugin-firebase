@@ -81,6 +81,32 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 @end
 
 /**
+ * A remote data message received by the app via FCM (not just the APNs interface).
+ *
+ * This is only for devices running iOS 10 or above. To support devices running iOS 9 or below, use
+ * the local and remote notifications handlers defined in UIApplicationDelegate protocol.
+ */
+@interface FIRMessagingRemoteMessage : NSObject
+
+/// The downstream message received by the application.
+@property(nonatomic, readonly, strong, nonnull) NSDictionary *appData;
+
+@end
+
+/**
+ * A protocol to receive data message via FCM for devices running iOS 10 or above.
+ *
+ * To support devices running iOS 9 or below, use the local and remote notifications handlers
+ * defined in UIApplicationDelegate protocol.
+ */
+@protocol FIRMessagingDelegate <NSObject>
+
+/// The callback to handle data message received via FCM for devices running iOS 10 or above.
+- (void)applicationReceivedRemoteMessage:(nonnull FIRMessagingRemoteMessage *)remoteMessage;
+
+@end
+
+/**
  *  Firebase Messaging enables apps to communicate with their app servers
  *  using simple messages.
  *
@@ -99,6 +125,11 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
  *
  */
 @interface FIRMessaging : NSObject
+
+/**
+ * Delegate to handle remote data messages received via FCM for devices running iOS 10 or above.
+ */
+@property(nonatomic, weak, nullable) id<FIRMessagingDelegate> remoteMessageDelegate;
 
 /**
  *  FIRMessaging

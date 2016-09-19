@@ -72,7 +72,7 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 
 #pragma mark - FIRRemoteConfig
 @interface FIRRemoteConfig : NSObject<NSFastEnumeration>
-/// Last long fetch completion time.
+/// Last successful fetch completion time.
 @property(nonatomic, readonly, strong, nullable) NSDate *lastFetchTime;
 /// Last fetch status. The status can be any enumerated value from FIRRemoteConfigFetchStatus.
 @property(nonatomic, readonly, assign) FIRRemoteConfigFetchStatus lastFetchStatus;
@@ -89,7 +89,7 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 /// Firebase service.
 + (nonnull FIRRemoteConfig *)remoteConfig NS_SWIFT_NAME(remoteConfig());
 
-/// Unavailable. Use +RemoteConfig instead.
+/// Unavailable. Use +remoteConfig instead.
 - (nonnull instancetype)init __attribute__((unavailable("Use +remoteConfig instead.")));
 
 #pragma mark - Fetch
@@ -105,10 +105,10 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
                   completionHandler:(nullable FIRRemoteConfigFetchCompletion)completionHandler;
 
 #pragma mark - Apply
-/// Applies fetched Config data to Active Config, causing updates to the behavior and appearance of
-/// the app to take effect (depending on how config data is used in the app).
-/// Returns true if FetchedConfig has been applied to RemoteConfig or if there is no FetchedConfig.
-/// Returns false if FetchedConfig is newer than RemoteConfig.
+/// Applies Fetched Config data to the Active Config, causing updates to the behavior and appearance
+/// of the app to take effect (depending on how config data is used in the app).
+/// Returns true if there was a Fetched Config, and it was activated.
+/// Returns false if no Fetched Config was found, or the Fetched Config was already activated.
 - (BOOL)activateFetched;
 
 #pragma mark - Get Config
@@ -146,8 +146,27 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 /// @param source           The config data source.
 /// @param aNamespace       The config data namespace.
 /// @return                 An array of keys under the given source and namespace.
-- (nonnull NSArray *)allKeysFromSource:(FIRRemoteConfigSource)source
-                             namespace:(nullable NSString *)aNamespace;
+- (nonnull NSArray<NSString *> *)allKeysFromSource:(FIRRemoteConfigSource)source
+                                         namespace:(nullable NSString *)aNamespace;
+
+/// Returns the set of parameter keys that start with the given prefix, from the default namespace
+///                         in the active config.
+///
+/// @param prefix           The key prefix to look for. If prefix is nil or empty, returns all the
+///                         keys.
+/// @return                 The set of parameter keys that start with the specified prefix.
+- (nonnull NSSet<NSString *> *)keysWithPrefix:(nullable NSString *)prefix;
+
+/// Returns the set of parameter keys that start with the given prefix, from the given namespace in
+///                         the active config.
+///
+/// @param prefix           The key prefix to look for. If prefix is nil or empty, returns all the
+///                         keys in the given namespace.
+/// @param aNamespace       The namespace in which to look up the keys. If the namespace is invalid,
+///                         returns an empty set.
+/// @return                 The set of parameter keys that start with the specified prefix.
+- (nonnull NSSet<NSString *> *)keysWithPrefix:(nullable NSString *)prefix
+                                    namespace:(nullable NSString *)aNamespace;
 
 #pragma mark - Defaults
 /// Sets config defaults for parameter keys and values in the default namespace config.
@@ -176,7 +195,12 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 - (void)setDefaultsFromPlistFileName:(nullable NSString *)fileName
                            namespace:(nullable NSString *)aNamespace;
 
-/// Returns the default value of a given key. Returns nil if the key doesn't exist in DefaultConfig.
+/// Returns the default value of a given key and a given namespace from the default config.
+///
+/// @param key              The parameter key of default config.
+/// @param aNamespace       The namespace of default config.
+/// @return                 Returns the default value of the specified key and namespace. Returns
+///                         nil if the key or namespace doesn't exist in the default config.
 - (nullable FIRRemoteConfigValue *)defaultValueForKey:(nullable NSString *)key
                                             namespace:(nullable NSString *)aNamespace;
 

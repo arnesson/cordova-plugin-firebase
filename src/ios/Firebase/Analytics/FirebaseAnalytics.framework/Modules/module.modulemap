@@ -16,7 +16,6 @@ framework module FirebaseAnalytics {
 
   link framework "AddressBook"
   link framework "AdSupport"
-  link framework "SafariServices"
   link framework "StoreKit"
   link framework "SystemConfiguration"
 

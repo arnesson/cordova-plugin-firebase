@@ -5,7 +5,7 @@
 #import "FIRUserPropertyNames.h"
 
 /// The top level Firebase Analytics singleton that provides methods for logging events and setting
-/// user properties. See <a href="http://goo.gl/C2PPSP">the developer guides</a> for general
+/// user properties. See <a href="http://goo.gl/gz8SLz">the developer guides</a> for general
 /// information on using Firebase Analytics in your apps.
 @interface FIRAnalytics : NSObject
 
@@ -16,7 +16,7 @@
 /// The following event names are reserved and cannot be used:
 /// <ul>
 ///     <li>app_clear_data</li>
-///     <li>app_uninstall</li>
+///     <li>app_remove</li>
 ///     <li>app_update</li>
 ///     <li>error</li>
 ///     <li>first_open</li>
@@ -44,7 +44,8 @@
 + (void)logEventWithName:(nonnull NSString *)name
               parameters:(nullable NSDictionary<NSString *, NSObject *> *)parameters;
 
-/// Sets a user property to a given value. Up to 25 user property names are supported.
+/// Sets a user property to a given value. Up to 25 user property names are supported. Once set,
+/// user property values persist throughout the app lifecycle and across sessions.
 ///
 /// The following user property names are reserved and cannot be used:
 /// <ul>
