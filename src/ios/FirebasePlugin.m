@@ -34,7 +34,7 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)grantPermission:(CDVInvokedUrlCommand *)command {
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+#if defined(__IPHONE_8_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
     if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         UIUserNotificationType notificationTypes =
         (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);

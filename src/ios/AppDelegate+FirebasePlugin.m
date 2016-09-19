@@ -68,4 +68,21 @@
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
+    
+    NSNumber* tap = application.applicationState == UIApplicationStateActive ? @(NO) : @(YES);
+    
+    [mutableUserInfo setValue:tap forKey:@"tap"];
+    
+    // Pring full message.
+    NSLog(@"%@", mutableUserInfo);
+    
+    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+}
+#endif
+
 @end
