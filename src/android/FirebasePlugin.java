@@ -2,10 +2,10 @@ package org.apache.cordova.firebase;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 import android.os.Bundle;
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -319,7 +319,9 @@ public class FirebasePlugin extends CordovaPlugin {
                             : FirebaseRemoteConfig.getInstance().getByteArray(key, namespace);
                     JSONObject object = new JSONObject();
                     object.put("base64", Base64.encodeToString(bytes, Base64.DEFAULT));
-                    object.put("array", new JSONArray(bytes));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        object.put("array", new JSONArray(bytes));
+                    }
                     callbackContext.success(object);
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
