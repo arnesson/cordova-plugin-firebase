@@ -14,11 +14,12 @@ public class OnNotificationOpenReceiver extends BroadcastReceiver {
         PackageManager pm = context.getPackageManager();
         Intent launchIntent = pm.getLaunchIntentForPackage(context.getPackageName());
 
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         Bundle data = intent.getExtras();
+        FirebasePlugin.onNotificationOpen(data);
         launchIntent.putExtras(data);
         context.startActivity(launchIntent);
-        FirebasePlugin.onNotificationOpen(data);
+
 
     }
 }

@@ -53,7 +53,7 @@ Note that token will be null if it has not been established yet
 
 ### onNotificationOpen
 
-Register notification callback: 
+Register notification callback:
 ```
 window.FirebasePlugin.onNotificationOpen(function(notification) {
     console.error(notification);
@@ -173,7 +173,7 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 ```
 
 ### getByteArray (Android only)
-
+### The option with byte array in only available for SDK +19!!
 Retrieve a Remote Config byte array:
 ```
 window.FirebasePlugin.getByteArray("key", function(bytes) {
