@@ -63,6 +63,8 @@
     
     // Connect to FCM since connection may have failed when attempted before having a token.
     [self connectToFcm];
+
+    [FirebasePlugin.firebasePlugin tokenRefreshNotification:refreshedToken];
 }
 
 - (void)connectToFcm {

@@ -8,6 +8,10 @@ exports.onNotificationOpen = function(success, error) {
     exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
 };
 
+exports.onTokenRefreshNotification = function(success, error) {
+    exec(success, error, "FirebasePlugin", "onTokenRefreshNotification", []);
+};
+
 exports.grantPermission = function(success, error) {
     exec(success, error, "FirebasePlugin", "grantPermission", []);
 };

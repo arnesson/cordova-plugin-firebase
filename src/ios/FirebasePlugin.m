@@ -13,6 +13,7 @@
 @implementation FirebasePlugin
 
 @synthesize notificationCallbackId;
+@synthesize tokenRefreshCallbackId;
 @synthesize notificationStack;
 
 static NSInteger const kNotificationStackSize = 10;
@@ -121,6 +122,14 @@ static FirebasePlugin *firebasePlugin;
     }
 }
 
+- (void)onTokenRefreshNotification:(CDVInvokedUrlCommand *)command {
+    self.tokenRefreshCallbackId = command.callbackId;
+    NSString* currentToken = [[FIRInstanceID instanceID] token];
+    if (currentToken != nil) {
+        [self tokenRefreshNotification:currentToken];
+    }
+}
+
 - (void)sendNotification:(NSDictionary *)userInfo {
     if (self.notificationCallbackId != nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
@@ -137,6 +146,13 @@ static FirebasePlugin *firebasePlugin;
         if ([self.notificationStack count] >= kNotificationStackSize) {
             [self.notificationStack removeLastObject];
         }
+    }
+}
+
+- (void)tokenRefreshNotification:(NSString *)token {
+    if (self.tokenRefreshCallbackId != nil) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.tokenRefreshCallbackId];
     }
 }
 
