@@ -173,7 +173,7 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 ```
 
 ### getByteArray (Android only)
-### The option with byte array in only available for SDK +19!!
+**NOTE: byte array is only available for SDK 19+**
 Retrieve a Remote Config byte array:
 ```
 window.FirebasePlugin.getByteArray("key", function(bytes) {
