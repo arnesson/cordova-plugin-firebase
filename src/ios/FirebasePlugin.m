@@ -39,16 +39,27 @@ static FirebasePlugin *firebasePlugin;
 
 - (void)grantPermission:(CDVInvokedUrlCommand *)command {
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-    UNAuthorizationOptions authOptions =
-      UNAuthorizationOptionAlert
-      | UNAuthorizationOptionSound
-      | UNAuthorizationOptionBadge;
-    [[UNUserNotificationCenter currentNotificationCenter]
-      requestAuthorizationWithOptions:authOptions
-      completionHandler:^(BOOL granted, NSError * _Nullable error) {
-      }
-    ];
-    [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_9_x_Max) {
+        UIUserNotificationType allNotificationTypes =
+        (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
+        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    } else {
+        UNAuthorizationOptions authOptions =
+          UNAuthorizationOptionAlert
+          | UNAuthorizationOptionSound
+          | UNAuthorizationOptionBadge;
+        [[UNUserNotificationCenter currentNotificationCenter]
+          requestAuthorizationWithOptions:authOptions
+          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+          }
+         ];
+
+        [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+        [[FIRMessaging messaging] setRemoteMessageDelegate:self];
+    }
+
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
 # elif defined(__IPHONE_8_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
     if ([[UIApplication sharedApplication]respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         UIUserNotificationType notificationTypes =
