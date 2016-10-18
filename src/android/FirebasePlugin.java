@@ -52,8 +52,6 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 Log.d(TAG, "Starting Firebase plugin");
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-                FirebaseMessaging.getInstance().subscribeToTopic("android");
-                FirebaseMessaging.getInstance().subscribeToTopic("all");
             }
         });
     }
