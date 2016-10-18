@@ -1,5 +1,6 @@
 # cordova-plugin-firebase
-Cordova plugin for Google Firebase
+This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
+Android and iOS supported (including iOS 10).
 
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
