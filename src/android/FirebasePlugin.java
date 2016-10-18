@@ -42,7 +42,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static final String KEY = "badge";
 
     private static WeakReference<CallbackContext> notificationCallbackContext;
-    public static WeakReference<CallbackContext> tokenRefreshCallbackContext;
+    private static WeakReference<CallbackContext> tokenRefreshCallbackContext;
 
     @Override
     protected void pluginInitialize() {
@@ -162,6 +162,21 @@ public class FirebasePlugin extends CordovaPlugin {
             }
 
             callbackContext.success(json);
+        }
+    }
+
+    public static void onTokenRefresh() {
+        if(FirebasePlugin.tokenRefreshCallbackContext == null) {
+            return;
+        }
+
+        // Get updated InstanceID token.
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Log.d(TAG, "Refreshed token: " + token);
+
+        final CallbackContext callbackContext = FirebasePlugin.tokenRefreshCallbackContext.get();
+        if (callbackContext != null && token != null) {
+            callbackContext.success(token);
         }
     }
 
