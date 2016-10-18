@@ -42,7 +42,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static final String KEY = "badge";
 
     private static WeakReference<CallbackContext> notificationCallbackContext;
-    private static WeakReference<CallbackContext> tokenRefreshCallbackContext;
+    public static WeakReference<CallbackContext> tokenRefreshCallbackContext;
 
     @Override
     protected void pluginInitialize() {
