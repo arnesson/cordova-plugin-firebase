@@ -32,7 +32,17 @@ static FirebasePlugin *firebasePlugin;
     firebasePlugin = self;
 }
 
+// DEPRECATED - alias of getToken
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult;
+
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
+                    [[FIRInstanceID instanceID] token]];
+
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)getToken:(CDVInvokedUrlCommand *)command {
     CDVPluginResult *pluginResult;
 
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:
@@ -126,7 +136,7 @@ static FirebasePlugin *firebasePlugin;
     }
 }
 
-- (void)onTokenRefreshNotification:(CDVInvokedUrlCommand *)command {
+- (void)onTokenRefresh:(CDVInvokedUrlCommand *)command {
     self.tokenRefreshCallbackId = command.callbackId;
     NSString* currentToken = [[FIRInstanceID instanceID] token];
     if (currentToken != nil) {

@@ -39,11 +39,11 @@ Hooks does not work with PhoneGap Build. This means you will have to manually ma
 
 ## Methods
 
-### getInstanceId
+### getToken
 
-Get the device id (token):
+Get the device token (registration id):
 ```
-window.FirebasePlugin.getInstanceId(function(token) {
+window.FirebasePlugin.getToken(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
 }, function(error) {
@@ -51,6 +51,19 @@ window.FirebasePlugin.getInstanceId(function(token) {
 });
 ```
 Note that token will be null if it has not been established yet
+
+### onTokenRefresh
+
+Register for token changes:
+```
+window.FirebasePlugin.onTokenRefresh(function(token) {
+    // save this server-side and use it to push notifications to this device
+    console.log(token);
+}, function(error) {
+    console.error(error);
+});
+```
+This is the best way to get a valid token for the device as soon as the token is established
 
 ### onNotificationOpen
 

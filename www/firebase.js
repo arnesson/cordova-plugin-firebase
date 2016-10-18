@@ -4,12 +4,16 @@ exports.getInstanceId = function(success, error) {
     exec(success, error, "FirebasePlugin", "getInstanceId", []);
 };
 
+exports.getToken = function(success, error) {
+    exec(success, error, "FirebasePlugin", "getToken", []);
+};
+
 exports.onNotificationOpen = function(success, error) {
     exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
 };
 
-exports.onTokenRefreshNotification = function(success, error) {
-    exec(success, error, "FirebasePlugin", "onTokenRefreshNotification", []);
+exports.onTokenRefresh = function(success, error) {
+    exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };
 
 exports.grantPermission = function(success, error) {

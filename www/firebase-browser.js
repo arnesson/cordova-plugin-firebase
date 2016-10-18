@@ -2,11 +2,15 @@ exports.getInstanceId = function(success, error) {
     success();
 };
 
+exports.getToken = function(success, error) {
+    success();
+};
+
 exports.onNotificationOpen = function(success, error) {
     success();
 };
 
-exports.onTokenRefreshNotification = function(success, error) {
+exports.onTokenRefresh = function(success, error) {
     success();
 };
 

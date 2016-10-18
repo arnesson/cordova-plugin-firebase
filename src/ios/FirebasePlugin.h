@@ -4,13 +4,14 @@
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
 - (void)getInstanceId:(CDVInvokedUrlCommand*)command;
+- (void)getToken:(CDVInvokedUrlCommand*)command;
 - (void)grantPermission:(CDVInvokedUrlCommand*)command;
 - (void)setBadgeNumber:(CDVInvokedUrlCommand*)command;
 - (void)getBadgeNumber:(CDVInvokedUrlCommand*)command;
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)onNotificationOpen:(CDVInvokedUrlCommand*)command;
-- (void)onTokenRefreshNotification:(CDVInvokedUrlCommand*)command;
+- (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)tokenRefreshNotification:(NSString*)token;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
