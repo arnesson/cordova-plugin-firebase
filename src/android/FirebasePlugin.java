@@ -17,6 +17,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,10 +79,10 @@ public class FirebasePlugin extends CordovaPlugin {
             this.unsubscribe(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("onNotificationOpen")) {
-            this.registerOnNotificationOpen(callbackContext);
+            this.onNotificationOpen(callbackContext);
             return true;
         } else if (action.equals("onTokenRefresh")) {
-            this.registerOnTokenRefresh(callbackContext);
+            this.onTokenRefresh(callbackContext);
             return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getJSONObject(1));
@@ -121,12 +122,12 @@ public class FirebasePlugin extends CordovaPlugin {
         return false;
     }
 
-    private void registerOnNotificationOpen(final CallbackContext callbackContext) {
+    private void onNotificationOpen(final CallbackContext callbackContext) {
         FirebasePlugin.notificationCallbackContext = new WeakReference<CallbackContext>(callbackContext);
         // TODO: send buffered notifications here. see iOS implementation
     }
 
-    private void registerOnTokenRefresh(final CallbackContext callbackContext) {
+    private void onTokenRefresh(final CallbackContext callbackContext) {
         FirebasePlugin.tokenRefreshCallbackContext = new WeakReference<CallbackContext>(callbackContext);
 
         cordova.getThreadPool().execute(new Runnable() {
@@ -135,7 +136,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     String currentToken = FirebaseInstanceId.getInstance().getToken();
 
                     if (currentToken != null) {
-                        callbackContext.success(currentToken);
+                        FirebasePlugin.sendToken(currentToken);
                     }
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
@@ -144,7 +145,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    public static void onNotificationOpen(Bundle bundle) {
+    public static void sendNotification(Bundle bundle) {
         if(FirebasePlugin.notificationCallbackContext == null) {
             return;  // TODO: buffer notifications here. see iOS implementation
         }
@@ -161,29 +162,28 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
 
-            callbackContext.success(json);
+            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, json);
+            pluginresult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginresult);
         }
     }
 
-    public static void onTokenRefresh() {
+    public static void sendToken(String token) {
         if(FirebasePlugin.tokenRefreshCallbackContext == null) {
             return;
         }
-
-        // Get updated InstanceID token.
-        String token = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "Refreshed token: " + token);
-
         final CallbackContext callbackContext = FirebasePlugin.tokenRefreshCallbackContext.get();
         if (callbackContext != null && token != null) {
-            callbackContext.success(token);
+            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, token);
+            pluginresult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginresult);
         }
     }
 
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        FirebasePlugin.onNotificationOpen(intent.getExtras());
+        FirebasePlugin.sendNotification(intent.getExtras());
     }
 
     // DEPRECTED - alias of getToken

@@ -140,7 +140,7 @@ static FirebasePlugin *firebasePlugin;
     self.tokenRefreshCallbackId = command.callbackId;
     NSString* currentToken = [[FIRInstanceID instanceID] token];
     if (currentToken != nil) {
-        [self tokenRefreshNotification:currentToken];
+        [self sendToken:currentToken];
     }
 }
 
@@ -163,9 +163,10 @@ static FirebasePlugin *firebasePlugin;
     }
 }
 
-- (void)tokenRefreshNotification:(NSString *)token {
+- (void)sendToken:(NSString *)token {
     if (self.tokenRefreshCallbackId != nil) {
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
+        [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self.tokenRefreshCallbackId];
     }
 }
