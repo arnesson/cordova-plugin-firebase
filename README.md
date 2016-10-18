@@ -41,7 +41,7 @@ Hooks does not work with PhoneGap Build. This means you will have to manually ma
 
 ### getToken
 
-Get the device token (registration id):
+Get the device token (id):
 ```
 window.FirebasePlugin.getToken(function(token) {
     // save this server-side and use it to push notifications to this device
