@@ -7,11 +7,9 @@ exports.getToken = function(success, error) {
 };
 
 exports.onNotificationOpen = function(success, error) {
-    success();
 };
 
 exports.onTokenRefresh = function(success, error) {
-    success();
 };
 
 exports.grantPermission = function(success, error) {
