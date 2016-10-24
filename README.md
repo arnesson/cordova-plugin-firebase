@@ -40,13 +40,15 @@ Hooks does not work with PhoneGap Build. This means you will have to manually ma
 
 In Android lollipop and higher the notification's icon in the status bar will be white if your icon doesn't fit the material design pattern, see: https://blog.clevertap.com/fixing-notification-icon-for-android-lollipop-and-above/
 
-To fix this, go to: https://romannurik.github.io/AndroidAssetStudio/icons-notification.html and create your material design icons, name them **notification_icon**, and after unzip the file, place place them in your android's root resources folder.
+To fix this, go to: https://romannurik.github.io/AndroidAssetStudio/icons-notification.html and create your material design icons, name them **notification_icon**, and after unzip the file, place place the folder in your android's root resources folder.
 
 ```
 - My Project/
     resources/
     android/
+    icon
     notification_icon       <--
+    splash
     ...
 ```
 Build the project and the hook will copy the icons to the android's drawable folder.
