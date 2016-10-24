@@ -2,6 +2,7 @@
 'use strict';
 
 var fs = require('fs');
+var path = require('path');
 
 var getValue = function(config, name) {
     var value = config.match(new RegExp('<' + name + '>(.*?)</' + name + '>', "i"))
