@@ -85,4 +85,33 @@ if (directoryExists("platforms/android")) {
       break;
     }
   }
+
+  if (directoryExists('resources/android/notification_icon')) {
+      copyNotificationIcons();
+  }
+}
+
+function copyNotificationIcons() {
+    var filestocopy = [{
+        "resources/android/notification_icon/res/drawable-hdpi-v11/notification_icon.png": "platforms/android/res/drawable-hdpi/notification_icon.png"
+    }, {
+        "resources/android/notification_icon/res/drawable-xhdpi-v11/notification_icon.png": "platforms/android/res/drawable-xhdpi/notification_icon.png"
+    }, {
+        "resources/android/notification_icon/res/drawable-xxhdpi-v11/notification_icon.png": "platforms/android/res/drawable-xxhdpi/notification_icon.png"
+    }, {
+        "resources/android/notification_icon/res/drawable-xxxhdpi-v11/notification_icon.png": "platforms/android/res/drawable-xxxhdpi/notification_icon.png"
+    }, {
+        "resources/android/notification_icon/res/drawable-mdpi-v11/notification_icon.png": "platforms/android/res/drawable-mdpi/notification_icon.png"
+    }];
+
+    filestocopy.forEach(function(obj) {
+        Object.keys(obj).forEach(function(key) {
+            var val = obj[key];
+            var destdir = path.dirname(val);
+            if (fs.existsSync(key) && fs.existsSync(destdir)) {
+                fs.createReadStream(key).pipe(
+                    fs.createWriteStream(val));
+            }
+        });
+    });
 }
