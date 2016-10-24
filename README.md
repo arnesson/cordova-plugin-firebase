@@ -36,6 +36,29 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 
 Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones.
 
+## Android Notification Icon
+
+In Android lollipop and higher the notification's icon in the status bar will be white if your icon doesn't fit the material design pattern, see: https://blog.clevertap.com/fixing-notification-icon-for-android-lollipop-and-above/
+
+To fix this, go to: https://romannurik.github.io/AndroidAssetStudio/icons-notification.html and create your material design icons, name them **notification_icon**, and after unzip the file, place place them in your android's root resources folder.
+
+```
+- My Project/
+    resources/
+    android/
+    notification_icon       <--
+    ...
+```
+Build the project and the hook will copy the icons to the android's drawable folder.
+
+```
+resources/android/notification_icon/res/drawable-mdpi-v11/notification_icon.png --> platforms/android/res/drawable-mdpi/notification_icon.png
+resources/android/notification_icon/res/drawable-hdpi-v11/notification_icon.png --> platforms/android/res/drawable-hdpi/notification_icon.png
+resources/android/notification_icon/res/drawable-xhdpi-v11/notification_icon.png --> platforms/android/res/drawable-xhdpi/notification_icon.png
+resources/android/notification_icon/res/drawable-xxhdpi-v11/notification_icon.png --> platforms/android/res/drawable-xxhdpi/notification_icon.png
+resources/android/notification_icon/res/drawable-xxxhdpi-v11/notification_icon.png --> platforms/android/res/drawable-xxxhdpi/notification_icon.png
+```
+
 
 ## Methods
 
