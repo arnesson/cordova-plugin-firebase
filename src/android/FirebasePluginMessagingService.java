@@ -77,7 +77,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(getApplicationInfo().icon)
+                .setSmallIcon(getNotificationIcon())
                 .setContentTitle(title)
                 .setContentText(messageBody)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
@@ -91,5 +91,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         notificationManager.notify(id.hashCode(), notificationBuilder.build());
     }
 
-
+    private int getNotificationIcon() {
+        int resID = getResources().getIdentifier("notification_icon", "drawable", getApplicationContext().getPackageName());
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon && resID>0 ? resID: getApplicationInfo().icon;
+    }
 }
