@@ -84,6 +84,10 @@ Notification flow:
     2. User taps the notification and the app opens
     3. User receives the notification data in the JavaScript callback
 
+Notification icon on Android:
+
+The plugin will look for and use notification_icon in drawable resources if it exists, otherwise the default app icon will is used. 
+
 ### grantPermission (iOS only)
 
 Grant permission to recieve push notifications (will trigger prompt):
