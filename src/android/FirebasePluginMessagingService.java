@@ -52,8 +52,14 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             title = remoteMessage.getData().get("title");
             text = remoteMessage.getData().get("text");
             id = remoteMessage.getData().get("id");
-
         }
+        
+        if(TextUtils.isEmpty(id)){
+            Random rand = new Random();
+            int  n = rand.nextInt(50) + 1;
+            id = Integer.toString(n);
+        }
+        
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Notification Message id: " + id);
         Log.d(TAG, "Notification Message Title: " + title);
