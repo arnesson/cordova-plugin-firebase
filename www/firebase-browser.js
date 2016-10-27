@@ -1,9 +1,13 @@
 exports.getInstanceId = function(success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.getToken = function(success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.onNotificationOpen = function(success, error) {
@@ -13,61 +17,91 @@ exports.onTokenRefresh = function(success, error) {
 };
 
 exports.grantPermission = function(success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.setBadgeNumber = function(number, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.getBadgeNumber = function(success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.subscribe = function(topic, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.unsubscribe = function(topic, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.logEvent = function(name, params, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.setUserId = function(id, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.setUserProperty = function(name, value, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.activateFetched = function (success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.fetch = function (cacheExpirationSeconds, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.getByteArray = function (key, namespace, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.getValue = function (key, namespace, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.getInfo = function (success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.setConfigSettings = function (settings, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
 
 exports.setDefaults = function (defaults, namespace, success, error) {
-    success();
+    if (typeof success === 'function') {
+        success();
+    }
 };
