@@ -40,6 +40,9 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
+    
+    self.applicationInBackground = @(YES);
+    
     return YES;
 }
 
