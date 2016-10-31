@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -42,6 +43,7 @@ public class FirebasePlugin extends CordovaPlugin {
     private final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
 
+    private static ArrayList<Bundle> notificationStack = null;
     private static WeakReference<CallbackContext> notificationCallbackContext;
     private static WeakReference<CallbackContext> tokenRefreshCallbackContext;
 
@@ -122,7 +124,12 @@ public class FirebasePlugin extends CordovaPlugin {
 
     private void onNotificationOpen(final CallbackContext callbackContext) {
         FirebasePlugin.notificationCallbackContext = new WeakReference<CallbackContext>(callbackContext);
-        // TODO: send buffered notifications here. see iOS implementation
+        if (FirebasePlugin.notificationStack != null) {
+            for (Bundle bundle : FirebasePlugin.notificationStack) {
+                FirebasePlugin.sendNotification(bundle);
+            }
+            FirebasePlugin.notificationStack.clear();
+        }
     }
 
     private void onTokenRefresh(final CallbackContext callbackContext) {
@@ -144,8 +151,12 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     public static void sendNotification(Bundle bundle) {
-        if(FirebasePlugin.notificationCallbackContext == null) {
-            return;  // TODO: buffer notifications here. see iOS implementation
+        if(FirebasePlugin.inBackground()) {
+            if (FirebasePlugin.notificationStack == null) {
+                FirebasePlugin.notificationStack = new ArrayList<Bundle>();
+            }
+            notificationStack.add(bundle);
+            return;
         }
         final CallbackContext callbackContext = FirebasePlugin.notificationCallbackContext.get();
         if (callbackContext != null && bundle != null) {
@@ -176,6 +187,14 @@ public class FirebasePlugin extends CordovaPlugin {
             pluginresult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginresult);
         }
+    }
+
+    public static boolean inBackground() {
+        return FirebasePlugin.notificationCallbackContext == null;
+    }
+
+    public static boolean inForeground() {
+        return !FirebasePlugin.inBackground();
     }
 
     @Override
