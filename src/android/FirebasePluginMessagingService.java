@@ -77,7 +77,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         for (String key : data.keySet()) {
             bundle.putString(key, data.get(key));
         }
-        FirebasePlugin.sendNotification(bundle);
         if (showNotification) {
             Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
             intent.putExtras(bundle);
@@ -104,6 +103,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             notificationManager.notify(id.hashCode(), notificationBuilder.build());
+        } else {
+            FirebasePlugin.sendNotification(bundle);
         }
     }
 
