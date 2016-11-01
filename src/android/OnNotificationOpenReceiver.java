@@ -16,6 +16,7 @@ public class OnNotificationOpenReceiver extends BroadcastReceiver {
 
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         Bundle data = intent.getExtras();
+        data.putBoolean("tap", true);
         FirebasePlugin.sendNotification(data);
         launchIntent.putExtras(data);
         context.startActivity(launchIntent);
