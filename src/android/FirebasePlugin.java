@@ -43,6 +43,7 @@ public class FirebasePlugin extends CordovaPlugin {
     private final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
 
+    private static boolean inBackground = true;
     private static ArrayList<Bundle> notificationStack = null;
     private static WeakReference<CallbackContext> notificationCallbackContext;
     private static WeakReference<CallbackContext> tokenRefreshCallbackContext;
@@ -122,6 +123,22 @@ public class FirebasePlugin extends CordovaPlugin {
         return false;
     }
 
+    @Override
+    public void onPause(boolean multitasking) {
+        FirebasePlugin.inBackground = true;
+    }
+
+    @Override
+    public void onResume(boolean multitasking) {
+        FirebasePlugin.inBackground = false;
+    }
+
+    @Override
+    public void onReset() {
+        FirebasePlugin.notificationCallbackContext = null;
+        FirebasePlugin.tokenRefreshCallbackContext = null;
+    }
+
     private void onNotificationOpen(final CallbackContext callbackContext) {
         FirebasePlugin.notificationCallbackContext = new WeakReference<CallbackContext>(callbackContext);
         if (FirebasePlugin.notificationStack != null) {
@@ -151,7 +168,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     public static void sendNotification(Bundle bundle) {
-        if(FirebasePlugin.inBackground()) {
+        if(!FirebasePlugin.hasNotificationsCallback()) {
             if (FirebasePlugin.notificationStack == null) {
                 FirebasePlugin.notificationStack = new ArrayList<Bundle>();
             }
@@ -190,11 +207,12 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     public static boolean inBackground() {
-        return FirebasePlugin.notificationCallbackContext == null;
+        return FirebasePlugin.inBackground;
     }
 
-    public static boolean inForeground() {
-        return !FirebasePlugin.inBackground();
+    public static boolean hasNotificationsCallback() {
+        return FirebasePlugin.notificationCallbackContext != null &&
+                FirebasePlugin.notificationCallbackContext.get() != null;
     }
 
     @Override
