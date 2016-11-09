@@ -70,7 +70,7 @@ This is the best way to get a valid token for the device as soon as the token is
 Register notification callback:
 ```
 window.FirebasePlugin.onNotificationOpen(function(notification) {
-    console.error(notification);
+    console.log(notification);
 }, function(error) {
     console.error(error);
 });
