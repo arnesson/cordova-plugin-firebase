@@ -224,8 +224,14 @@ static FirebasePlugin *firebasePlugin;
 - (void)activateFetched:(CDVInvokedUrlCommand *)command {
      [self.commandDelegate runInBackground:^{
         FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
-         [remoteConfig activateFetched];
-         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+         BOOL activated = [remoteConfig activateFetched];
+         CDVPluginResult *pluginResult;
+         if (activated) {
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+         } else {
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+         }
+         
          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
      }];
 }
