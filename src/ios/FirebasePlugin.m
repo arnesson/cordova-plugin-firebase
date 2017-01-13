@@ -5,6 +5,7 @@
 @import FirebaseInstanceID;
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
+@import FirebaseRemoteConfig;
 
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
@@ -203,6 +204,44 @@ static FirebasePlugin *firebasePlugin;
         [FIRAnalytics setUserPropertyString:value forName:name];
         
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)fetch:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+        [remoteConfig fetchWithCompletionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
+            if (status == FIRRemoteConfigFetchStatusSuccess) {
+                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }
+        }];
+
+    }];
+}
+
+- (void)activateFetched:(CDVInvokedUrlCommand *)command {
+     [self.commandDelegate runInBackground:^{
+        FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+         BOOL activated = [remoteConfig activateFetched];
+         CDVPluginResult *pluginResult;
+         if (activated) {
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+         } else {
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+         }
+         
+         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+     }];
+}
+
+- (void)getValue:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSString* key = [command.arguments objectAtIndex:0];
+        FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+        NSString* value = remoteConfig[key].stringValue;
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
