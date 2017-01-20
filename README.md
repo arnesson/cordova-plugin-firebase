@@ -151,7 +151,7 @@ Set a user property for use in Analytics:
 window.FirebasePlugin.setUserProperty("name", "value");
 ```
 
-### fetch (Android only)
+### fetch
 
 Fetch Remote Config parameter values for your app:
 ```
@@ -160,7 +160,7 @@ window.FirebasePlugin.fetch();
 window.FirebasePlugin.fetch(600);
 ```
 
-### activateFetched (Android only)
+### activateFetched
 
 Activate the Remote Config fetched config:
 ```
@@ -173,7 +173,7 @@ window.FirebasePlugin.activateFetched(function(activated) {
 });
 ```
 
-### getValue (Android only)
+### getValue
 
 Retrieve a Remote Config value:
 ```
