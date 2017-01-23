@@ -94,6 +94,14 @@ Grant permission to recieve push notifications (will trigger prompt):
 ```
 window.FirebasePlugin.grantPermission();
 ```
+### hasPermission (iOS only)
+
+Check permission to recieve push notifications:
+```
+window.FirebasePlugin.hasPermission(function(data){
+    console.log(data.isEnabled);
+});
+```
 
 ### setBadgeNumber
 
