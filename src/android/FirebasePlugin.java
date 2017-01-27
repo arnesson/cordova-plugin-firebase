@@ -51,10 +51,18 @@ public class FirebasePlugin extends CordovaPlugin {
     @Override
     protected void pluginInitialize() {
         final Context context = this.cordova.getActivity().getApplicationContext();
+        final Bundle extras = this.cordova.getActivity().getIntent().getExtras();
         this.cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 Log.d(TAG, "Starting Firebase plugin");
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+                if(extras != null && extras.size()>1) {
+                    if (FirebasePlugin.notificationStack == null) {
+                        FirebasePlugin.notificationStack = new ArrayList<Bundle>();
+                    }
+                    notificationStack.add(extras);
+                    
+                }
             }
         });
     }
