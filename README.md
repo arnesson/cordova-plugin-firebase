@@ -142,7 +142,7 @@ window.FirebasePlugin.unsubscribe("example");
 
 Log an event using Analytics:
 ```
-window.FirebasePlugin.logEvent("page_view", {page: "dashboard"});
+window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
 ```
 
 ### setUserId
