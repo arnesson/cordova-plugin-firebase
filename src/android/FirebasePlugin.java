@@ -61,7 +61,6 @@ public class FirebasePlugin extends CordovaPlugin {
                         FirebasePlugin.notificationStack = new ArrayList<Bundle>();
                     }
                     notificationStack.add(extras);
-                    
                 }
             }
         });
@@ -95,6 +94,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getJSONObject(1));
+            return true;
+        } else if (action.equals("setScreenName")) {
+            this.setScreenName(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("setUserId")) {
             this.setUserId (callbackContext, args.getString(0));
@@ -331,6 +333,20 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     mFirebaseAnalytics.logEvent(name, bundle);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void setScreenName(final CallbackContext callbackContext, final String name) {
+        // This must be called on the main thread
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                try {
+                    mFirebaseAnalytics.setCurrentScreen(cordova.getActivity(), name, null);
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());

@@ -145,6 +145,13 @@ Log an event using Analytics:
 window.FirebasePlugin.logEvent("page_view", {page: "dashboard"});
 ```
 
+### setScreenName
+
+Set the name of the current screen in Analytics:
+```
+window.FirebasePlugin.setScreenName("Home");
+```
+
 ### setUserId
 
 Set a user id for use in Analytics:

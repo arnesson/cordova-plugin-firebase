@@ -23,7 +23,7 @@ exports.grantPermission = function(success, error) {
 exports.hasPermission = function(success, error) {
     exec(success, error, "FirebasePlugin", "hasPermission", []);
 };
-               
+
 exports.setBadgeNumber = function(number, success, error) {
     exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
 };
@@ -42,6 +42,10 @@ exports.unsubscribe = function(topic, success, error) {
 
 exports.logEvent = function(name, params, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
+};
+
+exports.setScreenName = function(name, success, error) {
+    exec(success, error, "FirebasePlugin", "setScreenName", [name]);
 };
 
 exports.setUserId = function(id, success, error) {
