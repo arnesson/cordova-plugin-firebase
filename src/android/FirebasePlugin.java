@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -128,6 +130,9 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("setDefaults")) {
             if (args.length() > 1) this.setDefaults(callbackContext, args.getJSONObject(0), args.getString(1));
             else this.setDefaults(callbackContext, args.getJSONObject(0), null);
+            return true;
+        } else if (action.equals("upstream")) {
+            this.upstream(callbackContext, args.getJSONObject(0));
             return true;
         }
         return false;
@@ -536,5 +541,32 @@ public class FirebasePlugin extends CordovaPlugin {
             map.put(key, value);
         }
         return map;
+    }
+
+    private void upstream(final CallbackContext callbackContext, final JSONObject data) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try{
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    Iterator<?> keys = data.keys();
+
+                    while( keys.hasNext() ){
+                        String key = (String)keys.next();
+                        String value = data.getString(key);
+                        map.put(key, value);
+                    }
+
+                    FirebaseMessaging fm = FirebaseMessaging.getInstance();
+                    fm.send(new RemoteMessage.Builder("78391781623@gcm.googleapis.com")
+                        .setMessageId(map.get("eventId"))
+                        .setData(map)
+                        .setTtl(900)
+                        .build());
+                    callbackContext.success();
+                } catch(Exception e){
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
     }
 }

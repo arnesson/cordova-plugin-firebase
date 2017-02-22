@@ -111,3 +111,7 @@ exports.setDefaults = function (defaults, namespace, success, error) {
     }
     exec(success, error, "FirebasePlugin", "setDefaults", args);
 };
+
+exports.upstream = function(data, success, error ){
+    exec(success, error, "FirebasePlugin", "upstream", [data]);
+}
