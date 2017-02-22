@@ -263,4 +263,17 @@ static FirebasePlugin *firebasePlugin;
     }];
 }
 
+
+- (void)upstream:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSDictionary* data = [command.arguments objectAtIndex:0];
+        [[FIRMessaging messaging] sendMessage:data
+                                           to:@"78391781623@gcm.googleapis.com"
+                                withMessageID:data[@"eventId"]
+                                   timeToLive:900];
+        
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
 @end

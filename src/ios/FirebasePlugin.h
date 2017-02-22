@@ -21,6 +21,7 @@
 - (void)fetch:(CDVInvokedUrlCommand*)command;
 - (void)activateFetched:(CDVInvokedUrlCommand*)command;
 - (void)getValue:(CDVInvokedUrlCommand*)command;
+- (void)upstream:(CDVInvokedUrlCommand*)command;
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
