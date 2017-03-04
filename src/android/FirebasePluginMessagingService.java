@@ -106,6 +106,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             notificationManager.notify(id.hashCode(), notificationBuilder.build());
         } else {
             bundle.putBoolean("tap", false);
+            bundle.putString("title", title);
+            bundle.putString("body", messageBody);
             FirebasePlugin.sendNotification(bundle);
         }
     }
