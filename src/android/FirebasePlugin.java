@@ -2,39 +2,33 @@ package org.apache.cordova.firebase;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.os.Bundle;
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
-import org.apache.cordova.CordovaPlugin;
+import me.leolin.shortcutbadger.ShortcutBadger;
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
-
-import me.leolin.shortcutbadger.ShortcutBadger;
 
 
 public class FirebasePlugin extends CordovaPlugin {
@@ -56,11 +50,14 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 Log.d(TAG, "Starting Firebase plugin");
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-                if(extras != null && extras.size()>1) {
+                if (extras != null && extras.size() > 1) {
                     if (FirebasePlugin.notificationStack == null) {
                         FirebasePlugin.notificationStack = new ArrayList<Bundle>();
                     }
-                    notificationStack.add(extras);
+                    if (extras.containsKey("google.message_id")) {
+                        extras.putBoolean("tap", true);
+                        notificationStack.add(extras);
+                    }
                 }
             }
         });
@@ -99,7 +96,7 @@ public class FirebasePlugin extends CordovaPlugin {
             this.setScreenName(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("setUserId")) {
-            this.setUserId (callbackContext, args.getString(0));
+            this.setUserId(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("setUserProperty")) {
             this.setUserProperty(callbackContext, args.getString(0), args.getString(1));
@@ -178,7 +175,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     public static void sendNotification(Bundle bundle) {
-        if(!FirebasePlugin.hasNotificationsCallback()) {
+        if (!FirebasePlugin.hasNotificationsCallback()) {
             if (FirebasePlugin.notificationStack == null) {
                 FirebasePlugin.notificationStack = new ArrayList<Bundle>();
             }
@@ -205,7 +202,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     public static void sendToken(String token) {
-        if(FirebasePlugin.tokenRefreshCallbackContext == null) {
+        if (FirebasePlugin.tokenRefreshCallbackContext == null) {
             return;
         }
         final CallbackContext callbackContext = FirebasePlugin.tokenRefreshCallbackContext;
@@ -227,7 +224,11 @@ public class FirebasePlugin extends CordovaPlugin {
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        FirebasePlugin.sendNotification(intent.getExtras());
+        final Bundle data = intent.getExtras();
+        if (data != null && data.containsKey("google.message_id")) {
+            data.putBoolean("tap", true);
+            FirebasePlugin.sendNotification(data);
+        }
     }
 
     // DEPRECTED - alias of getToken
@@ -318,12 +319,12 @@ public class FirebasePlugin extends CordovaPlugin {
     private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params) throws JSONException {
         final Bundle bundle = new Bundle();
         Iterator iter = params.keys();
-        while(iter.hasNext()){
-            String key = (String)iter.next();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
             Object value = params.get(key);
 
             if (value instanceof Integer || value instanceof Double) {
-                bundle.putFloat(key, ((Number)value).floatValue());
+                bundle.putFloat(key, ((Number) value).floatValue());
             } else {
                 bundle.putString(key, value.toString());
             }
