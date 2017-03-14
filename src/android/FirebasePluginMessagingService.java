@@ -42,35 +42,36 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        String title;
-        String text;
-        String id;
-        if (remoteMessage.getNotification() != null) {
-            title = remoteMessage.getNotification().getTitle();
-            text = remoteMessage.getNotification().getBody();
-            id = remoteMessage.getMessageId();
-        } else {
-            title = remoteMessage.getData().get("title");
-            text = remoteMessage.getData().get("text");
-            id = remoteMessage.getData().get("id");
-        }
 
-        if(TextUtils.isEmpty(id)){
-            Random rand = new Random();
-            int  n = rand.nextInt(50) + 1;
-            id = Integer.toString(n);
-        }
-
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
-        Log.d(TAG, "Notification Message id: " + id);
-        Log.d(TAG, "Notification Message Title: " + title);
-        Log.d(TAG, "Notification Message Body/Text: " + text);
-
-        // TODO: Add option to developer to configure if show notification when app on foreground
-        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (!remoteMessage.getData().isEmpty())) {
-            boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
-            sendNotification(id, title, text, remoteMessage.getData(), showNotification);
-        }
+//        String title;
+//        String text;
+//        String id;
+//        if (remoteMessage.getNotification() != null) {
+//            title = remoteMessage.getNotification().getTitle();
+//            text = remoteMessage.getNotification().getBody();
+//            id = remoteMessage.getMessageId();
+//        } else {
+//            title = remoteMessage.getData().get("title");
+//            text = remoteMessage.getData().get("text");
+//            id = remoteMessage.getData().get("id");
+//        }
+//
+//        if(TextUtils.isEmpty(id)){
+//            Random rand = new Random();
+//            int  n = rand.nextInt(50) + 1;
+//            id = Integer.toString(n);
+//        }
+//
+//        Log.d(TAG, "From: " + remoteMessage.getFrom());
+//        Log.d(TAG, "Notification Message id: " + id);
+//        Log.d(TAG, "Notification Message Title: " + title);
+//        Log.d(TAG, "Notification Message Body/Text: " + text);
+//
+//        // TODO: Add option to developer to configure if show notification when app on foreground
+//        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (!remoteMessage.getData().isEmpty())) {
+//            boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
+//            sendNotification(id, title, text, remoteMessage.getData(), showNotification);
+//        }
     }
 
     private void sendNotification(String id, String title, String messageBody, Map<String, String> data, boolean showNotification) {
