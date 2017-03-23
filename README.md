@@ -94,7 +94,7 @@ Grant permission to recieve push notifications (will trigger prompt):
 ```
 window.FirebasePlugin.grantPermission();
 ```
-### hasPermission (iOS only)
+### hasPermission
 
 Check permission to recieve push notifications:
 ```

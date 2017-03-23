@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.ArrayList;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
-
+import android.support.v4.app.NotificationManagerCompat;
 
 public class FirebasePlugin extends CordovaPlugin {
 
@@ -73,6 +73,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("getToken")) {
             this.getToken(callbackContext);
+            return true;
+        } else if (action.equals("hasPermission")) {
+            this.hasPermission(callbackContext);
             return true;
         } else if (action.equals("setBadgeNumber")) {
             this.setBadgeNumber(callbackContext, args.getInt(0));
@@ -250,6 +253,23 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     String token = FirebaseInstanceId.getInstance().getToken();
                     callbackContext.success(token);
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void hasPermission(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    Context context = cordova.getActivity();
+                    NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+                    boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
+                    JSONObject object = new JSONObject();
+                    object.put("isEnabled", areNotificationsEnabled);
+                    callbackContext.success(object);
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
                 }
