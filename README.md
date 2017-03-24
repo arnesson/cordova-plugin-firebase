@@ -33,8 +33,9 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 **Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
 
 ## Changing Notification Icon
-To set a big icon and small icon for notifications, define them through styles.  
-Create a styles.xml and add the icons to the  
+The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon will is used.
+To set a big icon and small icon for notifications, define them through drawable nodes.  
+Create the required styles.xml files and add the icons to the  
 `<projectroot>/res/native/android/res/<drawable-DPI>` folders.  
 
 The example below uses a png named "ic_silhouette.png", the app Icon (@mipmap/icon) and sets a base theme.  
@@ -136,7 +137,7 @@ Notification flow:
 
 Notification icon on Android:
 
-The plugin will look for and use notification_icon in drawable resources if it exists, otherwise the default app icon will is used. 
+[Changing notification icon](#changing-notification-icon)
 
 ### grantPermission (iOS only)
 
