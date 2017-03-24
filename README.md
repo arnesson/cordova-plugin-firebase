@@ -40,7 +40,7 @@ Create the required styles.xml files and add the icons to the
 
 The example below uses a png named "ic_silhouette.png", the app Icon (@mipmap/icon) and sets a base theme.  
 From android version 21 (Lollipop) notifications were changed, needing a seperate setting.  
-If you only Lollipop and above, you don't need to setup both.  
+If you only target Lollipop and above, you don't need to setup both.  
 Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.  
 `<projectroot>/res/native/android/res/values/styles.xml`
 ```
