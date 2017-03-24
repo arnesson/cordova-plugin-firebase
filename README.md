@@ -33,19 +33,15 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 **Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
 
 ## Changing Notification Icon
-To set a big icon and small icon for notifications, define them through styles.
+To set a big icon and small icon for notifications, define them through styles.  
+Create a styles.xml and add the icons to the  
+`<projectroot>/res/native/android/res/<drawable-DPI>` folders.  
 
-Create a styles.xml and add the icons to the
-<projectroot>/res/native/android/res/<drawable-DPI> folders.
-
-The example below uses a png named "ic_silhouette.png" and sets a base theme.
-
-From version 21 notifications were changed, needing a seperate setting. 
-If you only target 21 and above, you don't need to setup both.
-
-Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.
-
-<projectroot>/res/native/android/res/values/styles.xml
+The example below uses a png named "ic_silhouette.png" and sets a base theme.  
+From version 21 notifications were changed, needing a seperate setting.  
+If you only target 21 and above, you don't need to setup both.  
+Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.  
+`<projectroot>/res/native/android/res/values/styles.xml`
 ```
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
@@ -58,8 +54,8 @@ Thankfully using the version dependant asset selections, we can make one build/a
 </resources>
 ```
 
-and
-<projectroot>/res/native/android/res/values-v21/styles.xml
+and  
+`<projectroot>/res/native/android/res/values-v21/styles.xml`
 ```
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
@@ -76,7 +72,7 @@ and
 
 On Android Lollipop and above you can also set the accent color for the notification by adding a color setting.
 
-<projectroot>/res/native/android/res/values/colors.xml
+`<projectroot>/res/native/android/res/values/colors.xml`
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
