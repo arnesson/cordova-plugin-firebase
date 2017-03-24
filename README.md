@@ -68,6 +68,21 @@ and
 </resources>
 ```
 
+## Notification Colors
+
+On Android Lollipop and above you can also set the accent color for the notification by adding a color setting.
+
+<projectroot>/res/native/android/res/values/colors.xml
+```
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#FFFFFF00</color>
+    <color name="primary_dark">#FF220022</color>
+    <color name="accent">#FF00FFFF</color>
+</resources>
+```
+
+
 ### Notes about PhoneGap Build
 
 Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones, as well as hard coding your app id and api key in plugin.xml.
