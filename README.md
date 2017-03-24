@@ -34,11 +34,15 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 
 ## Changing Notification Icon
 To set a big icon and small icon for notifications, define them through styles.
+
 Create a styles.xml and add the icons to the
-<projectroot>/res/native/android/res/<drawable-DPI> folders
+<projectroot>/res/native/android/res/<drawable-DPI> folders.
+
 The example below uses a png named "ic_silhouette.png" and sets a base theme.
+
 From version 21 notifications were changed, needing a seperate setting. 
 If you only target 21 and above, you don't need to setup both.
+
 Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.
 
 <projectroot>/res/native/android/res/values/styles.xml
