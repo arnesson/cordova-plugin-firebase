@@ -94,7 +94,7 @@ Grant permission to recieve push notifications (will trigger prompt):
 ```
 window.FirebasePlugin.grantPermission();
 ```
-### hasPermission (iOS only)
+### hasPermission
 
 Check permission to recieve push notifications:
 ```
@@ -142,7 +142,14 @@ window.FirebasePlugin.unsubscribe("example");
 
 Log an event using Analytics:
 ```
-window.FirebasePlugin.logEvent("page_view", {page: "dashboard"});
+window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
+```
+
+### setScreenName
+
+Set the name of the current screen in Analytics:
+```
+window.FirebasePlugin.setScreenName("Home");
 ```
 
 ### setUserId
