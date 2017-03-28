@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -106,9 +105,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             notificationManager.notify(id.hashCode(), notificationBuilder.build());
         } else {
             bundle.putBoolean("tap", false);
-            FirebasePlugin.sendNotification(bundle);
+            FirebasePlugin.sendNotification(bundle, this.getApplicationContext());
         }
     }
-
 
 }

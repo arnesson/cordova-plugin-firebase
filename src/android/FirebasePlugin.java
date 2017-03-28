@@ -1,11 +1,11 @@
 package org.apache.cordova.firebase;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Base64;
 import android.util.Log;
 import android.os.Bundle;
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,6 +15,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
+
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
@@ -27,7 +28,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -156,7 +156,7 @@ public class FirebasePlugin extends CordovaPlugin {
         FirebasePlugin.notificationCallbackContext = callbackContext;
         if (FirebasePlugin.notificationStack != null) {
             for (Bundle bundle : FirebasePlugin.notificationStack) {
-                FirebasePlugin.sendNotification(bundle);
+                FirebasePlugin.sendNotification(bundle,this.cordova.getActivity().getApplicationContext());
             }
             FirebasePlugin.notificationStack.clear();
         }
@@ -180,12 +180,22 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    public static void sendNotification(Bundle bundle) {
+    public static void sendNotification(Bundle bundle, Context context) {
         if(!FirebasePlugin.hasNotificationsCallback()) {
+            String packageName = context.getPackageName();
+
             if (FirebasePlugin.notificationStack == null) {
                 FirebasePlugin.notificationStack = new ArrayList<Bundle>();
             }
             notificationStack.add(bundle);
+
+            /* start the main activity, if not running */
+            Intent intent = new Intent("android.intent.action.MAIN");
+            intent.setComponent(new ComponentName(packageName, packageName + ".MainActivity"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+            context.startActivity(intent);
+
             return;
         }
         final CallbackContext callbackContext = FirebasePlugin.notificationCallbackContext;
@@ -230,7 +240,7 @@ public class FirebasePlugin extends CordovaPlugin {
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        FirebasePlugin.sendNotification(intent.getExtras());
+        FirebasePlugin.sendNotification(intent.getExtras(), this.cordova.getActivity().getApplicationContext());
     }
 
     // DEPRECTED - alias of getToken
