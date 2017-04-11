@@ -43,31 +43,31 @@ FOUNDATION_EXPORT NSString * __nonnull const FIRMessagingMessagesDeletedNotifica
  *  @enum FIRMessagingError
  */
 typedef NS_ENUM(NSUInteger, FIRMessagingError) {
-  // Unknown error.
+  /// Unknown error.
   FIRMessagingErrorUnknown = 0,
 
-  // Auth Error -- FIRMessaging couldn't validate request from this client.
+  /// FIRMessaging couldn't validate request from this client.
   FIRMessagingErrorAuthentication = 1,
 
-  // NoAccess -- InstanceID service cannot be accessed.
+  /// InstanceID service cannot be accessed.
   FIRMessagingErrorNoAccess = 2,
 
-  // Timeout -- Request to InstanceID backend timed out.
+  /// Request to InstanceID backend timed out.
   FIRMessagingErrorTimeout = 3,
 
-  // Network -- No network available to reach the servers.
+  /// No network available to reach the servers.
   FIRMessagingErrorNetwork = 4,
 
-  // OperationInProgress -- Another similar operation in progress,
-  // bailing this one.
+  /// Another similar operation in progress, bailing this one.
   FIRMessagingErrorOperationInProgress = 5,
 
-  // InvalidRequest -- Some parameters of the request were invalid.
+  /// Some parameters of the request were invalid.
   FIRMessagingErrorInvalidRequest = 7,
 };
 
 /// Status for the downstream message received by the app.
 typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
+  /// Unknown status.
   FIRMessagingMessageStatusUnknown,
   /// New downstream message received by the app.
   FIRMessagingMessageStatusNew,
@@ -76,6 +76,7 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 /// Information about a downstream message received by the app.
 @interface FIRMessagingMessageInfo : NSObject
 
+/// The status of the downstream message
 @property(nonatomic, readonly, assign) FIRMessagingMessageStatus status;
 
 @end
@@ -107,21 +108,14 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 @end
 
 /**
- *  Firebase Messaging enables apps to communicate with their app servers
- *  using simple messages.
+ *  Firebase Messaging lets you reliably deliver messages at no cost.
  *
  *  To send or receive messages, the app must get a
- *  registration token from GGLInstanceID, which authorizes an
- *  app server to send messages to an app instance. Pass your sender ID and
- *  `kGGLInstanceIDScopeFIRMessaging` as parameters to the method.
+ *  registration token from FIRInstanceID. This token authorizes an
+ *  app server to send messages to an app instance.
  *
- *  A sender ID is a project number created when you configure your API project.
- *  It is labeled "Project Number" in the Google Developers Console.
+ *  In order to receive FIRMessaging messages, declare `application:didReceiveRemoteNotification:`.
  *
- *  In order to receive FIRMessaging messages, declare application:didReceiveRemoteNotification:
- *
- *  Client apps can send upstream messages back to the app server using the XMPP-based
- *  <a href="http://developers.google.com/cloud-messaging/ccs.html">Cloud Connection Server</a>,
  *
  */
 @interface FIRMessaging : NSObject
@@ -147,12 +141,9 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 
 /**
  *  Create a FIRMessaging data connection which will be used to send the data notifications
- *  send by your server. It will also be used to send ACKS and other messages based
+ *  sent by your server. It will also be used to send ACKS and other messages based
  *  on the FIRMessaging ACKS and other messages based  on the FIRMessaging protocol.
  *
- *  Use the `disconnect` method to disconnect the connection.
- *
- *  @see FIRMessagingService disconnect
  *
  *  @param handler  The handler to be invoked once the connection is established.
  *                  If the connection fails we invoke the handler with an
@@ -177,12 +168,12 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 /**
  *  Asynchronously subscribes to a topic.
  *
- *  @param topic The name of the topic, for example @"sports".
+ *  @param topic The name of the topic, for example, @"sports".
  */
 - (void)subscribeToTopic:(nonnull NSString *)topic;
 
 /**
- *  Asynchronously unsubscribe to a topic.
+ *  Asynchronously unsubscribe from a topic.
  *
  *  @param topic The name of the topic, for example @"sports".
  */
@@ -193,13 +184,13 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 /**
  *  Sends an upstream ("device to cloud") message.
  *
- *  The message will be queued if we don't have an active connection.
- *  You can only use the upstream feature if your GCM implementation
- *  uses the XMPP-based Cloud Connection Server.
+ *  The message is queued if we don't have an active connection.
+ *  You can only use the upstream feature if your FCM implementation
+ *  uses the XMPP server protocol.
  *
  *  @param message      Key/Value pairs to be sent. Values must be String, any
  *                      other type will be ignored.
- *  @param to           A string identifying the receiver of the message. For GCM
+ *  @param to           A string identifying the receiver of the message. For FCM
  *                      project IDs the value is `SENDER_ID@gcm.googleapis.com`.
  *  @param messageID    The ID of the message. This is generated by the application. It
  *                      must be unique for each message generated by this application.
@@ -221,11 +212,11 @@ typedef NS_ENUM(NSInteger, FIRMessagingMessageStatus) {
 #pragma mark - Analytics
 
 /**
- *  Call this when the app received a downstream message. Used to track message
- *  delivery and analytics for messages. You don't need to call this if you
- *  don't set the `FIRMessagingAutoSetupEnabled` flag in your Info.plist. In the
- *  latter case the library will call this implicitly to track relevant
- *  messages.
+ *  Use this to track message delivery and analytics for messages, typically
+ *  when you receive a notification in `application:didReceiveRemoteNotification:`.
+ *  However, you only need to call this if you set the `FirebaseAppDelegateProxyEnabled`
+ *  flag to NO in your Info.plist. If `FirebaseAppDelegateProxyEnabled` is either missing
+ *  or set to YES in your Info.plist, the library will call this automatically.
  *
  *  @param message The downstream message received by the application.
  *

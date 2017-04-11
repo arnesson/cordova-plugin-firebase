@@ -17,9 +17,13 @@ extern NSString *const __nonnull FIRRemoteConfigThrottledEndTimeInSecondsKey;
 
 /// Indicates whether updated data was successfully fetched.
 typedef NS_ENUM(NSInteger, FIRRemoteConfigFetchStatus) {
+  /// Config has never been fetched.
   FIRRemoteConfigFetchStatusNoFetchYet,
+  /// Config fetch succeeded.
   FIRRemoteConfigFetchStatusSuccess,
+  /// Config fetch failed.
   FIRRemoteConfigFetchStatusFailure,
+  /// Config fetch was throttled.
   FIRRemoteConfigFetchStatusThrottled,
 };
 
@@ -52,16 +56,25 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
                                                NSError *__nullable error);
 
 #pragma mark - FIRRemoteConfigValue
+/// This class provides a wrapper for Remote Config parameter values, with methods to get parameter
+/// values as different data types.
 @interface FIRRemoteConfigValue : NSObject<NSCopying>
+/// Gets the value as a string.
 @property(nonatomic, readonly, nullable) NSString *stringValue;
+/// Gets the value as a number value.
 @property(nonatomic, readonly, nullable) NSNumber *numberValue;
+/// Gets the value as a NSData object.
 @property(nonatomic, readonly, nonnull) NSData *dataValue;
+/// Gets the value as a boolean.
 @property(nonatomic, readonly) BOOL boolValue;
+/// Identifies the source of the fetched value.
 @property(nonatomic, readonly) FIRRemoteConfigSource source;
 @end
 
 #pragma mark - FIRRemoteConfigSettings
+/// Firebase Remote Config settings.
 @interface FIRRemoteConfigSettings : NSObject
+/// Indicates whether Developer Mode is enabled.
 @property(nonatomic, readonly) BOOL isDeveloperModeEnabled;
 /// Initializes FIRRemoteConfigSettings, which is used to set properties for custom settings. To
 /// make custom settings take effect, pass the FIRRemoteConfigSettings instance to the
@@ -71,6 +84,8 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 @end
 
 #pragma mark - FIRRemoteConfig
+/// Firebase Remote Config class. The shared instance method +remoteConfig can be created and used
+/// to fetch, activate and read config results and set default config results.
 @interface FIRRemoteConfig : NSObject<NSFastEnumeration>
 /// Last successful fetch completion time.
 @property(nonatomic, readonly, strong, nullable) NSDate *lastFetchTime;
@@ -93,11 +108,13 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 - (nonnull instancetype)init __attribute__((unavailable("Use +remoteConfig instead.")));
 
 #pragma mark - Fetch
-/// Fetches Remote Config data with a callback.
+/// Fetches Remote Config data with a callback. Call activateFetched to make fetched data available
+/// to your app.
 /// @param completionHandler Fetch operation callback.
 - (void)fetchWithCompletionHandler:(nullable FIRRemoteConfigFetchCompletion)completionHandler;
 
 /// Fetches Remote Config data and sets a duration that specifies how long config data lasts.
+/// Call activateFetched to make fetched data available to your app.
 /// @param expirationDuration  Duration that defines how long fetched config data is available, in
 ///                            seconds. When the config data expires, a new fetch is required.
 /// @param completionHandler   Fetch operation callback.

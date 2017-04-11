@@ -6,7 +6,7 @@
 /// 500 different types of Events per app and you can associate up to 25 unique parameters with each
 /// Event type. Some common events are suggested below, but you may also choose to specify custom
 /// Event types that are associated with your specific app. Each event type is identified by a
-/// unique name. Event names can be up to 32 characters long, may only contain alphanumeric
+/// unique name. Event names can be up to 40 characters long, may only contain alphanumeric
 /// characters and underscores ("_"), and must start with an alphabetic character. The "firebase_"
 /// prefix is reserved and should not be used.
 
@@ -16,40 +16,40 @@ static NSString *const kFIREventAddPaymentInfo = @"add_payment_info";
 
 /// E-Commerce Add To Cart event. This event signifies that an item was added to a cart for
 /// purchase. Add this event to a funnel with kFIREventEcommercePurchase to gauge the effectiveness
-/// of your checkout process. Note: If you supply the {@link kFIRParameterValue} parameter, you must
-/// also supply the {@link kFIRParameterCurrency} parameter so that revenue metrics can be computed
+/// of your checkout process. Note: If you supply the @c kFIRParameterValue parameter, you must
+/// also supply the @c kFIRParameterCurrency parameter so that revenue metrics can be computed
 /// accurately. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterQuantity} (signed 64-bit integer as NSNumber)</li>
-///     <li>{@link kFIRParameterItemID} (NSString)</li>
-///     <li>{@link kFIRParameterItemName} (NSString)</li>
-///     <li>{@link kFIRParameterItemCategory} (NSString)</li>
-///     <li>{@link kFIRParameterItemLocationID} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterPrice} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterOrigin} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterDestination} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterStartDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterEndDate} (NSString) (optional)</li>
+///     <li>@c kFIRParameterQuantity (signed 64-bit integer as NSNumber)</li>
+///     <li>@c kFIRParameterItemID (NSString)</li>
+///     <li>@c kFIRParameterItemName (NSString)</li>
+///     <li>@c kFIRParameterItemCategory (NSString)</li>
+///     <li>@c kFIRParameterItemLocationID (NSString) (optional)</li>
+///     <li>@c kFIRParameterPrice (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterOrigin (NSString) (optional)</li>
+///     <li>@c kFIRParameterDestination (NSString) (optional)</li>
+///     <li>@c kFIRParameterStartDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterEndDate (NSString) (optional)</li>
 /// </ul>
 static NSString *const kFIREventAddToCart = @"add_to_cart";
 
 /// E-Commerce Add To Wishlist event. This event signifies that an item was added to a wishlist.
 /// Use this event to identify popular gift items in your app. Note: If you supply the
-/// {@link kFIRParameterValue} parameter, you must also supply the {@link kFIRParameterCurrency}
+/// @c kFIRParameterValue parameter, you must also supply the @c kFIRParameterCurrency
 /// parameter so that revenue metrics can be computed accurately. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterQuantity} (signed 64-bit integer as NSNumber)</li>
-///     <li>{@link kFIRParameterItemID} (NSString)</li>
-///     <li>{@link kFIRParameterItemName} (NSString)</li>
-///     <li>{@link kFIRParameterItemCategory} (NSString)</li>
-///     <li>{@link kFIRParameterItemLocationID} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterPrice} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterQuantity (signed 64-bit integer as NSNumber)</li>
+///     <li>@c kFIRParameterItemID (NSString)</li>
+///     <li>@c kFIRParameterItemName (NSString)</li>
+///     <li>@c kFIRParameterItemCategory (NSString)</li>
+///     <li>@c kFIRParameterItemLocationID (NSString) (optional)</li>
+///     <li>@c kFIRParameterPrice (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
 /// </ul>
 static NSString *const kFIREventAddToWishlist = @"add_to_wishlist";
 
@@ -61,74 +61,89 @@ static NSString *const kFIREventAppOpen = @"app_open";
 
 /// E-Commerce Begin Checkout event. This event signifies that a user has begun the process of
 /// checking out. Add this event to a funnel with your kFIREventEcommercePurchase event to gauge the
-/// effectiveness of your checkout process. Note: If you supply the {@link kFIRParameterValue}
-/// parameter, you must also supply the {@link kFIRParameterCurrency} parameter so that revenue
+/// effectiveness of your checkout process. Note: If you supply the @c kFIRParameterValue
+/// parameter, you must also supply the @c kFIRParameterCurrency parameter so that revenue
 /// metrics can be computed accurately. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterTransactionID} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterStartDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterEndDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterNumberOfNights} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterTransactionID (NSString) (optional)</li>
+///     <li>@c kFIRParameterStartDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterEndDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterNumberOfNights (signed 64-bit integer as NSNumber) (optional) for
 ///         hotel bookings</li>
-///     <li>{@link kFIRParameterNumberOfRooms} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterNumberOfRooms (signed 64-bit integer as NSNumber) (optional) for
 ///         hotel bookings</li>
-///     <li>{@link kFIRParameterNumberOfPassengers} (signed 64-bit integer as NSNumber) (optional)
+///     <li>@c kFIRParameterNumberOfPassengers (signed 64-bit integer as NSNumber) (optional)
 ///         for travel bookings</li>
-///     <li>{@link kFIRParameterOrigin} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterDestination} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterTravelClass} (NSString) (optional) for travel bookings</li>
+///     <li>@c kFIRParameterOrigin (NSString) (optional)</li>
+///     <li>@c kFIRParameterDestination (NSString) (optional)</li>
+///     <li>@c kFIRParameterTravelClass (NSString) (optional) for travel bookings</li>
 /// </ul>
 static NSString *const kFIREventBeginCheckout = @"begin_checkout";
 
+/// Campaign Detail event. Log this event to supply the referral details of a re-engagement
+/// campaign. Note: you must supply at least one of the required parameters kFIRParameterSource,
+/// kFIRParameterMedium or kFIRParameterCampaign. Params:
+///
+/// <ul>
+///     <li>@c kFIRParameterSource (NSString)</li>
+///     <li>@c kFIRParameterMedium (NSString)</li>
+///     <li>@c kFIRParameterCampaign (NSString)</li>
+///     <li>@c kFIRParameterTerm (NSString) (optional)</li>
+///     <li>@c kFIRParameterContent (NSString) (optional)</li>
+///     <li>@c kFIRParameterAdNetworkClickID (NSString) (optional)</li>
+///     <li>@c kFIRParameterCP1 (NSString) (optional)</li>
+/// </ul>
+static NSString *const kFIREventCampaignDetails = @"campaign_details";
+
 /// Earn Virtual Currency event. This event tracks the awarding of virtual currency in your app. Log
-/// this along with {@link kFIREventSpendVirtualCurrency} to better understand your virtual economy.
+/// this along with @c kFIREventSpendVirtualCurrency to better understand your virtual economy.
 /// Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterVirtualCurrencyName} (NSString)</li>
-///     <li>{@link kFIRParameterValue} (signed 64-bit integer or double as NSNumber)</li>
+///     <li>@c kFIRParameterVirtualCurrencyName (NSString)</li>
+///     <li>@c kFIRParameterValue (signed 64-bit integer or double as NSNumber)</li>
 /// </ul>
 static NSString *const kFIREventEarnVirtualCurrency = @"earn_virtual_currency";
 
 /// E-Commerce Purchase event. This event signifies that an item was purchased by a user. Note:
 /// This is different from the in-app purchase event, which is reported automatically for App
-/// Store-based apps. Note: If you supply the {@link kFIRParameterValue} parameter, you must also
-/// supply the {@link kFIRParameterCurrency} parameter so that revenue metrics can be computed
+/// Store-based apps. Note: If you supply the @c kFIRParameterValue parameter, you must also
+/// supply the @c kFIRParameterCurrency parameter so that revenue metrics can be computed
 /// accurately. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterTransactionID} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterTax} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterShipping} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCoupon} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterLocation} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterStartDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterEndDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterNumberOfNights} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterTransactionID (NSString) (optional)</li>
+///     <li>@c kFIRParameterTax (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterShipping (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCoupon (NSString) (optional)</li>
+///     <li>@c kFIRParameterLocation (NSString) (optional)</li>
+///     <li>@c kFIRParameterStartDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterEndDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterNumberOfNights (signed 64-bit integer as NSNumber) (optional) for
 ///         hotel bookings</li>
-///     <li>{@link kFIRParameterNumberOfRooms} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterNumberOfRooms (signed 64-bit integer as NSNumber) (optional) for
 ///         hotel bookings</li>
-///     <li>{@link kFIRParameterNumberOfPassengers} (signed 64-bit integer as NSNumber) (optional)
+///     <li>@c kFIRParameterNumberOfPassengers (signed 64-bit integer as NSNumber) (optional)
 ///         for travel bookings</li>
-///     <li>{@link kFIRParameterOrigin} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterDestination} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterTravelClass} (NSString) (optional) for travel bookings</li>
+///     <li>@c kFIRParameterOrigin (NSString) (optional)</li>
+///     <li>@c kFIRParameterDestination (NSString) (optional)</li>
+///     <li>@c kFIRParameterTravelClass (NSString) (optional) for travel bookings</li>
 /// </ul>
 static NSString *const kFIREventEcommercePurchase = @"ecommerce_purchase";
 
 /// Generate Lead event. Log this event when a lead has been generated in the app to understand the
 /// efficacy of your install and re-engagement campaigns. Note: If you supply the
-/// {@link kFIRParameterValue} parameter, you must also supply the {@link kFIRParameterCurrency}
+/// @c kFIRParameterValue parameter, you must also supply the @c kFIRParameterCurrency
 /// parameter so that revenue metrics can be computed accurately. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
 /// </ul>
 static NSString *const kFIREventGenerateLead = @"generate_lead";
 
@@ -136,7 +151,7 @@ static NSString *const kFIREventGenerateLead = @"generate_lead";
 /// this event to analyze how popular certain groups or social features are in your app. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterGroupID} (NSString)</li>
+///     <li>@c kFIRParameterGroupID (NSString)</li>
 /// </ul>
 static NSString *const kFIREventJoinGroup = @"join_group";
 
@@ -145,8 +160,8 @@ static NSString *const kFIREventJoinGroup = @"join_group";
 /// are difficult to pass. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterLevel} (signed 64-bit integer as NSNumber)</li>
-///     <li>{@link kFIRParameterCharacter} (NSString) (optional)</li>
+///     <li>@c kFIRParameterLevel (signed 64-bit integer as NSNumber)</li>
+///     <li>@c kFIRParameterCharacter (NSString) (optional)</li>
 /// </ul>
 static NSString *const kFIREventLevelUp = @"level_up";
 
@@ -159,39 +174,39 @@ static NSString *const kFIREventLogin = @"login";
 /// high scores with certain audiences or behaviors. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterScore} (signed 64-bit integer as NSNumber)</li>
-///     <li>{@link kFIRParameterLevel} (signed 64-bit integer as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCharacter} (NSString) (optional)</li>
+///     <li>@c kFIRParameterScore (signed 64-bit integer as NSNumber)</li>
+///     <li>@c kFIRParameterLevel (signed 64-bit integer as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCharacter (NSString) (optional)</li>
 /// </ul>
 static NSString *const kFIREventPostScore = @"post_score";
 
 /// Present Offer event. This event signifies that the app has presented a purchase offer to a user.
 /// Add this event to a funnel with the kFIREventAddToCart and kFIREventEcommercePurchase to gauge
-/// your conversion process. Note: If you supply the {@link kFIRParameterValue} parameter, you must
-/// also supply the {@link kFIRParameterCurrency} parameter so that revenue metrics can be computed
+/// your conversion process. Note: If you supply the @c kFIRParameterValue parameter, you must
+/// also supply the @c kFIRParameterCurrency parameter so that revenue metrics can be computed
 /// accurately. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterQuantity} (signed 64-bit integer as NSNumber)</li>
-///     <li>{@link kFIRParameterItemID} (NSString)</li>
-///     <li>{@link kFIRParameterItemName} (NSString)</li>
-///     <li>{@link kFIRParameterItemCategory} (NSString)</li>
-///     <li>{@link kFIRParameterItemLocationID} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterPrice} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterQuantity (signed 64-bit integer as NSNumber)</li>
+///     <li>@c kFIRParameterItemID (NSString)</li>
+///     <li>@c kFIRParameterItemName (NSString)</li>
+///     <li>@c kFIRParameterItemCategory (NSString)</li>
+///     <li>@c kFIRParameterItemLocationID (NSString) (optional)</li>
+///     <li>@c kFIRParameterPrice (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
 /// </ul>
 static NSString *const kFIREventPresentOffer = @"present_offer";
 
 /// E-Commerce Purchase Refund event. This event signifies that an item purchase was refunded.
-/// Note: If you supply the {@link kFIRParameterValue} parameter, you must also supply the
-/// {@link kFIRParameterCurrency} parameter so that revenue metrics can be computed accurately.
+/// Note: If you supply the @c kFIRParameterValue parameter, you must also supply the
+/// @c kFIRParameterCurrency parameter so that revenue metrics can be computed accurately.
 /// Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterTransactionID} (NSString) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterTransactionID (NSString) (optional)</li>
 /// </ul>
 static NSString *const kFIREventPurchaseRefund = @"purchase_refund";
 
@@ -200,18 +215,18 @@ static NSString *const kFIREventPurchaseRefund = @"purchase_refund";
 /// identify the most popular content in your app. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterSearchTerm} (NSString)</li>
-///     <li>{@link kFIRParameterStartDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterEndDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterNumberOfNights} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterSearchTerm (NSString)</li>
+///     <li>@c kFIRParameterStartDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterEndDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterNumberOfNights (signed 64-bit integer as NSNumber) (optional) for
 ///         hotel bookings</li>
-///     <li>{@link kFIRParameterNumberOfRooms} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterNumberOfRooms (signed 64-bit integer as NSNumber) (optional) for
 ///         hotel bookings</li>
-///     <li>{@link kFIRParameterNumberOfPassengers} (signed 64-bit integer as NSNumber) (optional)
+///     <li>@c kFIRParameterNumberOfPassengers (signed 64-bit integer as NSNumber) (optional)
 ///         for travel bookings</li>
-///     <li>{@link kFIRParameterOrigin} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterDestination} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterTravelClass} (NSString) (optional) for travel bookings</li>
+///     <li>@c kFIRParameterOrigin (NSString) (optional)</li>
+///     <li>@c kFIRParameterDestination (NSString) (optional)</li>
+///     <li>@c kFIRParameterTravelClass (NSString) (optional) for travel bookings</li>
 /// </ul>
 static NSString *const kFIREventSearch = @"search";
 
@@ -220,8 +235,8 @@ static NSString *const kFIREventSearch = @"search";
 /// identify popular content and categories of content in your app. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterContentType} (NSString)</li>
-///     <li>{@link kFIRParameterItemID} (NSString)</li>
+///     <li>@c kFIRParameterContentType (NSString)</li>
+///     <li>@c kFIRParameterItemID (NSString)</li>
 /// </ul>
 static NSString *const kFIREventSelectContent = @"select_content";
 
@@ -229,8 +244,8 @@ static NSString *const kFIREventSelectContent = @"select_content";
 /// content. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterContentType} (NSString)</li>
-///     <li>{@link kFIRParameterItemID} (NSString)</li>
+///     <li>@c kFIRParameterContentType (NSString)</li>
+///     <li>@c kFIRParameterItemID (NSString)</li>
 /// </ul>
 static NSString *const kFIREventShare = @"share";
 
@@ -239,7 +254,7 @@ static NSString *const kFIREventShare = @"share";
 /// different behaviors between logged in and logged out users. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterSignUpMethod} (NSString)</li>
+///     <li>@c kFIRParameterSignUpMethod (NSString)</li>
 /// </ul>
 static NSString *const kFIREventSignUp = @"sign_up";
 
@@ -247,9 +262,9 @@ static NSString *const kFIREventSignUp = @"sign_up";
 /// help you identify which virtual goods are the most popular objects of purchase. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterItemName} (NSString)</li>
-///     <li>{@link kFIRParameterVirtualCurrencyName} (NSString)</li>
-///     <li>{@link kFIRParameterValue} (signed 64-bit integer or double as NSNumber)</li>
+///     <li>@c kFIRParameterItemName (NSString)</li>
+///     <li>@c kFIRParameterVirtualCurrencyName (NSString)</li>
+///     <li>@c kFIRParameterValue (signed 64-bit integer or double as NSNumber)</li>
 /// </ul>
 static NSString *const kFIREventSpendVirtualCurrency = @"spend_virtual_currency";
 
@@ -268,39 +283,39 @@ static NSString *const kFIREventTutorialComplete = @"tutorial_complete";
 /// help you understand how many users are experiencing all that your game has to offer. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterAchievementID} (NSString)</li>
+///     <li>@c kFIRParameterAchievementID (NSString)</li>
 /// </ul>
 static NSString *const kFIREventUnlockAchievement = @"unlock_achievement";
 
 /// View Item event. This event signifies that some content was shown to the user. This content may
 /// be a product, a webpage or just a simple image or text. Use the appropriate parameters to
 /// contextualize the event. Use this event to discover the most popular items viewed in your app.
-/// Note: If you supply the {@link kFIRParameterValue} parameter, you must also supply the
-/// {@link kFIRParameterCurrency} parameter so that revenue metrics can be computed accurately.
+/// Note: If you supply the @c kFIRParameterValue parameter, you must also supply the
+/// @c kFIRParameterCurrency parameter so that revenue metrics can be computed accurately.
 /// Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterItemID} (NSString)</li>
-///     <li>{@link kFIRParameterItemName} (NSString)</li>
-///     <li>{@link kFIRParameterItemCategory} (NSString)</li>
-///     <li>{@link kFIRParameterItemLocationID} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterPrice} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterQuantity} (signed 64-bit integer as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterCurrency} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterValue} (double as NSNumber) (optional)</li>
-///     <li>{@link kFIRParameterStartDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterEndDate} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterFlightNumber} (NSString) (optional) for travel bookings</li>
-///     <li>{@link kFIRParameterNumberOfPassengers} (signed 64-bit integer as NSNumber) (optional)
+///     <li>@c kFIRParameterItemID (NSString)</li>
+///     <li>@c kFIRParameterItemName (NSString)</li>
+///     <li>@c kFIRParameterItemCategory (NSString)</li>
+///     <li>@c kFIRParameterItemLocationID (NSString) (optional)</li>
+///     <li>@c kFIRParameterPrice (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterQuantity (signed 64-bit integer as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterCurrency (NSString) (optional)</li>
+///     <li>@c kFIRParameterValue (double as NSNumber) (optional)</li>
+///     <li>@c kFIRParameterStartDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterEndDate (NSString) (optional)</li>
+///     <li>@c kFIRParameterFlightNumber (NSString) (optional) for travel bookings</li>
+///     <li>@c kFIRParameterNumberOfPassengers (signed 64-bit integer as NSNumber) (optional)
 ///         for travel bookings</li>
-///     <li>{@link kFIRParameterNumberOfNights} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterNumberOfNights (signed 64-bit integer as NSNumber) (optional) for
 ///         travel bookings</li>
-///     <li>{@link kFIRParameterNumberOfRooms} (signed 64-bit integer as NSNumber) (optional) for
+///     <li>@c kFIRParameterNumberOfRooms (signed 64-bit integer as NSNumber) (optional) for
 ///         travel bookings</li>
-///     <li>{@link kFIRParameterOrigin} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterDestination} (NSString) (optional)</li>
-///     <li>{@link kFIRParameterSearchTerm} (NSString) (optional) for travel bookings</li>
-///     <li>{@link kFIRParameterTravelClass} (NSString) (optional) for travel bookings</li>
+///     <li>@c kFIRParameterOrigin (NSString) (optional)</li>
+///     <li>@c kFIRParameterDestination (NSString) (optional)</li>
+///     <li>@c kFIRParameterSearchTerm (NSString) (optional) for travel bookings</li>
+///     <li>@c kFIRParameterTravelClass (NSString) (optional) for travel bookings</li>
 /// </ul>
 static NSString *const kFIREventViewItem = @"view_item";
 
@@ -308,7 +323,7 @@ static NSString *const kFIREventViewItem = @"view_item";
 /// certain category. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterItemCategory} (NSString)</li>
+///     <li>@c kFIRParameterItemCategory (NSString)</li>
 /// </ul>
 static NSString *const kFIREventViewItemList = @"view_item_list";
 
@@ -316,6 +331,6 @@ static NSString *const kFIREventViewItemList = @"view_item_list";
 /// search. Params:
 ///
 /// <ul>
-///     <li>{@link kFIRParameterSearchTerm} (NSString)</li>
+///     <li>@c kFIRParameterSearchTerm (NSString)</li>
 /// </ul>
 static NSString *const kFIREventViewSearchResults = @"view_search_results";

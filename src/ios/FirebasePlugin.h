@@ -16,6 +16,7 @@
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)sendToken:(NSString*)token;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
+- (void)setScreenName:(CDVInvokedUrlCommand*)command;
 - (void)setUserId:(CDVInvokedUrlCommand*)command;
 - (void)setUserProperty:(CDVInvokedUrlCommand*)command;
 - (void)fetch:(CDVInvokedUrlCommand*)command;
