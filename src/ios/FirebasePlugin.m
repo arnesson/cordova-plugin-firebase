@@ -203,14 +203,12 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)setScreenName:(CDVInvokedUrlCommand *)command {
-    [self.commandDelegate runInBackground:^{
-        NSString* name = [command.arguments objectAtIndex:0];
-        
-        [FIRAnalytics setScreenName:name screenClass:NULL];
-        
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    NSString* name = [command.arguments objectAtIndex:0];
+
+    [FIRAnalytics setScreenName:name screenClass:NULL];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)setUserId:(CDVInvokedUrlCommand *)command {
