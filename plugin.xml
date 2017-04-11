@@ -86,11 +86,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCore.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleInterchangeUtilities.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleSymbolUtilities.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleToolboxForMac.framework" />
+		<framework custom="true" src="src/ios/Firebase/Messaging/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
-		<framework custom="true" src="src/ios/Firebase/Messaging/GoogleIPhoneUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 	</platform>
