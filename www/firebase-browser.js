@@ -51,7 +51,11 @@ exports.logEvent = function(name, params, success, error) {
         success();
     }
 };
-
+exports.logError = function(message, success, error) {
+    if (typeof success === 'function') {
+        success();
+    }
+};
 exports.setScreenName = function(name, success, error) {
     if (typeof success === 'function') {
         success();
