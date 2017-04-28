@@ -17,6 +17,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
+import com.google.firebase.crash.FirebaseCrash;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -94,6 +95,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("logEvent")) {
             this.logEvent(callbackContext, args.getString(0), args.getJSONObject(1));
+            return true;
+        } else if (action.equals("logError")) {
+            this.logError(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("setScreenName")) {
             this.setScreenName(callbackContext, args.getString(0));
@@ -356,6 +360,21 @@ public class FirebasePlugin extends CordovaPlugin {
                     mFirebaseAnalytics.logEvent(name, bundle);
                     callbackContext.success();
                 } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void logError(final CallbackContext callbackContext, final String message) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseCrash.report(new Exception(message));
+                    callbackContext.success(1);
+                } catch (Exception e) {
+                    FirebaseCrash.log(e.getMessage());
+                    e.printStackTrace();
                     callbackContext.error(e.getMessage());
                 }
             }

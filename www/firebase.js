@@ -44,6 +44,10 @@ exports.logEvent = function(name, params, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
 
+exports.logError = function(message, success, error) {
+    exec(success, error, "FirebasePlugin", "logError", [message]);
+};
+
 exports.setScreenName = function(name, success, error) {
     exec(success, error, "FirebasePlugin", "setScreenName", [name]);
 };
