@@ -193,7 +193,8 @@ public class FirebasePlugin extends CordovaPlugin {
             Intent intent = new Intent("android.intent.action.MAIN");
             intent.setComponent(new ComponentName(packageName, packageName + ".MainActivity"));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
+            intent.putExtra("cdvStartInBackground", true);
+            
             context.startActivity(intent);
 
             return;
