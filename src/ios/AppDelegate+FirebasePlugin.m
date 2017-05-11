@@ -18,17 +18,15 @@
 #define kApplicationInBackgroundKey @"applicationInBackground"
 
 @implementation AppDelegate (FirebasePlugin)
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  UIUserNotificationType allNotificationTypes =
-      (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
-      UIUserNotificationSettings *settings =
-      [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
-      [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-          [[UIApplication sharedApplication] registerForRemoteNotifications];
 
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  UIUserNotificationType allNotificationTypes = (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
+      UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
+      [[UIApplication sharedApplication] registerUserNotificationSettings:settings]; 
+      [[UIApplication sharedApplication] registerForRemoteNotifications];
   [FIRApp configure];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
-                                               name:kFIRInstanceIDTokenRefreshNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:) name:kFIRInstanceIDTokenRefreshNotification object:nil];
+
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
