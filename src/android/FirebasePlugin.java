@@ -87,6 +87,9 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("unsubscribe")) {
             this.unsubscribe(callbackContext, args.getString(0));
             return true;
+        } else if (action.equals("unregister")) {
+            this.unregister(callbackContext);
+            return true;
         } else if (action.equals("onNotificationOpen")) {
             this.onNotificationOpen(callbackContext);
             return true;
@@ -332,6 +335,19 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void unregister(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    //TODO
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());

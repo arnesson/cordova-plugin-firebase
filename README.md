@@ -189,6 +189,13 @@ Unsubscribe from a topic:
 window.FirebasePlugin.unsubscribe("example");
 ```
 
+### unregister
+
+Unregister from firebase, used to stop receiving push notifications. Call this when you logout user from your app. :
+```
+window.FirebasePlugin.unregister();
+```
+
 ### logEvent
 
 Log an event using Analytics:

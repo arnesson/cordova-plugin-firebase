@@ -40,6 +40,10 @@ exports.unsubscribe = function(topic, success, error) {
     exec(success, error, "FirebasePlugin", "unsubscribe", [topic]);
 };
 
+exports.unregister = function(success, error) {
+    exec(success, error, "FirebasePlugin", "unregister", []);
+};
+
 exports.logEvent = function(name, params, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
