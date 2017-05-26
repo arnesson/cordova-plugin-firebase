@@ -347,7 +347,11 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    //TODO
+                    FirebaseInstanceId.deleteInstanceId();
+                    String currentToken = FirebaseInstanceId.getInstance().getToken();
+                    if (currentToken != null) {
+                        FirebasePlugin.sendToken(currentToken);
+                    }
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
