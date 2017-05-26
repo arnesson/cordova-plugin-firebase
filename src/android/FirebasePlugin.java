@@ -19,6 +19,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
+import org.apache.cordova.CordovaWebView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +41,7 @@ import android.support.v4.app.NotificationManagerCompat;
 public class FirebasePlugin extends CordovaPlugin {
 
     private FirebaseAnalytics mFirebaseAnalytics;
+    private static CordovaWebView appView;
     private final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
 
@@ -152,6 +154,16 @@ public class FirebasePlugin extends CordovaPlugin {
         FirebasePlugin.tokenRefreshCallbackContext = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.exit(0);
+
+        if (this.appView != null) {
+            appView.handleDestroy();
+        }
+    }
+    
     private void onNotificationOpen(final CallbackContext callbackContext) {
         FirebasePlugin.notificationCallbackContext = callbackContext;
         if (FirebasePlugin.notificationStack != null) {
@@ -193,7 +205,8 @@ public class FirebasePlugin extends CordovaPlugin {
             Intent intent = new Intent("android.intent.action.MAIN");
             intent.setComponent(new ComponentName(packageName, packageName + ".MainActivity"));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
+            intent.putExtra("cdvStartInBackground", true);
+            
             context.startActivity(intent);
 
             return;
