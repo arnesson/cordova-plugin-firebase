@@ -5,13 +5,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/** A block that takes a BOOL and has no return value. */
 typedef void (^FIRAppVoidBoolCallback)(BOOL success);
 
 /**
  * The entry point of Firebase SDKs.
  *
- * Initialize and configure FIRApp using [FIRApp configure];
- * Or other customized ways as shown below.
+ * Initialize and configure FIRApp using +[FIRApp configure]
+ * or other customized ways as shown below.
  *
  * The logging system has two modes: default mode and debug mode. In default mode, only logs with
  * log level Notice, Warning and Error will be sent to device. In debug mode, all logs will be sent
@@ -21,6 +22,9 @@ typedef void (^FIRAppVoidBoolCallback)(BOOL success);
  * argument in the application's Xcode scheme. When debug mode is enabled via -FIRDebugEnabled,
  * further executions of the application will also be in debug mode. In order to return to default
  * mode, you must explicitly disable the debug mode with the application argument -FIRDebugDisabled.
+ *
+ * It is also possible to change the default logging level in code by calling setLoggerLevel: on
+ * the FIRConfiguration interface.
  */
 @interface FIRApp : NSObject
 
@@ -62,22 +66,22 @@ typedef void (^FIRAppVoidBoolCallback)(BOOL success);
 + (nullable FIRApp *)appNamed:(NSString *)name;
 
 /**
- * Returns the set of all extant FIRApp instances, or nil if there is no FIRApp instance. This
+ * Returns the set of all extant FIRApp instances, or nil if there are no FIRApp instances. This
  * method is thread safe.
  */
 + (nullable NSDictionary *)allApps;
 
 /**
  * Cleans up the current FIRApp, freeing associated data and returning its name to the pool for
- * future use. This method is thread safe in class level.
+ * future use. This method is thread safe.
  */
 - (void)deleteApp:(FIRAppVoidBoolCallback)completion;
 
 /**
- * FIRFirebaseApp instances should not be initialized directly. Call |FIRApp configure|, or
- * |FIRApp configureWithOptions:|, or |FIRApp configureWithNames:options| directly.
+ * FIRApp instances should not be initialized directly. Call +[FIRApp configure],
+ * +[FIRApp configureWithOptions:], or +[FIRApp configureWithNames:options:] directly.
  */
-- (nullable instancetype)init NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Gets the name of this app.
