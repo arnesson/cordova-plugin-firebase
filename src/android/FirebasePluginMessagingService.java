@@ -92,7 +92,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setContentTitle(title)
+                .setContentText(messageBody);
 
             if (bundle.getString("image", null) != null) {
                 Bitmap remote_picture = null;
@@ -107,9 +109,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     .setSummaryText(messageBody);
                 notificationBuilder.setStyle(style);
             } else {
-                notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
-                    .setContentTitle(title)
-                    .setContentText(messageBody);
+                notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
             }
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
