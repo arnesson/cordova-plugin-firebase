@@ -34,14 +34,14 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 
 ## Changing Notification Icon
 The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon will is used.
-To set a big icon and small icon for notifications, define them through drawable nodes.  
-Create the required styles.xml files and add the icons to the  
-`<projectroot>/res/native/android/res/<drawable-DPI>` folders.  
+To set a big icon and small icon for notifications, define them through drawable nodes.
+Create the required styles.xml files and add the icons to the
+`<projectroot>/res/native/android/res/<drawable-DPI>` folders.
 
-The example below uses a png named "ic_silhouette.png", the app Icon (@mipmap/icon) and sets a base theme.  
-From android version 21 (Lollipop) notifications were changed, needing a seperate setting.  
-If you only target Lollipop and above, you don't need to setup both.  
-Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.  
+The example below uses a png named "ic_silhouette.png", the app Icon (@mipmap/icon) and sets a base theme.
+From android version 21 (Lollipop) notifications were changed, needing a seperate setting.
+If you only target Lollipop and above, you don't need to setup both.
+Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.
 `<projectroot>/res/native/android/res/values/styles.xml`
 ```
 <?xml version="1.0" encoding="utf-8" ?>
@@ -54,7 +54,7 @@ Thankfully using the version dependant asset selections, we can make one build/a
     <drawable name="notification_icon">@mipmap/icon</drawable>
 </resources>
 ```
-and  
+and
 `<projectroot>/res/native/android/res/values-v21/styles.xml`
 ```
 <?xml version="1.0" encoding="utf-8" ?>
@@ -80,6 +80,21 @@ On Android Lollipop and above you can also set the accent color for the notifica
     <color name="primary_dark">#FF220022</color>
     <color name="accent">#FF00FFFF</color>
 </resources>
+```
+
+## Big Picture in Notification
+
+If you want to send Big Picture Notification, you need to send data only message (without notification) with `image` field and `data_title` field
+
+```
+{
+    "to" : ...,
+    "data" : {
+      "image": "https://static.pexels.com/photos/4825/red-love-romantic-flowers.jpg",
+      "text":"Photo summary",
+      "data_title":"Photo Title"
+    }
+}
 ```
 
 

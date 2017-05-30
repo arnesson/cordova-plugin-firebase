@@ -4,6 +4,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,9 @@ import android.text.TextUtils;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.Random;
 
@@ -49,7 +54,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             text = remoteMessage.getNotification().getBody();
             id = remoteMessage.getMessageId();
         } else {
-            title = remoteMessage.getData().get("title");
+            title = remoteMessage.getData().get("data_title");
             text = remoteMessage.getData().get("text");
             id = remoteMessage.getData().get("id");
         }
@@ -85,12 +90,27 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent);
+
+            if (bundle.getString("image", null) != null) {
+                Bitmap remote_picture = null;
+                try {
+                    remote_picture = BitmapFactory.decodeStream((InputStream) new URL(bundle.getString("image")).getContent());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle();
+                style.bigPicture(remote_picture)
+                    .setBigContentTitle(title)
+                    .setSummaryText(messageBody);
+                notificationBuilder.setStyle(style);
+            } else {
+                notificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
                     .setContentTitle(title)
-                    .setContentText(messageBody)
-                    .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
-                    .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
+                    .setContentText(messageBody);
+            }
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
             if (resID != 0) {
@@ -101,17 +121,17 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
             if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
             {
-				int accentID = getResources().getIdentifier("accent", "color", getPackageName());
-                notificationBuilder.setColor(getResources().getColor(accentID, null));
+                int accentID = getResources().getIdentifier("accent", "color", getPackageName());
+                //notificationBuilder.setColor(getResources().getColor(accentID, null));
             }
 
             Notification notification = notificationBuilder.build();
             if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
-				int iconID = android.R.id.icon;
-				int notiID = getResources().getIdentifier("notification_big", "drawable", getPackageName());
-		if (notification.contentView != null) {
-	                notification.contentView.setImageViewResource(iconID, notiID);
-		}
+                int iconID = android.R.id.icon;
+                int notiID = getResources().getIdentifier("notification_big", "drawable", getPackageName());
+        if (notification.contentView != null) {
+                    notification.contentView.setImageViewResource(iconID, notiID);
+        }
             }
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
