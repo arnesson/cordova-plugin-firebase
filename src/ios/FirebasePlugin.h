@@ -11,6 +11,7 @@
 - (void)getBadgeNumber:(CDVInvokedUrlCommand*)command;
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
+- (void)unregister:(CDVInvokedUrlCommand*)command;
 - (void)onNotificationOpen:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
