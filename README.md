@@ -1,3 +1,6 @@
+# UPDATED TO IOS SDK 4
+This update was done to test phone authentication in iOS. All other methods haven't been tested.
+
 # cordova-plugin-firebase
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 Android and iOS supported (including iOS 10).
@@ -326,4 +329,38 @@ var defaults = {
 window.FirebasePlugin.setDefaults(defaults);
 // or, specify a namespace
 window.FirebasePlugin.setDefaults(defaults, "namespace");
+```
+
+### Phone Authetication (iOS only)
+
+IMPORTANT: SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
+WHEN YOU CALL THIS METHOD, FCM SENDS A SILENT PUSH TO THE DEVICE TO VERIFY IT.
+
+This method sends an SMS to the user with the SMS_code and gets the verification id you need to continue the sign in process, with the Firebase JS SDK.
+
+```
+window.FirebasePlugin.getVerificationID("+573123456789",function(id) {
+                console.log("verificationID: "+id);
+                
+            }, function(error) {             
+                console.error(error);
+            });
+```
+
+Using Ionic2?
+```
+  (<any>window).FirebasePlugin.getVerificationID("+573123456789", id => {
+          console.log("verificationID: " + id);
+          this.verificationId = id;
+        }, error => {
+          console.log("error: " + error);
+        });
+```
+Get the intermediate AuthCredential object
+```
+var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, SMS_code);
+```
+Then, you can sign in the user with the credential:
+```
+firebase.auth().signInWithCredential(credential);
 ```
