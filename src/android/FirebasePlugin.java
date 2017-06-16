@@ -645,9 +645,8 @@ public class FirebasePlugin extends CordovaPlugin {
                                 // The SMS quota for the project has been exceeded
                                 errorMsg = "The SMS quota for the project has been exceeded";
                             }
-                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, errorMsg);
-                            pluginresult.setKeepCallback(true);
-                            callbackContext.sendPluginResult(pluginresult);
+                            
+                            callbackContext.error(errorMsg);
                         }
 
                         @Override
