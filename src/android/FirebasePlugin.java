@@ -643,7 +643,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                 callbackContext.error(e.getMessage());
                                 return;
                             }
-                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
+                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, verificationId);
                             pluginresult.setKeepCallback(true);
                             callbackContext.sendPluginResult(pluginresult);
                         }
