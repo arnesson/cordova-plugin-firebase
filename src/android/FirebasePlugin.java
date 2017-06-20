@@ -142,7 +142,7 @@ public class FirebasePlugin extends CordovaPlugin {
             this.setConfigSettings(callbackContext, args.getJSONObject(0));
             return true;
         }else if (action.equals("getVerificationID")) {
-            this.getVerificationID(callbackContext, args.getJSONObject(0));
+            this.getVerificationID(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("setDefaults")) {
             if (args.length() > 1) this.setDefaults(callbackContext, args.getJSONObject(0), args.getString(1));
