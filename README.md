@@ -332,11 +332,15 @@ window.FirebasePlugin.setDefaults(defaults, "namespace");
 ```
 
 ### Phone Authetication
-IOS https://github.com/silverio/cordova-plugin-
-ANDROID https://github.com/apptum/cordova-plugin-firebase
-(iOS)
-IMPORTANT: SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
-WHEN YOU CALL THIS METHOD, FCM SENDS A SILENT PUSH TO THE DEVICE TO VERIFY IT.
+**BASED ON THE CONTRIBUTIONS OF**
+IOS 
+https://github.com/silverio/cordova-plugin-
+
+ANDROID 
+https://github.com/apptum/cordova-plugin-firebase
+
+**((((IOS))): SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
+WHEN YOU CALL THIS METHOD, FCM SENDS A SILENT PUSH TO THE DEVICE TO VERIFY IT.**
 
 This method sends an SMS to the user with the SMS_code and gets the verification id you need to continue the sign in process, with the Firebase JS SDK.
 
@@ -365,4 +369,8 @@ var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, SMS_
 Then, you can sign in the user with the credential:
 ```
 firebase.auth().signInWithCredential(credential);
+```
+Or link to an account
+```
+firebase.auth().currentUser.linkWithCredential(credential)
 ```
