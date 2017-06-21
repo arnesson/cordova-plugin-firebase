@@ -331,7 +331,7 @@ window.FirebasePlugin.setDefaults(defaults);
 window.FirebasePlugin.setDefaults(defaults, "namespace");
 ```
 
-### Phone Authetication
+### Phone Authentication
 **BASED ON THE CONTRIBUTIONS OF**
 IOS 
 https://github.com/silverio/cordova-plugin-
