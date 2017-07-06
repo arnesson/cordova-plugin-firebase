@@ -374,5 +374,5 @@ window.FirebasePlugin.setAlwaysShowNotification(true/false)
 Previous notifications are replaced by new ones. Data of old notifications is lost.
 
 ```
-window.FirebasePlugin.setAlwaysShowNotification(true/false)
+window.FirebasePlugin.setReplacePrevNotifications(true/false)
 ```
