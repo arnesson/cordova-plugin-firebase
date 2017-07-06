@@ -48,6 +48,8 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static final String KEY = "badge";
 
     private static boolean inBackground = true;
+    private static boolean alwaysShowNotification = false;
+    private static boolean replacePrevNotifications = false;
     private static ArrayList<Bundle> notificationStack = null;
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
@@ -147,6 +149,12 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("verifyPhoneNumber")) {
             this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
+            return true;
+        } else if (action.equals("setAlwaysShowNotification")) {
+            this.setAlwaysShowNotification(args.getBoolean(0));
+            return true;
+        } else if (action.equals("setReplacePrevNotifications")) {
+            this.setReplacePrevNotifications(args.getBoolean(0));
             return true;
         }
         return false;
@@ -645,7 +653,9 @@ public class FirebasePlugin extends CordovaPlugin {
                                 // The SMS quota for the project has been exceeded
                                 errorMsg = "The SMS quota for the project has been exceeded";
                             }
-                            
+                            // PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, errorMsg);
+                            // pluginresult.setKeepCallback(true);
+                            // callbackContext.sendPluginResult(pluginresult);
                             callbackContext.error(errorMsg);
                         }
 
@@ -686,5 +696,21 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
+    }
+
+    private void setAlwaysShowNotification(final boolean alwaysShow) {
+        FirebasePlugin.alwaysShowNotification = alwaysShow;
+    }
+
+    public static boolean alwaysShowNotification() {
+        return FirebasePlugin.alwaysShowNotification;
+    }
+
+    private void setReplacePrevNotifications(final boolean replace) {
+        FirebasePlugin.replacePrevNotifications = replace;
+    }
+    
+    public static boolean replacePrevNotifications() {
+        return FirebasePlugin.replacePrevNotifications;
     }
 }

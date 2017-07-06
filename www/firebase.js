@@ -123,3 +123,11 @@ exports.setDefaults = function (defaults, namespace, success, error) {
 exports.verifyPhoneNumber = function(number, timeOutDuration, success, error) {
     exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration]);
 };
+
+exports.setAlwaysShowNotification = function(alwaysShow, success, error) {
+    exec(success, error, "FirebasePlugin", "setAlwaysShowNotification", [alwaysShow]);
+};
+
+exports.setReplacePrevNotifications = function(replace, success, error) {
+    exec(success, error, "FirebasePlugin", "setReplacePrevNotifications", [replace]);
+};

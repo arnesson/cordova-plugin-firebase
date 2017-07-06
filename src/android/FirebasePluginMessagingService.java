@@ -54,10 +54,28 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             id = remoteMessage.getData().get("id");
         }
 
-        if(TextUtils.isEmpty(id)){
-            Random rand = new Random();
-            int  n = rand.nextInt(50) + 1;
-            id = Integer.toString(n);
+        /**
+         * TODO: not sure when the id can be empty?
+         * Doesn't seem to be the case when message is send through firebase notification composer or
+         * via cloud functions by using admin.messaging().sendToDevice(token, {notification:{title: 'title', body: `body`}});
+         */
+        // if(TextUtils.isEmpty(id)){
+        //     Random rand = new Random();
+        //     int  n = rand.nextInt(50) + 1;
+        //     id = Integer.toString(n);
+        // }
+
+        /**
+         * Notifications send with Firebase when no messageId is set look like this "0:1499330345939458%4581bbe44581bbe4"
+         * where the part behind '%' seems to be constant.
+         * By giving every notification the same id, new ones override older ones.
+         */
+        
+        if (FirebasePlugin.replacePrevNotifications()) {
+            if (id.contains("%")) {
+                String[] parts = id.split("%");
+                id = parts[1];
+            }
         }
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
@@ -65,9 +83,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Title: " + title);
         Log.d(TAG, "Notification Message Body/Text: " + text);
 
-        // TODO: Add option to developer to configure if show notification when app on foreground
         if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (!remoteMessage.getData().isEmpty())) {
-            boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
+            boolean showNotification = ((FirebasePlugin.alwaysShowNotification() || FirebasePlugin.inBackground()) || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
             sendNotification(id, title, text, remoteMessage.getData(), showNotification);
         }
     }
@@ -90,7 +107,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent);
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH); //shows notification over currently opened app. TODO: make optional
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
             if (resID != 0) {
@@ -99,8 +117,10 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 notificationBuilder.setSmallIcon(getApplicationInfo().icon);
             }
 
-            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-            {
+            if(android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.M){
+            /**
+             * not sure about this. was ">=" but that gives error. Read about it and "getResources().getColor()" seems deprecated WITH M
+             */
 				int accentID = getResources().getIdentifier("accent", "color", getPackageName());
                 notificationBuilder.setColor(getResources().getColor(accentID, null));
             }
@@ -109,9 +129,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
 				int iconID = android.R.id.icon;
 				int notiID = getResources().getIdentifier("notification_big", "drawable", getPackageName());
-		if (notification.contentView != null) {
-	                notification.contentView.setImageViewResource(iconID, notiID);
-		}
+                if (notification.contentView != null) {
+                            notification.contentView.setImageViewResource(iconID, notiID);
+                }
             }
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

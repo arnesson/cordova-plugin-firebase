@@ -131,6 +131,7 @@ Notification flow:
 
 1. App is in foreground:
     1. User receives the notification data in the JavaScript callback without any notification on the device itself (this is the normal behaviour of push notifications, it is up to you, the developer, to notify the user)
+    **unless**: ```fireBasePlugin.setAlwaysShowNotification(true)```
 2. App is in background:
     1. User receives the notification message in its device notification bar
     2. User taps the notification and the app opens
@@ -357,4 +358,21 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 }, function(error) {
     console.error(error);
 });
+```
+
+### setAlwaysShowNotification (Android only?)
+
+Shows notification when the app is in foreground.
+Notifications behaves as if app is in background. That means the notification data is received in the JavaScript callback when the users taps the notification.
+
+```
+window.FirebasePlugin.setAlwaysShowNotification(true/false)
+```
+
+### setReplacePrevNotifications (Android only?)
+
+Previous notifications are replaced by new ones. Data of old notifications is lost.
+
+```
+window.FirebasePlugin.setAlwaysShowNotification(true/false)
 ```
