@@ -63,6 +63,7 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 Log.d(TAG, "Starting Firebase plugin");
                 mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+                mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
                 if (extras != null && extras.size() > 1) {
                     if (FirebasePlugin.notificationStack == null) {
                         FirebasePlugin.notificationStack = new ArrayList<Bundle>();
@@ -98,6 +99,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("unsubscribe")) {
             this.unsubscribe(callbackContext, args.getString(0));
+            return true;
+        } else if (action.equals("unregister")) {
+            this.unregister(callbackContext);
             return true;
         } else if (action.equals("onNotificationOpen")) {
             this.onNotificationOpen(callbackContext);
@@ -347,6 +351,23 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void unregister(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                    String currentToken = FirebaseInstanceId.getInstance().getToken();
+                    if (currentToken != null) {
+                        FirebasePlugin.sendToken(currentToken);
+                    }
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());

@@ -177,6 +177,21 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)unregister:(CDVInvokedUrlCommand *)command {
+    [[FIRInstanceID instanceID] deleteIDWithHandler:^void(NSError *_Nullable error){
+        if (error) {
+            NSLog(@"Unable to delete instance");
+        } else {            
+            NSString* currentToken = [[FIRInstanceID instanceID] token];
+            if (currentToken != nil) {
+                [self sendToken:currentToken];
+            }
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];
+}
+
 - (void)onNotificationOpen:(CDVInvokedUrlCommand *)command {
     self.notificationCallbackId = command.callbackId;
 

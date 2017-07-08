@@ -3,18 +3,18 @@ This update was done to test phone authentication in iOS. All other methods have
 
 # cordova-plugin-firebase
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
-Android and iOS supported (including iOS 10).
+Android and iOS supported.
 
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="0.1.21" />
+<plugin name="cordova-plugin-firebase" spec="0.1.22" />
 ```
 or by running:
 ```
-cordova plugin add cordova-plugin-firebase@0.1.21 --save
+cordova plugin add cordova-plugin-firebase@0.1.22 --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
@@ -190,6 +190,13 @@ window.FirebasePlugin.subscribe("example");
 Unsubscribe from a topic:
 ```
 window.FirebasePlugin.unsubscribe("example");
+```
+
+### unregister
+
+Unregister from firebase, used to stop receiving push notifications. Call this when you logout user from your app. :
+```
+window.FirebasePlugin.unregister();
 ```
 
 ### logEvent
