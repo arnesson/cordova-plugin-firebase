@@ -3,6 +3,51 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 **And authentication via phone numer (for android)**
 Android and iOS supported (including iOS 10).
 
+##in this fork
+### verifyPhoneNumber (Android only)
+
+Request a verificationId and send a SMS with a verificatioCode.
+Use them to construct a credenial to sign in the user (in your app).
+https://firebase.google.com/docs/auth/android/phone-auth
+https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+
+```
+window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
+    console.log(credential);
+
+    // ask user to input verificationCode:
+    var code = inputField.value.toString();
+
+    var verificationId = credential.verificationId;
+    
+    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    firebase.auth().signInWithCredential(signInCredential);
+}, function(error) {
+    console.error(error);
+});
+```
+
+### setAlwaysShowNotification (Android only?)
+
+Shows notification when the app is in foreground.
+Notifications behaves as if app is in background. That means the notification data is received in the JavaScript callback when the users taps the notification.
+
+```
+window.FirebasePlugin.setAlwaysShowNotification(true/false)
+```
+
+### setReplacePrevNotifications (Android only?)
+
+Previous notifications are replaced by new ones. Data of old notifications is lost.
+
+```
+window.FirebasePlugin.setReplacePrevNotifications(true/false)
+```
+
+
+
+
+
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
@@ -335,44 +380,4 @@ var defaults = {
 window.FirebasePlugin.setDefaults(defaults);
 // or, specify a namespace
 window.FirebasePlugin.setDefaults(defaults, "namespace");
-```
-
-### verifyPhoneNumber (Android only)
-
-Request a verificationId and send a SMS with a verificatioCode.
-Use them to construct a credenial to sign in the user (in your app).
-https://firebase.google.com/docs/auth/android/phone-auth
-https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
-
-```
-window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
-    console.log(credential);
-
-    // ask user to input verificationCode:
-    var code = inputField.value.toString();
-
-    var verificationId = credential.verificationId;
-    
-    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-    firebase.auth().signInWithCredential(signInCredential);
-}, function(error) {
-    console.error(error);
-});
-```
-
-### setAlwaysShowNotification (Android only?)
-
-Shows notification when the app is in foreground.
-Notifications behaves as if app is in background. That means the notification data is received in the JavaScript callback when the users taps the notification.
-
-```
-window.FirebasePlugin.setAlwaysShowNotification(true/false)
-```
-
-### setReplacePrevNotifications (Android only?)
-
-Previous notifications are replaced by new ones. Data of old notifications is lost.
-
-```
-window.FirebasePlugin.setReplacePrevNotifications(true/false)
 ```
