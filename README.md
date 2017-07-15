@@ -3,7 +3,7 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 **And authentication via phone numer (for android)**
 Android and iOS supported (including iOS 10).
 
-##in this fork
+## in this fork
 ### verifyPhoneNumber (Android only)
 
 Request a verificationId and send a SMS with a verificatioCode.
