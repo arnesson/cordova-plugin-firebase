@@ -36,6 +36,11 @@ var name = getValue(config, "name")
 if (directoryExists("platforms/ios")) {
   var paths = ["GoogleService-Info.plist", "platforms/ios/www/GoogleService-Info.plist"];
 
+  // create the second Resources folder if it doesn't exist
+  if (!directoryExists("platforms/ios/" + name + "/Resources/Resources")) {
+    fs.mkdirSync("platforms/ios/" + name + "/Resources/Resources");
+  }
+
   for (var i = 0; i < paths.length; i++) {
     if (fileExists(paths[i])) {
       try {
