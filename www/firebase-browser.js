@@ -13,7 +13,13 @@ exports.getToken = function(success, error) {
 exports.onNotificationOpen = function(success, error) {
 };
 
-exports.clearNotifications = function(success, error) {
+exports.cancelAllNotifications = function(success, error) {
+    if (typeof success === 'function') {
+        success();
+    }
+};
+
+exports.cancelNotification = function(id, success, error) {
     if (typeof success === 'function') {
         success();
     }

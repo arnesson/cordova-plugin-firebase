@@ -95,8 +95,11 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("onNotificationOpen")) {
             this.onNotificationOpen(callbackContext);
             return true;
-        } else if (action.equals("clearNotifications")) {
-            this.clearNotifications(callbackContext);
+        } else if (action.equals("cancelAllNotifications")) {
+            this.cancelAllNotifications(callbackContext);
+            return true;
+        } else if (action.equals("cancelNotification")) {
+            this.cancelNotification(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("onTokenRefresh")) {
             this.onTokenRefresh(callbackContext);
@@ -171,12 +174,26 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
-    private void clearNotifications(final CallbackContext callbackContext) {
+    private void cancelAllNotifications(final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.cancelAll();
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void cancelNotification(final CallbackContext callbackContext, final String id) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(id.hashCode());
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());

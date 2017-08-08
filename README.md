@@ -263,11 +263,18 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 });
 ```
 
-### clearNotifications (Android only)
+### cancelAllNotifications (Android only)
 
-Clear all notifications:
+Clear all notifications from system tray:
 ```
-window.FirebasePlugin.clearNotifications();
+window.FirebasePlugin.cancelAllNotifications();
+```
+
+### cancelNotification (Android only)
+
+Clear notification from system tray:
+```
+window.FirebasePlugin.cancelNotification("message_id");
 ```
 
 ### getByteArray (Android only)

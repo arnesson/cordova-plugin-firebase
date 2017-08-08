@@ -12,8 +12,12 @@ exports.onNotificationOpen = function(success, error) {
     exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
 };
 
-exports.clearNotifications = function(success, error) {
-    exec(success, error, "FirebasePlugin", "clearNotifications", []);
+exports.cancelAllNotifications = function(success, error) {
+    exec(success, error, "FirebasePlugin", "cancelAllNotifications", []);
+};
+
+exports.cancelNotification = function(id, success, error) {
+    exec(success, error, "FirebasePlugin", "cancelNotification", [id]);
 };
 
 exports.onTokenRefresh = function(success, error) {
