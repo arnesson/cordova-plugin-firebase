@@ -156,6 +156,15 @@ static FirebasePlugin *firebasePlugin;
     }];
 }
 
+- (void)cancelAllNotifications:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
     NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
     

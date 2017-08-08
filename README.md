@@ -263,7 +263,7 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 });
 ```
 
-### cancelAllNotifications (Android only)
+### cancelAllNotifications
 
 Clear all notifications from system tray:
 ```
