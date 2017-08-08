@@ -13,6 +13,12 @@ exports.getToken = function(success, error) {
 exports.onNotificationOpen = function(success, error) {
 };
 
+exports.clearNotifications = function(success, error) {
+    if (typeof success === 'function') {
+        success();
+    }
+};
+
 exports.onTokenRefresh = function(success, error) {
 };
 

@@ -263,6 +263,13 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 });
 ```
 
+### clearNotifications (Android only)
+
+Clear all notifications:
+```
+window.FirebasePlugin.clearNotifications();
+```
+
 ### getByteArray (Android only)
 **NOTE: byte array is only available for SDK 19+**
 Retrieve a Remote Config byte array:

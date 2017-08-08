@@ -12,6 +12,10 @@ exports.onNotificationOpen = function(success, error) {
     exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
 };
 
+exports.clearNotifications = function(success, error) {
+    exec(success, error, "FirebasePlugin", "clearNotifications", []);
+};
+
 exports.onTokenRefresh = function(success, error) {
     exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };

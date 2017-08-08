@@ -1,5 +1,6 @@
 package org.apache.cordova.firebase;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -94,6 +95,9 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("onNotificationOpen")) {
             this.onNotificationOpen(callbackContext);
             return true;
+        } else if (action.equals("clearNotifications")) {
+            this.clearNotifications(callbackContext);
+            return true;
         } else if (action.equals("onTokenRefresh")) {
             this.onTokenRefresh(callbackContext);
             return true;
@@ -165,6 +169,20 @@ public class FirebasePlugin extends CordovaPlugin {
             }
             FirebasePlugin.notificationStack.clear();
         }
+    }
+
+    private void clearNotifications(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancelAll();
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
     }
 
     private void onTokenRefresh(final CallbackContext callbackContext) {
