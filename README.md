@@ -9,11 +9,11 @@ See npm package for versions - https://www.npmjs.com/package/floydspace-cordova-
 
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name=""floydspace-cordova-plugin-firebase" spec="0.1.24" />
+<plugin name=""floydspace-cordova-plugin-firebase" spec="0.1.25" />
 ```
 or by running:
 ```
-cordova plugin add "floydspace-cordova-plugin-firebase@0.1.24 --save
+cordova plugin add "floydspace-cordova-plugin-firebase@0.1.25 --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
