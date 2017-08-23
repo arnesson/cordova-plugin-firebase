@@ -26,5 +26,8 @@
     "firebase",
     "push",
     "notifications"
-  ]
+  ],
+  "dependencies": {
+    "fs-extra": "3.0.1"
+  }
 }
