@@ -603,7 +603,7 @@ public class FirebasePlugin extends CordovaPlugin {
         return map;
     }
 
-	public void clearAllNotifications(final CallbackContext callbackContext) {
+    public void clearAllNotifications(final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -616,4 +616,5 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
+    }
 }
