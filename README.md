@@ -38,6 +38,17 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 
 **Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
 
+## Google Tag Manager
+### Android
+Download your container-config json file from Tag Manager and add a resource-file node in your config.xml.
+```
+....
+<platform name="android">
+        <content src="index.html" />
+        <resource-file src="GTM-5MFXXXX.json" target="assets/containers/GTM-5MFXXXX.json" />
+        ...
+```
+
 ## Changing Notification Icon
 The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon will is used.
 To set a big icon and small icon for notifications, define them through drawable nodes.  
