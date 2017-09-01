@@ -117,3 +117,9 @@ exports.setDefaults = function (defaults, namespace, success, error) {
         success();
     }
 };
+
+exports.clearAllNotifications = function(success, error) {
+    if (typeof success === 'function') {
+        success();
+    }
+};

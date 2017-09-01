@@ -119,3 +119,7 @@ exports.setDefaults = function (defaults, namespace, success, error) {
     }
     exec(success, error, "FirebasePlugin", "setDefaults", args);
 };
+
+exports.clearAllNotifications = function(success, error) {
+    exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
+};
