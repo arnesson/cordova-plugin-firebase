@@ -16,6 +16,11 @@ Use them to construct a credenial to sign in the user (in your app).
 https://firebase.google.com/docs/auth/android/phone-auth
 https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
 
+NOTE: To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
+See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+
+NOTE: This will only works on physical devices.
+
 ```
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
     console.log(credential);
