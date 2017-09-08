@@ -1,11 +1,11 @@
 {
   "author": {
-    "name": "Robert Arnesson, Juan Semaan, John Castro, "
+    "name": "Robert Arnesson"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jestcastro/cordova-plugin-firebase"
+    "url": "https://github.com/arnesson/cordova-plugin-firebase"
   },
   "name": "cordova-plugin-firebase",
   "version": "0.1.24",
