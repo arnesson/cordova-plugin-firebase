@@ -1,5 +1,15 @@
 #import <Foundation/Foundation.h>
 
+// NS_SWIFT_NAME can only translate factory methods before the iOS 9.3 SDK.
+// Wrap it in our own macro if it's a non-compatible SDK.
+#ifndef FIR_SWIFT_NAME
+#ifdef __IPHONE_9_3
+#define FIR_SWIFT_NAME(X) NS_SWIFT_NAME(X)
+#else
+#define FIR_SWIFT_NAME(X)  // Intentionally blank.
+#endif  // #ifdef __IPHONE_9_3
+#endif  // #ifndef FIR_SWIFT_NAME
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -23,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param ap A variable argument list.
  */
 FOUNDATION_EXTERN NS_FORMAT_FUNCTION(1, 0)
+NS_SWIFT_UNAVAILABLE("Use `FirebaseCrashMessage(_:)` instead.")
 void FIRCrashLogv(NSString *format, va_list ap);
 
 /**
@@ -79,6 +90,7 @@ void FIRCrashLog(NSString *format, ...) {
  * @param ap A variable argument list.
  */
 FOUNDATION_STATIC_INLINE NS_FORMAT_FUNCTION(1, 0)
+FIR_SWIFT_NAME(FirebaseCrashNSLogv(_:_:))
 void FIRCrashNSLogv(NSString *format, va_list ap) {
   va_list ap2;
 
@@ -142,11 +154,11 @@ void FIRCrashNSLog(NSString *format, ...) {
  *   crash reporter.  Excessively long messages will be truncated
  *   safely but that will introduce a delay in submitting the message.
  *
- * @param Message A log message
+ * @param message A log message
  *
  * @see FIRCrashLog(format, ...)
  */
-FOUNDATION_STATIC_INLINE
+FOUNDATION_STATIC_INLINE FIR_SWIFT_NAME(FirebaseCrashMessage(_:))
 void FIRCrashMessage(NSString *message) {
   FIRCrashLog(@"%@", message);
 }

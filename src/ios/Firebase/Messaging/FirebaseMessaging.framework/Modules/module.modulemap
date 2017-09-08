@@ -4,8 +4,4 @@ framework module FirebaseMessaging {
   module * { export *}
   link "sqlite3"
   link "z"
-  link framework "CoreGraphics"
-  link framework "Foundation"
-  link framework "SystemConfiguration"
-  link framework "UIKit"
 }

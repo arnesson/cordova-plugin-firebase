@@ -91,12 +91,16 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCore.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCoreDiagnostics.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseNanoPB.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleToolboxForMac.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
 		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
+		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
+		<framework custom="true" src="src/ios/Firebase/Auth/GTMSessionFetcher.framework" />
 	</platform>
 
 	<platform name="browser">
