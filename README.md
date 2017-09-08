@@ -8,6 +8,35 @@ BTC: 1JuXhHMCPHXT2fDfSRUTef9TpE2D67sc9f
 
 Thank you for your support!
 
+## in this fork
+### verifyPhoneNumber (Android only)
+
+Request a verificationId and send a SMS with a verificatioCode.
+Use them to construct a credenial to sign in the user (in your app).
+https://firebase.google.com/docs/auth/android/phone-auth
+https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+
+NOTE: To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
+See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+
+NOTE: This will only works on physical devices.
+
+```
+window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
+    console.log(credential);
+
+    // ask user to input verificationCode:
+    var code = inputField.value.toString();
+
+    var verificationId = credential.verificationId;
+    
+    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    firebase.auth().signInWithCredential(signInCredential);
+}, function(error) {
+    console.error(error);
+});
+```
+
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
