@@ -123,3 +123,9 @@ exports.setDefaults = function (defaults, namespace, success, error) {
         success();
     }
 };
+
+exports.verifyPhoneNumber = function(number, timeOutDuration, success, error) {
+    if (typeof success === 'function') {
+        success();
+    }
+};

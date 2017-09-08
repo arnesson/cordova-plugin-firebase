@@ -84,27 +84,57 @@ static FirebasePlugin *firebasePlugin;
             [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
             #pragma GCC diagnostic pop
         }
-    } else {
-        #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-        // IOS 10
-        UNAuthorizationOptions authOptions =
-          UNAuthorizationOptionAlert
-          | UNAuthorizationOptionSound
-          | UNAuthorizationOptionBadge;
-        [[UNUserNotificationCenter currentNotificationCenter]
-          requestAuthorizationWithOptions:authOptions
-          completionHandler:^(BOOL granted, NSError * _Nullable error) {
-          }
-        ];
-        [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-        [[FIRMessaging messaging] setRemoteMessageDelegate:self];
-        #endif
-
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
+		
+		CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+		[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+		return;
     }
-
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+	
+	
+	
+	#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+	BOOL isIOS10 = TRUE;
+	#else
+	BOOL isIOS10 = FALSE;
+	#endif
+	
+	
+	if ( !isIOS10 ) {
+		[[UIApplication sharedApplication] registerForRemoteNotifications];
+		CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+		[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+		return;
+	}
+	
+	
+	
+	// IOS 10
+	UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
+	[[UNUserNotificationCenter currentNotificationCenter]
+		requestAuthorizationWithOptions:authOptions
+	 				  completionHandler:^(BOOL granted, NSError * _Nullable error) {
+			
+			if ( ![NSThread isMainThread] ) {
+				dispatch_sync(dispatch_get_main_queue(), ^{
+					[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+					[[FIRMessaging messaging] setRemoteMessageDelegate:self];
+					[[UIApplication sharedApplication] registerForRemoteNotifications];
+					
+					CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus: granted ? CDVCommandStatus_OK : CDVCommandStatus_ERROR];
+					[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+				});
+			}
+			else {
+				[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+				[[FIRMessaging messaging] setRemoteMessageDelegate:self];
+				[[UIApplication sharedApplication] registerForRemoteNotifications];
+				CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+				[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+			}
+	  }
+	];
+	
+	return;
 }
 
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {

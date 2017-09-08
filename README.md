@@ -5,16 +5,51 @@ This update was done to test phone authentication in iOS. All other methods have
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 Android and iOS supported.
 
+Donations are welcome and will go towards further development of this project. Use the wallet address below to donate.
+
+BTC: 1JuXhHMCPHXT2fDfSRUTef9TpE2D67sc9f
+
+Thank you for your support!
+
+## in this fork
+### verifyPhoneNumber (Android only)
+
+Request a verificationId and send a SMS with a verificatioCode.
+Use them to construct a credenial to sign in the user (in your app).
+https://firebase.google.com/docs/auth/android/phone-auth
+https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+
+NOTE: To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
+See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+
+NOTE: This will only works on physical devices.
+
+```
+window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
+    console.log(credential);
+
+    // ask user to input verificationCode:
+    var code = inputField.value.toString();
+
+    var verificationId = credential.verificationId;
+    
+    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    firebase.auth().signInWithCredential(signInCredential);
+}, function(error) {
+    console.error(error);
+});
+```
+
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="0.1.22" />
+<plugin name="cordova-plugin-firebase" spec="0.1.24" />
 ```
 or by running:
 ```
-cordova plugin add cordova-plugin-firebase@0.1.22 --save
+cordova plugin add cordova-plugin-firebase@0.1.24 --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
@@ -34,6 +69,17 @@ See https://support.google.com/firebase/answer/7015592 for details how to downlo
 This plugin uses a hook (after prepare) that copies the configuration files to the right place, namely platforms/ios/\<My Project\>/Resources for ios and platforms/android for android.
 
 **Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
+
+## Google Tag Manager
+### Android
+Download your container-config json file from Tag Manager and add a resource-file node in your config.xml.
+```
+....
+<platform name="android">
+        <content src="index.html" />
+        <resource-file src="GTM-5MFXXXX.json" target="assets/containers/GTM-5MFXXXX.json" />
+        ...
+```
 
 ## Changing Notification Icon
 The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon will is used.

@@ -18,7 +18,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import com.google.firebase.crash.FirebaseCrash;
-
 import me.leolin.shortcutbadger.ShortcutBadger;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -33,10 +32,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+
+// Firebase PhoneAuth
 import java.util.concurrent.TimeUnit;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -52,8 +54,6 @@ public class FirebasePlugin extends CordovaPlugin {
     private static ArrayList<Bundle> notificationStack = null;
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
-
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     @Override
     protected void pluginInitialize() {
@@ -145,12 +145,12 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("setConfigSettings")) {
             this.setConfigSettings(callbackContext, args.getJSONObject(0));
             return true;
-        }else if (action.equals("getVerificationID")) {
-            this.getVerificationID(callbackContext, args.getString(0));
-            return true;
         } else if (action.equals("setDefaults")) {
             if (args.length() > 1) this.setDefaults(callbackContext, args.getJSONObject(0), args.getString(1));
             else this.setDefaults(callbackContext, args.getJSONObject(0), null);
+            return true;
+        } else if (action.equals("verifyPhoneNumber")) {
+            this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
             return true;
         }
         return false;
@@ -613,7 +613,9 @@ public class FirebasePlugin extends CordovaPlugin {
         }
         return map;
     }
-    public void getVerificationID(final CallbackContext callbackContext, final String number) {
+
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    public void verifyPhoneNumber(final CallbackContext callbackContext, final String number, final int timeOutDuration) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -627,7 +629,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             //     detect the incoming verification SMS and perform verificaiton without
                             //     user action.
                             Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted - doing nothing. sign in with token from onCodeSent");
-                            
+
                             // does this fire in cordova?
                             // TODO: return credential
                         }
@@ -639,13 +641,17 @@ public class FirebasePlugin extends CordovaPlugin {
                             Log.w(TAG, "failed: verifyPhoneNumber.onVerificationFailed ", e);
 
                             String errorMsg = "unknown error verifying number";
+                            errorMsg += " Error instance: " + e.getClass().getName();
+                            errorMsg += " Error code: " + ((FirebaseAuthException)e).getErrorCode().toString();
+
                             if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                                // The phone number is invalid
+                                // Invalid request
                                 errorMsg = "Invalid phone number";
                             } else if (e instanceof FirebaseTooManyRequestsException) {
+                                // The SMS quota for the project has been exceeded
                                 errorMsg = "The SMS quota for the project has been exceeded";
                             }
-                            
+
                             callbackContext.error(errorMsg);
                         }
 
@@ -656,7 +662,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             // by combining the code with a verification ID [(in app)].
                             Log.d(TAG, "success: verifyPhoneNumber.onCodeSent");
 
-                            JSONObject returnResults = new JSONObject();                            
+                            JSONObject returnResults = new JSONObject();
                             try {
                                 returnResults.put("verificationId", verificationId);
                                 //returnResults.put("forceResendingToken", token); // TODO: return forceResendingToken
@@ -664,22 +670,22 @@ public class FirebasePlugin extends CordovaPlugin {
                                 callbackContext.error(e.getMessage());
                                 return;
                             }
-                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, verificationId);
+                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
                             pluginresult.setKeepCallback(true);
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
 
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                        number,                 // Phone number to verify
-                        60,                     // Timeout duration
-                        TimeUnit.SECONDS,       // Unit of timeout
-                        cordova.getActivity(),  // Activity (for callback binding)
-                        mCallbacks);            // OnVerificationStateChangedCallbacks
-                        //resentToken);         // The ForceResendingToken obtained from onCodeSent callback
-                                                // to force re-sending another verification SMS before the auto-retrieval timeout.
-                                                // TODO: make resendToken accessible
-                    
+                            number,                 // Phone number to verify
+                            timeOutDuration,        // Timeout duration
+                            TimeUnit.SECONDS,       // Unit of timeout
+                            cordova.getActivity(),  // Activity (for callback binding)
+                            mCallbacks);            // OnVerificationStateChangedCallbacks
+                    //resentToken);         // The ForceResendingToken obtained from onCodeSent callback
+                    // to force re-sending another verification SMS before the auto-retrieval timeout.
+                    // TODO: make resendToken accessible
+
 
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
