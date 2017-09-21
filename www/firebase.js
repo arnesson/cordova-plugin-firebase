@@ -1,4 +1,7 @@
 var exec = require('cordova/exec');
+exports.getVerificationID = function(number, success, error) {
+    exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
+};
 
 exports.getInstanceId = function(success, error) {
     exec(success, error, "FirebasePlugin", "getInstanceId", []);
@@ -126,4 +129,8 @@ exports.setDefaults = function (defaults, namespace, success, error) {
         success = namespace;
     }
     exec(success, error, "FirebasePlugin", "setDefaults", args);
+};
+
+exports.verifyPhoneNumber = function(number, timeOutDuration, success, error) {
+    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration]);
 };

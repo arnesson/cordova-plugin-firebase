@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+#import "FIRAnalyticsSwiftNameSupport.h"
 #import "FIREventNames.h"
 #import "FIRParameterNames.h"
 #import "FIRUserPropertyNames.h"
@@ -9,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The top level Firebase Analytics singleton that provides methods for logging events and setting
 /// user properties. See <a href="http://goo.gl/gz8SLz">the developer guides</a> for general
 /// information on using Firebase Analytics in your apps.
+FIR_SWIFT_NAME(Analytics)
 @interface FIRAnalytics : NSObject
 
 /// Logs an app event. The event can have up to 25 parameters. Events with the same name must have
@@ -17,6 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// The following event names are reserved and cannot be used:
 /// <ul>
+///     <li>ad_activeview</li>
+///     <li>ad_click</li>
+///     <li>ad_exposure</li>
+///     <li>ad_impression</li>
+///     <li>ad_query</li>
+///     <li>adunit_exposure</li>
 ///     <li>app_clear_data</li>
 ///     <li>app_remove</li>
 ///     <li>app_update</li>
@@ -28,23 +36,26 @@ NS_ASSUME_NONNULL_BEGIN
 ///     <li>notification_open</li>
 ///     <li>notification_receive</li>
 ///     <li>os_update</li>
+///     <li>screen_view</li>
 ///     <li>session_start</li>
 ///     <li>user_engagement</li>
 /// </ul>
 ///
 /// @param name The name of the event. Should contain 1 to 40 alphanumeric characters or
 ///     underscores. The name must start with an alphabetic character. Some event names are
-///     reserved. See FIREventNames.h for the list of reserved event names. The "firebase_" prefix
-///     is reserved and should not be used. Note that event names are case-sensitive and that
-///     logging two events whose names differ only in case will result in two distinct events.
+///     reserved. See FIREventNames.h for the list of reserved event names. The "firebase_",
+///     "google_", and "ga_" prefixes are reserved and should not be used. Note that event names are
+///     case-sensitive and that logging two events whose names differ only in case will result in
+///     two distinct events.
 /// @param parameters The dictionary of event parameters. Passing nil indicates that the event has
 ///     no parameters. Parameter names can be up to 40 characters long and must start with an
 ///     alphabetic character and contain only alphanumeric characters and underscores. Only NSString
 ///     and NSNumber (signed 64-bit integer and 64-bit floating-point number) parameter types are
-///     supported. NSString parameter values can be up to 100 characters long. The "firebase_"
-///     prefix is reserved and should not be used for parameter names.
+///     supported. NSString parameter values can be up to 100 characters long. The "firebase_",
+///     "google_", and "ga_" prefixes are reserved and should not be used for parameter names.
 + (void)logEventWithName:(NSString *)name
-              parameters:(nullable NSDictionary<NSString *, NSObject *> *)parameters;
+              parameters:(nullable NSDictionary<NSString *, id> *)parameters
+    FIR_SWIFT_NAME(logEvent(_:parameters:));
 
 /// Sets a user property to a given value. Up to 25 user property names are supported. Once set,
 /// user property values persist throughout the app lifecycle and across sessions.
@@ -59,9 +70,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param value The value of the user property. Values can be up to 36 characters long. Setting the
 ///     value to nil removes the user property.
 /// @param name The name of the user property to set. Should contain 1 to 24 alphanumeric characters
-///     or underscores and must start with an alphabetic character. The "firebase_" prefix is
-///     reserved and should not be used for user property names.
-+ (void)setUserPropertyString:(nullable NSString *)value forName:(NSString *)name;
+///     or underscores and must start with an alphabetic character. The "firebase_", "google_", and
+///     "ga_" prefixes are reserved and should not be used for user property names.
++ (void)setUserPropertyString:(nullable NSString *)value forName:(NSString *)name
+    FIR_SWIFT_NAME(setUserProperty(_:forName:));
 
 /// Sets the user ID property. This feature must be used in accordance with
 /// <a href="https://www.google.com/policies/privacy">Google's Privacy Policy</a>

@@ -25,6 +25,7 @@
     "cordova-browser",
     "firebase",
     "push",
-    "notifications"
+    "notifications",
+    "phone auth"
   ]
 }
