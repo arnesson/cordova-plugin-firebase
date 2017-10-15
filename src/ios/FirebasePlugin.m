@@ -323,12 +323,18 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
                 if (status == FIRRemoteConfigFetchStatusSuccess) {
                     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                } else {
+                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }
             }];
         } else {
             [remoteConfig fetchWithCompletionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
                 if (status == FIRRemoteConfigFetchStatusSuccess) {
                     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                } else {
+                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }
             }];
