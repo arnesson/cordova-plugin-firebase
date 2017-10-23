@@ -384,7 +384,7 @@ window.FirebasePlugin.setDefaults(defaults, "namespace");
 ### Phone Authentication
 **BASED ON THE CONTRIBUTIONS OF**
 IOS 
-https://github.com/silverio/cordova-plugin-
+https://github.com/silverio/cordova-plugin-firebase
 
 ANDROID 
 https://github.com/apptum/cordova-plugin-firebase
