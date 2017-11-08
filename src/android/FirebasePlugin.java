@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -482,9 +482,9 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    task.addOnCompleteListener(new OnCompleteListener<Void>() {
+                    task.addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onComplete(Task<Void> task) {
+                        public void onSuccess(Void data) {
                             callbackContext.success();
                         }
                     }).addOnFailureListener(new OnFailureListener() {

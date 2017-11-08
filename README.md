@@ -274,9 +274,17 @@ window.FirebasePlugin.setUserProperty("name", "value");
 
 Fetch Remote Config parameter values for your app:
 ```
-window.FirebasePlugin.fetch();
+window.FirebasePlugin.fetch(function () {
+    // success callback
+}, function () {
+    // error callback
+});
 // or, specify the cacheExpirationSeconds
-window.FirebasePlugin.fetch(600);
+window.FirebasePlugin.fetch(600, function () {
+    // success callback
+}, function () {
+    // error callback
+});
 ```
 
 ### activateFetched
