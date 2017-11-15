@@ -1,4 +1,6 @@
-# cordova-plugin-firebase
+## Fork of [arnesson/cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase)
+
+# floydspace-cordova-plugin-firebase
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 Android and iOS supported.
 
@@ -38,15 +40,15 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 ```
 
 ## Installation
-See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
+See npm package for versions - https://www.npmjs.com/package/floydspace-cordova-plugin-firebase
 
 Install the plugin by adding it your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="0.1.24" />
+<plugin name="floydspace-cordova-plugin-firebase" spec="0.1.26" />
 ```
 or by running:
 ```
-cordova plugin add cordova-plugin-firebase@0.1.24 --save
+cordova plugin add floydspace-cordova-plugin-firebase@0.1.26 --save
 ```
 Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
 
@@ -315,6 +317,20 @@ window.FirebasePlugin.getValue("key", "namespace", function(value) {
 }, function(error) {
     console.error(error);
 });
+```
+
+### cancelAllNotifications
+
+Clear all notifications from system tray:
+```
+window.FirebasePlugin.cancelAllNotifications();
+```
+
+### cancelNotification (Android only)
+
+Clear notification from system tray:
+```
+window.FirebasePlugin.cancelNotification("message_id");
 ```
 
 ### getByteArray (Android only)
