@@ -11,7 +11,7 @@ Thank you for your support!
 ## in this fork
 ### verifyPhoneNumber (Android only)
 
-Request a verificationId and send a SMS with a verificatioCode.
+Request a verificationId and send a SMS with a verificationCode.
 Use them to construct a credenial to sign in the user (in your app).
 https://firebase.google.com/docs/auth/android/phone-auth
 https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
