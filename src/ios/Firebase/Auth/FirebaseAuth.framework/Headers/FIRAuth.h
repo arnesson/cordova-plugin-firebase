@@ -1,16 +1,29 @@
-/** @file FIRAuth.h
-    @brief Firebase Auth SDK
-    @copyright Copyright 2015 Google Inc.
-    @remarks Use of this SDK is subject to the Google APIs Terms of Service:
-        https://developers.google.com/terms/
+/*
+ * Copyright 2017 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #import <Foundation/Foundation.h>
 
-#import "FIRAuthAPNSTokenType.h"
 #import "FIRAuthErrors.h"
 #import "FIRAuthSwiftNameSupport.h"
 
+#if TARGET_OS_IOS
+#import "FIRAuthAPNSTokenType.h"
+#endif
+
+@class FIRActionCodeSettings;
 @class FIRApp;
 @class FIRAuth;
 @class FIRAuthCredential;
@@ -53,8 +66,8 @@ typedef void(^FIRIDTokenDidChangeListenerBlock)(FIRAuth *auth, FIRUser *_Nullabl
 /** @typedef FIRAuthDataResultCallback
     @brief The type of block invoked when sign-in related events complete.
 
-    @param authResult Optionally; Result of sign-in request containing @c FIRUser and
-       @c FIRAdditionalUserInfo.
+    @param authResult Optionally; Result of sign-in request containing both the user and
+       the additional user info associated with the user.
     @param error Optionally; the error which occurred - or nil if the request was successful.
  */
 typedef void (^FIRAuthDataResultCallback)(FIRAuthDataResult *_Nullable authResult,
@@ -142,8 +155,8 @@ typedef void (^FIRApplyActionCodeCallback)(NSError *_Nullable error)
     FIR_SWIFT_NAME(ApplyActionCodeCallback);
 
 /**
-    @brief Keys used to retrieve operation data from a @c FIRActionCodeInfo object by the @c
-        dataForKey method.
+    @brief Keys used to retrieve operation data from a @c FIRActionCodeInfo object by the
+        @c dataForKey method.
   */
 typedef NS_ENUM(NSInteger, FIRActionDataKey) {
   /**
@@ -173,7 +186,11 @@ typedef NS_ENUM(NSInteger, FIRActionCodeOperation) {
     FIRActionCodeOperationPasswordReset = 1,
 
     /** Action code for verify email operation. */
-    FIRActionCodeOperationVerifyEmail = 2
+    FIRActionCodeOperationVerifyEmail = 2,
+
+    /** Action code for recover email operation. */
+    FIRActionCodeOperationRecoverEmail = 3,
+
 } FIR_SWIFT_NAME(ActionCodeOperation);
 
 /**
@@ -240,6 +257,15 @@ FIR_SWIFT_NAME(Auth)
  */
 @property(nonatomic, strong, readonly, nullable) FIRUser *currentUser;
 
+/** @proprty languageCode
+    @brief The current user language code. This property can be set to the app's current language by
+        calling @c useAppLanguage.
+
+    @remarks The string used to set this property must be a language code that follows BCP 47.
+ */
+@property (nonatomic, copy, nullable) NSString *languageCode;
+
+#if TARGET_OS_IOS
 /** @property APNSToken
     @brief The APNs token used for phone number authentication. The type of the token (production
         or sandbox) will be attempted to be automatcially detected.
@@ -247,6 +273,7 @@ FIR_SWIFT_NAME(Auth)
         by either setting this property or by calling @c setAPNSToken:type:
  */
 @property(nonatomic, strong, nullable) NSData *APNSToken;
+#endif
 
 /** @fn init
     @brief Please access auth instances using @c FIRAuth.auth and @c FIRAuth.authForApp:.
@@ -340,6 +367,20 @@ FIR_SWIFT_NAME(Auth)
             incorrect password, if credential is of the type EmailPasswordAuthCredential.
         </li>
         <li>@c FIRAuthErrorCodeInvalidEmail - Indicates the email address is malformed.
+        </li>
+        <li>@c FIRAuthErrorCodeMissingVerificationID - Indicates that the phone auth credential was
+            created with an empty verification ID.
+        </li>
+        <li>@c FIRAuthErrorCodeMissingVerificationCode - Indicates that the phone auth credential
+            was created with an empty verification code.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidVerificationCode - Indicates that the phone auth credential
+            was created with an invalid verification Code.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidVerificationID - Indicates that the phone auth credential was
+            created with an invalid verification ID.
+        </li>
+        <li>@c FIRAuthErrorCodeSessionExpired - Indicates that the SMS code has expired.
         </li>
     </ul>
 
@@ -503,6 +544,44 @@ FIR_SWIFT_NAME(Auth)
 - (void)sendPasswordResetWithEmail:(NSString *)email
                         completion:(nullable FIRSendPasswordResetCallback)completion;
 
+/** @fn sendPasswordResetWithEmail:actionCodeSetting:completion:
+    @brief Initiates a password reset for the given email address and @FIRActionCodeSettings object.
+
+    @param email The email address of the user.
+    @param actionCodeSettings An @c FIRActionCodeSettings object containing settings related to
+        handling action codes.
+    @param completion Optionally; a block which is invoked when the request finishes. Invoked
+        asynchronously on the main thread in the future.
+
+    @remarks Possible error codes:
+    <ul>
+        <li>@c FIRAuthErrorCodeInvalidRecipientEmail - Indicates an invalid recipient email was
+            sent in the request.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidSender - Indicates an invalid sender email is set in
+            the console for this action.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidMessagePayload - Indicates an invalid email template for
+            sending update email.
+        </li>
+        <li>@c FIRAuthErrorCodeMissingIosBundleID - Indicates that the iOS bundle ID is missing when
+            @c handleCodeInApp is set to YES.
+        </li>
+        <li>@c FIRAuthErrorCodeMissingAndroidPackageName - Indicates that the android package name
+            is missing when the @c androidInstallApp flag is set to true.
+        </li>
+        <li>@c FIRAuthErrorCodeUnauthorizedDomain - Indicates that the domain specified in the
+            continue URL is not whitelisted in the Firebase console.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidContinueURI - Indicates that the domain specified in the
+            continue URI is not valid.
+        </li>
+    </ul>
+ */
+ - (void)sendPasswordResetWithEmail:(NSString *)email
+                 actionCodeSettings:(FIRActionCodeSettings *)actionCodeSettings
+                         completion:(nullable FIRSendPasswordResetCallback)completion;
+
 /** @fn signOut:
     @brief Signs out the current user.
 
@@ -578,6 +657,25 @@ FIR_SWIFT_NAME(Auth)
  */
 - (void)removeIDTokenDidChangeListener:(FIRIDTokenDidChangeListenerHandle)listenerHandle;
 
+/** @fn useAppLanguage
+    @brief Sets @c languageCode to the app's current language.
+ */
+- (void)useAppLanguage;
+
+#if TARGET_OS_IOS
+
+/** @fn canHandleURL:
+    @brief Whether the specific URL is handled by @c FIRAuth .
+    @param URL The URL received by the application delegate from any of the openURL method.
+    @return Whether or the URL is handled. YES means the URL is for Firebase Auth
+        so the caller should ignore the URL from further processing, and NO means the
+        the URL is for the app (or another libaray) so the caller should continue handling
+        this URL as usual.
+    @remarks If swizzling is disabled, URLs received by the application delegate must be forwarded
+        to this method for phone number auth to work.
+ */
+- (BOOL)canHandleURL:(nonnull NSURL *)URL;
+
 /** @fn setAPNSToken:type:
     @brief Sets the APNs token along with its type.
     @remarks If swizzling is disabled, the APNs Token must be set for phone number auth to work,
@@ -589,14 +687,16 @@ FIR_SWIFT_NAME(Auth)
     @brief Whether the specific remote notification is handled by @c FIRAuth .
     @param userInfo A dictionary that contains information related to the
         notification in question.
-    @return Whether or the notification is handled. @c YES means the notification is for @c FIRAuth
-        so the caller should ignore the notification from further processing, and @c NO means the
+    @return Whether or the notification is handled. YES means the notification is for Firebase Auth
+        so the caller should ignore the notification from further processing, and NO means the
         the notification is for the app (or another libaray) so the caller should continue handling
         this notification as usual.
     @remarks If swizzling is disabled, related remote notifications must be forwarded to this method
         for phone number auth to work.
  */
 - (BOOL)canHandleNotification:(NSDictionary *)userInfo;
+
+#endif  // TARGET_OS_IOS
 
 @end
 

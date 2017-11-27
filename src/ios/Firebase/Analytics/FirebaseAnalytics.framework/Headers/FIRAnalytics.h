@@ -84,6 +84,7 @@ FIR_SWIFT_NAME(Analytics)
 
 /// Sets the current screen name, which specifies the current visual context in your app. This helps
 /// identify the areas in your app where users spend their time and how they interact with your app.
+/// Must be called on the main thread.
 ///
 /// Note that screen reporting is enabled automatically and records the class name of the current
 /// UIViewController for you without requiring you to call this method. If you implement

@@ -111,9 +111,9 @@ FOUNDATION_EXPORT const NSNotificationName __nonnull FIRMessagingConnectionState
     FIR_SWIFT_NAME(MessagingConnectionStateChanged);
 
 /**
- *  Notification sent when the FCM registration token has been refreshed. You can also
- *  receive the FCM token via the FIRMessagingDelegate method
- *  `-messaging:didRefreshRegistrationToken:`
+ *  Notification sent when the FCM registration token has been refreshed. Please use the
+ *  FIRMessaging delegate method `messaging:didReceiveRegistrationToken:` to receive current and
+ *  updated tokens.
  */
 FOUNDATION_EXPORT const NSNotificationName __nonnull
     FIRMessagingRegistrationTokenRefreshedNotification
@@ -156,9 +156,9 @@ FOUNDATION_EXPORT NSString * __nonnull const FIRMessagingConnectionStateChangedN
     FIR_SWIFT_NAME(MessagingConnectionStateChangedNotification);
 
 /**
- *  Notification sent when the FCM registration token has been refreshed. You can also
- *  receive the FCM token via the FIRMessagingDelegate method
- *  `-messaging:didRefreshRegistrationToken:`
+ *  Notification sent when the FCM registration token has been refreshed. Please use the
+ *  FIRMessaging delegate method `messaging:didReceiveRegistrationToken:` to receive current and
+ *  updated tokens.
  */
 FOUNDATION_EXPORT NSString * __nonnull const FIRMessagingRegistrationTokenRefreshedNotification
     FIR_SWIFT_NAME(MessagingRegistrationTokenRefreshedNotification);
@@ -246,14 +246,27 @@ FIR_SWIFT_NAME(MessagingRemoteMessage)
 FIR_SWIFT_NAME(MessagingDelegate)
 @protocol FIRMessagingDelegate <NSObject>
 
+@optional
+/// This method will be called once a token is available, or has been refreshed. Typically it
+/// will be called once per app start, but may be called more often, if token is invalidated or
+/// updated. In this method, you should perform operations such as:
+///
+/// * Uploading the FCM token to your application server, so targeted notifications can be sent.
+///
+/// * Subscribing to any topics.
+- (void)messaging:(nonnull FIRMessaging *)messaging
+    didReceiveRegistrationToken:(nonnull NSString *)fcmToken
+    FIR_SWIFT_NAME(messaging(_:didReceiveRegistrationToken:));
+
 /// This method will be called whenever FCM receives a new, default FCM token for your
-/// Firebase project's Sender ID.
-/// You can send this token to your application server to send notifications to this device.
+/// Firebase project's Sender ID. This method is deprecated. Please use
+/// `messaging:didReceiveRegistrationToken:`.
 - (void)messaging:(nonnull FIRMessaging *)messaging
     didRefreshRegistrationToken:(nonnull NSString *)fcmToken
-    FIR_SWIFT_NAME(messaging(_:didRefreshRegistrationToken:));
+    FIR_SWIFT_NAME(messaging(_:didRefreshRegistrationToken:))
+    __deprecated_msg("Please use messaging:didReceiveRegistrationToken:, which is called for both \
+                     current and refreshed tokens.");
 
-@optional
 /// This method is called on iOS 10 devices to handle data messages received via FCM through its
 /// direct channel (not via APNS). For iOS 9 and below, the FCM data message is delivered via the
 /// UIApplicationDelegate's -application:didReceiveRemoteNotification: method.
@@ -295,15 +308,15 @@ FIR_SWIFT_NAME(Messaging)
     __deprecated_msg("Use 'delegate' property");
 
 /**
- *  When set to YES, Firebase Messaging will automatically establish a socket-based, direct channel
- *  to the FCM server. You only need to enable this if you are sending upstream messages or
+ *  When set to `YES`, Firebase Messaging will automatically establish a socket-based, direct
+ *  channel to the FCM server. Enable this only if you are sending upstream messages or
  *  receiving non-APNS, data-only messages in foregrounded apps.
- *  Default is NO.
+ *  Default is `NO`.
  */
 @property(nonatomic) BOOL shouldEstablishDirectChannel;
 
 /**
- *  Returns YES if the direct channel to the FCM server is active, NO otherwise.
+ *  Returns `YES` if the direct channel to the FCM server is active, and `NO` otherwise.
  */
 @property(nonatomic, readonly) BOOL isDirectChannelEstablished;
 
@@ -324,14 +337,15 @@ FIR_SWIFT_NAME(Messaging)
 /**
  *  This property is used to set the APNS Token received by the application delegate.
  *
- *  FIRMessaging uses method swizzling to ensure the APNS token is set automatically.
- *  However, if you have disabled swizzling by setting `FirebaseAppDelegateProxyEnabled`
- *  to `NO` in your app's Info.plist, you should manually set the APNS token in your
- *  application delegate's -application:didRegisterForRemoteNotificationsWithDeviceToken:
+ *  FIRMessaging uses method swizzling to ensure that the APNS token is set
+ *  automatically. However, if you have disabled swizzling by setting
+ *  `FirebaseAppDelegateProxyEnabled` to `NO` in your app's
+ *  Info.plist, you should manually set the APNS token in your application
+ *  delegate's `-application:didRegisterForRemoteNotificationsWithDeviceToken:`
  *  method.
  *
- *  If you would like to set the type of the APNS token, rather than relying on automatic
- *  detection, see: -setAPNSToken:type:.
+ *  If you would like to set the type of the APNS token, rather than relying on
+ *  automatic detection, see: `-setAPNSToken:type:`.
  */
 @property(nonatomic, copy, nullable) NSData *APNSToken FIR_SWIFT_NAME(apnsToken);
 
@@ -355,9 +369,10 @@ FIR_SWIFT_NAME(Messaging)
  *  It is associated with your APNS token when the APNS token is supplied, so that sending
  *  messages to the FCM token will be delivered over APNS.
  *
- *  The FCM token is sometimes refreshed automatically. You can be notified of these changes
- *  via the FIRMessagingDelegate method `-message:didRefreshRegistrationToken:`, or by
- *  listening for the `FIRMessagingRegistrationTokenRefreshedNotification` notification.
+ *  The FCM token is sometimes refreshed automatically. In your FIRMessaging delegate, the
+ *  delegate method `messaging:didReceiveRegistrationToken:` will be called once a token is
+ *  available, or has been refreshed. Typically it should be called once per app start, but
+ *  may be called more often, if token is invalidated or updated.
  *
  *  Once you have an FCM token, you should send it to your application server, so it can use
  *  the FCM token to send notifications to your device.
@@ -366,12 +381,17 @@ FIR_SWIFT_NAME(Messaging)
 
 
 /**
- *  Retrieves an FCM registration token for a particular Sender ID. This registration token is
- *  not cached by FIRMessaging. FIRMessaging should have an APNS token set before calling this
- *  to ensure that notifications can be delivered via APNS using this FCM token. You may
- *  re-retrieve the FCM token once you have the APNS token set, to associate it with the FCM
- *  token. The default FCM token is automatically associated with the APNS token, if the APNS
- *  token data is available.
+ *  Retrieves an FCM registration token for a particular Sender ID. This can be used to allow
+ *  multiple senders to send notifications to the same device. By providing a different Sender
+ *  ID than your default when fetching a token, you can create a new FCM token which you can
+ *  give to a different sender. Both tokens will deliver notifications to your device, and you
+ *  can revoke a token when you need to.
+ *
+ *  This registration token is not cached by FIRMessaging. FIRMessaging should have an APNS
+ *  token set before calling this to ensure that notifications can be delivered via APNS using
+ *  this FCM token. You may re-retrieve the FCM token once you have the APNS token set, to
+ *  associate it with the FCM token. The default FCM token is automatically associated with
+ *  the APNS token, if the APNS token data is available.
  *
  *  @param senderID The Sender ID for a particular Firebase project.
  *  @param completion The completion handler to handle the token request.
@@ -416,7 +436,7 @@ FIR_SWIFT_NAME(Messaging)
  *  connect to FIRMessaging. Calling this on an already disconnected client is a no-op.
  *
  *  Call this before `teardown` when your app is going to the background.
- *  Since the FIRMessaging connection won't be allowed to live when in background it is
+ *  Since the FIRMessaging connection won't be allowed to live when in the background, it is
  *  prudent to close the connection.
  */
 - (void)disconnect
@@ -474,8 +494,8 @@ FIR_SWIFT_NAME(Messaging)
  *  Use this to track message delivery and analytics for messages, typically
  *  when you receive a notification in `application:didReceiveRemoteNotification:`.
  *  However, you only need to call this if you set the `FirebaseAppDelegateProxyEnabled`
- *  flag to NO in your Info.plist. If `FirebaseAppDelegateProxyEnabled` is either missing
- *  or set to YES in your Info.plist, the library will call this automatically.
+ *  flag to `NO` in your Info.plist. If `FirebaseAppDelegateProxyEnabled` is either missing
+ *  or set to `YES` in your Info.plist, the library will call this automatically.
  *
  *  @param message The downstream message received by the application.
  *

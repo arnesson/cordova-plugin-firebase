@@ -215,11 +215,14 @@ FIR_SWIFT_NAME(InstanceID)
  *  @param scope            Action authorized for authorizedEntity.
  *  @param options          The extra options to be sent with your token request. The
  *                          value for the `apns_token` should be the NSData object
- *                          passed to UIApplication's
+ *                          passed to the UIApplicationDelegate's
  *                          `didRegisterForRemoteNotificationsWithDeviceToken` method.
- *                          All other keys and values in the options dict need to be
- *                          instances of NSString or else they will be discarded. Bundle
- *                          keys starting with 'GCM.' and 'GOOGLE.' are reserved.
+ *                          The value for `apns_sandbox` should be a boolean (or an
+ *                          NSNumber representing a BOOL in Objective C) set to true if
+ *                          your app is a debug build, which means that the APNs
+ *                          device token is for the sandbox environment. It should be
+ *                          set to false otherwise. If the `apns_sandbox` key is not
+ *                          provided, an automatically-detected value shall be used.
  *  @param handler          The callback handler which is invoked when the token is
  *                          successfully fetched. In case of success a valid `token` and
  *                          `nil` error are returned. In case of any error the `token`

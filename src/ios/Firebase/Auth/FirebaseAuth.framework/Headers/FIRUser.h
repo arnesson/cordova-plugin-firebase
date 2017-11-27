@@ -1,8 +1,17 @@
-/** @file FIRUser.h
-    @brief Firebase Auth SDK
-    @copyright Copyright 2015 Google Inc.
-    @remarks Use of this SDK is subject to the Google APIs Terms of Service:
-        https://developers.google.com/terms/
+/*
+ * Copyright 2017 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #import <Foundation/Foundation.h>
@@ -14,6 +23,7 @@
 
 @class FIRPhoneAuthCredential;
 @class FIRUserProfileChangeRequest;
+@class FIRUserMetadata;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -74,6 +84,11 @@ FIR_SWIFT_NAME(User)
     @remarks This data is cached on sign-in and updated when linking or unlinking.
  */
 @property(nonatomic, readonly, nonnull) NSArray<id<FIRUserInfo>> *providerData;
+
+/** @property metadata
+    @brief Metadata associated with the Firebase user in question.
+ */
+@property(nonatomic, readonly, nonnull) FIRUserMetadata *metadata;
 
 /** @fn init
     @brief This class should not be instantiated.
@@ -149,6 +164,7 @@ FIR_SWIFT_NAME(User)
             completion:(nullable FIRUserProfileChangeCallback)completion
     FIR_SWIFT_NAME(updatePassword(to:completion:));
 
+#if TARGET_OS_IOS
 /** @fn updatePhoneNumberCredential:completion:
     @brief Updates the phone number for the user. On success, the cached user profile data is
         updated.
@@ -172,6 +188,7 @@ FIR_SWIFT_NAME(User)
  */
 - (void)updatePhoneNumberCredential:(FIRPhoneAuthCredential *)phoneNumberCredential
                          completion:(nullable FIRUserProfileChangeCallback)completion;
+#endif
 
 /** @fn profileChangeRequest
     @brief Creates an object which may be used to change the user's profile data.
@@ -389,6 +406,42 @@ FIR_SWIFT_NAME(User)
     @remarks See @c FIRAuthErrors for a list of error codes that are common to all FIRUser methods.
  */
 - (void)sendEmailVerificationWithCompletion:(nullable FIRSendEmailVerificationCallback)completion;
+
+/** @fn sendEmailVerificationWithActionCodeSettings:completion:
+    @brief Initiates email verification for the user.
+
+    @param actionCodeSettings An @c FIRActionCodeSettings object containing settings related to
+        handling action codes.
+
+    @remarks Possible error codes:
+    <ul>
+        <li>@c FIRAuthErrorCodeInvalidRecipientEmail - Indicates an invalid recipient email was
+            sent in the request.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidSender - Indicates an invalid sender email is set in
+            the console for this action.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidMessagePayload - Indicates an invalid email template for
+            sending update email.
+        </li>
+        <li>@c FIRAuthErrorCodeUserNotFound - Indicates the user account was not found.</li>
+        <li>@c FIRAuthErrorCodeMissingIosBundleID - Indicates that the iOS bundle ID is missing when
+            a iOS App Store ID is provided.
+        </li>
+        <li>@c FIRAuthErrorCodeMissingAndroidPackageName - Indicates that the android package name
+            is missing when the @c androidInstallApp flag is set to true.
+        </li>
+        <li>@c FIRAuthErrorCodeUnauthorizedDomain - Indicates that the domain specified in the
+            continue URL is not whitelisted in the Firebase console.
+        </li>
+        <li>@c FIRAuthErrorCodeInvalidContinueURI - Indicates that the domain specified in the
+            continue URI is not valid.
+        </li>
+    </ul>
+ */
+- (void)sendEmailVerificationWithActionCodeSettings:(FIRActionCodeSettings *)actionCodeSettings
+                                         completion:(nullable FIRSendEmailVerificationCallback)
+                                                    completion;
 
 /** @fn deleteWithCompletion:
     @brief Deletes the user account (also signs out the user, if this was the current user).
