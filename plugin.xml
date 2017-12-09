@@ -26,15 +26,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="/resources" target="res/values/strings.xml">
 			<string name="google_api_key">@string/google_api_key</string>
 		</config-file>
-		<config-file target="AndroidManifest.xml" parent="/*">
+		<config-file target="app/src/main/AndroidManifest.xml" parent="/*">
 				<uses-permission android:name="android.permission.INTERNET" />
 				<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 				<uses-permission android:name="android.permission.WAKE_LOCK" />
 		</config-file>
-		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+		<config-file target="app/src/main/AndroidManifest.xml" parent="/manifest/application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
 		</config-file>
-		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+		<config-file target="app/src/main/AndroidManifest.xml" parent="/manifest/application">
 			<service android:name="org.apache.cordova.firebase.FirebasePluginMessagingService">
 				<intent-filter>
 					<action android:name="com.google.firebase.MESSAGING_EVENT"/>
