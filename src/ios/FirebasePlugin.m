@@ -2,12 +2,6 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
 
-@import FirebaseInstanceID;
-@import FirebaseMessaging;
-@import FirebaseAnalytics;
-@import FirebaseRemoteConfig;
-@import FirebaseAuth;
-
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
 #endif
@@ -85,56 +79,57 @@ static FirebasePlugin *firebasePlugin;
             #pragma GCC diagnostic pop
         }
 
-		CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-		[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-		return;
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
     }
 
 
 
-	#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-	BOOL isIOS10 = TRUE;
-	#else
-	BOOL isIOS10 = FALSE;
-	#endif
+    #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+    BOOL isIOS10 = TRUE;
+    #else
+    BOOL isIOS10 = FALSE;
+    #endif
 
 
-	if ( !isIOS10 ) {
-		[[UIApplication sharedApplication] registerForRemoteNotifications];
-		CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-		[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-		return;
-	}
+    if ( !isIOS10 ) {
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        return;
+    }
 
 
 
-	// IOS 10
-	UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
-	[[UNUserNotificationCenter currentNotificationCenter]
-		requestAuthorizationWithOptions:authOptions
-	 				  completionHandler:^(BOOL granted, NSError * _Nullable error) {
+    // IOS 10
+    UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
 
-			if ( ![NSThread isMainThread] ) {
-				dispatch_sync(dispatch_get_main_queue(), ^{
-					[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-					[[FIRMessaging messaging] setRemoteMessageDelegate:self];
-					[[UIApplication sharedApplication] registerForRemoteNotifications];
+    [[UNUserNotificationCenter currentNotificationCenter]
+        requestAuthorizationWithOptions:authOptions
+                      completionHandler:^(BOOL granted, NSError * _Nullable error) {
 
-					CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus: granted ? CDVCommandStatus_OK : CDVCommandStatus_ERROR];
-					[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-				});
-			}
-			else {
-				[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-				[[FIRMessaging messaging] setRemoteMessageDelegate:self];
-				[[UIApplication sharedApplication] registerForRemoteNotifications];
-				CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-				[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-			}
-	  }
-	];
+            if ( ![NSThread isMainThread] ) {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+                    [FIRMessaging messaging].delegate = self;
+                    [[UIApplication sharedApplication] registerForRemoteNotifications];
 
-	return;
+                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus: granted ? CDVCommandStatus_OK : CDVCommandStatus_ERROR];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                });
+            }
+            else {
+                [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
+                [FIRMessaging messaging].delegate = self;
+                [[UIApplication sharedApplication] registerForRemoteNotifications];
+                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }
+      }
+    ];
+
+    return;
 }
 
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
@@ -153,31 +148,22 @@ static FirebasePlugin *firebasePlugin;
     NSString* number = [command.arguments objectAtIndex:0];
 
     [[FIRPhoneAuthProvider provider]
-    verifyPhoneNumber:number
-           completion:^(NSString *_Nullable verificationID,
-                        NSError *_Nullable error) {
-NSDictionary *message;
-  if (error) {
-
-    // Verification code not sent.
-    message = @{
+    verifyPhoneNumber:number UIDelegate: nil completion:^(NSString *_Nullable verificationID, NSError *_Nullable error) {
+        NSDictionary *message;
+        if (error) {
+            // Verification code not sent.
+            message = @{
                 @"code": [NSNumber numberWithInteger:error.code],
                 @"description": error.description == nil ? [NSNull null] : error.description
-                };
-
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
-
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-
-  } else {
-    // Successful.
-CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-  }
-}];
-
-
-
+            };
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        } else {
+            // Successful.
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];
 }
 
 - (void)getBadgeNumber:(CDVInvokedUrlCommand *)command {

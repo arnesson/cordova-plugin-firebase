@@ -60,7 +60,7 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[FIRMessaging messaging] disconnect];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = NO;
     self.applicationInBackground = @(YES);
     NSLog(@"Disconnected from FCM");
 }
@@ -79,15 +79,7 @@
 }
 
 - (void)connectToFcm {
-    [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
-        if (error != nil) {
-            NSLog(@"Unable to connect to FCM. %@", error);
-        } else {
-            NSLog(@"Connected to FCM.");
-            NSString *refreshedToken = [[FIRInstanceID instanceID] token];
-            NSLog(@"InstanceID token: %@", refreshedToken);
-        }
-    }];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = YES;
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
