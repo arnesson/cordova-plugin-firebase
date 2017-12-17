@@ -350,6 +350,10 @@ window.FirebasePlugin.getInfo(function(info) {
     // the timestamp (milliseconds since epoch) of the last successful fetch
     console.log(info.fetchTimeMillis);
     // the status of the most recent fetch attempt (int)
+    // 0 = Config has never been fetched.
+    // 1 = Config fetch succeeded.
+    // 2 = Config fetch failed.
+    // 3 = Config fetch was throttled.
     console.log(info.lastFetchStatus);
 }, function(error) {
     console.error(error);
