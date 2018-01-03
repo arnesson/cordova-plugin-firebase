@@ -18,6 +18,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.perf.FirebasePerformance;
+import com.google.firebase.perf.metrics.Trace;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -151,6 +153,15 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("verifyPhoneNumber")) {
             this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
+            return true;
+        } else if (action.equals("startTrace")) {
+            this.startTrace(callbackContext, args.getString(0));
+            return true;
+        } else if (action.equals("incrementCounter")) {
+            this.incrementCounter(callbackContext, args.getString(0), args.getString(1));
+            return true;
+        } else if (action.equals("stopTrace")) {
+            this.stopTrace(callbackContext, args.getString(0));
             return true;
         }
         return false;
@@ -688,6 +699,94 @@ public class FirebasePlugin extends CordovaPlugin {
 
 
                 } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    //
+    // Firebase Performace
+    //
+
+    private HashMap<String,Trace> traces = new HashMap<String,Trace>();
+
+    private void startTrace(final CallbackContext callbackContext, final String name){
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    Trace myTrace = null;
+                    if ( self.traces.containsKey(name) ){
+                        myTrace = self.traces.get(name);
+                    }
+
+                    if ( myTrace == null ){
+                        myTrace = FirebasePerformance.getInstance().newTrace(name);
+                        myTrace.start();
+                        self.traces.put(name, myTrace);
+                    }
+
+                    callbackContext.success();
+                } catch (Exception e) {
+                    FirebaseCrash.log(e.getMessage());
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void incrementCounter(final CallbackContext callbackContext, final String name, final String counterNamed){
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    Trace myTrace = null;
+                    if ( self.traces.containsKey(name) ){
+                        myTrace = self.traces.get(name);
+                    }
+
+                    if ( myTrace != null && myTrace instanceof Trace ){
+                        myTrace.incrementCounter(counterNamed);
+                        callbackContext.success();
+                    }else{
+                        callbackContext.error("Trace not found");
+                    }
+
+                } catch (Exception e) {
+                    FirebaseCrash.log(e.getMessage());
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void stopTrace(final CallbackContext callbackContext, final String name){
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    Trace myTrace = null;
+                    if ( self.traces.containsKey(name) ){
+                        myTrace = self.traces.get(name);
+                    }
+
+                    if ( myTrace != null && myTrace instanceof Trace ){ //
+                        myTrace.stop();
+                        self.traces.remove(name);
+                        callbackContext.success();
+                    }else{
+                        callbackContext.error("Trace not found");
+                    }
+
+                } catch (Exception e) {
+                    FirebaseCrash.log(e.getMessage());
+                    e.printStackTrace();
                     callbackContext.error(e.getMessage());
                 }
             }

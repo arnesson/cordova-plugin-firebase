@@ -29,7 +29,7 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
     var code = inputField.value.toString();
 
     var verificationId = credential.verificationId;
-    
+
     var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
     firebase.auth().signInWithCredential(signInCredential);
 }, function(error) {
@@ -393,12 +393,36 @@ window.FirebasePlugin.setDefaults(defaults);
 window.FirebasePlugin.setDefaults(defaults, "namespace");
 ```
 
+### startTrace
+
+Start a trace.
+
+```
+window.FirebasePlugin.startTrace("test trace", success, error);
+```
+
+### incrementCounter
+
+To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
+
+```
+window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
+```
+
+### stopTrace
+
+Stop the trace
+
+```
+window.FirebasePlugin.stopTrace("test trace");
+```
+
 ### Phone Authentication
 **BASED ON THE CONTRIBUTIONS OF**
-IOS 
+IOS
 https://github.com/silverio/cordova-plugin-firebase
 
-ANDROID 
+ANDROID
 https://github.com/apptum/cordova-plugin-firebase
 
 **((((IOS))): SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
@@ -409,7 +433,7 @@ This method sends an SMS to the user with the SMS_code and gets the verification
 ```
 window.FirebasePlugin.getVerificationID("+573123456789",function(id) {
                 console.log("verificationID: "+id);
-                
+
             }, function(error) {             
                 console.error(error);
             });

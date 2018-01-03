@@ -7,5 +7,4 @@ framework module FirebaseCrash {
   link "z"
   link framework "CoreTelephony"
   link framework "SystemConfiguration"
-  link framework "UIKit"
-}
+  link framework "UIKit"}
