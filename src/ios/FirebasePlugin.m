@@ -118,7 +118,7 @@ static FirebasePlugin *firebasePlugin;
 			if ( ![NSThread isMainThread] ) {
 				dispatch_sync(dispatch_get_main_queue(), ^{
 					[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-					[[FIRMessaging messaging] setRemoteMessageDelegate:self];
+					[[FIRMessaging messaging] setDelegate:self];
 					[[UIApplication sharedApplication] registerForRemoteNotifications];
 
 					CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus: granted ? CDVCommandStatus_OK : CDVCommandStatus_ERROR];
@@ -127,7 +127,7 @@ static FirebasePlugin *firebasePlugin;
 			}
 			else {
 				[[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-				[[FIRMessaging messaging] setRemoteMessageDelegate:self];
+				[[FIRMessaging messaging] setDelegate:self];
 				[[UIApplication sharedApplication] registerForRemoteNotifications];
 				CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
 				[self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
