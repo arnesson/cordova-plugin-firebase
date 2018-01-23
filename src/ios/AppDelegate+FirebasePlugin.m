@@ -60,12 +60,6 @@
         // For iOS 10 display notification (sent via APNS)
         self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
         [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-        UNAuthorizationOptions authOptions =
-                UNAuthorizationOptionAlert
-                        | UNAuthorizationOptionSound
-                        | UNAuthorizationOptionBadge;
-        [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:authOptions completionHandler:^(BOOL granted, NSError * _Nullable error) {
-        }];
     #endif
 
     return YES;
