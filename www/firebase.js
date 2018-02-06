@@ -119,3 +119,15 @@ exports.setDefaults = function (defaults, namespace, success, error) {
     }
     exec(success, error, "FirebasePlugin", "setDefaults", args);
 };
+
+exports.startTrace = function (name, success, error) {
+    exec(success, error, "FirebasePlugin", "startTrace", [name]);
+};
+
+exports.incrementCounter = function (name, counterNamed, success, error) {
+    exec(success, error, "FirebasePlugin", "incrementCounter", [name, counterNamed]);
+};
+
+exports.stopTrace = function (name, success, error) {
+    exec(success, error, "FirebasePlugin", "stopTrace", [name]);
+};
