@@ -127,8 +127,8 @@ module.exports = function(context) {
   var platforms = context.opts.platforms;
   // Copy key files to their platform specific folders
   if (platforms.indexOf('ios') !== -1 && directoryExists(IOS_DIR)) {
-    console.log('Preparing Firebase on iOS');
-    copyKey(PLATFORM.IOS);
+    //console.log('Preparing Firebase on iOS');
+    //copyKey(PLATFORM.IOS);
   }
   if (platforms.indexOf('android') !== -1 && directoryExists(ANDROID_DIR)) {
     console.log('Preparing Firebase on Android');
