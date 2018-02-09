@@ -74,6 +74,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
+		
+		<resource-file src="src/ios/GoogleService-Info.plist" />
 
 		<header-file src="src/ios/AppDelegate+FirebasePlugin.h" />
 		<source-file src="src/ios/AppDelegate+FirebasePlugin.m" />
