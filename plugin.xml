@@ -108,4 +108,5 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</platform>
 
 	<hook src="scripts/after_prepare.js" type="after_prepare" />
+	<hook src="scripts/after_plugin_install.js" type="after_plugin_install" />
 </plugin>
