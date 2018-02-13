@@ -4,6 +4,10 @@ exports.getInstanceId = function(success, error) {
     exec(success, error, "FirebasePlugin", "getInstanceId", []);
 };
 
+exports.getId = function(success, error) {
+  exec(success, error, "FirebasePlugin", "getId", []);
+};
+
 exports.getToken = function(success, error) {
     exec(success, error, "FirebasePlugin", "getToken", []);
 };
