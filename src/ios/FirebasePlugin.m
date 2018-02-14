@@ -35,6 +35,17 @@ static FirebasePlugin *firebasePlugin;
     firebasePlugin = self;
 }
 
+- (void)getId:(CDVInvokedUrlCommand *)command {
+  __block CDVPluginResult *pluginResult;
+
+  FIRInstanceIDHandler handler = ^(NSString *_Nullable instID, NSError *_Nullable error) {
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:instID];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  };
+
+  [[FIRInstanceID instanceID] getIDWithHandler:handler];
+}
+
 // DEPRECATED - alias of getToken
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
     CDVPluginResult *pluginResult;
