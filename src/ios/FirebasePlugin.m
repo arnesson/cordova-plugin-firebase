@@ -39,7 +39,13 @@ static FirebasePlugin *firebasePlugin;
   __block CDVPluginResult *pluginResult;
 
   FIRInstanceIDHandler handler = ^(NSString *_Nullable instID, NSError *_Nullable error) {
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:instID];
+    if (error) {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
+    else {
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:instID];
+    }
+
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
   };
 
