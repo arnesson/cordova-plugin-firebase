@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "4565416807",
+    "firebase_url": "https://kababji-ss.firebaseio.com",
+    "project_id": "kababji-ss",
+    "storage_bucket": "kababji-ss.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4565416807:android:065c3ae6891041ff",
+        "android_client_info": {
+          "package_name": "com.spoonstream.kababji"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4565416807-tcn9te81gn344mnbcmjblp3s6te4orim.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAslQMlT0ioBli4LyvjNjvbaYI4KYJZVWk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
