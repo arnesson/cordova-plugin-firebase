@@ -84,6 +84,9 @@ public class FirebasePlugin extends CordovaPlugin {
         if (action.equals("getInstanceId")) {
             this.getInstanceId(callbackContext);
             return true;
+        } else if (action.equals("getId")) {
+            this.getId(callbackContext);
+            return true;
         } else if (action.equals("getToken")) {
             this.getToken(callbackContext);
             return true;
@@ -275,6 +278,19 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     String token = FirebaseInstanceId.getInstance().getToken();
                     callbackContext.success(token);
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void getId(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String id = FirebaseInstanceId.getInstance().getId();
+                    callbackContext.success(id);
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
                 }

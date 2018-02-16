@@ -16,6 +16,12 @@ exports.getToken = function(success, error) {
     }
 };
 
+exports.getId = function(success, error) {
+  if (typeof success === 'function') {
+    success();
+  }
+};
+
 exports.onNotificationOpen = function(success, error) {
 };
 
