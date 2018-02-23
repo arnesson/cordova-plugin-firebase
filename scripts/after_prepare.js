@@ -25,7 +25,7 @@ var config = fs.readFileSync('config.xml').toString();
 var name = getValue(config, 'name');
 
 var IOS_DIR = 'platforms/ios';
-var ANDROID_DIR = 'platforms/android';
+var ANDROID_DIR = directoryExists('platforms/android/app/src/main') ? 'platforms/android/app/src/main' : 'platforms/android';
 
 var PLATFORM = {
     IOS: {
