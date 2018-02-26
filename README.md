@@ -44,6 +44,12 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 
 **Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
 
+### Notes about PhoneGap Build
+
+Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones, as well as hard coding your app id and api key in plugin.xml.
+
+
+
 ## Google Tag Manager
 ### Android
 Download your container-config json file from Tag Manager and add a resource-file node in your config.xml.
@@ -104,11 +110,6 @@ On Android Lollipop and above you can also set the accent color for the notifica
     <color name="accent">#FF00FFFF</color>
 </resources>
 ```
-
-
-### Notes about PhoneGap Build
-
-Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones, as well as hard coding your app id and api key in plugin.xml.
 
 
 ## Methods
