@@ -5,41 +5,16 @@ Android and iOS supported.
 Donations are welcome and will go towards further development of this project. Use the addresses below to donate.
 
 BTC: 1JuXhHMCPHXT2fDfSRUTef9TpE2D67sc9f
+
 ETH: 0x74B5eDEce465fDd360b3b03C6984784140ac742e
+
 BCH: qzu5ffphkcgajn7kd7d90etq82maylz34uqg4uj5jf
+
 LTC: LKnFugRfczVH7qfBrmhzZDknhqxCzz6wJB
+
 XMR: 43ZMMEh5x4miZLMZF3W3faAL5Y44fPBXrFWBVXYePBjwXCvxLuo84Cof8ufXgb4sZLEpSDE3eKr5X7jNPfd4kppr8oMX9uM
 
 Thank you for your support!
-
-## in this fork
-### verifyPhoneNumber (Android only)
-
-Request a verificationId and send a SMS with a verificationCode.
-Use them to construct a credenial to sign in the user (in your app).
-https://firebase.google.com/docs/auth/android/phone-auth
-https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
-
-NOTE: To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
-See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
-
-NOTE: This will only works on physical devices.
-
-```
-window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
-    console.log(credential);
-
-    // ask user to input verificationCode:
-    var code = inputField.value.toString();
-
-    var verificationId = credential.verificationId;
-
-    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-    firebase.auth().signInWithCredential(signInCredential);
-}, function(error) {
-    console.error(error);
-});
-```
 
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
@@ -272,6 +247,34 @@ window.FirebasePlugin.setUserId("user_id");
 Set a user property for use in Analytics:
 ```
 window.FirebasePlugin.setUserProperty("name", "value");
+```
+
+### verifyPhoneNumber (Android only)
+
+Request a verificationId and send a SMS with a verificationCode.
+Use them to construct a credenial to sign in the user (in your app).
+https://firebase.google.com/docs/auth/android/phone-auth
+https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+
+NOTE: To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
+See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+
+NOTE: This will only works on physical devices.
+
+```
+window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
+    console.log(credential);
+
+    // ask user to input verificationCode:
+    var code = inputField.value.toString();
+
+    var verificationId = credential.verificationId;
+
+    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    firebase.auth().signInWithCredential(signInCredential);
+}, function(error) {
+    console.error(error);
+});
 ```
 
 ### fetch
