@@ -23,9 +23,15 @@ fs.ensureDirSync = function (dir) {
 
 var config = fs.readFileSync('config.xml').toString();
 var name = getValue(config, 'name');
+var androidVersion = getPreferenceValue(config,"ANDROID_VERSION");
 
 var IOS_DIR = 'platforms/ios';
 var ANDROID_DIR = 'platforms/android';
+var STRING_XML_PATH = '/res/values/strings.xml';
+
+if(androidVersion == "7x") {
+	STRING_XML_PATH = '/app/src/main/res/values/strings.xml';
+}
 
 var PLATFORM = {
     IOS: {
@@ -48,7 +54,7 @@ var PLATFORM = {
             ANDROID_DIR + '/assets/www/google-services.json',
             'www/google-services.json'
         ],
-        stringsXml: ANDROID_DIR + '/res/values/strings.xml'
+        stringsXml: ANDROID_DIR + STRING_XML_PATH
     }
 };
 
@@ -104,6 +110,15 @@ function copyKey(platform, callback) {
 function getValue(config, name) {
     var value = config.match(new RegExp('<' + name + '>(.*?)</' + name + '>', 'i'));
     if (value && value[1]) {
+        return value[1]
+    } else {
+        return null
+    }
+}
+
+function getPreferenceValue(config, name) {
+    var value = config.match(new RegExp('name="' + name + '" value="(.*?)"', "i"))
+    if(value && value[1]) {
         return value[1]
     } else {
         return null
