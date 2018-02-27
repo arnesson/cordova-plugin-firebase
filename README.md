@@ -10,6 +10,7 @@ ETH: 0x74B5eDEce465fDd360b3b03C6984784140ac742e
 BCH: qzu5ffphkcgajn7kd7d90etq82maylz34uqg4uj5jf
 LTC: LKnFugRfczVH7qfBrmhzZDknhqxCzz6wJB
 XMR: 43ZMMEh5x4miZLMZF3W3faAL5Y44fPBXrFWBVXYePBjwXCvxLuo84Cof8ufXgb4sZLEpSDE3eKr5X7jNPfd4kppr8oMX9uM
+Paypal: https://paypal.me/arnesson
 ```
 
 Thank you for your support!
