@@ -198,10 +198,6 @@ static FirebasePlugin *firebasePlugin;
         if (error) {
             NSLog(@"Unable to delete instance");
         } else {
-            NSString* currentToken = [[FIRInstanceID instanceID] token];
-            if (currentToken != nil) {
-                [self sendToken:currentToken];
-            }
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
