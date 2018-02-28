@@ -1,6 +1,7 @@
 env:
   global:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+  - LANG=en_US.UTF-8
 
 matrix:
   include:
@@ -22,8 +23,6 @@ matrix:
         packages:
         - oracle-java8-installer
         - oracle-java8-set-default
-        - nodejs
-        - npm
     licenses:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
@@ -34,8 +33,7 @@ matrix:
     osx_image: xcode8.3
 
 before_install:
-- export LANG=en_US.UTF-8
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; brew install node cocoapods ; pod setup ; fi
+- nvm install 8
 - npm install cordova
 - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
 
