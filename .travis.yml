@@ -23,6 +23,7 @@ matrix:
         - oracle-java8-installer
         - oracle-java8-set-default
         - nodejs
+        - npm
     licenses:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
@@ -31,19 +32,9 @@ matrix:
     language: objective-c
     osx_image: xcode8.3
 
-before_cache:
-- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-- rm -f  $HOME/.gradle/caches/transforms-1/transforms-1.lock
-- rm -rf $HOME/.gradle/caches/3.5/fileHashes/
-- rm -rf $HOME/.gradle/caches/*/plugin-resolution/
-
-cache:
-  directories:
-  - $HOME/.gradle/caches/
-  - $HOME/.gradle/wrapper/
-
 before_install:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; brew install nodejs cocoapods ; pod setup ; fi
+- export LANG=en_US.UTF-8
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; brew install node cocoapods ; pod setup ; fi
 - npm install -g cordova
 
 script:
