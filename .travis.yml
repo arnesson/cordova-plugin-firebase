@@ -28,6 +28,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
+
   - os: osx
     language: objective-c
     osx_image: xcode8.3
@@ -35,8 +36,9 @@ matrix:
 before_install:
 - export LANG=en_US.UTF-8
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; brew install node cocoapods ; pod setup ; fi
-- npm install -g cordova
+- npm install cordova
+- ln -s node_modules/.bin/cordova cordova
 
 script:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-ios.sh ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-android.sh ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh build-ios.sh ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh build-android.sh ; fi
