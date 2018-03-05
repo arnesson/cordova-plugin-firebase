@@ -20,6 +20,8 @@ Thank you for your support!
 ## Installation
 See npm package for versions - https://www.npmjs.com/package/cordova-plugin-firebase
 
+Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
+
 Install the plugin by adding it your project's config.xml:
 ```
 <plugin name="cordova-plugin-firebase" spec="0.1.25" />
