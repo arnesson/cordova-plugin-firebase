@@ -1,0 +1,42 @@
+env:
+  global:
+  - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+  - LANG=en_US.UTF-8
+
+matrix:
+  include:
+  - os: linux
+    sudo: false
+    language: android
+    android:
+      components:
+      - tools
+      - platform-tools
+      - tools
+      - build-tools-26.0.0
+      - android-25
+      - extra-google-google_play_services
+      - extra-google-m2repository
+      - extra-android-m2repository
+    addons:
+      apt:
+        packages:
+        - oracle-java8-installer
+        - oracle-java8-set-default
+    licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+
+  - os: osx
+    language: objective-c
+    osx_image: xcode8.3
+
+before_install:
+- nvm install 8
+- npm install cordova
+- PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
+
+script:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh build-ios.sh ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh build-android.sh ; fi

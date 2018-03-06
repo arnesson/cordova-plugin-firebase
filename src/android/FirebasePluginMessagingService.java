@@ -48,20 +48,19 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         String id;
         String sound = null;
         String lights = null;
+        Map<String, String> data = remoteMessage.getData();
+      
         if (remoteMessage.getNotification() != null) {
             title = remoteMessage.getNotification().getTitle();
             text = remoteMessage.getNotification().getBody();
             id = remoteMessage.getMessageId();
         } else {
-            title = remoteMessage.getData().get("title");
-            text = remoteMessage.getData().get("text");
-            id = remoteMessage.getData().get("id");
-            sound = remoteMessage.getData().get("sound");
-            lights = remoteMessage.getData().get("lights"); //String containing hex ARGB color, miliseconds on, miliseconds off, example: '#FFFF00FF,1000,3000'
-
-            if(TextUtils.isEmpty(text)){
-                text = remoteMessage.getData().get("body");
-            }
+            title = data.get("title");
+            text = data.get("text");
+            id = data.get("id");
+            sound = data.get("sound");
+            lights = data.get("lights"); //String containing hex ARGB color, miliseconds on, miliseconds off, example: '#FFFF00FF,1000,3000'
+            if(TextUtils.isEmpty(text)) text = data.get("body");
         }
 
         if(TextUtils.isEmpty(id)){
@@ -78,9 +77,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Lights: " + lights);
 
         // TODO: Add option to developer to configure if show notification when app on foreground
-        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (!remoteMessage.getData().isEmpty())) {
+        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (!data.isEmpty())) {
             boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
-            sendNotification(id, title, text, remoteMessage.getData(), showNotification, sound, lights);
+            sendNotification(id, title, text, data, showNotification, sound, lights);
         }
 
     }
