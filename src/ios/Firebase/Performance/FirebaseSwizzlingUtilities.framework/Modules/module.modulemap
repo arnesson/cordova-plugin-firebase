@@ -1,0 +1,4 @@
+framework module FirebaseSwizzlingUtilities {
+  export *
+  module * { export *}
+  link "c++"}

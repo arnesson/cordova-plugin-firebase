@@ -8,5 +8,6 @@ framework module FirebasePerformance {
   link framework "CoreTelephony"
   link framework "QuartzCore"
   link framework "Security"
+  link framework "StoreKit"
   link framework "SystemConfiguration"
   link framework "UIKit"}
