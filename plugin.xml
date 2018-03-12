@@ -106,6 +106,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
 		<framework custom="true" src="src/ios/Firebase/Auth/GTMSessionFetcher.framework" />
 		<framework custom="true" src="src/ios/Firebase/Performance/FirebasePerformance.framework" />
+		<framework custom="true" src="src/ios/Firebase/Performance/FirebaseSwizzlingUtilities.framework" />
 	</platform>
 
 	<platform name="browser">
