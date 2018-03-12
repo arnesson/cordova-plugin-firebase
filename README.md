@@ -428,6 +428,16 @@ Stop the trace
 window.FirebasePlugin.stopTrace("test trace");
 ```
 
+### setAnalyticsCollectionEnabled
+
+Enable/disable analytics collection
+
+```
+window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+
+window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+```
+
 ### Phone Authentication
 **BASED ON THE CONTRIBUTIONS OF**
 IOS
