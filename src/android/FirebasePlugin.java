@@ -820,7 +820,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void setAnalyticsCollectionEnabled(final CallbackContext callbackContext, final Boolean enabled) {
+    private void setAnalyticsCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
         final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
