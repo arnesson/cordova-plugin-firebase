@@ -61,9 +61,9 @@ Download your container-config json file from Tag Manager and add a resource-fil
 ```
 ....
 <platform name="android">
-        <content src="index.html" />
-        <resource-file src="GTM-5MFXXXX.json" target="assets/containers/GTM-5MFXXXX.json" />
-        ...
+    <content src="index.html" />
+    <resource-file src="GTM-5MFXXXX.json" target="assets/containers/GTM-5MFXXXX.json" />
+    ...
 ```
 
 ## Changing Notification Icon
@@ -453,21 +453,20 @@ This method sends an SMS to the user with the SMS_code and gets the verification
 
 ```
 window.FirebasePlugin.getVerificationID("+573123456789",function(id) {
-                console.log("verificationID: "+id);
-
-            }, function(error) {             
-                console.error(error);
-            });
+    console.log("verificationID: "+id);
+}, function(error) {             
+    console.error(error);
+});
 ```
 
 Using Ionic2?
 ```
-  (<any>window).FirebasePlugin.getVerificationID("+573123456789", id => {
-          console.log("verificationID: " + id);
-          this.verificationId = id;
-        }, error => {
-          console.log("error: " + error);
-        });
+(<any>window).FirebasePlugin.getVerificationID("+573123456789", id => {
+    console.log("verificationID: " + id);
+    this.verificationId = id;
+}, error => {
+    console.log("error: " + error);
+});
 ```
 Get the intermediate AuthCredential object
 ```
