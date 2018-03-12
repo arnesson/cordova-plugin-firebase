@@ -27,6 +27,7 @@
 - (void)startTrace:(CDVInvokedUrlCommand*)command;
 - (void)incrementCounter:(CDVInvokedUrlCommand*)command;
 - (void)stopTrace:(CDVInvokedUrlCommand*)command;
+- (void)setAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
