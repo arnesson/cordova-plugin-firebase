@@ -16,24 +16,13 @@
 #endif
 
 #define kApplicationInBackgroundKey @"applicationInBackground"
-#define kDelegateKey @"delegate"
 
 @implementation AppDelegate (FirebasePlugin)
-
-@dynamic delegate;
 
 + (void)load {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
     Method swizzled = class_getInstanceMethod(self, @selector(application:swizzledDidFinishLaunchingWithOptions:));
     method_exchangeImplementations(original, swizzled);
-}
-
-- (void)setDelegate:(id)delegate {
-    objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (id)delegate {
-    return objc_getAssociatedObject(self, kDelegateKey);
 }
 
 - (void)setApplicationInBackground:(NSNumber *)applicationInBackground {
@@ -51,17 +40,52 @@
         [FIRApp configure];
     }
 
+    // [START set_messaging_delegate]
+    [FIRMessaging messaging].delegate = self;
+    // [END set_messaging_delegate]
+    
+    // Register for remote notifications. This shows a permission dialog on first run, to
+    // show the dialog at a more appropriate time move this registration accordingly.
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1) {
+        // iOS 7.1 or earlier. Disable the deprecation warnings.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        UIRemoteNotificationType allNotificationTypes =
+        (UIRemoteNotificationTypeSound |
+         UIRemoteNotificationTypeAlert |
+         UIRemoteNotificationTypeBadge);
+        [application registerForRemoteNotificationTypes:allNotificationTypes];
+#pragma clang diagnostic pop
+    } else {
+        // iOS 8 or later
+        // [START register_for_notifications]
+        if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_9_x_Max) {
+            UIUserNotificationType allNotificationTypes =
+            (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
+            UIUserNotificationSettings *settings =
+            [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
+            [application registerUserNotificationSettings:settings];
+        } else {
+            // iOS 10 or later
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+            // For iOS 10 display notification (sent via APNS)
+            [UNUserNotificationCenter currentNotificationCenter].delegate = self;
+            UNAuthorizationOptions authOptions =
+            UNAuthorizationOptionAlert
+            | UNAuthorizationOptionSound
+            | UNAuthorizationOptionBadge;
+            [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:authOptions completionHandler:^(BOOL granted, NSError * _Nullable error) { 
+            }];
+#endif 
+        }[application registerForRemoteNotifications];
+        // [END register_for_notifications]
+    }
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
-
+    
     self.applicationInBackground = @(YES);
-
-    #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-        // For iOS 10 display notification (sent via APNS)
-        self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
-        [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-    #endif
-
+    
     return YES;
 }
 
@@ -85,7 +109,6 @@
 
     // Connect to FCM since connection may have failed when attempted before having a token.
     [self connectToFcm];
-
     [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
 }
 
@@ -121,10 +144,17 @@
 
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
-
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
+// [START ios_10_data_message]
+// Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
+// To enable direct data messages, you can set [Messaging messaging].shouldEstablishDirectChannel to YES.
+- (void)messaging:(FIRMessaging *)messaging didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage {
+    NSLog(@"Received data message: %@", remoteMessage.appData);
+}
+
+// [END ios_10_data_message]
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
@@ -136,33 +166,7 @@
     // Print full message.
     NSLog(@"%@", mutableUserInfo);
 
-    if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class]) {
-        [self.delegate userNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
-        return;
-    }
-
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
-}
-
-// Handle notification messages after display notification is tapped by the user.
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-didReceiveNotificationResponse:(UNNotificationResponse *)response
-         withCompletionHandler:(void(^)(void))completionHandler {
-    NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
-
-    [mutableUserInfo setValue:@YES forKey:@"tap"];
-
-    // Print full message.
-    NSLog(@"Response %@", mutableUserInfo);
-
-    if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class]) {
-        [self.delegate userNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
-        return;
-    }
-
-    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
-
-    completionHandler();
 }
 
 // Receive data message on iOS 10 devices.
