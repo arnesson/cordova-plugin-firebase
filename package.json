@@ -27,5 +27,8 @@
     "push",
     "notifications",
     "phone auth"
-  ]
+  ],
+  "scripts": {
+    "postversion": "git push && git push --tags && npm publish"
+  }
 }
