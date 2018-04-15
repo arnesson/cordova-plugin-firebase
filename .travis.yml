@@ -1,10 +1,11 @@
 env:
-- CORDOVA_NPM="cordova@6.5.0"
-- CORDOVA_NPM="cordova@7.1.0"
-- CORDOVA_NPM="cordova@8.0.0"
   global:
-  - JAVA_HOME=/usr/lib/jvm/java-8-oracle
-  - LANG=en_US.UTF-8
+    - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+    - LANG=en_US.UTF-8
+  matrix:
+    - CORDOVA_NPM="cordova@6.5.0"
+    - CORDOVA_NPM="cordova@7.1.0"
+    - CORDOVA_NPM="cordova@8.0.0"
 
 matrix:
   include:
