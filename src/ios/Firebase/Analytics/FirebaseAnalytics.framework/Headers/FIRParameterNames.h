@@ -10,6 +10,8 @@
 /// be up to 100 characters long. The "firebase_", "google_", and "ga_" prefixes are reserved and
 /// should not be used.
 
+#import <Foundation/Foundation.h>
+
 /// Game achievement ID (NSString).
 /// <pre>
 ///     NSDictionary *params = @{
