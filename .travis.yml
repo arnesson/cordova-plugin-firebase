@@ -39,7 +39,9 @@ before_install:
 - nvm install 8
 - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
 
-script:
+before_script:
 - npm install $CORDOVA_NPM
+
+script:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh build-ios.sh ; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh build-android.sh ; fi
