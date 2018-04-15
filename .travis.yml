@@ -1,4 +1,7 @@
 env:
+  - CORDOVA_NPM=cordova@6.5.0
+  - CORDOVA_NPM=cordova@7.1.0
+  - CORDOVA_NPM=cordova@8.0.0
   global:
   - JAVA_HOME=/usr/lib/jvm/java-8-oracle
   - LANG=en_US.UTF-8
@@ -34,7 +37,7 @@ matrix:
 
 before_install:
 - nvm install 8
-- npm install cordova
+- npm install $CORDOVA_NPM
 - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
 
 script:
