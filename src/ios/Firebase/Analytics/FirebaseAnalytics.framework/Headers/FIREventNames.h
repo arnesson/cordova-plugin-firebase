@@ -10,6 +10,8 @@
 /// characters and underscores ("_"), and must start with an alphabetic character. The "firebase_",
 /// "google_", and "ga_" prefixes are reserved and should not be used.
 
+#import <Foundation/Foundation.h>
+
 /// Add Payment Info event. This event signifies that a user has submitted their payment information
 /// to your app.
 static NSString *const kFIREventAddPaymentInfo NS_SWIFT_NAME(AnalyticsEventAddPaymentInfo) =

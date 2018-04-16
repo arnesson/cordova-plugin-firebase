@@ -110,6 +110,10 @@ NS_SWIFT_NAME(Analytics)
 /// The unique ID for this instance of the application.
 + (NSString *)appInstanceID;
 
+/// Clears all analytics data for this instance from the device and resets the app instance ID.
+/// FIRAnalyticsConfiguration values will be reset to the default values.
++ (void)resetAnalyticsData;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -23,9 +23,9 @@
  *  If the call fails we return the appropriate `error code`, described by
  *  `FIRMessagingError`.
  *
- *  @param FCMToken The valid registration token returned by FCM.
- *  @param error The error describing why a token request failed. The error code
- *               will match a value from the FIRMessagingError enumeration.
+ *  @param FCMToken  The valid registration token returned by FCM.
+ *  @param error     The error describing why a token request failed. The error code
+ *                   will match a value from the FIRMessagingError enumeration.
  */
 typedef void(^FIRMessagingFCMTokenFetchCompletion)(NSString * _Nullable FCMToken,
     NSError * _Nullable error)
@@ -44,6 +44,16 @@ typedef void(^FIRMessagingFCMTokenFetchCompletion)(NSString * _Nullable FCMToken
  */
 typedef void(^FIRMessagingDeleteFCMTokenCompletion)(NSError * _Nullable error)
     NS_SWIFT_NAME(MessagingDeleteFCMTokenCompletion);
+
+/**
+ *  Callback to invoke once the HTTP call to FIRMessaging backend for updating
+ *  subscription finishes.
+ *
+ *  @param error  The error which occurred while updating the subscription topic
+ *                on the FIRMessaging server. This will be nil in case the operation
+ *                was successful, or if the operation was cancelled.
+ */
+typedef void (^FIRMessagingTopicOperationCompletion)(NSError *_Nullable error);
 
 /**
  *  The completion handler invoked once the data connection with FIRMessaging is
@@ -290,23 +300,12 @@ NS_SWIFT_NAME(Messaging)
 @property(nonatomic, weak, nullable) id<FIRMessagingDelegate> delegate;
 
 /**
- * Delegate to handle remote data messages received via FCM for devices running iOS 10 or above.
- */
-@property(nonatomic, weak, nullable) id<FIRMessagingDelegate> remoteMessageDelegate
-    __deprecated_msg("Use 'delegate' property");
-
-/**
  *  When set to `YES`, Firebase Messaging will automatically establish a socket-based, direct
  *  channel to the FCM server. Enable this only if you are sending upstream messages or
  *  receiving non-APNS, data-only messages in foregrounded apps.
  *  Default is `NO`.
  */
-@property(nonatomic) BOOL shouldEstablishDirectChannel;
-
-/**
- *  Returns `YES` if the direct channel to the FCM server is active, and `NO` otherwise.
- */
-@property(nonatomic, readonly) BOOL isDirectChannelEstablished;
+@property(nonatomic, assign, getter=isDirectChannelEstablished) BOOL shouldEstablishDirectChannel;
 
 /**
  *  FIRMessaging
@@ -459,11 +458,33 @@ NS_SWIFT_NAME(Messaging)
 - (void)subscribeToTopic:(nonnull NSString *)topic NS_SWIFT_NAME(subscribe(toTopic:));
 
 /**
+ *  Asynchronously subscribe to the provided topic, retrying on failure.
+ *
+ *  @param topic       The topic name to subscribe to, for example, @"sports".
+ *  @param completion  The completion that is invoked once the subscribe call ends.
+ *                     In case of success, nil error is returned. Otherwise, an
+ *                     appropriate error object is returned.
+ */
+- (void)subscribeToTopic:(nonnull NSString *)topic
+              completion:(nullable FIRMessagingTopicOperationCompletion)completion;
+
+/**
  *  Asynchronously unsubscribe from a topic.
  *
  *  @param topic The name of the topic, for example @"sports".
  */
 - (void)unsubscribeFromTopic:(nonnull NSString *)topic NS_SWIFT_NAME(unsubscribe(fromTopic:));
+
+/**
+ *  Asynchronously unsubscribe from the provided topic, retrying on failure.
+ *
+ *  @param topic       The topic name to unsubscribe from, for example @"sports".
+ *  @param completion  The completion that is invoked once the unsubscribe call ends.
+ *                     In case of success, nil error is returned. Otherwise, an
+ *                     appropriate error object is returned.
+ */
+- (void)unsubscribeFromTopic:(nonnull NSString *)topic
+                  completion:(nullable FIRMessagingTopicOperationCompletion)completion;
 
 #pragma mark - Upstream
 
