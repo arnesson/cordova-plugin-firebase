@@ -1,5 +1,6 @@
 package org.apache.cordova.firebase;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -23,6 +24,17 @@ import java.util.Random;
 public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "FirebasePlugin";
+
+  /**
+   * Get a string from resources without importing the .R package
+   * @param name Resource Name
+   * @return Resource
+   */
+    private String getStringResource(String name) {
+      return this.getString(
+        this.getResources().getIdentifier(
+          name, "string", this.getPackageName()));
+    }
 
     /**
      * Called when message is received.
@@ -95,8 +107,10 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+            String channelId = this.getStringResource("default_notification_channel_id");
+            String channelName = this.getStringResource("default_notification_channel_name");
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
                 .setContentText(messageBody)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -149,6 +163,14 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 }
             }
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            // Since android Oreo notification channel is needed.
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+              NotificationChannel channel = new NotificationChannel(channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_DEFAULT);
+              notificationManager.createNotificationChannel(channel);
+            }
 
             notificationManager.notify(id.hashCode(), notification);
         } else {
