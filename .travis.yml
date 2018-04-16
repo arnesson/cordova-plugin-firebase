@@ -27,8 +27,8 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_NPM="cordova@6.5.0"
-    
+    env: CORDOVA_NPM="cordova@6.5.0" SCRIPT_NAME="build-android-v6.sh"
+
   - os: linux
     sudo: false
     language: android
@@ -51,17 +51,17 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_NPM="cordova@7.1.0"
+    env: CORDOVA_NPM="cordova@7.1.0" SCRIPT_NAME="build-android-v7.sh"
 
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_NPM="cordova@6.5.0"
-    
+    env: CORDOVA_NPM="cordova@6.5.0" SCRIPT_NAME="build-ios-v4.sh"
+
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_NPM="cordova@7.1.0"
+    env: CORDOVA_NPM="cordova@7.1.0" SCRIPT_NAME="build-ios-v4.sh"
 
 before_install:
 - nvm install 8
@@ -72,5 +72,4 @@ before_script:
 - npm install $CORDOVA_NPM
 
 script:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sh build-ios.sh ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sh build-android.sh ; fi
+- sh $SCRIPT_NAME

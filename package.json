@@ -29,6 +29,14 @@
     "phone auth"
   ],
   "scripts": {
-    "postversion": "git push && git push --tags && npm publish"
+    "postversion": "git push && git push --tags && npm publish",
+    "test": "npm run test:cordova:v6 && npm run test:cordova:v7",
+    "test:cordova:v6": "npm run install:cordova:v6 && npm run test:ios:v4 && npm run test:android:v6",
+    "test:cordova:v7": "npm run install:cordova:v7 && npm run test:ios:v4 && npm run test:android:v7",
+    "test:ios:v4": "sh build-ios-v4.sh",
+    "test:android:v6": "sh build-android-v6.sh",
+    "test:android:v7": "sh build-android-v7.sh",
+    "install:cordova:v6": "npm uninstall cordova && npm install cordova@^6.x.x --no-save",
+    "install:cordova:v7": "npm uninstall cordova && npm install cordova@^7.x.x --no-save"
   }
 }

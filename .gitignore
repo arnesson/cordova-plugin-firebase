@@ -3,3 +3,5 @@
 *.log
 .build-ios
 .build-android
+package-lock.json
+node_modules
