@@ -10,11 +10,10 @@ matrix:
     language: android
     android:
       components:
-      - tools
-      - platform-tools
-      - tools
+      - tools-26.0.0
+      - platform-tools-26.0.0
       - build-tools-26.0.0
-      - android-25
+      - android-26.0.0
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -34,11 +33,10 @@ matrix:
     language: android
     android:
       components:
-      - tools
-      - platform-tools
-      - tools
+      - tools-26.0.0
+      - platform-tools-26.0.0
       - build-tools-26.0.0
-      - android-25
+      - android-26.0.0
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -66,7 +64,7 @@ matrix:
 before_install:
 - nvm install 8
 - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yes | sdkmanager "platforms;android-26" ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
 
 before_script:
 - npm install $CORDOVA_NPM
