@@ -4,7 +4,7 @@ rm -rf .build-ios
 
 cd .build-ios
 
-../node_modules/.bin/cordova platform add ios@~4.0.0
+../node_modules/.bin/cordova platform add ios@4.5.4
 
 ../node_modules/.bin/cordova plugin add ..
 

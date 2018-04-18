@@ -26,7 +26,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_NPM="cordova@6.5.0" SCRIPT_NAME="build-android-v6.sh"
+    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v6.sh"
 
   - os: linux
     sudo: false
@@ -49,25 +49,31 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_NPM="cordova@7.1.0" SCRIPT_NAME="build-android-v7.sh"
+    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v7.sh"
 
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_NPM="cordova@6.5.0" SCRIPT_NAME="build-ios-v4.sh"
+    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
 
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_NPM="cordova@7.1.0" SCRIPT_NAME="build-ios-v4.sh"
+    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
+
+  - os: linux
+    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
+
+  - os: linux
+    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
 
 before_install:
 - nvm install 8
 - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
+- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
 
 before_script:
-- npm install $CORDOVA_NPM
+- npm install $CORDOVA_VERSION
 
 script:
 - sh $SCRIPT_NAME
