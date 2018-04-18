@@ -10,11 +10,10 @@ matrix:
     language: android
     android:
       components:
-      - tools
-      - platform-tools
-      - tools
+      - tools-26.0.0
+      - platform-tools-26.0.0
       - build-tools-26.0.0
-      - android-26
+      - android-26.0.0
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -34,11 +33,10 @@ matrix:
     language: android
     android:
       components:
-      - tools
-      - platform-tools
-      - tools
+      - tools-26.0.0
+      - platform-tools-26.0.0
       - build-tools-26.0.0
-      - android-26
+      - android-26.0.0
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
