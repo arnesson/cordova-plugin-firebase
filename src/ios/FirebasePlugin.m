@@ -157,35 +157,36 @@ static FirebasePlugin *firebasePlugin;
 	return;
 }
 
+- (void)verifyPhoneNumber:(CDVInvokedUrlCommand *)command {
+    [self getVerificationID:command];
+}
+
 - (void)getVerificationID:(CDVInvokedUrlCommand *)command {
     NSString* number = [command.arguments objectAtIndex:0];
 
     [[FIRPhoneAuthProvider provider]
     verifyPhoneNumber:number
-           completion:^(NSString *_Nullable verificationID,
-                        NSError *_Nullable error) {
-NSDictionary *message;
-  if (error) {
+           completion:^(NSString *_Nullable verificationID, NSError *_Nullable error) {
 
-    // Verification code not sent.
-    message = @{
-                @"code": [NSNumber numberWithInteger:error.code],
-                @"description": error.description == nil ? [NSNull null] : error.description
-                };
+    NSDictionary *message;
 
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
-                                                                                                        
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId]; 
-    
-  } else {
-    // Successful.
-CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId]; 
-  }
-}];
+    if (error) {
 
-     
-    
+      // Verification code not sent.
+      message = @{
+                  @"code": [NSNumber numberWithInteger:error.code],
+                  @"description": error.description == nil ? [NSNull null] : error.description
+                  };
+
+      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+
+      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } else {
+      // Successful.
+      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+  }];
 }
 
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
@@ -297,7 +298,7 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
 
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-        NSString* errorMessage = [command.arguments objectAtIndex:0];       
+        NSString* errorMessage = [command.arguments objectAtIndex:0];
         FIRCrashLog(@"%@", errorMessage);
         assert(NO);
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -308,7 +309,7 @@ CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStat
 - (void)setScreenName:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* name = [command.arguments objectAtIndex:0];
- 
+
         [FIRAnalytics setScreenName:name screenClass:NULL];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];

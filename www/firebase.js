@@ -143,3 +143,7 @@ exports.stopTrace = function (name, success, error) {
 exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
     exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
 };
+
+exports.verifyPhoneNumber = function (number, success, error) {
+    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number]);
+};

@@ -253,17 +253,14 @@ Set a user property for use in Analytics:
 window.FirebasePlugin.setUserProperty("name", "value");
 ```
 
-### verifyPhoneNumber (Android only)
+### verifyPhoneNumber
 
-Request a verificationId and send a SMS with a verificationCode.
-Use them to construct a credenial to sign in the user (in your app).
-https://firebase.google.com/docs/auth/android/phone-auth
-https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+Request a verification ID and send a SMS with a verification code. Use them to construct a credential to sign in the user (in your app).
+- https://firebase.google.com/docs/auth/android/phone-auth
+- https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+- https://firebase.google.com/docs/reference/js/firebase.User#linkWithCredential
 
-NOTE: To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
-See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
-
-NOTE: This will only works on physical devices.
+**NOTE: This will only works on physical devices.**
 
 ```
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
@@ -274,12 +271,24 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 
     var verificationId = credential.verificationId;
 
-    var signInCredential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-    firebase.auth().signInWithCredential(signInCredential);
+    var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+
+    // sign in with the credential
+    firebase.auth().signInWithCredential(credential);
+
+    // OR link to an account
+    firebase.auth().currentUser.linkWithCredential(credential)
 }, function(error) {
     console.error(error);
 });
 ```
+
+#### Android
+To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
+See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+
+#### iOS
+Setup your push notifications first, and verify that they are arriving to your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
 
 ### fetch
 
@@ -436,47 +445,4 @@ Enable/disable analytics collection
 window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
 
 window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
-```
-
-### Phone Authentication
-**BASED ON THE CONTRIBUTIONS OF**
-IOS
-https://github.com/silverio/cordova-plugin-firebase
-
-ANDROID
-https://github.com/apptum/cordova-plugin-firebase
-
-**((((IOS))): SETUP YOUR PUSH NOTIFICATIONS FIRST, AND VERIFY THAT THEY ARE ARRIVING TO YOUR PHYSICAL DEVICE BEFORE YOU TEST THIS METHOD. USE THE APNS AUTH KEY TO GENERATE THE .P8 FILE AND UPLOAD IT TO FIREBASE.
-WHEN YOU CALL THIS METHOD, FCM SENDS A SILENT PUSH TO THE DEVICE TO VERIFY IT.**
-
-This method sends an SMS to the user with the SMS_code and gets the verification id you need to continue the sign in process, with the Firebase JS SDK.
-
-```
-window.FirebasePlugin.getVerificationID("+573123456789",function(id) {
-    console.log("verificationID: "+id);
-}, function(error) {             
-    console.error(error);
-});
-```
-
-Using Ionic2?
-```
-(<any>window).FirebasePlugin.getVerificationID("+573123456789", id => {
-    console.log("verificationID: " + id);
-    this.verificationId = id;
-}, error => {
-    console.log("error: " + error);
-});
-```
-Get the intermediate AuthCredential object
-```
-var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, SMS_code);
-```
-Then, you can sign in the user with the credential:
-```
-firebase.auth().signInWithCredential(credential);
-```
-Or link to an account
-```
-firebase.auth().currentUser.linkWithCredential(credential)
 ```
