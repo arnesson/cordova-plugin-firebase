@@ -14,7 +14,7 @@ matrix:
       - platform-tools
       - tools
       - build-tools-26.0.0
-      - android-25
+      - android-26
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -38,7 +38,7 @@ matrix:
       - platform-tools
       - tools
       - build-tools-26.0.0
-      - android-25
+      - android-26
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -66,7 +66,7 @@ matrix:
 before_install:
 - nvm install 8
 - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yes | sdkmanager "platforms;android-26" ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
 
 before_script:
 - npm install $CORDOVA_NPM

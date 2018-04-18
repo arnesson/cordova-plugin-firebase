@@ -4,7 +4,7 @@ rm -rf .build-android
 
 cd .build-android
 
-../node_modules/.bin/cordova platform add android@~6.0.0
+../node_modules/.bin/cordova platform add android@~6.2.2
 
 ../node_modules/.bin/cordova plugin add ..
 
