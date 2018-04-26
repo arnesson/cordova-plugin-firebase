@@ -51,6 +51,29 @@ matrix:
     - google-gdk-license-.+
     env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v7.sh"
 
+  - os: linux
+    sudo: false
+    language: android
+    android:
+      components:
+      - tools-26.0.0
+      - platform-tools-26.0.0
+      - build-tools-26.0.0
+      - android-26.0.0
+      - extra-google-google_play_services
+      - extra-google-m2repository
+      - extra-android-m2repository
+    addons:
+      apt:
+        packages:
+        - oracle-java8-installer
+        - oracle-java8-set-default
+    licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v7.sh"
+
   - os: osx
     language: objective-c
     osx_image: xcode8.3
@@ -61,11 +84,19 @@ matrix:
     osx_image: xcode8.3
     env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
 
+  - os: osx
+    language: objective-c
+    osx_image: xcode8.3
+    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
+
   - os: linux
     env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
 
   - os: linux
     env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
+
+  - os: linux
+    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
 
 before_install:
 - nvm install 8
