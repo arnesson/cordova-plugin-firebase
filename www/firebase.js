@@ -144,6 +144,11 @@ exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
     exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
 };
 
-exports.verifyPhoneNumber = function (number, success, error) {
-    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number]);
+exports.verifyPhoneNumber = function (number, timeout, success, error) {
+    let args=[];
+    if (typeof number === 'string') {
+        args.push(number);
+    }
+    args.push(timeout);
+    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", args);
 };
