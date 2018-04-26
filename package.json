@@ -29,6 +29,7 @@
     "phone auth"
   ],
   "scripts": {
+    "version": "node ./bump-version.js && git add -A plugin.xml",
     "postversion": "git push && git push --tags && npm publish",
     "test": "npm run test:cordova:v6 && npm run test:cordova:v7",
     "test:cordova:v6": "npm run install:cordova:v6 && npm run test:ios:v4 && npm run test:android:v6 && npm run test:browser:v5",
