@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebasePluginMessageReceiverManager {
-    private static List<FirebasePluginMessageReceiver> receivers = new ArrayList<>();
+    private static List<FirebasePluginMessageReceiver> receivers = new ArrayList<FirebasePluginMessageReceiver>();
 
     public static void register(FirebasePluginMessageReceiver receiver){
         receivers.add(receiver);
