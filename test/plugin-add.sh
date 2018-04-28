@@ -1,10 +1,15 @@
 #!/bin/sh
 
-PLATFORM=$1
-PLATFORM_VERSION=$2
-PLUGIN=$3
-FOLDER=".build-$1"
+CORDOVA_VERSION=$1
+PLATFORM=$2
+PLATFORM_VERSION=$3
+PLUGIN=$4
 
+FOLDER=".build-$PLATFORM"
 cd $FOLDER
 
-../node_modules/.bin/cordova plugin add $PLUGIN
+if [[ "${CORDOVA_VERSION:0:1}" == "6" ]]; then
+  ../node_modules/.bin/cordova plugin add $PLUGIN --fetch
+else
+  ../node_modules/.bin/cordova plugin add $PLUGIN
+fi

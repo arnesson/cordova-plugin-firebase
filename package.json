@@ -31,19 +31,21 @@
   "scripts": {
     "version": "node ./bump-version.js && git add -A plugin.xml",
     "postversion": "git push && git push --tags && npm publish",
-    "test": "npm run test:cordova:v6 && npm run test:cordova:v7 && npm run test:cordova:v8",
-    "test:ios": "npm run install:cordova:v6 && npm run test:ios:v4 && npm run install:cordova:v7 && npm run test:ios:v4 && npm run install:cordova:v8 && npm run test:ios:v4",
-    "test:android": "npm run install:cordova:v6 && npm run test:android:v6 && npm run install:cordova:v7 && npm run test:android:v7 && npm run install:cordova:v8 && npm run test:android:v7",
-    "test:browser": "npm run install:cordova:v6 && npm run test:browser:v5 && npm run install:cordova:v7 && npm run test:browser:v5 && npm run install:cordova:v8 && npm run test:browser:v5",
-    "test:cordova:v6": "npm run install:cordova:v6 && npm run test:ios:v4 && npm run test:android:v6 && npm run test:browser:v5",
-    "test:cordova:v7": "npm run install:cordova:v7 && npm run test:ios:v4 && npm run test:android:v7 && npm run test:browser:v5",
-    "test:cordova:v8": "npm run install:cordova:v8 && npm run test:ios:v4 && npm run test:android:v7 && npm run test:browser:v5",
-    "test:ios:v4": "sh ./test/base-app.sh ios 4.5.4",
-    "test:android:v6": "sh ./test/test-default.sh android 6.4.0 && sh ./test/test-with-plugin.sh android 6.4.0 cordova-plugin-request-location-accuracy",
-    "test:android:v7": "sh ./test/test-default.sh android 7.1.0 && sh ./test/test-with-plugin.sh android 7.1.0 cordova-plugin-request-location-accuracy",
-    "test:browser:v5": "sh ./test/test-default.sh browser 5.0.3",
-    "install:cordova:v6": "npm uninstall cordova && npm install cordova@^6.x.x --no-save",
-    "install:cordova:v7": "npm uninstall cordova && npm install cordova@^7.x.x --no-save",
-    "install:cordova:v8": "npm uninstall cordova && npm install cordova@^8.x.x --no-save"
+    "test": "npm run test:ios && npm run test:android && npm run test:browser",
+    "test:android": "npm run test:cordova@6.5.0:android@6.4.0 && npm run test:cordova@7.1.0:android@7.1.0 && npm run test:cordova@8.0.0:android@7.1.0",
+    "test:browser": "npm run test:cordova@6.5.0:browser@6.4.0 && npm run test:cordova@7.1.0:browser@7.1.0 && npm run test:cordova@8.0.0:browser@7.1.0",
+    "test:ios": "npm run test:cordova@6.5.0:ios@4.5.4 && npm run test:cordova@7.1.0:ios@4.5.4 && npm run test:cordova@8.0.0:ios@4.5.4",
+    "test:cordova@6.5.0:ios@4.5.4": "sh ./test/test-default.sh 6.5.0 ios 4.5.4",
+    "test:cordova@7.1.0:ios@4.5.4": "sh ./test/test-default.sh 7.1.0 ios 4.5.4",
+    "test:cordova@8.0.0:ios@4.5.4": "sh ./test/test-default.sh 8.0.0 ios 4.5.4",
+    "test:cordova@6.5.0:android@6.4.0": "sh ./test/test-default.sh 6.5.0 android 6.4.0 && sh ./test/test-with-2-plugins.sh 6.5.0 android 6.4.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release",
+    "test:cordova@7.1.0:android@7.1.0": "sh ./test/test-default.sh 7.1.0 android 7.1.0 && sh ./test/test-with-2-plugins.sh 7.1.0 android 7.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release",
+    "test:cordova@8.0.0:android@7.1.0": "sh ./test/test-default.sh 8.0.0 android 7.1.0 && sh ./test/test-with-2-plugins.sh 8.0.0 android 7.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release",
+    "test:cordova@6.5.0:browser@5.0.3": "sh ./test/test-default.sh 6.5.0 browser 5.0.3",
+    "test:cordova@7.1.0:browser@5.0.3": "sh ./test/test-default.sh 7.1.0 browser 5.0.3",
+    "test:cordova@8.0.0:browser@5.0.3": "sh ./test/test-default.sh 8.0.0 browser 5.0.3"
+  },
+  "dependencies": {
+    "cordova": "^8.0.0"
   }
 }
