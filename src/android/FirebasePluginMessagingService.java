@@ -53,6 +53,13 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
         // [END_EXCLUDE]
 
+        // Pass the message to the receiver manager so any registered receivers can decide to handle it
+        boolean wasHandled = FirebasePluginMessageReceiverManager.onMessageReceived(remoteMessage);
+        if(wasHandled){
+            Log.d(TAG, "Message was handled by a registered receiver");
+            return; // don't process the message in this method
+        }
+
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         String title;
