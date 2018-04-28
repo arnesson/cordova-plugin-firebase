@@ -58,6 +58,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+		<framework src="src/android/build-extras.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.gms:google-services:+" />
 		<framework src="com.google.android.gms:play-services-tagmanager:+" />
 		<framework src="com.google.firebase:firebase-core:+" />
