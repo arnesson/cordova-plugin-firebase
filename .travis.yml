@@ -26,7 +26,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v6.sh"
+    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="6.4.0"
 
   - os: linux
     sudo: false
@@ -49,7 +49,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v7.sh"
+    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
 
   - os: linux
     sudo: false
@@ -72,31 +72,31 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="android" SCRIPT_NAME="build-android-v7.sh"
+    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
 
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
+    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
 
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
+    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
 
   - os: osx
     language: objective-c
     osx_image: xcode8.3
-    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="ios" SCRIPT_NAME="build-ios-v4.sh"
+    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
 
   - os: linux
-    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
+    env: CORDOVA_VERSION="cordova@6.5.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
 
   - os: linux
-    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
+    env: CORDOVA_VERSION="cordova@7.1.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
 
   - os: linux
-    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="browser" SCRIPT_NAME="build-browser-v5.sh"
+    env: CORDOVA_VERSION="cordova@8.0.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
 
 before_install:
 - nvm install 8
@@ -107,4 +107,5 @@ before_script:
 - npm install $CORDOVA_VERSION
 
 script:
-- sh $SCRIPT_NAME
+- sh ./test/default.sh $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
+- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then sh ./test/test-with-plugin.sh $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy ; fi
