@@ -107,5 +107,5 @@ before_script:
 - npm install $CORDOVA_VERSION
 
 script:
-- sh ./test/default.sh $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
+- sh ./test/test-default.sh $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
 - if [[ "$CORDOVA_PLATFORM" == "android" ]]; then sh ./test/test-with-plugin.sh $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy ; fi
