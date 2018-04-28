@@ -53,7 +53,8 @@ This plugin uses a hook (after prepare) that copies the configuration files to t
 
 Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones, as well as hard coding your app id and api key in plugin.xml.
 
-
+### Android Build Failures
+If you're having an issue with your android build, try installing [cordova-android-play-services-gradle-release] (https://github.com/dpa99c/cordova-android-play-services-gradle-release)
 
 ## Google Tag Manager
 ### Android
