@@ -682,7 +682,6 @@ public class FirebasePlugin extends CordovaPlugin {
 
                             String errorMsg = "unknown error verifying number";
                             errorMsg += " Error instance: " + e.getClass().getName();
-                            errorMsg += " Error code: " + ((FirebaseAuthException) e).getErrorCode().toString();
 
                             if (e instanceof FirebaseAuthInvalidCredentialsException) {
                                 // Invalid request
