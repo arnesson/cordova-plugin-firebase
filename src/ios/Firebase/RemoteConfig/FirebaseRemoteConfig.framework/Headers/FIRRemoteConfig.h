@@ -8,12 +8,14 @@
 /// The Firebase Remote Config service default namespace, to be used if the API method does not
 /// specify a different namespace. Use the default namespace if configuring from the Google Firebase
 /// service.
-extern NSString *const __nonnull FIRNamespaceGoogleMobilePlatform;
+extern NSString *const __nonnull FIRNamespaceGoogleMobilePlatform
+    NS_SWIFT_NAME(NamespaceGoogleMobilePlatform);
 
 /// Key used to manage throttling in NSError user info when the refreshing of Remote Config
 /// parameter values (data) is throttled. The value of this key is the elapsed time since 1970,
 /// measured in seconds.
-extern NSString *const __nonnull FIRRemoteConfigThrottledEndTimeInSecondsKey;
+extern NSString *const __nonnull FIRRemoteConfigThrottledEndTimeInSecondsKey
+    NS_SWIFT_NAME(RemoteConfigThrottledEndTimeInSecondsKey);
 
 /// Indicates whether updated data was successfully fetched.
 typedef NS_ENUM(NSInteger, FIRRemoteConfigFetchStatus) {
@@ -25,10 +27,10 @@ typedef NS_ENUM(NSInteger, FIRRemoteConfigFetchStatus) {
   FIRRemoteConfigFetchStatusFailure,
   /// Config fetch was throttled.
   FIRRemoteConfigFetchStatusThrottled,
-};
+} NS_SWIFT_NAME(RemoteConfigFetchStatus);
 
 /// Remote Config error domain that handles errors when fetching data from the service.
-extern NSString *const __nonnull FIRRemoteConfigErrorDomain;
+extern NSString *const __nonnull FIRRemoteConfigErrorDomain NS_SWIFT_NAME(RemoteConfigErrorDomain);
 /// Firebase Remote Config service fetch error.
 typedef NS_ENUM(NSInteger, FIRRemoteConfigError) {
   /// Unknown or no error.
@@ -37,7 +39,7 @@ typedef NS_ENUM(NSInteger, FIRRemoteConfigError) {
   FIRRemoteConfigErrorThrottled = 8002,
   /// Internal error that covers all internal HTTP errors.
   FIRRemoteConfigErrorInternalError = 8003,
-};
+} NS_SWIFT_NAME(RemoteConfigError);
 
 /// Enumerated value that indicates the source of Remote Config data. Data can come from
 /// the Remote Config service, the DefaultConfig that is available when the app is first installed,
@@ -46,18 +48,20 @@ typedef NS_ENUM(NSInteger, FIRRemoteConfigSource) {
   FIRRemoteConfigSourceRemote,   ///< The data source is the Remote Config service.
   FIRRemoteConfigSourceDefault,  ///< The data source is the DefaultConfig defined for this app.
   FIRRemoteConfigSourceStatic,   ///< The data doesn't exist, return a static initialized value.
-};
+} NS_SWIFT_NAME(RemoteConfigSource);
 
 /// Completion handler invoked by fetch methods when they get a response from the server.
 ///
 /// @param status Config fetching status.
 /// @param error  Error message on failure.
 typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status,
-                                               NSError *__nullable error);
+                                               NSError *__nullable error)
+    NS_SWIFT_NAME(RemoteConfigFetchCompletion);
 
 #pragma mark - FIRRemoteConfigValue
 /// This class provides a wrapper for Remote Config parameter values, with methods to get parameter
 /// values as different data types.
+NS_SWIFT_NAME(RemoteConfigValue)
 @interface FIRRemoteConfigValue : NSObject<NSCopying>
 /// Gets the value as a string.
 @property(nonatomic, readonly, nullable) NSString *stringValue;
@@ -73,6 +77,7 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 
 #pragma mark - FIRRemoteConfigSettings
 /// Firebase Remote Config settings.
+NS_SWIFT_NAME(RemoteConfigSettings)
 @interface FIRRemoteConfigSettings : NSObject
 /// Indicates whether Developer Mode is enabled.
 @property(nonatomic, readonly) BOOL isDeveloperModeEnabled;
@@ -86,6 +91,7 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 #pragma mark - FIRRemoteConfig
 /// Firebase Remote Config class. The shared instance method +remoteConfig can be created and used
 /// to fetch, activate and read config results and set default config results.
+NS_SWIFT_NAME(RemoteConfig)
 @interface FIRRemoteConfig : NSObject<NSFastEnumeration>
 /// Last successful fetch completion time.
 @property(nonatomic, readonly, strong, nullable) NSDate *lastFetchTime;
@@ -110,11 +116,25 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 #pragma mark - Fetch
 /// Fetches Remote Config data with a callback. Call activateFetched to make fetched data available
 /// to your app.
+///
+/// Note: This method uses a Firebase Instance ID token to identify the app instance, and once it's
+/// called, it periodically sends data to the Firebase backend. (see
+/// `[FIRInstanceID getIDWithHandler:]`).
+/// To stop the periodic sync, developers need to call `[FIRInstanceID deleteIDWithHandler:]` and
+/// avoid calling this method again.
+///
 /// @param completionHandler Fetch operation callback.
 - (void)fetchWithCompletionHandler:(nullable FIRRemoteConfigFetchCompletion)completionHandler;
 
 /// Fetches Remote Config data and sets a duration that specifies how long config data lasts.
 /// Call activateFetched to make fetched data available to your app.
+///
+/// Note: This method uses a Firebase Instance ID token to identify the app instance, and once it's
+/// called, it periodically sends data to the Firebase backend. (see
+/// `[FIRInstanceID getIDWithHandler:]`).
+/// To stop the periodic sync, developers need to call `[FIRInstanceID deleteIDWithHandler:]` and
+/// avoid calling this method again.
+///
 /// @param expirationDuration  Duration that defines how long fetched config data is available, in
 ///                            seconds. When the config data expires, a new fetch is required.
 /// @param completionHandler   Fetch operation callback.
@@ -188,21 +208,22 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 #pragma mark - Defaults
 /// Sets config defaults for parameter keys and values in the default namespace config.
 ///
-/// @param defaultConfig    A dictionary mapping a NSString * key to a NSObject * value.
+/// @param defaults         A dictionary mapping a NSString * key to a NSObject * value.
 - (void)setDefaults:(nullable NSDictionary<NSString *, NSObject *> *)defaults;
 
 /// Sets config defaults for parameter keys and values in the default namespace config.
 ///
-/// @param defaultConfig    A dictionary mapping a NSString * key to a NSObject * value.
+/// @param defaults         A dictionary mapping a NSString * key to a NSObject * value.
 /// @param aNamespace       Config under a given namespace.
-- (void)setDefaults:(nullable NSDictionary<NSString *, NSObject *> *)defaultConfig
+- (void)setDefaults:(nullable NSDictionary<NSString *, NSObject *> *)defaults
           namespace:(nullable NSString *)aNamespace;
 
 /// Sets default configs from plist for default namespace;
 /// @param fileName The plist file name, with no file name extension. For example, if the plist file
 ///                 is defaultSamples.plist, call:
 ///                 [[FIRRemoteConfig remoteConfig] setDefaultsFromPlistFileName:@"defaultSamples"];
-- (void)setDefaultsFromPlistFileName:(nullable NSString *)fileName;
+- (void)setDefaultsFromPlistFileName:(nullable NSString *)fileName
+    NS_SWIFT_NAME(setDefaults(fromPlist:));
 
 /// Sets default configs from plist for a given namespace;
 /// @param fileName The plist file name, with no file name extension. For example, if the plist file
@@ -210,7 +231,8 @@ typedef void (^FIRRemoteConfigFetchCompletion)(FIRRemoteConfigFetchStatus status
 ///                 [[FIRRemoteConfig remoteConfig] setDefaultsFromPlistFileName:@"defaultSamples"];
 /// @param aNamespace The namespace where the default config is set.
 - (void)setDefaultsFromPlistFileName:(nullable NSString *)fileName
-                           namespace:(nullable NSString *)aNamespace;
+                           namespace:(nullable NSString *)aNamespace
+    NS_SWIFT_NAME(setDefaults(fromPlist:namespace:));
 
 /// Returns the default value of a given key and a given namespace from the default config.
 ///

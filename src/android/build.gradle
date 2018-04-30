@@ -3,13 +3,17 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.gms:google-services:3.0.0'
+        classpath 'com.google.gms:google-services:3.1.0'
     }
 }
 repositories {
     mavenCentral()
+    maven {
+        url "https://maven.google.com"
+    }
 }
 dependencies {
     compile 'me.leolin:ShortcutBadger:1.1.4@aar'
     compile 'com.google.firebase:firebase-crash:+'
+    compile 'com.google.firebase:firebase-auth:+'
 }

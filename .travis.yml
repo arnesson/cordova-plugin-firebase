@@ -1,0 +1,108 @@
+env:
+  global:
+    - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+    - LANG=en_US.UTF-8
+
+matrix:
+  include:
+  - os: linux
+    sudo: false
+    language: android
+    android:
+      components:
+      - tools-26.0.0
+      - platform-tools-26.0.0
+      - build-tools-26.0.0
+      - android-26.0.0
+      - extra-google-google_play_services
+      - extra-google-m2repository
+      - extra-android-m2repository
+    addons:
+      apt:
+        packages:
+        - oracle-java8-installer
+        - oracle-java8-set-default
+    licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="6.4.0"
+
+  - os: linux
+    sudo: false
+    language: android
+    android:
+      components:
+      - tools-26.0.0
+      - platform-tools-26.0.0
+      - build-tools-26.0.0
+      - android-26.0.0
+      - extra-google-google_play_services
+      - extra-google-m2repository
+      - extra-android-m2repository
+    addons:
+      apt:
+        packages:
+        - oracle-java8-installer
+        - oracle-java8-set-default
+    licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+
+  - os: linux
+    sudo: false
+    language: android
+    android:
+      components:
+      - tools-26.0.0
+      - platform-tools-26.0.0
+      - build-tools-26.0.0
+      - android-26.0.0
+      - extra-google-google_play_services
+      - extra-google-m2repository
+      - extra-android-m2repository
+    addons:
+      apt:
+        packages:
+        - oracle-java8-installer
+        - oracle-java8-set-default
+    licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+
+  - os: osx
+    language: objective-c
+    osx_image: xcode8.3
+    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
+
+  - os: osx
+    language: objective-c
+    osx_image: xcode8.3
+    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
+
+  - os: osx
+    language: objective-c
+    osx_image: xcode8.3
+    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
+
+  - os: linux
+    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
+
+  - os: linux
+    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
+
+  - os: linux
+    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
+
+before_install:
+- nvm install 8
+- PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH ; export PATH
+- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
+
+script:
+- sh ./test/test-default.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
+- sh ./test/test-with-2-plugins.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release

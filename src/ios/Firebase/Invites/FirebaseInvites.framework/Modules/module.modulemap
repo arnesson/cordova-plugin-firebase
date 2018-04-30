@@ -1,0 +1,18 @@
+framework module FirebaseInvites {
+  umbrella header "FirebaseInvites.h"
+  export *
+  module * { export *}
+  link "sqlite3"
+  link "z"
+  link framework "AddressBook"
+  link framework "CoreGraphics"
+  link framework "CoreText"
+  link framework "Foundation"
+  link framework "MessageUI"
+  link framework "QuartzCore"
+  link framework "SafariServices"
+  link framework "Security"
+  link framework "StoreKit"
+  link framework "SystemConfiguration"
+  link framework "UIKit"
+  link framework "WebKit"}
