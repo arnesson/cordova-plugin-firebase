@@ -670,6 +670,19 @@ public class FirebasePlugin extends CordovaPlugin {
                             Log.d(TAG,
                                     "success: verifyPhoneNumber.onVerificationCompleted - doing nothing. sign in with token from onCodeSent");
 
+                            JSONObject returnResults = new JSONObject();
+                            try {
+                                returnResults.put("verificationId", false);
+                                returnResults.put("instantVerification", true);
+                                //returnResults.put("forceResendingToken", token); // TODO: return forceResendingToken
+                            } catch (JSONException e) {
+                                callbackContext.error(e.getMessage());
+                                return;
+                            }
+                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
+                            pluginresult.setKeepCallback(true);
+                            callbackContext.sendPluginResult(pluginresult);
+
                             // does this fire in cordova?
                             // TODO: return credential
                         }
@@ -704,6 +717,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             JSONObject returnResults = new JSONObject();
                             try {
                                 returnResults.put("verificationId", verificationId);
+                                returnResults.put("instantVerification", false);
                                 //returnResults.put("forceResendingToken", token); // TODO: return forceResendingToken
                             } catch (JSONException e) {
                                 callbackContext.error(e.getMessage());
