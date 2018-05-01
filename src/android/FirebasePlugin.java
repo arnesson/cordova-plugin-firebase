@@ -668,13 +668,12 @@ public class FirebasePlugin extends CordovaPlugin {
                             //     detect the incoming verification SMS and perform verificaiton without
                             //     user action.
                             Log.d(TAG,
-                                    "success: verifyPhoneNumber.onVerificationCompleted - doing nothing. sign in with token from onCodeSent");
+                                    "success: verifyPhoneNumber.onVerificationCompleted - callback and create a custom JWT Token on server and sign in with custom token - we cant do anything");
 
                             JSONObject returnResults = new JSONObject();
                             try {
                                 returnResults.put("verificationId", false);
                                 returnResults.put("instantVerification", true);
-                                //returnResults.put("forceResendingToken", token); // TODO: return forceResendingToken
                             } catch (JSONException e) {
                                 callbackContext.error(e.getMessage());
                                 return;
@@ -684,7 +683,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
 
                             // does this fire in cordova?
-                            // TODO: return credential
+                            // YES IT DOES!
                         }
 
                         @Override
