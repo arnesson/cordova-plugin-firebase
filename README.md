@@ -21,7 +21,7 @@ Thank you for your support!
 - cordova: `>= 6`
 - cordova-android: `>= 6.3`
 - cordova-ios: `>= 4`
-- cordova-browser: `>= 4`
+- cordova-browser: `>= 5`
 
 ## Installation
 Install the plugin by adding it your project's config.xml:
