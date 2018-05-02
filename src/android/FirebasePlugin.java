@@ -667,11 +667,19 @@ public class FirebasePlugin extends CordovaPlugin {
                             // 2 - Auto-retrieval. On some devices Google Play services can automatically
                             //     detect the incoming verification SMS and perform verificaiton without
                             //     user action.
-                            Log.d(TAG,
-                                    "success: verifyPhoneNumber.onVerificationCompleted - doing nothing. sign in with token from onCodeSent");
+                            Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted - callback and create a custom JWT Token on server and sign in with custom token - we cant do anything");
 
-                            // does this fire in cordova?
-                            // TODO: return credential
+                            JSONObject returnResults = new JSONObject();
+                            try {
+                                returnResults.put("verificationId", false);
+                                returnResults.put("instantVerification", true);
+                            } catch (JSONException e) {
+                                callbackContext.error(e.getMessage());
+                                return;
+                            }
+                            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
+                            pluginresult.setKeepCallback(true);
+                            callbackContext.sendPluginResult(pluginresult);
                         }
 
                         @Override
@@ -704,7 +712,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             JSONObject returnResults = new JSONObject();
                             try {
                                 returnResults.put("verificationId", verificationId);
-                                //returnResults.put("forceResendingToken", token); // TODO: return forceResendingToken
+                                returnResults.put("instantVerification", false);
                             } catch (JSONException e) {
                                 callbackContext.error(e.getMessage());
                                 return;
@@ -720,10 +728,6 @@ public class FirebasePlugin extends CordovaPlugin {
                             TimeUnit.SECONDS, // Unit of timeout
                             cordova.getActivity(), // Activity (for callback binding)
                             mCallbacks); // OnVerificationStateChangedCallbacks
-                    //resentToken);         // The ForceResendingToken obtained from onCodeSent callback
-                    // to force re-sending another verification SMS before the auto-retrieval timeout.
-                    // TODO: make resendToken accessible
-
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
                 }
