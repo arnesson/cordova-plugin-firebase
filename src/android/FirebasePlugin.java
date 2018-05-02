@@ -667,8 +667,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             // 2 - Auto-retrieval. On some devices Google Play services can automatically
                             //     detect the incoming verification SMS and perform verificaiton without
                             //     user action.
-                            Log.d(TAG,
-                                    "success: verifyPhoneNumber.onVerificationCompleted - callback and create a custom JWT Token on server and sign in with custom token - we cant do anything");
+                            Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted - callback and create a custom JWT Token on server and sign in with custom token - we cant do anything");
 
                             JSONObject returnResults = new JSONObject();
                             try {
@@ -681,9 +680,6 @@ public class FirebasePlugin extends CordovaPlugin {
                             PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, returnResults);
                             pluginresult.setKeepCallback(true);
                             callbackContext.sendPluginResult(pluginresult);
-
-                            // does this fire in cordova?
-                            // YES IT DOES!
                         }
 
                         @Override
