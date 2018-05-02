@@ -1,5 +1,6 @@
 package org.apache.cordova.firebase;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,10 +26,10 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
+import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,6 +50,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 public class FirebasePlugin extends CordovaPlugin {
 
     private FirebaseAnalytics mFirebaseAnalytics;
+    private static CordovaWebView appView;
     private final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
 
@@ -198,11 +200,21 @@ public class FirebasePlugin extends CordovaPlugin {
         FirebasePlugin.tokenRefreshCallbackContext = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.exit(0);
+
+        if (this.appView != null) {
+            appView.handleDestroy();
+        }
+    }
+    
     private void onNotificationOpen(final CallbackContext callbackContext) {
         FirebasePlugin.notificationCallbackContext = callbackContext;
         if (FirebasePlugin.notificationStack != null) {
             for (Bundle bundle : FirebasePlugin.notificationStack) {
-                FirebasePlugin.sendNotification(bundle);
+                FirebasePlugin.sendNotification(bundle,this.cordova.getActivity().getApplicationContext());
             }
             FirebasePlugin.notificationStack.clear();
         }
@@ -226,12 +238,22 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    public static void sendNotification(Bundle bundle) {
-        if (!FirebasePlugin.hasNotificationsCallback()) {
+    public static void sendNotification(Bundle bundle, Context context) {
+        if(!FirebasePlugin.hasNotificationsCallback()) {
+            String packageName = context.getPackageName();
             if (FirebasePlugin.notificationStack == null) {
                 FirebasePlugin.notificationStack = new ArrayList<Bundle>();
             }
             notificationStack.add(bundle);
+
+            /* start the main activity, if not running */
+            Intent intent = new Intent("android.intent.action.MAIN");
+            intent.setComponent(new ComponentName(packageName, packageName + ".MainActivity"));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra("cdvStartInBackground", true);
+            
+            context.startActivity(intent);
+
             return;
         }
         final CallbackContext callbackContext = FirebasePlugin.notificationCallbackContext;
@@ -279,7 +301,7 @@ public class FirebasePlugin extends CordovaPlugin {
         final Bundle data = intent.getExtras();
         if (data != null && data.containsKey("google.message_id")) {
             data.putBoolean("tap", true);
-            FirebasePlugin.sendNotification(data);
+            FirebasePlugin.sendNotification(data, this.cordova.getActivity().getApplicationContext());
         }
     }
 
