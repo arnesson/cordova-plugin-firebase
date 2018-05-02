@@ -713,7 +713,6 @@ public class FirebasePlugin extends CordovaPlugin {
                             try {
                                 returnResults.put("verificationId", verificationId);
                                 returnResults.put("instantVerification", false);
-                                //returnResults.put("forceResendingToken", token); // TODO: return forceResendingToken
                             } catch (JSONException e) {
                                 callbackContext.error(e.getMessage());
                                 return;
@@ -729,10 +728,6 @@ public class FirebasePlugin extends CordovaPlugin {
                             TimeUnit.SECONDS, // Unit of timeout
                             cordova.getActivity(), // Activity (for callback binding)
                             mCallbacks); // OnVerificationStateChangedCallbacks
-                    //resentToken);         // The ForceResendingToken obtained from onCodeSent callback
-                    // to force re-sending another verification SMS before the auto-retrieval timeout.
-                    // TODO: make resendToken accessible
-
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
                 }
