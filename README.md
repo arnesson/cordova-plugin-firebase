@@ -17,9 +17,13 @@ Paypal: https://paypal.me/arnesson
 
 Thank you for your support!
 
-## Installation
-Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
+## Supported Cordova Versions
+- cordova: `>= 6`
+- cordova-android: `>= 6.3`
+- cordova-ios: `>= 4`
+- cordova-browser: `>= 4`
 
+## Installation
 Install the plugin by adding it your project's config.xml:
 ```
 <plugin name="cordova-plugin-firebase" spec="^1.0.0" />
@@ -28,7 +32,12 @@ or by running:
 ```
 cordova plugin add cordova-plugin-firebase --save
 ```
-Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project:
+
+### Guides
+Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
+
+### Setup
+Download your Firebase configuration files, GoogleService-Info.plist for ios and google-services.json for android, and place them in the root folder of your cordova project.  Check out this [firebase article](https://support.google.com/firebase/answer/7015592) for details on how to download the files.
 
 ```
 - My Project/
@@ -41,17 +50,14 @@ Download your Firebase configuration files, GoogleService-Info.plist for ios and
     ...
 ```
 
-See https://support.google.com/firebase/answer/7015592 for details how to download the files from firebase.
+#### IMPORTANT NOTES
+- This plugin uses a hook (after prepare) that copies the configuration files to the right place, namely `platforms/ios/\<My Project\>/Resources` for ios and `platforms/android` for android.
+- Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
 
-This plugin uses a hook (after prepare) that copies the configuration files to the right place, namely platforms/ios/\<My Project\>/Resources for ios and platforms/android for android.
-
-**Note that the Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.**
-
-### Notes about PhoneGap Build
-
+### PhoneGap Build
 Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones, as well as hard coding your app id and api key in plugin.xml.
 
-### Issues with Google Play Services
+### Google Play Services
 Your build may fail if you are installing multiple plugins that use Google Play Services.  This is caused by the plugins installing different versions of the Google Play Services library.  This can be resolved by installing [cordova-android-play-services-gradle-release](https://github.com/dpa99c/cordova-android-play-services-gradle-release).
 
 ## Google Tag Manager
