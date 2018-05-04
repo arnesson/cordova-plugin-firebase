@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
+const fs = require('fs');
 const version = require('./package.json').version;
 
 let data = fs.readFileSync('./plugin.xml', "utf8");
