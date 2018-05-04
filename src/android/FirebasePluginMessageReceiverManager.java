@@ -6,20 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebasePluginMessageReceiverManager {
+
     private static List<FirebasePluginMessageReceiver> receivers = new ArrayList<FirebasePluginMessageReceiver>();
 
-    public static void register(FirebasePluginMessageReceiver receiver){
+    public static void register(FirebasePluginMessageReceiver receiver) {
         receivers.add(receiver);
     }
 
-    public static boolean onMessageReceived(RemoteMessage remoteMessage){
+    public static boolean onMessageReceived(RemoteMessage remoteMessage) {
         boolean handled = false;
-        for(FirebasePluginMessageReceiver receiver : receivers){
+        for (FirebasePluginMessageReceiver receiver : receivers) {
             boolean wasHandled = receiver.onMessageReceived(remoteMessage);
-            if(wasHandled){
+            if (wasHandled) {
                 handled = true;
             }
         }
+
         return handled;
     }
 }
