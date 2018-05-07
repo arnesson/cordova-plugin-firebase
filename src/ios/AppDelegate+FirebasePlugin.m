@@ -142,8 +142,7 @@
               willPresentNotification:notification
                 withCompletionHandler:completionHandler];
 
-    UNNotificationRequest* toast = notification.request;
-    if (![toast.trigger isKindOfClass:UNPushNotificationTrigger.class])
+    if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
         return;
     
     NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
@@ -163,6 +162,20 @@
     [self.delegate userNotificationCenter:center
        didReceiveNotificationResponse:response
                 withCompletionHandler:completionHandler];
+
+    if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
+        return;
+    
+    NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
+
+    [mutableUserInfo setValue:@YES forKey:@"tap"];
+
+    // Print full message.
+    NSLog(@"Response %@", mutableUserInfo);
+
+    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+
+    completionHandler();
 }
 
 // Receive data message on iOS 10 devices.
