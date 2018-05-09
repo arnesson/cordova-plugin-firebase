@@ -180,11 +180,12 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     notification.contentView.setImageViewResource(iconID, notiID);
                 }
             }
+            notification.setPriority(NotificationCompat.PRIORITY_MAX);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             // Since android Oreo notification channel is needed.
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
                 notificationManager.createNotificationChannel(channel);
             }
 
