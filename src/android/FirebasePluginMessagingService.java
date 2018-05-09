@@ -135,6 +135,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     .setAutoCancel(true)
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_MAX);
             ;
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
@@ -170,6 +171,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 int accentID = getResources().getIdentifier("accent", "color", getPackageName());
                 notificationBuilder.setColor(getResources().getColor(accentID, null));
+                
             }
 
             Notification notification = notificationBuilder.build();
@@ -180,7 +182,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     notification.contentView.setImageViewResource(iconID, notiID);
                 }
             }
-            notification.setPriority(NotificationCompat.PRIORITY_MAX);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
             // Since android Oreo notification channel is needed.
