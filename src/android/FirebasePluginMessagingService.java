@@ -136,7 +136,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_MAX);
-            ;
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
             if (resID != 0) {
