@@ -14,8 +14,21 @@
 #endif
 
 #define kApplicationInBackgroundKey @"applicationInBackground"
+#define kDelegateKey @"delegate"
 
 @implementation AppDelegate (FirebasePlugin)
+
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+
+- (void)setDelegate:(id)delegate {
+    objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (id)delegate {
+    return objc_getAssociatedObject(self, kDelegateKey);
+}
+
+#endif
 
 + (void)load {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
@@ -41,6 +54,10 @@
     // [START set_messaging_delegate]
     [FIRMessaging messaging].delegate = self;
     // [END set_messaging_delegate]
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+    self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
+    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
+#endif
         
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
@@ -120,6 +137,14 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    
+    [self.delegate userNotificationCenter:center
+              willPresentNotification:notification
+                withCompletionHandler:completionHandler];
+
+    if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
+        return;
+    
     NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
 
     [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
@@ -128,6 +153,29 @@
     NSLog(@"%@", mutableUserInfo);
 
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+}
+
+- (void) userNotificationCenter:(UNUserNotificationCenter *)center
+ didReceiveNotificationResponse:(UNNotificationResponse *)response
+          withCompletionHandler:(void (^)(void))completionHandler
+{
+    [self.delegate userNotificationCenter:center
+       didReceiveNotificationResponse:response
+                withCompletionHandler:completionHandler];
+
+    if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
+        return;
+    
+    NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
+
+    [mutableUserInfo setValue:@YES forKey:@"tap"];
+
+    // Print full message.
+    NSLog(@"Response %@", mutableUserInfo);
+
+    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+
+    completionHandler();
 }
 
 // Receive data message on iOS 10 devices.

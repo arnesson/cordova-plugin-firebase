@@ -119,7 +119,6 @@ static FirebasePlugin *firebasePlugin;
 
             if (![NSThread isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
-                    [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
                     [[FIRMessaging messaging] setDelegate:self];
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
 
@@ -127,7 +126,6 @@ static FirebasePlugin *firebasePlugin;
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 });
             } else {
-                [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
                 [[FIRMessaging messaging] setDelegate:self];
                 [[UIApplication sharedApplication] registerForRemoteNotifications];
                 CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
