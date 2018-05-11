@@ -8,7 +8,7 @@ ADDITIONAL_PLUGIN=$4
 FOLDER=".build-$PLATFORM"
 rm -rf $FOLDER
 
-npm install "cordova@$CORDOVA_VERSION"
+npm install "cordova@$CORDOVA_VERSION" --no-save
 ./node_modules/.bin/cordova create $FOLDER com.example.hello HelloWorld
 
 cd $FOLDER
