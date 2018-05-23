@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebase" version="0.1.24"
+<plugin id="cordova-plugin-firebase" version="1.0.5"
 xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -47,11 +47,14 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</service>
 			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"></receiver>
 		</config-file>
-		<source-file src="src/android/google-services.json" target-dir="." />
+		<resource-file src="src/android/google-services.json" target="."/>
+		<resource-file src="src/android/cordova-plugin-firebase-strings.xml" target="res/values/cordova-plugin-firebase-strings.xml" />
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/OnNotificationOpenReceiver.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase" />
+		<source-file src="src/android/FirebasePluginMessageReceiver.java" target-dir="src/org/apache/cordova/firebase" />
+		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
@@ -61,6 +64,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework src="com.google.firebase:firebase-messaging:+" />
 		<framework src="com.google.firebase:firebase-crash:+" />
 		<framework src="com.google.firebase:firebase-config:+" />
+		<framework src="com.google.firebase:firebase-perf:+" />
+
 	</platform>
 
 	<platform name="ios">
@@ -95,12 +100,17 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseNanoPB.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleToolboxForMac.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/nanopb.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
 		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
+		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseABTesting.framework" />
 		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
 		<framework custom="true" src="src/ios/Firebase/Auth/GTMSessionFetcher.framework" />
+		<framework custom="true" src="src/ios/Firebase/Performance/FirebasePerformance.framework" />
+		<framework custom="true" src="src/ios/Firebase/Performance/FirebaseISASwizzler.framework" />
+		<framework custom="true" src="src/ios/Firebase/Performance/FirebaseMethodSwizzler.framework" />
 	</platform>
 
 	<platform name="browser">

@@ -1,57 +1,64 @@
-/** @file FIRAuthErrors.h
-    @brief Firebase Auth SDK
-    @copyright Copyright 2015 Google Inc.
-    @remarks Use of this SDK is subject to the Google APIs Terms of Service:
-        https://developers.google.com/terms/
+/*
+ * Copyright 2017 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #import <Foundation/Foundation.h>
 
-#import "FIRAuthSwiftNameSupport.h"
-
 /** @class FIRAuthErrors
     @remarks Error Codes common to all API Methods:
-    <ul>
-        <li>@c FIRAuthErrorCodeNetworkError</li>
-        <li>@c FIRAuthErrorCodeUserNotFound</li>
-        <li>@c FIRAuthErrorCodeUserTokenExpired</li>
-        <li>@c FIRAuthErrorCodeTooManyRequests</li>
-        <li>@c FIRAuthErrorCodeInvalidAPIKey</li>
-        <li>@c FIRAuthErrorCodeAppNotAuthorized</li>
-        <li>@c FIRAuthErrorCodeKeychainError</li>
-        <li>@c FIRAuthErrorCodeInternalError</li>
-    </ul>
-    @remarks Common error codes for @c FIRUser operations:
-    <ul>
-        <li>@c FIRAuthErrorCodeInvalidUserToken</li>
-        <li>@c FIRAuthErrorCodeUserDisabled</li>
-    </ul>
+
+        + `FIRAuthErrorCodeNetworkError`
+        + `FIRAuthErrorCodeUserNotFound`
+        + `FIRAuthErrorCodeUserTokenExpired`
+        + `FIRAuthErrorCodeTooManyRequests`
+        + `FIRAuthErrorCodeInvalidAPIKey`
+        + `FIRAuthErrorCodeAppNotAuthorized`
+        + `FIRAuthErrorCodeKeychainError`
+        + `FIRAuthErrorCodeInternalError`
+
+    @remarks Common error codes for `FIRUser` operations:
+
+        + `FIRAuthErrorCodeInvalidUserToken`
+        + `FIRAuthErrorCodeUserDisabled`
+
  */
-FIR_SWIFT_NAME(AuthErrors)
+NS_SWIFT_NAME(AuthErrors)
 @interface FIRAuthErrors
 
 /**
     @brief The Firebase Auth error domain.
  */
-extern NSString *const FIRAuthErrorDomain FIR_SWIFT_NAME(AuthErrorDomain);
+extern NSString *const FIRAuthErrorDomain NS_SWIFT_NAME(AuthErrorDomain);
 
 /**
     @brief The key used to read the updated credential from the userinfo dictionary of the NSError
         object returned in the case that the credential being linked in already in use.
  */
-extern NSString *const FIRAuthUpdatedCredentialKey FIR_SWIFT_NAME(AuthUpdatedCredentialKey);
+extern NSString *const FIRAuthUpdatedCredentialKey NS_SWIFT_NAME(AuthUpdatedCredentialKey);
 
 /**
     @brief The name of the key for the "error_name" string in the NSError userinfo dictionary.
  */
-extern NSString *const FIRAuthErrorNameKey FIR_SWIFT_NAME(AuthErrorNameKey);
+extern NSString *const FIRAuthErrorNameKey NS_SWIFT_NAME(AuthErrorNameKey);
 
-/** @var FIRAuthErrorUserInfoEmailKey
-    @brief Errors with the code @c FIRAuthErrorCodeEmailAlreadyInUse may contains an
-        @c NSError.userInfo dictinary which contains this key. The value associated with this key is
-        an NSString of the email address that already exists.
+/**
+    @brief Errors with the code `FIRAuthErrorCodeAccountExistsWithDifferentCredential` may contain
+        an `NSError.userInfo` dictinary object which contains this key. The value associated with
+        this key is an NSString of the email address of the account that already exists.
  */
-extern NSString *const FIRAuthErrorUserInfoEmailKey FIR_SWIFT_NAME(AuthErrorUserInfoEmailKey);
+extern NSString *const FIRAuthErrorUserInfoEmailKey NS_SWIFT_NAME(AuthErrorUserInfoEmailKey);
 
 /**
     @brief Error codes used by Firebase Auth.
@@ -119,8 +126,8 @@ typedef NS_ENUM(NSInteger, FIRAuthErrorCode) {
     FIRAuthErrorCodeInvalidUserToken = 17017,
 
     /** Indicates a network error occurred (such as a timeout, interrupted connection, or
-        unreachable host). These types of errors are often recoverable with a retry. The @c
-        NSUnderlyingError field in the @c NSError.userInfo dictionary will contain the error
+        unreachable host). These types of errors are often recoverable with a retry. The
+        `NSUnderlyingError` field in the `NSError.userInfo` dictionary will contain the error
         encountered.
      */
     FIRAuthErrorCodeNetworkError = 17020,
@@ -175,16 +182,42 @@ typedef NS_ENUM(NSInteger, FIRAuthErrorCode) {
      */
     FIRAuthErrorCodeInvalidRecipientEmail = 17033,
 
-    // The enum values between 17033 and 17041 are reserved and should NOT be used for new error
-    // codes.
+    /** Indicates that an email address was expected but one was not provided.
+     */
+    FIRAuthErrorCodeMissingEmail = 17034,
 
-    /** Indicates that a phone number was not provided in a call to @c
-        verifyPhoneNumber:completion:.
+    // The enum values 17035 is reserved and should NOT be used for new error codes.
+
+    /** Indicates that the iOS bundle ID is missing when a iOS App Store ID is provided.
+     */
+    FIRAuthErrorCodeMissingIosBundleID = 17036,
+
+    /** Indicates that the android package name is missing when the `androidInstallApp` flag is set
+        to true.
+     */
+    FIRAuthErrorCodeMissingAndroidPackageName = 17037,
+
+    /** Indicates that the domain specified in the continue URL is not whitelisted in the Firebase
+        console.
+     */
+    FIRAuthErrorCodeUnauthorizedDomain = 17038,
+
+    /** Indicates that the domain specified in the continue URI is not valid.
+     */
+    FIRAuthErrorCodeInvalidContinueURI = 17039,
+
+    /** Indicates that a continue URI was not provided in a request to the backend which requires
+        one.
+     */
+    FIRAuthErrorCodeMissingContinueURI = 17040,
+
+    /** Indicates that a phone number was not provided in a call to
+        `verifyPhoneNumber:completion:`.
      */
     FIRAuthErrorCodeMissingPhoneNumber = 17041,
 
-    /** Indicates that an invalid phone number was provided in a call to @c
-        verifyPhoneNumber:completion:.
+    /** Indicates that an invalid phone number was provided in a call to
+        `verifyPhoneNumber:completion:`.
      */
     FIRAuthErrorCodeInvalidPhoneNumber = 17042,
 
@@ -237,6 +270,40 @@ typedef NS_ENUM(NSInteger, FIRAuthErrorCode) {
      */
     FIRAuthErrorCodeAppNotVerified = 17055,
 
+    /** Indicates that the reCAPTCHA token is not valid.
+     */
+    FIRAuthErrorCodeCaptchaCheckFailed = 17056,
+
+    /** Indicates that an attempt was made to present a new web context while one was already being
+        presented.
+     */
+    FIRAuthErrorCodeWebContextAlreadyPresented = 17057,
+
+    /** Indicates that the URL presentation was cancelled prematurely by the user.
+     */
+    FIRAuthErrorCodeWebContextCancelled = 17058,
+
+    /** Indicates a general failure during the app verification flow.
+     */
+    FIRAuthErrorCodeAppVerificationUserInteractionFailure = 17059,
+
+    /** Indicates that the clientID used to invoke a web flow is invalid.
+     */
+    FIRAuthErrorCodeInvalidClientID = 17060,
+
+    /** Indicates that a network request within a SFSafariViewController or UIWebview failed.
+     */
+    FIRAuthErrorCodeWebNetworkRequestFailed = 17061,
+
+    /** Indicates that an internal error occurred within a SFSafariViewController or UIWebview.
+     */
+    FIRAuthErrorCodeWebInternalError = 17062,
+
+    /** Indicates that a non-null user was expected as an argmument to the operation but a null
+        user was provided.
+     */
+    FIRAuthErrorCodeNullUser = 17067,
+
     /** Indicates an error occurred while attempting to access the keychain.
      */
     FIRAuthErrorCodeKeychainError = 17995,
@@ -244,6 +311,6 @@ typedef NS_ENUM(NSInteger, FIRAuthErrorCode) {
     /** Indicates an internal error occurred.
      */
     FIRAuthErrorCodeInternalError = 17999,
-} FIR_SWIFT_NAME(AuthErrorCode);
+} NS_SWIFT_NAME(AuthErrorCode);
 
 @end

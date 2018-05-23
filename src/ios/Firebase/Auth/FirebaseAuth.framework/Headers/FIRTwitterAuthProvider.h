@@ -1,13 +1,20 @@
-/** @file FIRTwitterAuthProvider.h
-    @brief Firebase Auth SDK
-    @copyright Copyright 2016 Google Inc.
-    @remarks Use of this SDK is subject to the Google APIs Terms of Service:
-        https://developers.google.com/terms/
+/*
+ * Copyright 2017 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #import <Foundation/Foundation.h>
-
-#import "FIRAuthSwiftNameSupport.h"
 
 @class FIRAuthCredential;
 
@@ -16,16 +23,22 @@ NS_ASSUME_NONNULL_BEGIN
 /**
     @brief A string constant identifying the Twitter identity provider.
  */
-extern NSString *const FIRTwitterAuthProviderID FIR_SWIFT_NAME(TwitterAuthProviderID);
+extern NSString *const FIRTwitterAuthProviderID NS_SWIFT_NAME(TwitterAuthProviderID);
+
+/**
+    @brief A string constant identifying the Twitter sign-in method.
+ */
+extern NSString *const _Nonnull FIRTwitterAuthSignInMethod NS_SWIFT_NAME(TwitterAuthSignInMethod);
+
 
 /** @class FIRTwitterAuthProvider
     @brief Utility class for constructing Twitter credentials.
  */
-FIR_SWIFT_NAME(TwitterAuthProvider)
+NS_SWIFT_NAME(TwitterAuthProvider)
 @interface FIRTwitterAuthProvider : NSObject
 
 /** @fn credentialWithToken:secret:
-    @brief Creates an @c FIRAuthCredential for a Twitter sign in.
+    @brief Creates an `FIRAuthCredential` for a Twitter sign in.
 
     @param token The Twitter OAuth token.
     @param secret The Twitter OAuth secret.

@@ -1,69 +1,74 @@
 var exec = require('cordova/exec');
-exports.getVerificationID = function(number, success, error) {
+
+exports.getVerificationID = function (number, success, error) {
     exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
 
-exports.getInstanceId = function(success, error) {
+exports.getInstanceId = function (success, error) {
     exec(success, error, "FirebasePlugin", "getInstanceId", []);
 };
 
-exports.getToken = function(success, error) {
+exports.getId = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getId", []);
+};
+
+exports.getToken = function (success, error) {
     exec(success, error, "FirebasePlugin", "getToken", []);
 };
 
-exports.onNotificationOpen = function(success, error) {
+exports.onNotificationOpen = function (success, error) {
     exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
 };
 
-exports.onTokenRefresh = function(success, error) {
+exports.onTokenRefresh = function (success, error) {
     exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };
 
-exports.grantPermission = function(success, error) {
+exports.grantPermission = function (success, error) {
     exec(success, error, "FirebasePlugin", "grantPermission", []);
 };
 
-exports.hasPermission = function(success, error) {
+exports.hasPermission = function (success, error) {
     exec(success, error, "FirebasePlugin", "hasPermission", []);
 };
 
-exports.setBadgeNumber = function(number, success, error) {
+exports.setBadgeNumber = function (number, success, error) {
     exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
 };
 
-exports.getBadgeNumber = function(success, error) {
+exports.getBadgeNumber = function (success, error) {
     exec(success, error, "FirebasePlugin", "getBadgeNumber", []);
 };
 
-exports.subscribe = function(topic, success, error) {
+exports.subscribe = function (topic, success, error) {
     exec(success, error, "FirebasePlugin", "subscribe", [topic]);
 };
 
-exports.unsubscribe = function(topic, success, error) {
+exports.unsubscribe = function (topic, success, error) {
     exec(success, error, "FirebasePlugin", "unsubscribe", [topic]);
 };
 
-exports.unregister = function(success, error) {
+exports.unregister = function (success, error) {
     exec(success, error, "FirebasePlugin", "unregister", []);
 };
 
-exports.logEvent = function(name, params, success, error) {
+exports.logEvent = function (name, params, success, error) {
     exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
 
-exports.logError = function(message, success, error) {
+exports.logError = function (message, success, error) {
     exec(success, error, "FirebasePlugin", "logError", [message]);
 };
 
-exports.setScreenName = function(name, success, error) {
+exports.setScreenName = function (name, success, error) {
     exec(success, error, "FirebasePlugin", "setScreenName", [name]);
 };
 
-exports.setUserId = function(id, success, error) {
+exports.setUserId = function (id, success, error) {
     exec(success, error, "FirebasePlugin", "setUserId", [id]);
 };
 
-exports.setUserProperty = function(name, value, success, error) {
+exports.setUserProperty = function (name, value, success, error) {
     exec(success, error, "FirebasePlugin", "setUserProperty", [name, value]);
 };
 
@@ -123,6 +128,30 @@ exports.setDefaults = function (defaults, namespace, success, error) {
     exec(success, error, "FirebasePlugin", "setDefaults", args);
 };
 
-exports.verifyPhoneNumber = function(number, timeOutDuration, success, error) {
-    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration]);
+exports.startTrace = function (name, success, error) {
+    exec(success, error, "FirebasePlugin", "startTrace", [name]);
+};
+
+exports.incrementCounter = function (name, counterNamed, success, error) {
+    exec(success, error, "FirebasePlugin", "incrementCounter", [name, counterNamed]);
+};
+
+exports.stopTrace = function (name, success, error) {
+    exec(success, error, "FirebasePlugin", "stopTrace", [name]);
+};
+
+exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
+};
+
+exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
+    if (typeof timeOutDuration === 'function') {
+      // method being called with old signature: function(number, success, error)
+      // timeOutDuration is the success callback, success is the error callback
+      exec(timeOutDuration, success, "FirebasePlugin", "verifyPhoneNumber", [number]);
+    } else {
+      // method being called with new signature: function(number, timeOutDuration, success, error)
+      // callbacks are correctly named
+      exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration]);
+    }
 };

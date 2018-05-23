@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 
-#import "FIRAnalyticsSwiftNameSupport.h"
 #import "FIREventNames.h"
 #import "FIRParameterNames.h"
 #import "FIRUserPropertyNames.h"
@@ -10,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The top level Firebase Analytics singleton that provides methods for logging events and setting
 /// user properties. See <a href="http://goo.gl/gz8SLz">the developer guides</a> for general
 /// information on using Firebase Analytics in your apps.
-FIR_SWIFT_NAME(Analytics)
+NS_SWIFT_NAME(Analytics)
 @interface FIRAnalytics : NSObject
 
 /// Logs an app event. The event can have up to 25 parameters. Events with the same name must have
@@ -55,7 +54,7 @@ FIR_SWIFT_NAME(Analytics)
 ///     "google_", and "ga_" prefixes are reserved and should not be used for parameter names.
 + (void)logEventWithName:(NSString *)name
               parameters:(nullable NSDictionary<NSString *, id> *)parameters
-    FIR_SWIFT_NAME(logEvent(_:parameters:));
+    NS_SWIFT_NAME(logEvent(_:parameters:));
 
 /// Sets a user property to a given value. Up to 25 user property names are supported. Once set,
 /// user property values persist throughout the app lifecycle and across sessions.
@@ -73,24 +72,26 @@ FIR_SWIFT_NAME(Analytics)
 ///     or underscores and must start with an alphabetic character. The "firebase_", "google_", and
 ///     "ga_" prefixes are reserved and should not be used for user property names.
 + (void)setUserPropertyString:(nullable NSString *)value forName:(NSString *)name
-    FIR_SWIFT_NAME(setUserProperty(_:forName:));
+    NS_SWIFT_NAME(setUserProperty(_:forName:));
 
 /// Sets the user ID property. This feature must be used in accordance with
 /// <a href="https://www.google.com/policies/privacy">Google's Privacy Policy</a>
 ///
 /// @param userID The user ID to ascribe to the user of this app on this device, which must be
-///     non-empty and no more than 36 characters long. Setting userID to nil removes the user ID.
+///     non-empty and no more than 256 characters long. Setting userID to nil removes the user ID.
 + (void)setUserID:(nullable NSString *)userID;
 
 /// Sets the current screen name, which specifies the current visual context in your app. This helps
 /// identify the areas in your app where users spend their time and how they interact with your app.
+/// Must be called on the main thread.
 ///
 /// Note that screen reporting is enabled automatically and records the class name of the current
 /// UIViewController for you without requiring you to call this method. If you implement
 /// viewDidAppear in your UIViewController but do not call [super viewDidAppear:], that screen class
 /// will not be automatically tracked. The class name can optionally be overridden by calling this
 /// method in the viewDidAppear callback of your UIViewController and specifying the
-/// screenClassOverride parameter.
+/// screenClassOverride parameter. setScreenName:screenClass: must be called after
+/// [super viewDidAppear:].
 ///
 /// If your app does not use a distinct UIViewController for each screen, you should call this
 /// method and specify a distinct screenName each time a new screen is presented to the user.
@@ -108,6 +109,10 @@ FIR_SWIFT_NAME(Analytics)
 
 /// The unique ID for this instance of the application.
 + (NSString *)appInstanceID;
+
+/// Clears all analytics data for this instance from the device and resets the app instance ID.
+/// FIRAnalyticsConfiguration values will be reset to the default values.
++ (void)resetAnalyticsData;
 
 @end
 

@@ -3,4 +3,5 @@ framework module FirebaseInstanceID {
   export *
   module * { export *}
   link "z"
-}
+  link framework "Security"
+  link framework "SystemConfiguration"}
