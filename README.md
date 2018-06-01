@@ -208,6 +208,13 @@ window.FirebasePlugin.getBadgeNumber(function(n) {
 });
 ```
 
+### clearAllNotifications
+
+Clear all pending notifications from the drawer:
+```
+window.FirebasePlugin.clearAllNotifications();
+```
+
 ### subscribe
 
 Subscribe to a topic:
