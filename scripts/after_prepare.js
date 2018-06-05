@@ -102,9 +102,9 @@ function copyKey(platform, callback) {
 }
 
 function getValue(config, name) {
-    var value = config.match(new RegExp('<' + name + '>(.*?)</' + name + '>', 'i'));
-    if (value && value[1]) {
-        return value[1]
+    var value = config.match(new RegExp('<' + name + '(.*?)>(.*?)</' + name + '>', 'i'));
+    if (value && value[2]) {
+        return value[2]
     } else {
         return null
     }
