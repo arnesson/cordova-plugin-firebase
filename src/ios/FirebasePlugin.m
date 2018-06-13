@@ -285,7 +285,7 @@ static FirebasePlugin *firebasePlugin;
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
         FIRCrashLog(@"%@", errorMessage);
-        assert(NO);
+        // assert(NO);
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
