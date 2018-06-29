@@ -54,14 +54,14 @@ Download your Firebase configuration files, GoogleService-Info.plist for ios and
 - Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
 
 ### PhoneGap Build
-Hooks does not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see src/ios and src/android) with your actual ones, as well as hard coding your app id and api key in plugin.xml.
+Hooks do not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see `src/ios` and `src/android`) with your actual ones, as well as hard coding your app id and api key in `plugin.xml`.
 
 ### Google Play Services
 Your build may fail if you are installing multiple plugins that use Google Play Services.  This is caused by the plugins installing different versions of the Google Play Services library.  This can be resolved by installing [cordova-android-play-services-gradle-release](https://github.com/dpa99c/cordova-android-play-services-gradle-release).
 
 ## Google Tag Manager
 ### Android
-Download your container-config json file from Tag Manager and add a resource-file node in your config.xml.
+Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
 ```
 ....
 <platform name="android">
@@ -71,13 +71,13 @@ Download your container-config json file from Tag Manager and add a resource-fil
 ```
 
 ## Changing Notification Icon
-The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon will is used.
+The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon is used.
 To set a big icon and small icon for notifications, define them through drawable nodes.  
-Create the required styles.xml files and add the icons to the  
+Create the required `styles.xml` files and add the icons to the  
 `<projectroot>/res/native/android/res/<drawable-DPI>` folders.  
 
-The example below uses a png named "ic_silhouette.png", the app Icon (@mipmap/icon) and sets a base theme.  
-From android version 21 (Lollipop) notifications were changed, needing a seperate setting.  
+The example below uses a png named `ic_silhouette.png`, the app Icon (@mipmap/icon) and sets a base theme.  
+From android version 21 (Lollipop) notifications were changed, needing a separate setting.  
 If you only target Lollipop and above, you don't need to setup both.  
 Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.  
 `<projectroot>/res/native/android/res/values/styles.xml`
@@ -174,13 +174,13 @@ Notification icon on Android:
 
 ### grantPermission (iOS only)
 
-Grant permission to recieve push notifications (will trigger prompt):
+Grant permission to receive push notifications (will trigger prompt):
 ```
 window.FirebasePlugin.grantPermission();
 ```
 ### hasPermission
 
-Check permission to recieve push notifications:
+Check permission to receive push notifications:
 ```
 window.FirebasePlugin.hasPermission(function(data){
     console.log(data.isEnabled);
@@ -206,6 +206,13 @@ Get icon badge number:
 window.FirebasePlugin.getBadgeNumber(function(n) {
     console.log(n);
 });
+```
+
+### clearAllNotifications
+
+Clear all pending notifications from the drawer:
+```
+window.FirebasePlugin.clearAllNotifications();
 ```
 
 ### subscribe
@@ -264,7 +271,7 @@ Request a verification ID and send a SMS with a verification code. Use them to c
 - https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
 - https://firebase.google.com/docs/reference/js/firebase.User#linkWithCredential
 
-**NOTE: This will only works on physical devices.**
+**NOTE: This will only work on physical devices.**
 
 iOS will return: credential (string)
 Android will return: 
@@ -273,7 +280,7 @@ credential.instantVerification (boolean)
 
 You need to use device plugin in order to access the right key. 
 
-IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that cases it doesn't make sense to ask for sms code as you won't receive any. Also, **verificationId** will be *false* in this case. In order to sign the user in you need to check **credential.instantVerification**, if it's true, skip the SMS Code entry, call your backend server (sorry, the only way to succeed with this plugin) and pass over the phonenumber as param to identify the user (via ajax for example, using any endpoint to your backend).
+IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that case it doesn't make sense to ask for an sms code as you won't receive one. Also, **verificationId** will be *false* in this case. In order to sign the user in you need to check **credential.instantVerification**, if it's true, skip the SMS Code entry, call your backend server (sorry, it is the only way to succeed with this plugin) and pass the phone number as param to identify the user (via ajax for example, using any endpoint to your backend).
 
 When using node.js Firebase Admin-SDK, follow this tutorial:
 - https://firebase.google.com/docs/auth/admin/create-custom-tokens
@@ -286,11 +293,11 @@ instead of
 ```
 firebase.auth().signInWithCredential(credential)
 ```
-**YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STUCKING AT YOUR SCREEN, NO RECEIVING ANYTHING**
+**YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
 If this process is too complex for you, use this awesome plugin
 - https://github.com/chemerisuk/cordova-plugin-firebase-authentication
 
-It's not perfect but it fits for the most usecases and doesn't require to call your endpoint, as it has native phone auth support.
+It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
 
 ```
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
@@ -318,11 +325,11 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 
 
 #### Android
-To use this auth you need to configure your app SHA hash in the android app configuration on firebase console.
+To use this auth you need to configure your app SHA hash in the android app configuration in the firebase console.
 See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
 
 #### iOS
-Setup your push notifications first, and verify that they are arriving to your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
+Setup your push notifications first, and verify that they are arriving on your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
 
 ### fetch
 
