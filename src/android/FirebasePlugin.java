@@ -214,16 +214,6 @@ public class FirebasePlugin extends CordovaPlugin {
         FirebasePlugin.tokenRefreshCallbackContext = null;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        System.exit(0);
-
-        if (this.appView != null) {
-            appView.handleDestroy();
-        }
-    }
-
     private void onNotificationOpen(final CallbackContext callbackContext) {
         FirebasePlugin.notificationCallbackContext = callbackContext;
         if (FirebasePlugin.notificationStack != null) {
@@ -259,14 +249,6 @@ public class FirebasePlugin extends CordovaPlugin {
                 FirebasePlugin.notificationStack = new ArrayList<Bundle>();
             }
             notificationStack.add(bundle);
-
-            /* start the main activity, if not running */
-            Intent intent = new Intent("android.intent.action.MAIN");
-            intent.setComponent(new ComponentName(packageName, packageName + ".MainActivity"));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("cdvStartInBackground", true);
-
-            context.startActivity(intent);
 
             return;
         }
