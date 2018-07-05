@@ -56,20 +56,20 @@ function updateStringsXml(contents) {
     var json = JSON.parse(contents);
     var strings = fs.readFileSync(PLATFORM.ANDROID.stringsXml).toString();
 
-    // strip non-default value
-    strings = strings.replace(new RegExp('<string name="google_app_id">([^\@<]+?)</string>', 'i'), '');
+    // replace the value
+    strings = strings.replace(new RegExp('<string name="google_app_id">([^<]+?)</string>', 'i'), '<string name="google_app_id">' + json.client[0].client_info.mobilesdk_app_id + '</string>');
 
-    // strip non-default value
-    strings = strings.replace(new RegExp('<string name="google_api_key">([^\@<]+?)</string>', 'i'), '');
+    // replace the value
+    strings = strings.replace(new RegExp('<string name="google_api_key">([^<]+?)</string>', 'i'), '<string name="google_api_key">' + json.client[0].api_key[0].current_key + '</string>');
+	
+	// strip default value if still present
+    strings = strings.replace(new RegExp('<string name="google_app_id">\@([^<]+?)</string>', 'i'), '');
+
+    // strip default value if still present
+    strings = strings.replace(new RegExp('<string name="google_api_key">\@([^<]+?)</string>', 'i'), '');
 
     // strip empty lines
     strings = strings.replace(new RegExp('(\r\n|\n|\r)[ \t]*(\r\n|\n|\r)', 'gm'), '$1');
-
-    // replace the default value
-    strings = strings.replace(new RegExp('<string name="google_app_id">([^<]+?)</string>', 'i'), '<string name="google_app_id">' + json.client[0].client_info.mobilesdk_app_id + '</string>');
-
-    // replace the default value
-    strings = strings.replace(new RegExp('<string name="google_api_key">([^<]+?)</string>', 'i'), '<string name="google_api_key">' + json.client[0].api_key[0].current_key + '</string>');
 
     fs.writeFileSync(PLATFORM.ANDROID.stringsXml, strings);
 }
