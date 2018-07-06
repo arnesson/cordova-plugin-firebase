@@ -8,6 +8,5 @@ fs.unlinkSync('./plugins/cordova-plugin-firebase/src/ios/GoogleService-Info.plis
 fs.writeFileSync('./plugins/cordova-plugin-firebase/src/ios/GoogleService-Info.plist', fs.readFileSync('./GoogleService-Info.plist'));
 
 module.exports = function (context) {
-  console.log(context);
   require('./after_prepare')(context);
 };
