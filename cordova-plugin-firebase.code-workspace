@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+  ],
+  "settings": {
+    "jshint.options": {
+      "esversion":6
+    },
+    "eslint.options": {
+      "parserOptions": {
+        "ecmaVersion": 6
+      }
+    },
+    "files.eol": "\n"
+  }
+}
