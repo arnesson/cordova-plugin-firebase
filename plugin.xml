@@ -79,6 +79,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
+    <config-file parent="FirebaseMessagingAutoInitEnabled" target="*-Info.plist">
+      <string>no</string>
+    </config-file>
+    <config-file parent="firebase_performance_collection_enabled" target="*-Info.plist">
+      <false />
+    </config-file>
+    <config-file parent="firebase_crashlytics_collection_enabled" target="*-Info.plist">
+      <false />
+    </config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />
 
@@ -98,7 +107,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Analytics/nanopb.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
-		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crashlytics/Fabric.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crashlytics/Crashlytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseABTesting.framework" />
 		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
