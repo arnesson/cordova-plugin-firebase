@@ -6,12 +6,10 @@
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
 
-// Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices running iOS 10 and above.
-@interface AppDelegate () <UNUserNotificationCenterDelegate>
-@end
-#else
-// Implement FIRMessagingDelegate to receive data message via FCM for devices running iOS 9 and below.
-@interface AppDelegate () <FIRMessagingDelegate>
+// Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices
+// running iOS 10 and above. Implement FIRMessagingDelegate to receive data message via FCM for
+// devices running iOS 10 and above.
+@interface AppDelegate () <UNUserNotificationCenterDelegate, FIRMessagingDelegate>
 @end
 #endif
 
@@ -32,28 +30,52 @@
 
 #endif
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    if (![FIRApp defaultApp] && FirebasePlugin.firebasePlugin.firebaseInit) {
++ (void)load {
+    Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
+    Method swizzled = class_getInstanceMethod(self, @selector(application:swizzledDidFinishLaunchingWithOptions:));
+    method_exchangeImplementations(original, swizzled);
+}
+
+- (void)setApplicationInBackground:(NSNumber *)applicationInBackground {
+    objc_setAssociatedObject(self, kApplicationInBackgroundKey, applicationInBackground, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)applicationInBackground {
+    return objc_getAssociatedObject(self, kApplicationInBackgroundKey);
+}
+
+- (BOOL)application:(UIApplication *)application swizzledDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
+
+    if (![FIRApp defaultApp]) {
         [FIRApp configure];
     }
-    if ([FIRApp defaultApp]) {
-      // Register for remote notifications. This shows a permission dialog on first run, to
-      // show the dialog at a more appropriate time move this registration accordingly.
-      // [START register_for_notifications]
-      if ([UNUserNotificationCenter class] != nil) {
-        // iOS 10 or later
-        // For iOS 10 display notification (sent via APNS)
+
+    // [START set_messaging_delegate]
+    [FIRMessaging messaging].delegate = self;
+    // [END set_messaging_delegate]
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+    self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
         [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-      } else {
-        // iOS 10 notifications aren't available; fall back to iOS 8-9 notifications.
-        UIUserNotificationType allNotificationTypes = (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
-        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
-        [application registerUserNotificationSettings:settings];
+#endif
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
+                                                 name:kFIRInstanceIDTokenRefreshNotification object:nil];
+
+    self.applicationInBackground = @(YES);
+
+    return YES;
       }
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    [self connectToFcm];
+    self.applicationInBackground = @(NO);
     }
 
-    [application registerForRemoteNotifications];
-    return YES;
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    [[FIRMessaging messaging] disconnect];
+    self.applicationInBackground = @(YES);
+    NSLog(@"Disconnected from FCM");
 }
 
 - (void)tokenRefreshNotification:(NSNotification *)notification {
@@ -83,6 +105,8 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
+    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
+
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
 
@@ -94,6 +118,7 @@
 
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
+    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
     completionHandler(UIBackgroundFetchResultNewData);
