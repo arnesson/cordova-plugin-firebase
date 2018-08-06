@@ -6,10 +6,12 @@
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
 
-// Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices
-// running iOS 10 and above. Implement FIRMessagingDelegate to receive data message via FCM for
-// devices running iOS 10 and above.
-@interface AppDelegate () <UNUserNotificationCenterDelegate, FIRMessagingDelegate>
+// Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices running iOS 10 and above.
+@interface AppDelegate () <UNUserNotificationCenterDelegate>
+@end
+#else
+// Implement FIRMessagingDelegate to receive data message via FCM for devices running iOS 9 and below.
+@interface AppDelegate () <FIRMessagingDelegate>
 @end
 #endif
 
@@ -30,52 +32,28 @@
 
 #endif
 
-+ (void)load {
-    Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
-    Method swizzled = class_getInstanceMethod(self, @selector(application:swizzledDidFinishLaunchingWithOptions:));
-    method_exchangeImplementations(original, swizzled);
-}
-
-- (void)setApplicationInBackground:(NSNumber *)applicationInBackground {
-    objc_setAssociatedObject(self, kApplicationInBackgroundKey, applicationInBackground, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (NSNumber *)applicationInBackground {
-    return objc_getAssociatedObject(self, kApplicationInBackgroundKey);
-}
-
-- (BOOL)application:(UIApplication *)application swizzledDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
-
-    if (![FIRApp defaultApp]) {
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    if (![FIRApp defaultApp] && FirebasePlugin.firebasePlugin.firebaseInit) {
         [FIRApp configure];
     }
+    if ([FIRApp defaultApp]) {
+      // Register for remote notifications. This shows a permission dialog on first run, to
+      // show the dialog at a more appropriate time move this registration accordingly.
+      // [START register_for_notifications]
+      if ([UNUserNotificationCenter class] != nil) {
+        // iOS 10 or later
+        // For iOS 10 display notification (sent via APNS)
+        [UNUserNotificationCenter currentNotificationCenter].delegate = self;
+      } else {
+        // iOS 10 notifications aren't available; fall back to iOS 8-9 notifications.
+        UIUserNotificationType allNotificationTypes = (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge);
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:allNotificationTypes categories:nil];
+        [application registerUserNotificationSettings:settings];
+      }
+    }
 
-    // [START set_messaging_delegate]
-    [FIRMessaging messaging].delegate = self;
-    // [END set_messaging_delegate]
-#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-    self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
-    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-#endif
-        
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
-                                                 name:kFIRInstanceIDTokenRefreshNotification object:nil];
-    
-    self.applicationInBackground = @(YES);
-    
+    [application registerForRemoteNotifications];
     return YES;
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    [self connectToFcm];
-    self.applicationInBackground = @(NO);
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[FIRMessaging messaging] disconnect];
-    self.applicationInBackground = @(YES);
-    NSLog(@"Disconnected from FCM");
 }
 
 - (void)tokenRefreshNotification:(NSNotification *)notification {
@@ -105,8 +83,6 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
-    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
-
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
 
@@ -118,10 +94,9 @@
 
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
-    [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
-
     // Pring full message.
     NSLog(@"%@", mutableUserInfo);
+    completionHandler(UIBackgroundFetchResultNewData);
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
@@ -130,6 +105,11 @@
 // To enable direct data messages, you can set [Messaging messaging].shouldEstablishDirectChannel to YES.
 - (void)messaging:(FIRMessaging *)messaging didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage {
     NSLog(@"Received data message: %@", remoteMessage.appData);
+    [FirebasePlugin.firebasePlugin sendNotification:remoteMessage.appData];
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  NSLog(@"Unable to register for remote notifications: %@", error);
 }
 
 // [END ios_10_data_message]
@@ -137,14 +117,14 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    
+
     [self.delegate userNotificationCenter:center
               willPresentNotification:notification
                 withCompletionHandler:completionHandler];
 
     if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
         return;
-    
+
     NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
 
     [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
@@ -152,6 +132,7 @@
     // Print full message.
     NSLog(@"%@", mutableUserInfo);
 
+    completionHandler(UNNotificationPresentationOptionAlert);
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
@@ -165,7 +146,7 @@
 
     if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class])
         return;
-    
+
     NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
 
     [mutableUserInfo setValue:@YES forKey:@"tap"];
