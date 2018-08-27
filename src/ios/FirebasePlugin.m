@@ -395,7 +395,6 @@ static FirebasePlugin *firebasePlugin;
         } else {
           pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITCRASHLYTICS];
         }
-        assert(NO);
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
