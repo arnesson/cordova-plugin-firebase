@@ -59,6 +59,8 @@ Hooks do not work with PhoneGap Build. This means you will have to manually make
 ### Google Play Services
 Your build may fail if you are installing multiple plugins that use Google Play Services.  This is caused by the plugins installing different versions of the Google Play Services library.  This can be resolved by installing [cordova-android-play-services-gradle-release](https://github.com/dpa99c/cordova-android-play-services-gradle-release).
 
+If your build is still failing, you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release).  For more info, read the following [comment](https://github.com/dpa99c/cordova-plugin-request-location-accuracy/issues/50#issuecomment-390025013) about locking down the specific versions for play services and firebase.
+
 ## Google Tag Manager
 Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
 
@@ -280,22 +282,22 @@ Request a verification ID and send a SMS with a verification code. Use them to c
 **NOTE: This will only work on physical devices.**
 
 iOS will return: credential (string)
-Android will return: 
+Android will return:
 credential.verificationId (object and with key verificationId)
 credential.instantVerification (boolean)
 
-You need to use device plugin in order to access the right key. 
+You need to use device plugin in order to access the right key.
 
 IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that case it doesn't make sense to ask for an sms code as you won't receive one. Also, **verificationId** will be *false* in this case. In order to sign the user in you need to check **credential.instantVerification**, if it's true, skip the SMS Code entry, call your backend server (sorry, it is the only way to succeed with this plugin) and pass the phone number as param to identify the user (via ajax for example, using any endpoint to your backend).
 
 When using node.js Firebase Admin-SDK, follow this tutorial:
 - https://firebase.google.com/docs/auth/admin/create-custom-tokens
 
-Pass back your custom generated token and call 
-```js 
+Pass back your custom generated token and call
+```js
 firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 ```
-instead of 
+instead of
 ```
 firebase.auth().signInWithCredential(credential)
 ```
@@ -318,7 +320,7 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 
     // sign in with the credential
     firebase.auth().signInWithCredential(credential);
-    
+
     // call if credential.instantVerification was true (android only)
     firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 
