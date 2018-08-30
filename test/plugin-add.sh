@@ -8,7 +8,9 @@ PLUGIN=$4
 FOLDER=".build-$PLATFORM"
 cd $FOLDER
 
-if [[ "${CORDOVA_VERSION:0:1}" == "6" ]]; then
+CORDOVA_MAJOR_VERSION=$(echo $CORDOVA_VERSION | cut -c 1-1)
+
+if [[ "$CORDOVA_MAJOR_VERSION" == "6" ]]; then
   ../node_modules/.bin/cordova plugin add $PLUGIN --fetch
 else
   ../node_modules/.bin/cordova plugin add $PLUGIN
