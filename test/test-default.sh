@@ -9,6 +9,6 @@ ADDITIONAL_PLUGIN=$4
 
 npm install
 
-sh ./test/platform-add.sh $CORDOVA_VERSION $PLATFORM $PLATFORM_VERSION
-sh ./test/plugin-add.sh $CORDOVA_VERSION $PLATFORM $PLATFORM_VERSION ..
-sh ./test/platform-build.sh $CORDOVA_VERSION $PLATFORM $PLATFORM_VERSION
+bash ./test/platform-add.sh $CORDOVA_VERSION $PLATFORM $PLATFORM_VERSION
+bash ./test/plugin-add.sh $CORDOVA_VERSION $PLATFORM $PLATFORM_VERSION ..
+bash ./test/platform-build.sh $CORDOVA_VERSION $PLATFORM $PLATFORM_VERSION

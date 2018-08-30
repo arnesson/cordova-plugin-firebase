@@ -105,4 +105,4 @@ before_install:
 
 script:
 - bash ./test/test-default.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
-- bash ./test/test-with-2-plugins.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release
+- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then bash ./test/test-with-3-plugins.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release; fi
