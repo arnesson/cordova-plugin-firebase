@@ -47,8 +47,7 @@
     "test:cordova@7.1.0:browser@5.0.3": "sh ./test/test-default.sh 7.1.0 browser 5.0.3",
     "test:cordova@8.0.0:browser@5.0.3": "sh ./test/test-default.sh 8.0.0 browser 5.0.3"
   },
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "firebase-ios-sdk": "^4.13.0"
   }
 }
