@@ -40,6 +40,7 @@ static NSString * const ERRORINITREMOTECONFIG = @"RemoteConfig isn't initialised
 static NSString * const ERRORINITPERFORMANCE = @"Performance isn't initialised";
 static FirebasePlugin *firebasePlugin;
 
+
 + (FirebasePlugin *) firebasePlugin {
     return firebasePlugin;
 }
