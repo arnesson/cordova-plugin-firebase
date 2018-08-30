@@ -1,0 +1,5 @@
+framework module BoringSSL {
+  umbrella header "BoringSSL.h"
+  export *
+  module * { export *}
+}
