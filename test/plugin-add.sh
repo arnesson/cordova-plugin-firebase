@@ -11,7 +11,19 @@ cd $FOLDER
 CORDOVA_MAJOR_VERSION=$(echo $CORDOVA_VERSION | cut -c 1-1)
 
 if [[ "$CORDOVA_MAJOR_VERSION" == "6" ]]; then
-  ../node_modules/.bin/cordova plugin add $PLUGIN --fetch
+  if [[ "$PLUGIN" == "cordova-android-play-services-gradle-release" ]]; then
+    ../node_modules/.bin/cordova plugin add $PLUGIN --fetch --variable PLAY_SERVICES_VERSION=15.+
+  elif [[ "$PLUGIN" == "cordova-android-firebase-gradle-release" ]]; then
+    ../node_modules/.bin/cordova plugin add $PLUGIN --fetch --variable FIREBASE_VERSION=15.+
+  else
+    ../node_modules/.bin/cordova plugin add $PLUGIN --fetch
+  fi
 else
-  ../node_modules/.bin/cordova plugin add $PLUGIN
+  if [[ "$PLUGIN" == "cordova-android-play-services-gradle-release" ]]; then
+    ../node_modules/.bin/cordova plugin add $PLUGIN --variable PLAY_SERVICES_VERSION=15.+
+  elif [[ "$PLUGIN" == "cordova-android-firebase-gradle-release" ]]; then
+    ../node_modules/.bin/cordova plugin add $PLUGIN --variable FIREBASE_VERSION=15.+
+  else
+    ../node_modules/.bin/cordova plugin add $PLUGIN
+  fi
 fi
