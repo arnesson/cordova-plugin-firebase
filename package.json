@@ -30,6 +30,7 @@
   ],
   "scripts": {
     "postinstall": "npm run copy-ios-sdk",
+    "postupdate": "npm run copy-ios-sdk",
     "version": "node ./bump-version.js && git add -A plugin.xml",
     "postversion": "git push && git push --tags && npm publish",
     "copy-ios-sdk": "(rm -r ./src/ios/Firebase || true) && cp -r ./node_modules/firebase-ios-sdk/src ./src/ios/Firebase",
