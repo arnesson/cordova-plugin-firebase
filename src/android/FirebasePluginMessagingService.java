@@ -67,11 +67,11 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        String title;
-        String text;
-        String id;
-        String sound = null;
-        String lights = null;
+        String title = "";
+        String text = "";
+        String id = "";
+        String sound = "";
+        String lights = "";
         Map<String, String> data = remoteMessage.getData();
 
         if (remoteMessage.getNotification() != null) {
