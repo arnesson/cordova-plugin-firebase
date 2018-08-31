@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebase" version="1.0.5"
+<plugin id="cordova-plugin-firebase" version="1.1.0"
 xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -20,12 +20,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		<config-file parent="/resources" target="res/values/strings.xml">
-			<string name="google_app_id">@string/google_app_id</string>
-		</config-file>
-		<config-file parent="/resources" target="res/values/strings.xml">
-			<string name="google_api_key">@string/google_api_key</string>
-		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/*">
 				<uses-permission android:name="android.permission.INTERNET" />
 				<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -33,6 +27,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
+      <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+      <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+      <meta-data android:name="firebase_performance_collection_enabled" android:value="false" />
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:name="org.apache.cordova.firebase.FirebasePluginMessagingService">
@@ -58,11 +55,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-		<framework src="com.google.gms:google-services:+" />
 		<framework src="com.google.android.gms:play-services-tagmanager:+" />
 		<framework src="com.google.firebase:firebase-core:+" />
 		<framework src="com.google.firebase:firebase-messaging:+" />
-		<framework src="com.google.firebase:firebase-crash:+" />
 		<framework src="com.google.firebase:firebase-config:+" />
 		<framework src="com.google.firebase:firebase-perf:+" />
 
@@ -84,6 +79,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
+    <config-file parent="FirebaseMessagingAutoInitEnabled" target="*-Info.plist">
+      <string>no</string>
+    </config-file>
+    <config-file parent="firebase_performance_collection_enabled" target="*-Info.plist">
+      <false />
+    </config-file>
+    <config-file parent="firebase_crashlytics_collection_enabled" target="*-Info.plist">
+      <false />
+    </config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />
 
@@ -103,7 +107,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/Analytics/nanopb.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
-		<framework custom="true" src="src/ios/Firebase/Crash/FirebaseCrash.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crashlytics/Fabric.framework" />
+		<framework custom="true" src="src/ios/Firebase/Crashlytics/Crashlytics.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseABTesting.framework" />
 		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
@@ -120,4 +125,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</platform>
 
 	<hook src="scripts/after_prepare.js" type="after_prepare" />
+	<hook src="scripts/after_plugin_add.js" type="after_plugin_add" />
+	<hook src="scripts/before_plugin_rm.js" type="before_plugin_rm" />
 </plugin>

@@ -104,5 +104,5 @@ before_install:
 - if [[ "$CORDOVA_PLATFORM" == "android" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
 
 script:
-- sh ./test/test-default.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
-- sh ./test/test-with-2-plugins.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release
+- bash ./test/test-default.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
+- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then bash ./test/test-with-3-plugins.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release; fi
