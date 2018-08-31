@@ -139,6 +139,6 @@ module.exports = function (context) {
   }
   if (platforms.indexOf('android') !== -1 && directoryExists(ANDROID_DIR)) {
     console.log('Preparing Firebase on Android');
-    copyKey(PLATFORM.ANDROID);
+    copyKey(PLATFORM.ANDROID, updateStringsXml);
   }
 };
