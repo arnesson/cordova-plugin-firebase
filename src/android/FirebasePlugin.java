@@ -350,14 +350,6 @@ public class FirebasePlugin extends CordovaPlugin {
             }
             notificationStack.add(bundle);
 
-            /* start the main activity, if not running */
-            Intent intent = new Intent("android.intent.action.MAIN");
-            intent.setComponent(new ComponentName(packageName, packageName + ".MainActivity"));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra("cdvStartInBackground", true);
-
-            context.startActivity(intent);
-
             return;
         }
         final CallbackContext callbackContext = FirebasePlugin.notificationCallbackContext;
