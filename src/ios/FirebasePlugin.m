@@ -379,7 +379,6 @@ static FirebasePlugin *firebasePlugin;
         @catch (NSException *execption) {
           parameters = [command argumentAtIndex:1];
         }
-        NSDictionary *parameters = @{ NSLocalizedDescriptionKey: description };
 
         if(self.analyticsInit){
           [FIRAnalytics logEventWithName:name parameters:parameters];
