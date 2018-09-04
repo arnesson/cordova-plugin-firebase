@@ -1,6 +1,11 @@
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:+'
+        classpath 'com.google.gms:google-services:4.1.0'
     }
 }
 repositories {
@@ -17,3 +22,7 @@ dependencies {
        transitive = true
     }
 }
+
+cdvPluginPostBuildExtras.add({
+    apply plugin: 'com.google.gms.google-services'
+})
