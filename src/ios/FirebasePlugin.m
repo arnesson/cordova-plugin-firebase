@@ -233,6 +233,7 @@ static FirebasePlugin *firebasePlugin;
 
     [[FIRPhoneAuthProvider provider]
     verifyPhoneNumber:number
+           UIDelegate:nil
            completion:^(NSString *_Nullable verificationID, NSError *_Nullable error) {
 
     NSDictionary *message;
