@@ -29,14 +29,12 @@
 @synthesize firebaseInit;
 @synthesize crashlyticsInit;
 @synthesize analyticsInit;
-@synthesize remoteconfigInit;
 @synthesize performanceInit;
 
 static NSInteger const kNotificationStackSize = 10;
 static NSString * const ERRORINITFIREBASE = @"Firebase isn't initialised";
 static NSString * const ERRORINITCRASHLYTICS = @"Crashlytics isn't initialised";
 static NSString * const ERRORINITANALYTICS = @"Analytics isn't initialised";
-static NSString * const ERRORINITREMOTECONFIG = @"RemoteConfig isn't initialised";
 static NSString * const ERRORINITPERFORMANCE = @"Performance isn't initialised";
 static FirebasePlugin *firebasePlugin;
 
@@ -50,7 +48,6 @@ static FirebasePlugin *firebasePlugin;
     self.firebaseInit = NO;
     self.crashlyticsInit = NO;
     self.analyticsInit = NO;
-    self.remoteconfigInit = NO;
     self.performanceInit = NO;
 }
 
@@ -116,10 +113,6 @@ static FirebasePlugin *firebasePlugin;
     }
 
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-- (void)initRemoteConfig:(CDVInvokedUrlCommand *)command {
-    [self activateFetched:command];
 }
 
 - (void)getId:(CDVInvokedUrlCommand *)command {
@@ -452,7 +445,6 @@ static FirebasePlugin *firebasePlugin;
 
 - (void)fetch:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-        if(self.remoteconfigInit){
           FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
 
           if ([command.arguments count] > 0) {
@@ -472,10 +464,6 @@ static FirebasePlugin *firebasePlugin;
                   }
               }];
           }
-        } else {
-          CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITREMOTECONFIG];
-          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        }
     }];
 }
 
@@ -483,7 +471,6 @@ static FirebasePlugin *firebasePlugin;
      [self.commandDelegate runInBackground:^{
         FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
          BOOL activated = [remoteConfig activateFetched];
-         self.remoteconfigInit = activated;
          CDVPluginResult *pluginResult;
 
          if (activated) {
@@ -501,13 +488,9 @@ static FirebasePlugin *firebasePlugin;
         CDVPluginResult *pluginResult;
         NSString* key = [command.arguments objectAtIndex:0];
 
-        if(self.remoteconfigInit){
-          FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
-          NSString* value = remoteConfig[key].stringValue;
-          pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
-        } else {
-          pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITREMOTECONFIG];
-        }
+        FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+        NSString* value = remoteConfig[key].stringValue;
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:value];
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];

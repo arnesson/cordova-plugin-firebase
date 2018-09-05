@@ -63,14 +63,12 @@ public class FirebasePlugin extends CordovaPlugin {
     private final String ERRORINITFIREBASE = "Firebase isn't initialised";
     private final String ERRORINITCRASHLYTICS = "Crashlytics isn't initialised";
     private final String ERRORINITANALYTICS = "Analytics isn't initialised";
-    private final String ERRORINITREMOTECONFIG = "RemoteConfig isn't initialised";
     private final String ERRORINITPERFORMANCE = "Performance isn't initialised";
     protected static final String KEY = "badge";
 
     private static boolean firebaseInit = false;
     private static boolean crashlyticsInit = false;
     private static boolean analyticsInit = false;
-    private static boolean remoteconfigInit = false;
     private static boolean performanceInit = false;
     private static boolean inBackground = true;
     private static ArrayList<Bundle> notificationStack = null;
@@ -158,7 +156,7 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("setUserProperty")) {
             this.setUserProperty(callbackContext, args.getString(0), args.getString(1));
             return true;
-        } else if (action.equals("activateFetched") || action.equals("initRemoteConfig")) {
+        } else if (action.equals("activateFetched")) {
             this.activateFetched(callbackContext);
             return true;
         } else if (action.equals("fetch")) {
@@ -401,10 +399,6 @@ public class FirebasePlugin extends CordovaPlugin {
 
     public static boolean analyticsInit() {
         return FirebasePlugin.analyticsInit;
-    }
-
-    public static boolean remoteconfigInit() {
-        return FirebasePlugin.remoteconfigInit;
     }
 
     public static boolean performanceInit() {
@@ -713,13 +707,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                  if (!FirebasePlugin.remoteconfigInit()) {
                     final boolean activated = FirebaseRemoteConfig.getInstance().activateFetched();
-                    FirebasePlugin.remoteconfigInit = true;
                     callbackContext.success(String.valueOf(activated));
-                  } else {
-                    callbackContext.error(String.valueOf(true));
-                  }
                 } catch (Exception e) {
                     if(FirebasePlugin.crashlyticsInit()){
                       Crashlytics.logException(e);
@@ -731,19 +720,11 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void fetch(CallbackContext callbackContext) {
-        if (FirebasePlugin.remoteconfigInit()) {
-          fetch(callbackContext, FirebaseRemoteConfig.getInstance().fetch());
-        } else {
-          callbackContext.error(ERRORINITREMOTECONFIG);
-        }
+        fetch(callbackContext, FirebaseRemoteConfig.getInstance().fetch());
     }
 
     private void fetch(CallbackContext callbackContext, long cacheExpirationSeconds) {
-        if (FirebasePlugin.remoteconfigInit()) {
-          fetch(callbackContext, FirebaseRemoteConfig.getInstance().fetch(cacheExpirationSeconds));
-        } else {
-          callbackContext.error(ERRORINITREMOTECONFIG);
-        }
+        fetch(callbackContext, FirebaseRemoteConfig.getInstance().fetch(cacheExpirationSeconds));
     }
 
     private void fetch(final CallbackContext callbackContext, final Task<Void> task) {
@@ -775,53 +756,44 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void getByteArray(final CallbackContext callbackContext, final String key, final String namespace) {
-      if (FirebasePlugin.remoteconfigInit()) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    byte[] bytes = namespace == null ? FirebaseRemoteConfig.getInstance().getByteArray(key)
-                            : FirebaseRemoteConfig.getInstance().getByteArray(key, namespace);
-                    JSONObject object = new JSONObject();
-                    object.put("base64", Base64.encodeToString(bytes, Base64.DEFAULT));
-                    object.put("array", new JSONArray(bytes));
-                    callbackContext.success(object);
-                } catch (Exception e) {
-                    if(FirebasePlugin.crashlyticsInit()){
-                      Crashlytics.logException(e);
-                    }
-                    callbackContext.error(e.getMessage());
+      cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+            try {
+                byte[] bytes = namespace == null ? FirebaseRemoteConfig.getInstance().getByteArray(key)
+                        : FirebaseRemoteConfig.getInstance().getByteArray(key, namespace);
+                JSONObject object = new JSONObject();
+                object.put("base64", Base64.encodeToString(bytes, Base64.DEFAULT));
+                object.put("array", new JSONArray(bytes));
+                callbackContext.success(object);
+            } catch (Exception e) {
+                if(FirebasePlugin.crashlyticsInit()){
+                    Crashlytics.logException(e);
                 }
+                callbackContext.error(e.getMessage());
             }
-        });
-      } else {
-        callbackContext.error(ERRORINITREMOTECONFIG);
-      }
+        }
+      });
     }
 
     private void getValue(final CallbackContext callbackContext, final String key, final String namespace) {
-      if (FirebasePlugin.remoteconfigInit()) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    FirebaseRemoteConfigValue value = namespace == null
-                            ? FirebaseRemoteConfig.getInstance().getValue(key)
-                            : FirebaseRemoteConfig.getInstance().getValue(key, namespace);
-                    callbackContext.success(value.asString());
-                } catch (Exception e) {
-                    if(FirebasePlugin.crashlyticsInit()){
-                      Crashlytics.logException(e);
-                    }
-                    callbackContext.error(e.getMessage());
+      cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+            try {
+                FirebaseRemoteConfigValue value = namespace == null
+                        ? FirebaseRemoteConfig.getInstance().getValue(key)
+                        : FirebaseRemoteConfig.getInstance().getValue(key, namespace);
+                callbackContext.success(value.asString());
+            } catch (Exception e) {
+                if(FirebasePlugin.crashlyticsInit()){
+                    Crashlytics.logException(e);
                 }
+                callbackContext.error(e.getMessage());
             }
-        });
-      } else {
-        callbackContext.error(ERRORINITREMOTECONFIG);
-      }
+        }
+      });
     }
 
     private void getInfo(final CallbackContext callbackContext) {
-      if (FirebasePlugin.remoteconfigInit()) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -838,19 +810,15 @@ public class FirebasePlugin extends CordovaPlugin {
                     callbackContext.success(info);
                 } catch (Exception e) {
                     if(FirebasePlugin.crashlyticsInit()){
-                      Crashlytics.logException(e);
+                        Crashlytics.logException(e);
                     }
                     callbackContext.error(e.getMessage());
                 }
             }
         });
-      } else {
-        callbackContext.error(ERRORINITREMOTECONFIG);
-      }
     }
 
     private void setConfigSettings(final CallbackContext callbackContext, final JSONObject config) {
-      if (FirebasePlugin.remoteconfigInit()) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -867,13 +835,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
-      } else {
-        callbackContext.error(ERRORINITREMOTECONFIG);
-      }
     }
 
     private void setDefaults(final CallbackContext callbackContext, final JSONObject defaults, final String namespace) {
-      if (FirebasePlugin.remoteconfigInit()) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -890,9 +854,6 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
-      } else {
-        callbackContext.error(ERRORINITREMOTECONFIG);
-      }
     }
 
     private static Map<String, Object> defaultsToMap(JSONObject object) throws JSONException {

@@ -16,10 +16,6 @@ exports.initPerformance = function (success, error) {
   exec(success, error, "FirebasePlugin", "initPerformance", []);
 };
 
-exports.initRemoteConfig = function (success, error) {
-  exec(success, error, "FirebasePlugin", "initRemoteConfig", []);
-};
-
 exports.getVerificationID = function (number, success, error) {
   exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };

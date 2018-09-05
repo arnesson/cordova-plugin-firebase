@@ -7,7 +7,6 @@
 - (void)initCrashlytics:(CDVInvokedUrlCommand*)command;
 - (void)initAnalytics:(CDVInvokedUrlCommand*)command;
 - (void)initPerformance:(CDVInvokedUrlCommand*)command;
-- (void)initRemoteConfig:(CDVInvokedUrlCommand*)command;
 - (void)getVerificationID:(CDVInvokedUrlCommand*)command;
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
 - (void)getInstanceId:(CDVInvokedUrlCommand*)command;

@@ -22,12 +22,6 @@ exports.initPerformance = function (success, error) {
   }
 };
 
-exports.initRemoteConfig = function (success, error) {
-  if (typeof success === 'function') {
-    success();
-  }
-};
-
 exports.getVerificationID = function (number, success, error) {
   if (typeof success === 'function') {
     success();
