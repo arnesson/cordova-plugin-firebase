@@ -66,7 +66,6 @@ public class FirebasePlugin extends CordovaPlugin {
     private final String ERRORINITPERFORMANCE = "Performance isn't initialised";
     protected static final String KEY = "badge";
 
-    private static boolean firebaseInit = false;
     private static boolean crashlyticsInit = false;
     private static boolean analyticsInit = false;
     private static boolean performanceInit = false;
@@ -77,10 +76,12 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     protected void pluginInitialize() {
+        final Context context = this.cordova.getActivity().getApplicationContext();
         final Bundle extras = this.cordova.getActivity().getIntent().getExtras();
         this.cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 Log.d(TAG, "Starting Firebase plugin");
+                FirebaseApp.initializeApp(context);
                 if (extras != null && extras.size() > 1) {
                     if (FirebasePlugin.notificationStack == null) {
                         FirebasePlugin.notificationStack = new ArrayList<Bundle>();
@@ -96,10 +97,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("initFirebase")) {
-          this.initFirebase(callbackContext);
-          return true;
-        } else if (action.equals("initCrashlytics")) {
+        if (action.equals("initCrashlytics")) {
           this.initCrashlytics(callbackContext);
           return true;
         } else if (action.equals("initAnalytics")) {
@@ -244,22 +242,6 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
-    private void initFirebase(final CallbackContext callbackContext) {
-        final Context context = this.cordova.getActivity().getApplicationContext();
-
-        Log.d(TAG, "Initialising Firebase");
-        try {
-          FirebaseApp.initializeApp(context);
-          FirebasePlugin.firebaseInit = true;
-          callbackContext.success();
-        } catch(Exception e) {
-          if(FirebasePlugin.crashlyticsInit()){
-            Crashlytics.logException(e);
-          }
-          callbackContext.error(ERRORINITFIREBASE);
-        }
-    }
-
     private void initCrashlytics(final CallbackContext callbackContext) {
         final Context context = this.cordova.getActivity().getApplicationContext();
 
@@ -322,13 +304,9 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    if(FirebasePlugin.firebaseInit()){
-                      String currentToken = FirebaseInstanceId.getInstance().getToken();
-                      if (currentToken != null) {
-                          FirebasePlugin.sendToken(currentToken);
-                      }
-                    } else {
-                      callbackContext.error(ERRORINITFIREBASE);
+                    String currentToken = FirebaseInstanceId.getInstance().getToken();
+                    if (currentToken != null) {
+                        FirebasePlugin.sendToken(currentToken);
                     }
                 } catch (Exception e) {
                     if(FirebasePlugin.crashlyticsInit()){
@@ -389,10 +367,6 @@ public class FirebasePlugin extends CordovaPlugin {
         return FirebasePlugin.inBackground;
     }
 
-    public static boolean firebaseInit() {
-        return FirebasePlugin.firebaseInit;
-    }
-
     public static boolean crashlyticsInit() {
         return FirebasePlugin.crashlyticsInit;
     }
@@ -424,12 +398,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    if(FirebasePlugin.firebaseInit()){
-                      String token = FirebaseInstanceId.getInstance().getToken();
-                      callbackContext.success(token);
-                    } else {
-                      callbackContext.error(ERRORINITFIREBASE);
-                    }
+                    String token = FirebaseInstanceId.getInstance().getToken();
+                    callbackContext.success(token);
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
                 }
@@ -441,12 +411,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                  if(FirebasePlugin.firebaseInit()){
                     String id = FirebaseInstanceId.getInstance().getId();
                     callbackContext.success(id);
-                  } else {
-                    callbackContext.error(ERRORINITFIREBASE);
-                  }
                 } catch (Exception e) {
                     if(FirebasePlugin.crashlyticsInit()){
                       Crashlytics.logException(e);
@@ -461,12 +427,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                  if(FirebasePlugin.firebaseInit()){
                     String token = FirebaseInstanceId.getInstance().getToken();
                     callbackContext.success(token);
-                  } else {
-                    callbackContext.error(ERRORINITFIREBASE);
-                  }
                 } catch (Exception e) {
                     if(FirebasePlugin.crashlyticsInit()){
                       Crashlytics.logException(e);
@@ -571,12 +533,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                  if(FirebasePlugin.firebaseInit()){
                     FirebaseInstanceId.getInstance().deleteInstanceId();
                     callbackContext.success();
-                  } else {
-                    callbackContext.error(ERRORINITFIREBASE);
-                  }
                 } catch (Exception e) {
                     if(FirebasePlugin.crashlyticsInit()){
                       Crashlytics.logException(e);

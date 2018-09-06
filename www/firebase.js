@@ -1,9 +1,5 @@
 var exec = require('cordova/exec');
 
-exports.initFirebase = function (success, error) {
-  exec(success, error, "FirebasePlugin", "initFirebase", []);
-};
-
 exports.initCrashlytics = function (success, error) {
   exec(success, error, "FirebasePlugin", "initCrashlytics", []);
 };
