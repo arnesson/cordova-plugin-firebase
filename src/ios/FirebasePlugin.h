@@ -41,7 +41,6 @@
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
-@property (atomic, assign) BOOL firebaseInit;
 @property (atomic, assign) BOOL crashlyticsInit;
 @property (atomic, assign) BOOL analyticsInit;
 @property (atomic, assign) BOOL remoteconfigInit;

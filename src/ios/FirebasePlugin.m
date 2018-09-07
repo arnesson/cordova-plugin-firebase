@@ -26,7 +26,6 @@
 @synthesize notificationStack;
 @synthesize traces;
 
-@synthesize firebaseInit;
 @synthesize crashlyticsInit;
 @synthesize analyticsInit;
 @synthesize performanceInit;
@@ -45,26 +44,9 @@ static FirebasePlugin *firebasePlugin;
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
-    self.firebaseInit = NO;
     self.crashlyticsInit = NO;
     self.analyticsInit = NO;
     self.performanceInit = NO;
-}
-
-- (void)initFirebase:(CDVInvokedUrlCommand *)command {
-    __block CDVPluginResult *pluginResult;
-    if ([FIRApp defaultApp] == nil) {
-      [FIRApp configure];
-    }
-
-    if ([FIRApp defaultApp] == nil) {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
-    } else {
-        self.firebaseInit = YES;
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    }
-
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)initCrashlytics:(CDVInvokedUrlCommand *)command {
@@ -133,22 +115,12 @@ static FirebasePlugin *firebasePlugin;
 
 // DEPRECATED - alias of getToken
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
-    if(self.firebaseInit){
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
-    } else {
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITFIREBASE];
-    }
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)getToken:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult;
-    if(self.firebaseInit){
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
-    } else {
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITFIREBASE];
-    }
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -294,19 +266,14 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)unregister:(CDVInvokedUrlCommand *)command {
-    __block CDVPluginResult *pluginResult;
-    if(self.firebaseInit){
-      [[FIRInstanceID instanceID] deleteIDWithHandler:^void(NSError *_Nullable error) {
-          if (error) {
-              NSLog(@"Unable to delete instance");
-          } else {
-              pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-          }
-      }];
-    } else {
-      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITFIREBASE];
-    }
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [[FIRInstanceID instanceID] deleteIDWithHandler:^void(NSError *_Nullable error) {
+        if (error) {
+            NSLog(@"Unable to delete instance");
+        } else {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+    }];
 }
 
 - (void)onNotificationOpen:(CDVInvokedUrlCommand *)command {
@@ -321,16 +288,11 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)onTokenRefresh:(CDVInvokedUrlCommand *)command {
-    if(self.firebaseInit){
-      self.tokenRefreshCallbackId = command.callbackId;
-      NSString* currentToken = [[FIRInstanceID instanceID] token];
+    self.tokenRefreshCallbackId = command.callbackId;
+    NSString* currentToken = [[FIRInstanceID instanceID] token];
 
-      if (currentToken != nil) {
-          [self sendToken:currentToken];
-      }
-    } else {
-      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:ERRORINITFIREBASE];
-      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    if (currentToken != nil) {
+        [self sendToken:currentToken];
     }
 }
 
