@@ -1,27 +1,3 @@
-exports.initFirebase = function (success, error) {
-  if (typeof success === 'function') {
-    success();
-  }
-};
-
-exports.initCrashlytics = function (success, error) {
-  if (typeof success === 'function') {
-    success();
-  }
-};
-
-exports.initAnalytics = function (success, error) {
-  if (typeof success === 'function') {
-    success();
-  }
-};
-
-exports.initPerformance = function (success, error) {
-  if (typeof success === 'function') {
-    success();
-  }
-};
-
 exports.getVerificationID = function (number, success, error) {
   if (typeof success === 'function') {
     success();
