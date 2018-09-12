@@ -27,9 +27,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
-      <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
-      <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
-      <meta-data android:name="firebase_performance_collection_enabled" android:value="false" />
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:name="org.apache.cordova.firebase.FirebasePluginMessagingService">
@@ -79,15 +76,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
-    <config-file parent="FirebaseMessagingAutoInitEnabled" target="*-Info.plist">
-      <string>no</string>
-    </config-file>
-    <config-file parent="firebase_performance_collection_enabled" target="*-Info.plist">
-      <false />
-    </config-file>
-    <config-file parent="firebase_crashlytics_collection_enabled" target="*-Info.plist">
-      <false />
-    </config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />
 
