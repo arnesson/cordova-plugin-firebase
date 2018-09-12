@@ -1,12 +1,11 @@
 var fs = require("fs");
-var path = require("path");
 var utilities = require("./utilities");
 
 /**
  * This is used as the display text for the build phase block in XCode as well as the
  * inline comments inside of the .pbxproj file for the build script phase block.
  */
-var comment = "\"Fabric.io: Crashlytics\"";
+var comment = "\"Crashlytics\"";
 
 module.exports = {
 
@@ -25,12 +24,12 @@ module.exports = {
     xcodeProject.parseSync();
 
     // Build the body of the script to be executed during the build phase.
-    //var script = '"' + '\\"${SRCROOT}\\"' + "/\\\"" + utilities.getAppName(context) + "\\\"/Plugins/cordova-fabric-plugin/Fabric.framework/run " + pluginConfig.apiKey + " " + pluginConfig.apiSecret + '"';
+    var script = '"' + '\\"${SRCROOT}\\"' + "/\\\"" + utilities.getAppName(context) + "\\\"/Plugins/" + utilities.getPluginId() + "/Fabric.framework/run" + '"';
 
     // Generate a unique ID for our new build phase.
     var id = xcodeProject.generateUuid();
     // Create the build phase.
-    /*xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[id] = {
+    xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[id] = {
           isa: "PBXShellScriptBuildPhase",
           buildActionMask: 2147483647,
           files: [],
@@ -41,7 +40,7 @@ module.exports = {
           shellPath: "/bin/sh",
           shellScript: script,
           showEnvVarsInLog: 0
-        };*/
+        };
 
     // Add a comment to the block (viewable in the source of the pbxproj file).
     xcodeProject.hash.project.objects.PBXShellScriptBuildPhase[id + "_comment"] = comment;

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebase" version="1.1.4"
+<plugin id="cordova-plugin-firebase" version="2.0.0"
 xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -27,9 +27,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
-      <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
-      <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
-      <meta-data android:name="firebase_performance_collection_enabled" android:value="false" />
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:name="org.apache.cordova.firebase.FirebasePluginMessagingService">
@@ -79,15 +76,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
-    <config-file parent="FirebaseMessagingAutoInitEnabled" target="*-Info.plist">
-      <string>no</string>
-    </config-file>
-    <config-file parent="firebase_performance_collection_enabled" target="*-Info.plist">
-      <false />
-    </config-file>
-    <config-file parent="firebase_crashlytics_collection_enabled" target="*-Info.plist">
-      <false />
-    </config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />
 
@@ -98,24 +86,24 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
 		<header-file src="src/ios/Firebase/Firebase.h" />
 
-		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
+		<framework custom="true" src="src/ios/Crashlytics/Crashlytics.framework" />
+		<framework custom="true" src="src/ios/Crashlytics/Fabric.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleAppMeasurement.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/MeasurementNanoPB.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCore.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCoreDiagnostics.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseNanoPB.framework" />
-		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleToolboxForMac.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework" />
 		<framework custom="true" src="src/ios/Firebase/Analytics/nanopb.framework" />
-		<framework custom="true" src="src/ios/Firebase/Messaging/Protobuf.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework" />
+		<framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCoreDiagnostics.framework" />
+		<framework custom="true" src="src/ios/Firebase/Auth/GTMSessionFetcher.framework" />
+		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
 		<framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework" />
-		<framework custom="true" src="src/ios/Firebase/Crashlytics/Fabric.framework" />
-		<framework custom="true" src="src/ios/Firebase/Crashlytics/Crashlytics.framework" />
+		<framework custom="true" src="src/ios/Firebase/Performance/GoogleToolboxForMac.framework" />
+		<framework custom="true" src="src/ios/Firebase/Performance/FirebasePerformance.framework" />
+		<framework custom="true" src="src/ios/Firebase/RemoteConfig/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseABTesting.framework" />
-		<framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework" />
-		<framework custom="true" src="src/ios/Firebase/Auth/GTMSessionFetcher.framework" />
-		<framework custom="true" src="src/ios/Firebase/Performance/FirebasePerformance.framework" />
-		<framework custom="true" src="src/ios/Firebase/Performance/FirebaseISASwizzler.framework" />
-		<framework custom="true" src="src/ios/Firebase/Performance/FirebaseMethodSwizzler.framework" />
 	</platform>
 
 	<platform name="browser">

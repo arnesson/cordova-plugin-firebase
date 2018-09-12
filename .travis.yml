@@ -76,17 +76,17 @@ matrix:
 
   - os: osx
     language: objective-c
-    osx_image: xcode8.3
+    osx_image: xcode9.4
     env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
 
   - os: osx
     language: objective-c
-    osx_image: xcode8.3
+    osx_image: xcode9.4
     env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
 
   - os: osx
     language: objective-c
-    osx_image: xcode8.3
+    osx_image: xcode9.4
     env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
 
   - os: linux
