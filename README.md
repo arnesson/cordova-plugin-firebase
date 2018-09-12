@@ -23,9 +23,9 @@ Thank you for your support!
 - cordova-ios: `>= 4`
 
 ## Installation
-Install the plugin by adding it your project's config.xml:
+Install the plugin by adding it to your project's config.xml:
 ```
-<plugin name="cordova-plugin-firebase" spec="^1.0.0" />
+<plugin name="cordova-plugin-firebase" spec="^2.0.0" />
 ```
 or by running:
 ```
