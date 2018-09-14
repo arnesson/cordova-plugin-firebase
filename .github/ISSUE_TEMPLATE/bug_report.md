@@ -20,6 +20,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Plugin Version**
+Run `cordova plugin list` to find out what version of cordova-plugin-firebase you are running with
+
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
