@@ -1,6 +1,11 @@
 var fs = require("fs");
 var path = require("path");
 
+function rootBuildGradleExists() {
+  var target = path.join("platforms", "android", "build.gradle");
+  return fs.existsSync(target);
+}
+
 /*
  * Helper function to read the build.gradle that sits at the root of the project
  */
@@ -52,6 +57,11 @@ function writeRootBuildGradle(contents) {
 module.exports = {
 
   modifyRootBuildGradle: function() {
+    // be defensive and don't crash if the file doesn't exist
+    if (!rootBuildGradleExists) {
+      return;
+    }
+
     var buildGradle = readRootBuildGradle();
 
     // Add Google Play Services Dependency
@@ -64,6 +74,11 @@ module.exports = {
   },
 
   restoreRootBuildGradle: function() {
+    // be defensive and don't crash if the file doesn't exist
+    if (!rootBuildGradleExists) {
+      return;
+    }
+
     var buildGradle = readRootBuildGradle();
 
     // remove any lines we added
