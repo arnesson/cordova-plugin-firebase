@@ -41,6 +41,8 @@ Submitting a bug fix or feature takes only a few minutes.
 4. Create a commit and push it to your repo.
 5. See the Pull Request section to let us know your code is ready to be merged into the main repo.
 
+MAKE SURE THE CODE WORKS WITHOUT MODIFYING OR CHECKING IN ANY PLATFORM FILES.  Any changes to platform files (like build scripts, config files or anything in the /platform directory) should be made by the plugin.  Since Cordova 4.3.0, the [platform management feature](https://cordova.apache.org/docs/en/latest/platform_plugin_versioning_ref/) allows you to build your project without checking in any platform files.  
+
 # Pull Requests
 
 * Fill in [the required template](PULL_REQUEST_TEMPLATE.md)
