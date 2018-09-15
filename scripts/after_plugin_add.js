@@ -10,8 +10,8 @@ module.exports = function(context) {
     // Modify the Gradle build file to add a task that will upload the debug symbols
     // at build time.
     if (platforms.indexOf("android") !== -1) {
-        androidHelper.removeFabricBuildToolsFromGradle();
-        androidHelper.addFabricBuildToolsGradle();
+        androidHelper.restoreRootBuildGradle();
+        androidHelper.modifyRootBuildGradle();
     }
 
     // Add a build phase which runs a shell script that executes the Crashlytics

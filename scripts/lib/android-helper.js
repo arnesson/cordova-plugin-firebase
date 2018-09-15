@@ -1,43 +1,74 @@
 var fs = require("fs");
 var path = require("path");
-var utilities = require("./utilities");
+
+/*
+ * Helper function to read the build.gradle that sits at the root of the project
+ */
+function readRootBuildGradle() {
+  var target = path.join("platforms", "android", "build.gradle");
+  return fs.readFileSync(target, "utf-8");
+}
+
+/*
+ * Added a dependency on 'com.google.gms' based on the position of the know 'com.android.tools.build' dependency in the build.gradle
+ */
+function addGPSDependencies(buildGradle) {
+  // find the known line to match
+  var match = buildGradle.match(/^(\s*)classpath 'com.android.tools.build(.*)/m);
+  var whitespace = match[1];
+  
+  // modify the line to add the necessary dependencies
+  var googlePlayDependency = whitespace + 'classpath \'com.google.gms:google-services:4.1.0\' // google-services plugin from cordova-plugin-firebase';
+  var modifiedLine = match[0] + '\n' + googlePlayDependency;
+  
+  // modify the actual line
+  return buildGradle.replace(/^(\s*)classpath 'com.android.tools.build(.*)/m, modifiedLine);
+}
+
+/*
+ * Add 'google()' to the repository repo list
+ */
+function addGoogleRepo(buildGradle) {
+  // find the known line to match
+  var match = buildGradle.match(/^(\s*)jcenter\(\)/m);
+  var whitespace = match[1];
+
+  // modify the line to add the necessary repo
+  var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+  var modifiedLine = match[0] + '\n' + googlesMavenRepo;
+
+  // modify the actual line
+  return buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+}
+
+/*
+ * Helper function to write to the build.gradle that sits at the root of the project
+ */
+function writeRootBuildGradle(contents) {
+  var target = path.join("platforms", "android", "build.gradle");
+  fs.writeFileSync(target, contents);
+}
 
 module.exports = {
 
-  addFabricBuildToolsGradle: function () {
+  modifyRootBuildGradle: function() {
+    var buildGradle = readRootBuildGradle();
 
-    var buildGradle = utilities.readBuildGradle();
+    // Add Google Play Services Dependency
+    buildGradle = addGPSDependencies(buildGradle);
+  
+    // Add Google's Maven Repo
+    buildGradle = addGoogleRepo(buildGradle);
 
-    var addToBuildGradle = [
-      "",
-      "// Fabric Cordova Plugin - Start Fabric Build Tools ",
-      "buildscript {",
-      "    repositories {",
-      "        maven { url 'https://maven.fabric.io/public' }",
-      "        maven { url 'https://maven.google.com' }",
-      "    }",
-      "    dependencies {",
-      "        classpath 'io.fabric.tools:gradle:1.25.4'",
-      "        classpath 'com.google.gms:google-services:+'",
-      "    }",
-      "}",
-      "",
-      "apply plugin: 'io.fabric'",
-      "apply plugin: 'com.google.gms.google-services'",
-      "// Fabric Cordova Plugin - End Fabric Build Tools"
-    ].join("\n");
-
-    buildGradle = buildGradle.replace(/(\/\/ PLUGIN GRADLE EXTENSIONS START)/, addToBuildGradle + '\n\n$1');
-
-    utilities.writeBuildGradle(buildGradle);
+    writeRootBuildGradle(buildGradle);
   },
 
-  removeFabricBuildToolsFromGradle: function () {
+  restoreRootBuildGradle: function() {
+    var buildGradle = readRootBuildGradle();
 
-    var buildGradle = utilities.readBuildGradle();
-
-    buildGradle = buildGradle.replace(/\n\/\/ Fabric Cordova Plugin - Start Fabric Build Tools[\s\S]*\/\/ Fabric Cordova Plugin - End Fabric Build Tools/, "");
-
-    utilities.writeBuildGradle(buildGradle);
+    // remove any lines we added
+    buildGradle = buildGradle.replace(/(?:^|\r?\n)(.*)cordova-plugin-firebase*?(?=$|\r?\n)/g, '');
+  
+    writeRootBuildGradle(buildGradle);
   }
 };
