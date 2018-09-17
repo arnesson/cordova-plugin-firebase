@@ -1,3 +1,8 @@
+# Version 2.0.2
+
+### Bug Fixes
+- <a href="https://github.com/arnesson/cordova-plugin-firebase/issues/837">#837</a>: Fixed android build
+
 # Version 2.0.1
 
 ### Bug Fixes
