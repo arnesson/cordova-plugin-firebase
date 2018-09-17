@@ -9,7 +9,7 @@ module.exports = function(context) {
 
     // Remove the Gradle modifications that were added when the plugin was installed.
     if (platforms.indexOf("android") !== -1) {
-        androidHelper.removeFabricBuildToolsFromGradle();
+        androidHelper.restoreRootBuildGradle();
     }
 
     // Remove the build script that was added when the plugin was installed.
