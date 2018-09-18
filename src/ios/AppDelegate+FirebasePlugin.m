@@ -72,11 +72,13 @@
     self.applicationInBackground = @(NO);
     }
 
+#if defined(__DISCONNECT_IN_BACKGROUND)
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     [[FIRMessaging messaging] disconnect];
     self.applicationInBackground = @(YES);
     NSLog(@"Disconnected from FCM");
 }
+#endif
 
 - (void)tokenRefreshNotification:(NSNotification *)notification {
     // Note that this callback will be fired everytime a new token is generated, including the first
