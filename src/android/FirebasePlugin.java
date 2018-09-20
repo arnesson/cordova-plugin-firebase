@@ -800,7 +800,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 	
-    private String getPrivateField(PhoneAuthCredential credential, String field) throws NoSuchFieldException, IllegalAccessException {
+    private static String getPrivateField(PhoneAuthCredential credential, String field) throws NoSuchFieldException, IllegalAccessException {
         Field credentialField = credential.getClass().getDeclaredField(field);
         credentialField.setAccessible(true);
         return (String) credentialField.get(credential);
