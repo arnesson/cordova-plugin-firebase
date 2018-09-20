@@ -724,13 +724,17 @@ public class FirebasePlugin extends CordovaPlugin {
                             // 2 - Auto-retrieval. On some devices Google Play services can automatically
                             //     detect the incoming verification SMS and perform verificaiton without
                             //     user action.
-                            Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted - callback and create a custom JWT Token on server and sign in with custom token - we cant do anything");
+                            Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted");
 
                             JSONObject returnResults = new JSONObject();
                             try {
-                                returnResults.put("verificationId", false);
+                                String verificationId = getPrivateField(credential, "zzfc");
+                                String code = getPrivateField(credential, "zzfd");
+
+                                returnResults.put("verificationId", verificationId);
+                                returnResults.put("code", code);
                                 returnResults.put("instantVerification", true);
-                            } catch (JSONException e) {
+                            } catch(JSONException | IllegalAccessException | NoSuchFieldException e){
                                 Crashlytics.logException(e);
                                 callbackContext.error(e.getMessage());
                                 return;
@@ -782,7 +786,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
-
+	
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration
                             TimeUnit.SECONDS, // Unit of timeout
@@ -794,6 +798,12 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
+    }
+	
+    private String getPrivateField(PhoneAuthCredential credential, String field) throws NoSuchFieldException, IllegalAccessException {
+        Field credentialField = credential.getClass().getDeclaredField(field);
+        credentialField.setAccessible(true);
+        return (String) credentialField.get(credential);
     }
 
     //
