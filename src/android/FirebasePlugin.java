@@ -734,7 +734,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                 returnResults.put("verificationId", verificationId);
                                 returnResults.put("code", code);
                                 returnResults.put("instantVerification", true);
-                            } catch(JSONException | IllegalAccessException | NoSuchFieldException e){
+                            } catch(Exception e){ // JSONException | IllegalAccessException | NoSuchFieldException
                                 Crashlytics.logException(e);
                                 callbackContext.error(e.getMessage());
                                 return;
