@@ -728,13 +728,24 @@ public class FirebasePlugin extends CordovaPlugin {
 
                             JSONObject returnResults = new JSONObject();
                             try {
-                                String verificationId = getPrivateField(credential, "zzfc");
-                                String code = getPrivateField(credential, "zzfd");
+                                String verificationId = null;
+                                String code = null;
+								
+                                Field[] fields = credential.getClass().getDeclaredFields();
+                                for (Field field : fields) {
+                                    Class type = field.getType();
+                                    if(type == String.class){
+                                        String value = getPrivateField(credential, field);
+                                        if(value == null) continue;
+                                        if(value.length() > 100) verificationId = value;
+                                        else if(value.length() >= 4 && value.length() <= 6) code = value;
+                                    }
+                                }
 
-                                returnResults.put("verificationId", verificationId);
-                                returnResults.put("code", code);
+                                returnResults.put("verificationId", verificationId != null ? verificationId : false);
+                                returnResults.put("code", code != null ? code : false);
                                 returnResults.put("instantVerification", true);
-                            } catch(Exception e){ // JSONException | IllegalAccessException | NoSuchFieldException
+                            } catch(JSONException e){
                                 Crashlytics.logException(e);
                                 callbackContext.error(e.getMessage());
                                 return;
@@ -800,10 +811,13 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 	
-    private static String getPrivateField(PhoneAuthCredential credential, String field) throws NoSuchFieldException, IllegalAccessException {
-        Field credentialField = credential.getClass().getDeclaredField(field);
-        credentialField.setAccessible(true);
-        return (String) credentialField.get(credential);
+    private static String getPrivateField(PhoneAuthCredential credential, Field field) {
+        try {
+            field.setAccessible(true);
+            return (String) field.get(credential);
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 
     //
