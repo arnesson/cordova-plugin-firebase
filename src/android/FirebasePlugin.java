@@ -741,9 +741,9 @@ public class FirebasePlugin extends CordovaPlugin {
                                         else if(value.length() >= 4 && value.length() <= 6) code = value;
                                     }
                                 }
-
-                                returnResults.put("verificationId", verificationId != null ? verificationId : false);
-                                returnResults.put("code", code != null ? code : false);
+                                returnResults.put("verified", verificationId != null && code != null);
+                                returnResults.put("verificationId", verificationId);
+                                returnResults.put("code", code);
                                 returnResults.put("instantVerification", true);
                             } catch(JSONException e){
                                 Crashlytics.logException(e);
