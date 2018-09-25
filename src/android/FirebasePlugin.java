@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
-
+import java.lang.reflect.Field;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -724,13 +724,28 @@ public class FirebasePlugin extends CordovaPlugin {
                             // 2 - Auto-retrieval. On some devices Google Play services can automatically
                             //     detect the incoming verification SMS and perform verificaiton without
                             //     user action.
-                            Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted - callback and create a custom JWT Token on server and sign in with custom token - we cant do anything");
+                            Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted");
 
                             JSONObject returnResults = new JSONObject();
                             try {
-                                returnResults.put("verificationId", false);
+                                String verificationId = null;
+                                String code = null;
+								
+                                Field[] fields = credential.getClass().getDeclaredFields();
+                                for (Field field : fields) {
+                                    Class type = field.getType();
+                                    if(type == String.class){
+                                        String value = getPrivateField(credential, field);
+                                        if(value == null) continue;
+                                        if(value.length() > 100) verificationId = value;
+                                        else if(value.length() >= 4 && value.length() <= 6) code = value;
+                                    }
+                                }
+                                returnResults.put("verified", verificationId != null && code != null);
+                                returnResults.put("verificationId", verificationId);
+                                returnResults.put("code", code);
                                 returnResults.put("instantVerification", true);
-                            } catch (JSONException e) {
+                            } catch(JSONException e){
                                 Crashlytics.logException(e);
                                 callbackContext.error(e.getMessage());
                                 return;
@@ -782,7 +797,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
-
+	
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration
                             TimeUnit.SECONDS, // Unit of timeout
@@ -794,6 +809,15 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             }
         });
+    }
+	
+    private static String getPrivateField(PhoneAuthCredential credential, Field field) {
+        try {
+            field.setAccessible(true);
+            return (String) field.get(credential);
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 
     //
