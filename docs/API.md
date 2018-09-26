@@ -122,6 +122,11 @@ Log an event using Analytics:
 window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
 ```
 
+## setCrashlyticsUserId
+
+Set Crashlytics user identifier.
+- https://firebase.google.com/docs/crashlytics/customize-crash-reports?authuser=0#set_user_ids
+
 ## setScreenName
 
 Set the name of the current screen in Analytics:
