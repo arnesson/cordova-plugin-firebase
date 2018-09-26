@@ -50,3 +50,16 @@ MAKE SURE THE CODE WORKS WITHOUT MODIFYING OR CHECKING IN ANY PLATFORM FILES.  A
 * Maintain the formatting (specifically white spacing) in the files you are modifying
 * Reference the Issue number in the PR if there's a related issue
 * If you are adding new APIs or changing behavior, include entries in the README.md so new users know how to interact with the new features.  We want everyone to use your work!
+
+## Need to test a PR?
+We rely on the community to help test out fixes and enhancements to this plugin. You can test out a PR by running the following commands:
+1. `cordova plugin remove cordova-plugin-firebase`
+2. `cordova plugin add https://github.com/<username>/cordova-plugin-firebase.git#<branch>`
+   * replace `<username>` with the name of user/org where the branch resides
+   * replace `<branch>` with the name of the branch used to create the PR
+3. `cordova prepare`
+
+For example, to test the fix made by PR [#832](https://github.com/arnesson/cordova-plugin-firebase/pull/832#issuecomment-420386486), you would use the url `https://github.com/briantq/cordova-plugin-firebase.git#revert-lazy-init` since `briantq` is the name of the user and `revert-lazy-init` is the name of the branch.  This information is available at the top of each PR.  For this specific PR, the following information is displayed:
+* briantq wants to merge 2 commits into arnesson:master from briantq:revert-lazy-init
+
+The last part being the vital information as it tells you exactly what to use in the url.
