@@ -332,17 +332,23 @@ static FirebasePlugin *firebasePlugin;
               int expirationDuration = [[command.arguments objectAtIndex:0] intValue];
 
               [remoteConfig fetchWithExpirationDuration:expirationDuration completionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
+                  CDVPluginResult *pluginResult;
                   if (status == FIRRemoteConfigFetchStatusSuccess) {
-                      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-                      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                  } else {
+                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                   }
+                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
               }];
           } else {
               [remoteConfig fetchWithCompletionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
+                  CDVPluginResult *pluginResult;
                   if (status == FIRRemoteConfigFetchStatusSuccess) {
-                      CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-                      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                  } else {
+                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
                   }
+                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
               }];
           }
     }];
