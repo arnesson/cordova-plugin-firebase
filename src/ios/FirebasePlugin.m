@@ -293,6 +293,14 @@ static FirebasePlugin *firebasePlugin;
     }];
 }
 
+- (void)setCrashlyticsUserId:(CDVInvokedUrlCommand *)command {
+    NSString* userId = [command.arguments objectAtIndex:0];
+
+    [CrashlyticsKit setUserIdentifier:userId];
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)setScreenName:(CDVInvokedUrlCommand *)command {
     NSString* name = [command.arguments objectAtIndex:0];
 

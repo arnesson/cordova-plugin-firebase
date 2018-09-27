@@ -60,6 +60,10 @@ exports.logError = function (message, success, error) {
   exec(success, error, "FirebasePlugin", "logError", [message]);
 };
 
+exports.setCrashlyticsUserId = function (userId, success, error) {
+    exec(success, error, "FirebasePlugin", "setCrashlyticsUserId", [userId]);
+};
+
 exports.setScreenName = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "setScreenName", [name]);
 };
