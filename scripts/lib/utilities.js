@@ -37,19 +37,6 @@ module.exports = {
     return "cordova-plugin-firebase";
   },
 
-  /**
-     * Used to get the path to the XCode project's .pbxproj file.
-     *
-     * @param {object} context - The Cordova context.
-     * @returns The path to the XCode project's .pbxproj file.
-     */
-  getXcodeProjectPath: function (context) {
-
-    var appName = this.getAppName(context);
-
-    return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
-  },
-
   copyKey: function (platform) {
     for (var i = 0; i < platform.src.length; i++) {
       var file = platform.src[i];
