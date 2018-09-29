@@ -32,7 +32,7 @@ function addDependencies(buildGradle) {
 }
 
 /*
- * Add 'google()' to the repository repo list
+ * Add 'google()' and Crashlytics to the repository repo list
  */
 function addRepos(buildGradle) {
   // find the known line to match
@@ -40,12 +40,39 @@ function addRepos(buildGradle) {
   var whitespace = match[1];
 
   // modify the line to add the necessary repo
-  var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+  // Crashlytics goes under buildscripts which is the first grouping in the file
   var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase'
-  var modifiedLine = match[0] + '\n' + googlesMavenRepo + '\n' + fabricMavenRepo;
+  var modifiedLine = match[0] + '\n' + fabricMavenRepo;
 
   // modify the actual line
-  return buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+  buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+
+  // update the all projects grouping
+  var allProjectsIndex = buildGradle.indexOf('allprojects');
+  if (allProjectsIndex > 0) {
+    // split the string on allprojects because jcenter is in both groups and we need to modify the 2nd instance
+    var firstHalfOfFile = buildGradle.substring(0, allProjectsIndex);
+    var secondHalfOfFile = buildGradle.substring(allProjectsIndex);
+
+    // Add google() to the allprojects section of the string
+    match = secondHalfOfFile.match(/^(\s*)jcenter\(\)/m);
+    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+    modifiedLine = match[0] + '\n' + googlesMavenRepo;
+    // modify the part of the string that is after 'allprojects'
+    secondHalfOfFile = secondHalfOfFile.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+
+    // recombine the modified line
+    buildGradle = firstHalfOfFile + secondHalfOfFile;
+  } else {
+    // this should not happen, but if it does, we should try to add the dependency to the buildscript
+    match = buildGradle.match(/^(\s*)jcenter\(\)/m);
+    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+    modifiedLine = match[0] + '\n' + googlesMavenRepo;
+    // modify the part of the string that is after 'allprojects'
+    buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+  }
+
+  return buildGradle;
 }
 
 /*
