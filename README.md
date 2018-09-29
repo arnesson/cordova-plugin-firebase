@@ -5,7 +5,7 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 
 ## Supported Cordova Versions
 - cordova: `>= 6`
-- cordova-android: `>= 6.3`
+- cordova-android: `>= 6.4`
 - cordova-ios: `>= 4`
 
 ## Installation
