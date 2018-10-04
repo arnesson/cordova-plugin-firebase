@@ -1,3 +1,8 @@
+# Version 2.0.4
+
+### Bug Fixes
+- <a href="https://github.com/arnesson/cordova-plugin-firebase/issues/866">#866</a>: Fixed issue with loading .plist file on some iOS devices
+
 # Version 2.0.3
 
 ### Features
