@@ -11,7 +11,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</engines>
 
 	<platform name="android">
-		<hook type="after_prepare" src="scripts/android/after_prepare.js" />
 		<hook type="after_plugin_install" src="scripts/android/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/android/before_plugin_uninstall.js" />
 
@@ -64,7 +63,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</platform>
 
 	<platform name="ios">
-		<hook type="after_prepare" src="scripts/ios/after_prepare.js" />
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
@@ -118,4 +116,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
 	</platform>
+
+	<hook type="after_prepare" src="scripts/after_prepare.js" />
 </plugin>

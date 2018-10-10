@@ -17,7 +17,6 @@ fs.ensureDirSync = function (dir) {
 };
 
 module.exports = {
-
   /**
      * Used to get the name of the application as defined in the config.xml.
      *
