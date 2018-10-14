@@ -17,16 +17,6 @@ or by running:
 ```
 cordova plugin add cordova-plugin-firebase --save
 ```
-or to hide notifications when app is in foreground by adding:
-```
-<plugin name="cordova-plugin-firebase" spec="^2.0.0">
-    <variable name="IOS_HIDE_FOREGROUND_NOTIFICATION" value="true" />
-</plugin>
-```
-or to hide notifications when app is in foreground by running:
-```
-cordova plugin add cordova-plugin-firebase --variable IOS_HIDE_FOREGROUND_NOTIFICATION="true" --save
-```
 
 ### Guides
 Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
@@ -63,7 +53,7 @@ Checkout our [guide](docs/GOOGLE_TAG_MANAGER.md) for info on setting up Google T
 
 ## Configuring Notifications
 
-Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons and colors.
+Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons, colors and how to hide notifications when the app is in foreground for iOS.
 
 ## API
 
