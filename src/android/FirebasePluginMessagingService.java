@@ -116,6 +116,12 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             bundle.putString(key, data.get(key));
         }
 
+        if (!FirebasePlugin.inBackground()) {
+            bundle.putBoolean("foreground", true);
+        } else {
+            bundle.putBoolean("foreground", false);
+        }
+
         if (showNotification) {
             Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
             intent.putExtras(bundle);
@@ -190,9 +196,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
             notificationManager.notify(id.hashCode(), notification);
         } else {
-            if (!FirebasePlugin.inBackground()) {
-                bundle.putBoolean("foreground", true);
-            }
             bundle.putBoolean("tap", false);
             bundle.putString("title", title);
             bundle.putString("body", messageBody);
