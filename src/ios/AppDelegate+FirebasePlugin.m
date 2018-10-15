@@ -2,6 +2,7 @@
 #import "FirebasePlugin.h"
 #import "Firebase.h"
 #import <objc/runtime.h>
+#import "PushPlugin.h"
 
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
@@ -29,6 +30,11 @@
 }
 
 #endif
+
+- (id) getCommandInstance:(NSString*)className
+{
+    return [self.viewController getCommandInstance:className];
+}
 
 + (void)load {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
@@ -118,6 +124,8 @@
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    PushPlugin *pushHandler = [self getCommandInstance:@"PushPlugin"];
+    [pushHandler didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
     [FIRMessaging messaging].APNSToken = deviceToken;
     NSLog(@"deviceToken1 = %@", deviceToken);
 }
