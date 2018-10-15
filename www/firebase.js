@@ -128,6 +128,20 @@ exports.setDefaults = function (defaults, namespace, success, error) {
     exec(success, error, "FirebasePlugin", "setDefaults", args);
 };
 
+exports.enabeldPerformance  = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "enabeldPerformance", [enabled]);
+};
+
+exports.isPerformanceEnabled  = function (success, error) {
+	var oSuccess = success;
+	success = function(enabled){
+		if (typeof oSuccess == 'function'){
+			oSuccess(enabled === "true");
+		}
+	}
+	exec(success, error, "FirebasePlugin", "isPerformanceEnabled", []);
+};
+
 exports.startTrace = function (name, success, error) {
     exec(success, error, "FirebasePlugin", "startTrace", [name]);
 };
@@ -139,6 +153,14 @@ exports.incrementCounter = function (name, counterNamed, success, error) {
 exports.stopTrace = function (name, success, error) {
     exec(success, error, "FirebasePlugin", "stopTrace", [name]);
 };
+
+exports.startTraceHTTP = function (url, method, payloadSize, success, error ){
+    exec(success, error, "FirebasePlugin", "startTraceHTTP", [url, method, payloadSize]);
+}
+
+exports.stopTraceHTTP = function (traceId, statusCode, contentType, payloadSize, success, error ){
+    exec(success, error, "FirebasePlugin", "stopTraceHTTP", [traceId, statusCode, contentType, payloadSize]);
+}
 
 exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
     exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);

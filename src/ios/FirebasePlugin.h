@@ -27,13 +27,18 @@
 - (void)fetch:(CDVInvokedUrlCommand*)command;
 - (void)activateFetched:(CDVInvokedUrlCommand*)command;
 - (void)getValue:(CDVInvokedUrlCommand*)command;
+- (void)enabeldPerformance:(CDVInvokedUrlCommand*)command;
+- (void)isPerformanceEnabled:(CDVInvokedUrlCommand*)command;
 - (void)startTrace:(CDVInvokedUrlCommand*)command;
 - (void)incrementCounter:(CDVInvokedUrlCommand*)command;
 - (void)stopTrace:(CDVInvokedUrlCommand*)command;
+- (void)startTraceHTTP:(CDVInvokedUrlCommand*)command;
+- (void)stopTraceHTTP:(CDVInvokedUrlCommand*)command;
 - (void)setAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
+@property (nonatomic, readwrite) NSMutableDictionary* httpTraces;
 
 @end

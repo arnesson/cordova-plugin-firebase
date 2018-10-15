@@ -378,6 +378,27 @@ static FirebasePlugin *firebasePlugin;
 //
 // Performace
 //
+
+- (void)isPerformanceEnabled:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: [FIRPerformance sharedInstance].isInstrumentationEnabled && [FIRPerformance sharedInstance].isDataCollectionEnabled ];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)enabeldPerformance:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSNumber *enabled = [command.arguments objectAtIndex:0];
+        if([enabled isEqual: @(YES)]){
+            [FIRPerformance sharedInstance].instrumentationEnabled = YES;
+            [FIRPerformance sharedInstance].dataCollectionEnabled = YES;
+        }else{
+            [FIRPerformance sharedInstance].instrumentationEnabled = NO;
+            [FIRPerformance sharedInstance].dataCollectionEnabled = NO;
+        }
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
 - (void)startTrace:(CDVInvokedUrlCommand *)command {
 
     [self.commandDelegate runInBackground:^{
@@ -434,6 +455,87 @@ static FirebasePlugin *firebasePlugin;
         }
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+-(void)startTraceHTTP:(CDVInvokedUrlCommand *)command{
+    [self.commandDelegate runInBackground:^{
+
+        if ( self.httpTraces == nil) {
+            self.httpTraces = [NSMutableDictionary new];
+        }
+
+        NSString *url = [command.arguments objectAtIndex:0];
+        NSString *method = [command.arguments objectAtIndex:1];
+        long requestPayloadSize = [[command.arguments objectAtIndex:2] longValue];
+
+        method = [method uppercaseString];
+        FIRHTTPMethod aMethod = false;
+
+        if ( [method isEqualToString:@"GET"] ){
+            aMethod = FIRHTTPMethodGET;
+        }else if ( [method isEqualToString:@"PUT"] ){
+            aMethod = FIRHTTPMethodPUT;
+        }else if ( [method isEqualToString:@"POST"] ){
+            aMethod = FIRHTTPMethodPOST;
+        }else if ( [method isEqualToString:@"DELETE"] ){
+            aMethod = FIRHTTPMethodDELETE;
+        }else if ( [method isEqualToString:@"HEAD"] ){
+            aMethod = FIRHTTPMethodHEAD;
+        }else if ( [method isEqualToString:@"PATCH"] ){
+            aMethod = FIRHTTPMethodPATCH;
+        }else if ( [method isEqualToString:@"OPTIONS"] ){
+            aMethod = FIRHTTPMethodOPTIONS;
+        }else if ( [method isEqualToString:@"TRACE"] ){
+            aMethod = FIRHTTPMethodTRACE;
+        }else if ( [method isEqualToString:@"CONNECT"] ){
+            aMethod = FIRHTTPMethodCONNECT;
+        }
+
+        @try {
+            FIRHTTPMetric *metric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:url] HTTPMethod:aMethod];
+            if ( requestPayloadSize > 0 )
+                [metric setRequestPayloadSize:requestPayloadSize];
+            [metric start];
+
+            NSString *traceName = [metric description];
+
+            [self.httpTraces setObject:metric forKey:traceName ];
+
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:traceName];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+        @catch (NSException *exception) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"The HTTP method is not compatible"] callbackId:command.callbackId];
+        }
+
+
+    }];
+}
+
+-(void)stopTraceHTTP:(CDVInvokedUrlCommand *)command{
+    [self.commandDelegate runInBackground:^{
+
+        NSString *traceId = [command.arguments objectAtIndex:0];
+        NSInteger statusCode = [[command.arguments objectAtIndex:1] integerValue];
+        NSString *contentType = [command.arguments objectAtIndex:2];
+        long responsePayloadSize = [[command.arguments objectAtIndex:3] longValue];
+
+        FIRHTTPMetric *metric = [self.httpTraces objectForKey:traceId];
+        if ( metric != nil ){
+            [metric setResponseCode:statusCode];
+            [metric setResponseContentType:contentType];
+            if ( responsePayloadSize > 0 )
+                [metric setResponsePayloadSize:responsePayloadSize];
+            [metric stop];
+            [self.httpTraces removeObjectForKey:traceId];
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }else{
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Trace not found"];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+
     }];
 }
 

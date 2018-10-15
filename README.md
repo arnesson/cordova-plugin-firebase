@@ -69,6 +69,11 @@ Download your container-config json file from Tag Manager and add a resource-fil
     <resource-file src="GTM-5MFXXXX.json" target="assets/containers/GTM-5MFXXXX.json" />
     ...
 ```
+### iOS
+Download your container-config json file from Tag Manager and add the file `GTM-5MFXXX.json` into xCode project root. Create a group name `container` and put in the file json.
+![GTM xCode Project](gtm_xcode_project.png)
+
+
 
 ## Changing Notification Icon
 The plugin will use notification_icon from drawable resources if it exists, otherwise the default app icon will is used.
@@ -257,6 +262,16 @@ Set a user property for use in Analytics:
 window.FirebasePlugin.setUserProperty("name", "value");
 ```
 
+### setAnalyticsCollectionEnabled
+
+Enable/disable analytics collection
+
+```
+window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+
+window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+```
+
 ### verifyPhoneNumber
 
 Request a verification ID and send a SMS with a verification code. Use them to construct a credential to sign in the user (in your app).
@@ -267,22 +282,22 @@ Request a verification ID and send a SMS with a verification code. Use them to c
 **NOTE: This will only works on physical devices.**
 
 iOS will return: credential (string)
-Android will return: 
+Android will return:
 credential.verificationId (object and with key verificationId)
 credential.instantVerification (boolean)
 
-You need to use device plugin in order to access the right key. 
+You need to use device plugin in order to access the right key.
 
 IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that cases it doesn't make sense to ask for sms code as you won't receive any. Also, **verificationId** will be *false* in this case. In order to sign the user in you need to check **credential.instantVerification**, if it's true, skip the SMS Code entry, call your backend server (sorry, the only way to succeed with this plugin) and pass over the phonenumber as param to identify the user (via ajax for example, using any endpoint to your backend).
 
 When using node.js Firebase Admin-SDK, follow this tutorial:
 - https://firebase.google.com/docs/auth/admin/create-custom-tokens
 
-Pass back your custom generated token and call 
-```js 
+Pass back your custom generated token and call
+```js
 firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 ```
-instead of 
+instead of
 ```
 firebase.auth().signInWithCredential(credential)
 ```
@@ -305,7 +320,7 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 
     // sign in with the credential
     firebase.auth().signInWithCredential(credential);
-    
+
     // call if credential.instantVerification was true (android only)
     firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 
@@ -455,12 +470,12 @@ Start a trace.
 window.FirebasePlugin.startTrace("test trace", success, error);
 ```
 
-### incrementCounter
+### incrementMetric
 
 To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
 
 ```
-window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
+window.FirebasePlugin.incrementMetric("test trace", "retry", success, error);
 ```
 
 ### stopTrace
@@ -471,12 +486,22 @@ Stop the trace
 window.FirebasePlugin.stopTrace("test trace");
 ```
 
-### setAnalyticsCollectionEnabled
+### startTraceHTTP
 
-Enable/disable analytics collection
+Start the HTTP trace. When it started, it return a traceId for identify the metric.
 
 ```
-window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+window.FirebasePlugin.stopTrace('https://www.google.com', 'GET', 0, function(traceId){
+		console.log("HTTP Trace id: "+traceId);
+	}, error );
+```
 
-window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+### stopTraceHTTP
+
+Stop the HTTP trace
+
+
+
+```
+window.FirebasePlugin.stopTrace(TraceId, StatusCode, ContentType, payloadSize, success, error);
 ```

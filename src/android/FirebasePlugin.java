@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
+import android.telecom.Call;
 import android.util.Base64;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.perf.metrics.HttpMetric;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -34,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,6 +89,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -177,14 +181,35 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("verifyPhoneNumber")) {
             this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
             return true;
-        } else if (action.equals("startTrace")) {
+        }else if (action.equals("enabeldPerformance")) {
+            this.enabeldPerformance(callbackContext, args.getBoolean(0) );
+        }else if (action.equals("isPerformanceEnabled")) {
+            this.isPerformanceEnabled(callbackContext);
+        }else if (action.equals("startTrace")) {
             this.startTrace(callbackContext, args.getString(0));
             return true;
-        } else if (action.equals("incrementCounter")) {
-            this.incrementCounter(callbackContext, args.getString(0), args.getString(1));
+        } else if (action.equals("incrementMetric")) {
+            this.incrementMetric(callbackContext, args.getString(0), args.getString(1));
             return true;
         } else if (action.equals("stopTrace")) {
             this.stopTrace(callbackContext, args.getString(0));
+            return true;
+        }else if (action.equals("startTraceHTTP")) {
+            String url = args.getString(0);
+            String method = args.getString(1);
+            long requestPayloadSize = 0;
+            if ( !args.isNull(2) )
+                requestPayloadSize = args.getLong(2);
+            this.startTraceHTTP(callbackContext, url, method, requestPayloadSize);
+            return true;
+        }else if (action.equals("stopTraceHTTP")) {
+            String traceId = args.getString(0);
+            int statusCode = args.getInt(1);
+            String contentType = args.getString(2);
+            long responsePayloadSize = 0;
+            if ( !args.isNull(3) )
+                responsePayloadSize = args.getLong(3);
+            this.stopTraceHTTP(callbackContext, traceId, statusCode, contentType, responsePayloadSize);
             return true;
         } else if (action.equals("setAnalyticsCollectionEnabled")) {
             this.setAnalyticsCollectionEnabled(callbackContext, args.getBoolean(0));
@@ -444,20 +469,49 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
-            throws JSONException {
+    private void parseDataBundle(Bundle bundle, String key, Object value) throws JSONException{
+        if ( value instanceof  Float ){
+            bundle.putFloat(key, ((Number) value).floatValue());
+        } else if (value instanceof Integer ){
+            bundle.putInt(key, ((Number) value).intValue() );
+        } else if ( value instanceof Double) {
+            bundle.putDouble(key, ((Number) value).doubleValue() );
+        } else if ( value instanceof  Long ){
+            bundle.putLong(key, ((Number) value).longValue() );
+        } else if ( value instanceof JSONArray ){
+            ArrayList aList = new ArrayList();
+            JSONArray ja    = (JSONArray)value;
+
+            for (int i=0; i < ja.length(); i++){
+                aList.add( this.makeBundle(ja.getJSONObject(i)) );
+            }
+
+            bundle.putParcelableArrayList(key, aList);
+
+        }else if ( value instanceof  JSONObject ){
+            bundle.putBundle(key, this.makeBundle( (JSONObject)value ) );
+        }else {
+            bundle.putString(key, value.toString());
+        }
+    }
+
+    private Bundle makeBundle(JSONObject params) throws JSONException{
         final Bundle bundle = new Bundle();
         Iterator iter = params.keys();
         while (iter.hasNext()) {
             String key = (String) iter.next();
             Object value = params.get(key);
 
-            if (value instanceof Integer || value instanceof Double) {
-                bundle.putFloat(key, ((Number) value).floatValue());
-            } else {
-                bundle.putString(key, value.toString());
-            }
+            this.parseDataBundle(bundle, key, value);
+
         }
+        return bundle;
+    }
+
+    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
+            throws JSONException {
+
+        final Bundle bundle = this.makeBundle(params);
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -475,10 +529,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    FirebaseCrash.report(new Exception(message));
                     callbackContext.success(1);
                 } catch (Exception e) {
-                    FirebaseCrash.log(e.getMessage());
                     e.printStackTrace();
                     callbackContext.error(e.getMessage());
                 }
@@ -775,7 +827,19 @@ public class FirebasePlugin extends CordovaPlugin {
     // Firebase Performace
     //
 
-    private HashMap<String, Trace> traces = new HashMap<String, Trace>();
+    private HashMap<String, Trace> traces           = new HashMap<String, Trace>();
+    private  HashMap<String, HttpMetric> httpTraces = new HashMap<String, HttpMetric>();
+
+
+    private void isPerformanceEnabled(final CallbackContext callbackContext){
+        FirebasePerformance fp = FirebasePerformance.getInstance();
+        callbackContext.success( fp.isPerformanceCollectionEnabled() ? "true" : "false" );
+    }
+
+    private void enabeldPerformance(final CallbackContext callbackContext, Boolean enabled){
+        FirebasePerformance.getInstance().setPerformanceCollectionEnabled( enabled );
+        callbackContext.success();
+    }
 
     private void startTrace(final CallbackContext callbackContext, final String name) {
         final FirebasePlugin self = this;
@@ -783,20 +847,25 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
 
+                    FirebasePerformance fp = FirebasePerformance.getInstance();
+                    if (!fp.isPerformanceCollectionEnabled()){
+                        callbackContext.error("Firebase Performance is not enabled");
+                    }
+
+
                     Trace myTrace = null;
                     if (self.traces.containsKey(name)) {
                         myTrace = self.traces.get(name);
                     }
 
                     if (myTrace == null) {
-                        myTrace = FirebasePerformance.getInstance().newTrace(name);
+                        myTrace = fp.newTrace(name);
                         myTrace.start();
                         self.traces.put(name, myTrace);
                     }
 
                     callbackContext.success();
                 } catch (Exception e) {
-                    FirebaseCrash.log(e.getMessage());
                     e.printStackTrace();
                     callbackContext.error(e.getMessage());
                 }
@@ -804,7 +873,11 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void incrementCounter(final CallbackContext callbackContext, final String name, final String counterNamed) {
+    private void incrementMetric(final CallbackContext callbackContext, final String name, final String metricNamed){
+        this.incrementMetric(callbackContext, name, metricNamed, 1);
+    }
+
+    private void incrementMetric(final CallbackContext callbackContext, final String name, final String metricNamed, final long incrementBy) {
         final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -816,13 +889,12 @@ public class FirebasePlugin extends CordovaPlugin {
                     }
 
                     if (myTrace != null && myTrace instanceof Trace) {
-                        myTrace.incrementCounter(counterNamed);
+                        myTrace.incrementMetric(metricNamed, incrementBy);
                         callbackContext.success();
                     } else {
                         callbackContext.error("Trace not found");
                     }
                 } catch (Exception e) {
-                    FirebaseCrash.log(e.getMessage());
                     e.printStackTrace();
                     callbackContext.error(e.getMessage());
                 }
@@ -849,13 +921,121 @@ public class FirebasePlugin extends CordovaPlugin {
                         callbackContext.error("Trace not found");
                     }
                 } catch (Exception e) {
-                    FirebaseCrash.log(e.getMessage());
                     e.printStackTrace();
                     callbackContext.error(e.getMessage());
                 }
             }
         });
     }
+
+    private void startTraceHTTP(final CallbackContext callbackContext, final String url, final String method, final long payloadSize){
+
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    FirebasePerformance fp = FirebasePerformance.getInstance();
+                    if (!fp.isPerformanceCollectionEnabled()){
+                        callbackContext.error("Firebase Performance is not enabled");
+                    }
+
+
+                    HttpMetric myTrace = null;
+                    String aMethod = null;
+
+                    switch (method.toUpperCase()){
+                        case "GET":
+                            aMethod = FirebasePerformance.HttpMethod.GET;
+                            break;
+                        case "PUT":
+                            aMethod = FirebasePerformance.HttpMethod.PUT;
+                            break;
+                        case "POST":
+                            aMethod = FirebasePerformance.HttpMethod.POST;
+                            break;
+                        case "DELETE":
+                            aMethod = FirebasePerformance.HttpMethod.DELETE;
+                            break;
+                        case "HEAD":
+                            aMethod = FirebasePerformance.HttpMethod.HEAD;
+                            break;
+                        case "PATCH":
+                            aMethod = FirebasePerformance.HttpMethod.PATCH;
+                            break;
+                        case "OPTIONS":
+                            aMethod = FirebasePerformance.HttpMethod.OPTIONS;
+                            break;
+                        case "TRACE":
+                            aMethod = FirebasePerformance.HttpMethod.TRACE;
+                            break;
+                        case "CONNECT":
+                            aMethod = FirebasePerformance.HttpMethod.CONNECT;
+                            break;
+                    }
+
+                    if ( aMethod == null){
+                        callbackContext.error("The HTTP method is not compatible");
+                        return;
+                    }
+
+
+                    myTrace = fp.newHttpMetric(url, aMethod);
+
+                    if ( payloadSize > 0 )
+                        myTrace.setRequestPayloadSize(payloadSize);
+
+                    myTrace.start();
+
+                    String traceName = myTrace.toString();
+                    self.httpTraces.put(traceName, myTrace);
+
+                    callbackContext.success(traceName);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+
+    }
+
+    private void stopTraceHTTP(final CallbackContext callbackContext, final String traceId, final int responseCode, final String contentType, final long payLoadSize){
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    HttpMetric myTrace = null;
+                    if (self.httpTraces.containsKey(traceId)) {
+                        myTrace = self.httpTraces.get(traceId);
+                    }
+
+                    if (myTrace != null && myTrace instanceof HttpMetric) { //
+
+                        myTrace.setResponseContentType(contentType);
+                        myTrace.setResponsePayloadSize(payLoadSize);
+                        myTrace.setHttpResponseCode(responseCode);
+                        myTrace.stop();
+
+                        self.httpTraces.remove(traceId);
+                        callbackContext.success();
+
+                    } else {
+                        callbackContext.error("Trace not found");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+
+    // End performace
 
     private void setAnalyticsCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
         final FirebasePlugin self = this;
