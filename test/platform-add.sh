@@ -11,6 +11,7 @@ rm -rf $FOLDER
 
 npm install "cordova@$CORDOVA_VERSION" --no-save
 ./node_modules/.bin/cordova create $FOLDER com.github.cordova_plugin_firebase HelloWorld
+cp ./test/google-services.json $FOLDER
 
 cd $FOLDER
 
