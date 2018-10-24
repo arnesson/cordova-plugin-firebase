@@ -49,7 +49,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.1"
 
   - os: linux
     sudo: false
@@ -72,7 +72,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.1"
 
   - os: osx
     language: objective-c
