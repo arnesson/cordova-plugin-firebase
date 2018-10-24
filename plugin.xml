@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="cordova-plugin-firebase" version="2.0.5"
-xmlns="http://apache.org/cordova/ns/plugins/1.0"
-xmlns:android="http://schemas.android.com/apk/res/android">
+	xmlns="http://apache.org/cordova/ns/plugins/1.0"
+	xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
 
 	<license>MIT</license>
@@ -17,16 +17,16 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
-		<config-file parent="/*" target="res/xml/config.xml">
+		<config-file target="config.xml" parent="/*">
 			<feature name="FirebasePlugin">
 				<param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/*">
-				<uses-permission android:name="android.permission.INTERNET" />
-				<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-				<uses-permission android:name="android.permission.WAKE_LOCK" />
+			<uses-permission android:name="android.permission.INTERNET" />
+			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+			<uses-permission android:name="android.permission.WAKE_LOCK" />
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
@@ -44,15 +44,16 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</service>
 			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"></receiver>
 		</config-file>
-		<resource-file src="src/android/google-services.json" target="."/>
+
 		<resource-file src="src/android/cordova-plugin-firebase-strings.xml" target="res/values/cordova-plugin-firebase-strings.xml" />
+		<resource-file src="src/android/colors.xml" target="res/values/colors.xml" />
+
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/OnNotificationOpenReceiver.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiver.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
-		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.android.gms:play-services-tagmanager:+" />
@@ -76,7 +77,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</feature>
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Debug.plist">
-		    <string>development</string>
+			<string>development</string>
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
