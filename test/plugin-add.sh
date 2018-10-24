@@ -10,7 +10,7 @@ PLUGIN=$4
 FOLDER=".build-$PLATFORM"
 cd $FOLDER
 
-CORDOVA_MAJOR_VERSION=$(echo $CORDOVA_VERSION | cut -c 1-1)
+CORDOVA_MAJOR_VERSION=`echo "$CORDOVA_VERSION" | sed -E "s/\~?\^?([[:digit:]]).*/\1/"`
 
 if [[ "$CORDOVA_MAJOR_VERSION" == "6" ]]; then
   FETCH_COMMAND="--fetch"
