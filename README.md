@@ -55,6 +55,10 @@ Checkout our [guide](docs/GOOGLE_TAG_MANAGER.md) for info on setting up Google T
 
 Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons and colors.
 
+## Crashlytics
+
+Checkout our [guide](docs/CRASHLYTICS.md) for info on configuring the project for crashlytics.
+
 ## API
 
 See the full [API](docs/API.md) available for this plugin.
