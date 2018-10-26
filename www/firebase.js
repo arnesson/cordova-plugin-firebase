@@ -177,3 +177,23 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
       exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration]);
     }
 };
+if ( cordova.platformId == "android" ){
+    var remainingAttempts = 10;
+    var waitForAndCallHandlerFunction = function waitForAndCallHandlerFunction(url) {
+        if (typeof window.handleOpenURL === "function") {
+            // Clear the intent when we have a handler (note that this is only done when the preference 'CustomURLSchemePluginClearsAndroidIntent' is 'true' in config.xml
+            cordova.exec(
+              null,
+              null,
+              "FirebasePlugin",
+              "clearIntentUrlScheme",
+              []);
+            window.handleOpenURL(url);
+        } else if (remainingAttempts-- > 0) {
+            setTimeout(function(){waitForAndCallHandlerFunction(url);}, 500);
+        }
+    }
+    document.addEventListener("deviceready", function triggerOpenURL() {
+        cordova.exec(waitForAndCallHandlerFunction,null,"FirebasePlugin","checkIntentUrlScheme",[]);
+    }, false);
+}

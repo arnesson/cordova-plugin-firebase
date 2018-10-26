@@ -4,9 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
-import android.telecom.Call;
 import android.util.Base64;
 import android.util.Log;
 
@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.perf.metrics.HttpMetric;
@@ -36,20 +38,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 // Firebase PhoneAuth
 import java.util.concurrent.TimeUnit;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -70,21 +73,22 @@ public class FirebasePlugin extends CordovaPlugin {
     @Override
     protected void pluginInitialize() {
         final Context context = this.cordova.getActivity().getApplicationContext();
-        final Bundle extras = this.cordova.getActivity().getIntent().getExtras();
-        this.cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                Log.d(TAG, "Starting Firebase plugin");
-                FirebaseApp.initializeApp(context);
-                mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-                mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
-                if (extras != null && extras.size() > 1) {
-                    if (FirebasePlugin.notificationStack == null) {
-                        FirebasePlugin.notificationStack = new ArrayList<Bundle>();
-                    }
-                    if (extras.containsKey("google.message_id")) {
-                        extras.putBoolean("tap", true);
-                        notificationStack.add(extras);
-                    }
+
+        final Intent intent = this.cordova.getActivity().getIntent();
+        final Bundle extras = intent.getExtras();
+
+        this.cordova.getThreadPool().execute(() -> {
+            Log.d(TAG, "Starting Firebase plugin");
+            FirebaseApp.initializeApp(context);
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
+            if (extras != null && extras.size() > 1) {
+                if (FirebasePlugin.notificationStack == null) {
+                    FirebasePlugin.notificationStack = new ArrayList<Bundle>();
+                }
+                if (extras.containsKey("google.message_id")) {
+                    extras.putBoolean("tap", true);
+                    notificationStack.add(extras);
                 }
             }
         });
@@ -93,6 +97,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+
         if (action.equals("getInstanceId")) {
             this.getInstanceId(callbackContext);
             return true;
@@ -213,6 +218,22 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("setAnalyticsCollectionEnabled")) {
             this.setAnalyticsCollectionEnabled(callbackContext, args.getBoolean(0));
+            return true;
+        } else if (action.equals("checkIntentUrlScheme")){
+            // check if the starup with custom url scheme
+            final Intent intent = this.cordova.getActivity().getIntent();
+            final String intentString = intent.getDataString();
+            if (intentString != null && intent.getScheme() != null) {
+                // callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, intentString));
+                this.getUrlFromDynamicLink(intent, callbackContext);
+            } else {
+                callbackContext.error("App was not started via the launchmyapp URL scheme. Ignoring this errorcallback is the best approach.");
+            }
+            return  true;
+        } else if (action.equals("clearIntentUrlScheme")){
+            // clear the intent if the app start up with custom url scheme
+            Intent intent = this.cordova.getActivity().getIntent();
+            intent.setData(null);
             return true;
         }
 
@@ -339,6 +360,135 @@ public class FirebasePlugin extends CordovaPlugin {
             data.putBoolean("tap", true);
             FirebasePlugin.sendNotification(data, this.cordova.getActivity().getApplicationContext());
         }
+
+        this.getUrlFromDynamicLink(intent, null);
+
+    }
+
+    private  void runHandleOpenURLJs(String url, String scheme){
+        this.cordova.getActivity().runOnUiThread(() -> {
+            if (url != null && scheme != null) {
+                try {
+                    StringWriter writer = new StringWriter(url.length() * 2);
+                    escapeJavaStyleString(writer, url, true, false);
+                    webView.loadUrl("javascript:window.handleOpenURL('" + URLEncoder.encode(writer.toString()) + "')");
+                } catch (IOException ignore) {}
+
+            }
+        });
+    }
+
+    private void getUrlFromDynamicLink(Intent intent, final CallbackContext callbackContext){
+
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(intent)
+                .addOnSuccessListener(this.cordova.getActivity(), (PendingDynamicLinkData pendingDynamicLinkData) -> {
+                    // Get deep link from result (may be null if no link is found)
+                    Uri deepLink = intent.getData();
+                    if (pendingDynamicLinkData != null) {
+                        deepLink = pendingDynamicLinkData.getLink();
+                    }
+
+                    if ( callbackContext != null && deepLink != null ){
+                        callbackContext.success(deepLink.toString());
+                    }else{
+                        runHandleOpenURLJs(deepLink.toString(), intent.getScheme());
+                    }
+                })
+                .addOnFailureListener(this.cordova.getActivity(),(Exception e) -> {
+                    Uri deepLink = intent.getData();
+                    if ( callbackContext != null && deepLink != null ){
+                        callbackContext.success(deepLink.toString());
+                    }else{
+                        runHandleOpenURLJs(deepLink.toString(), intent.getScheme());
+                    }
+                });
+
+    }
+
+    // Taken from commons StringEscapeUtils
+    private static void escapeJavaStyleString(Writer out, String str, boolean escapeSingleQuote,  boolean escapeForwardSlash) throws IOException {
+
+        if (out == null) {
+            throw new IllegalArgumentException("The Writer must not be null");
+        }
+        if (str == null) {
+            return;
+        }
+        int sz;
+        sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            char ch = str.charAt(i);
+
+            // handle unicode
+            if (ch > 0xfff) {
+                out.write("\\u" + hex(ch));
+            } else if (ch > 0xff) {
+                out.write("\\u0" + hex(ch));
+            } else if (ch > 0x7f) {
+                out.write("\\u00" + hex(ch));
+            } else if (ch < 32) {
+                switch (ch) {
+                    case '\b':
+                        out.write('\\');
+                        out.write('b');
+                        break;
+                    case '\n':
+                        out.write('\\');
+                        out.write('n');
+                        break;
+                    case '\t':
+                        out.write('\\');
+                        out.write('t');
+                        break;
+                    case '\f':
+                        out.write('\\');
+                        out.write('f');
+                        break;
+                    case '\r':
+                        out.write('\\');
+                        out.write('r');
+                        break;
+                    default:
+                        if (ch > 0xf) {
+                            out.write("\\u00" + hex(ch));
+                        } else {
+                            out.write("\\u000" + hex(ch));
+                        }
+                        break;
+                }
+            } else {
+                switch (ch) {
+                    case '\'':
+                        if (escapeSingleQuote) {
+                            out.write('\\');
+                        }
+                        out.write('\'');
+                        break;
+                    case '"':
+                        out.write('\\');
+                        out.write('"');
+                        break;
+                    case '\\':
+                        out.write('\\');
+                        out.write('\\');
+                        break;
+                    case '/':
+                        if (escapeForwardSlash) {
+                            out.write('\\');
+                        }
+                        out.write('/');
+                        break;
+                    default:
+                        out.write(ch);
+                        break;
+                }
+            }
+        }
+    }
+
+    private static String hex(char ch) {
+        return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
     }
 
     // DEPRECTED - alias of getToken
@@ -1013,7 +1163,7 @@ public class FirebasePlugin extends CordovaPlugin {
                         myTrace = self.httpTraces.get(traceId);
                     }
 
-                    if (myTrace != null && myTrace instanceof HttpMetric) { //
+                    if (myTrace != null) { //
 
                         myTrace.setResponseContentType(contentType);
                         myTrace.setResponsePayloadSize(payLoadSize);

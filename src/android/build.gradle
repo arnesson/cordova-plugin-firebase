@@ -1,9 +1,10 @@
+
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.gms:google-services:3.1.0'
+
     }
 }
 repositories {
@@ -14,6 +15,10 @@ repositories {
 }
 dependencies {
     compile 'me.leolin:ShortcutBadger:1.1.4@aar'
-    compile 'com.google.firebase:firebase-crash:+'
-    compile 'com.google.firebase:firebase-auth:+'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
+    implementation 'com.google.firebase:firebase-auth:16.0.5'
+    implementation 'com.google.firebase:firebase-config:16.1.0'
+    implementation 'com.google.firebase:firebase-perf:16.1.2'
+    implementation 'com.google.firebase:firebase-analytics:16.0.4'
+    implementation 'com.google.firebase:firebase-dynamic-links:16.1.2'
 }
