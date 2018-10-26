@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #import <Foundation/Foundation.h>
 
 #import "FIRDynamicLink.h"
@@ -19,10 +35,10 @@ NS_SWIFT_NAME(DynamicLinks)
 
 /**
  * @method dynamicLinks
- * @abstract Shared instance of FIRDynamicLinks. Returns nil on iOS versions prior to 8.
+ * @abstract Shared instance of FIRDynamicLinks.
  * @return Shared instance of FIRDynamicLinks.
  */
-+ (nullable instancetype)dynamicLinks NS_SWIFT_NAME(dynamicLinks());
++ (instancetype)dynamicLinks NS_SWIFT_NAME(dynamicLinks());
 
 /**
  * @method shouldHandleDynamicLinkFromCustomSchemeURL:
@@ -52,7 +68,7 @@ NS_SWIFT_NAME(DynamicLinks)
  * @method dynamicLinkFromUniversalLinkURL:
  * @abstract Get a Dynamic Link from a universal link URL. This method parses universal link
  *     URLs, for instance,
- *     "https://example.app.goo.gl?link=https://www.google.com&ibi=com.google.app&ius=comgoogleapp".
+ *     "https://example.page.link?link=https://www.google.com&ibi=com.google.app&ius=comgoogleapp".
  *     It is suggested to call it inside your |UIApplicationDelegate|'s
  *     |application:continueUserActivity:restorationHandler:| method.
  * @param url Custom scheme URL.
@@ -69,8 +85,7 @@ NS_SWIFT_NAME(DynamicLinks)
  * @param completion A block that handles the outcome of attempting to create a FIRDynamicLink.
  * @return YES if FIRDynamicLinks is handling the link, otherwise, NO.
  */
-- (BOOL)handleUniversalLink:(NSURL *)url
-                 completion:(FIRDynamicLinkUniversalLinkHandler)completion;
+- (BOOL)handleUniversalLink:(NSURL *)url completion:(FIRDynamicLinkUniversalLinkHandler)completion;
 
 /**
  * @method resolveShortLink:completion:
@@ -78,8 +93,7 @@ NS_SWIFT_NAME(DynamicLinks)
  * @param url A Short Dynamic Link.
  * @param completion Block to be run upon completion.
  */
-- (void)resolveShortLink:(NSURL *)url
-              completion:(FIRDynamicLinkResolverHandler)completion;
+- (void)resolveShortLink:(NSURL *)url completion:(FIRDynamicLinkResolverHandler)completion;
 
 /**
  * @method matchesShortLinkFormat:

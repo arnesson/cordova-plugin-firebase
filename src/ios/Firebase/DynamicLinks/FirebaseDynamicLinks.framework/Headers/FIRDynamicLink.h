@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -6,23 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @file FIRDynamicLink.h
  * @abstract Dynamic Link object used in Firebase Dynamic Links.
  */
-
-/**
- * @abstract The confidence level of the matched Dynamic Link.
- */
-typedef NS_ENUM(NSUInteger, FIRDynamicLinkMatchConfidence) {
-  /**
-   * The match between the Dynamic Link and this device may not be perfect, hence you should not
-   *    reveal any personal information related to the Dynamic Link.
-   */
-  FIRDynamicLinkMatchConfidenceWeak,
-  /**
-   * The match between the Dynamic Link and this device is exact, hence you may reveal personal
-   *     information related to the Dynamic Link.
-   */
-  FIRDynamicLinkMatchConfidenceStrong
-} NS_SWIFT_NAME(DynamicLinkMatchConfidence)
-    DEPRECATED_MSG_ATTRIBUTE("Use FIRDLMatchType instead.");
 
 /**
  * @abstract The match type of the Dynamic Link.
@@ -63,14 +62,6 @@ NS_SWIFT_NAME(DynamicLink)
 @property(nonatomic, copy, readonly, nullable) NSURL *url;
 
 /**
- * @property matchConfidence
- * @abstract The match confidence of the received Dynamic Link.
- */
-@property(nonatomic, assign, readonly)
-    FIRDynamicLinkMatchConfidence matchConfidence DEPRECATED_MSG_ATTRIBUTE(
-        "Use FIRDynamicLink.matchType (DynamicLink.DLMatchType) instead.");
-
-/**
  * @property matchType
  * @abstract The match type of the received Dynamic Link.
  */
@@ -81,7 +72,7 @@ NS_SWIFT_NAME(DynamicLink)
  * @abstract The minimum iOS application version that supports the Dynamic Link. This is retrieved
  *     from the imv= parameter of the Dynamic Link URL. Note: This is not the minimum iOS system
  *     version, but the minimum app version. If app version of the opening app is less than the
- *     value of this property, than app expected to open AppStore to allow user to download most
+ *     value of this property, then app expected to open AppStore to allow user to download most
  *     recent version. App can notify or ask user before opening AppStore.
  */
 @property(nonatomic, copy, readonly, nullable) NSString *minimumAppVersion;

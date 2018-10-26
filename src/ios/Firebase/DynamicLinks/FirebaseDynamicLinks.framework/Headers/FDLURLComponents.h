@@ -1,3 +1,19 @@
+/*
+ * Copyright 2018 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #import <Foundation/Foundation.h>
 
 // NS_SWIFT_NAME can only translate factory methods before the iOS 9.3 SDK.
@@ -7,8 +23,8 @@
 #define FIR_SWIFT_NAME(X) NS_SWIFT_NAME(X)
 #else
 #define FIR_SWIFT_NAME(X)  // Intentionally blank.
-#endif  // #ifdef __IPHONE_9_3
-#endif  // #ifndef FIR_SWIFT_NAME
+#endif                     // #ifdef __IPHONE_9_3
+#endif                     // #ifndef FIR_SWIFT_NAME
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,10 +50,10 @@ typedef NS_ENUM(NSInteger, FIRShortDynamicLinkPathLength) {
  *     error or missing parameter.
  * @param error Error if URL can't be shortened.
  */
-typedef void (^FIRDynamicLinkShortenerCompletion)(NSURL * _Nullable shortURL,
-  NSArray<NSString *> * _Nullable warnings,
-  NSError * _Nullable error) FIR_SWIFT_NAME(DynamicLinkShortenerCompletion);
-
+typedef void (^FIRDynamicLinkShortenerCompletion)(NSURL *_Nullable shortURL,
+                                                  NSArray<NSString *> *_Nullable warnings,
+                                                  NSError *_Nullable error)
+    FIR_SWIFT_NAME(DynamicLinkShortenerCompletion);
 
 /**
  * @class FIRDynamicLinkGoogleAnalyticsParameters
@@ -118,7 +134,6 @@ FIR_SWIFT_NAME(DynamicLinkGoogleAnalyticsParameters)
 
 @end
 
-
 /**
  * @class FIRDynamicLinkIOSParameters
  * @abstract The Dynamic Link iOS parameters.
@@ -182,7 +197,7 @@ FIR_SWIFT_NAME(DynamicLinkIOSParameters)
  *     generated Dynamic Link URL.
  */
 + (instancetype)parametersWithBundleID:(NSString *)bundleID
-NS_SWIFT_UNAVAILABLE("Use initWithBundleID()");
+    NS_SWIFT_UNAVAILABLE("Use initWithBundleID()");
 
 /**
  * @method initWithBundleID:
@@ -194,7 +209,6 @@ NS_SWIFT_UNAVAILABLE("Use initWithBundleID()");
 - (instancetype)initWithBundleID:(NSString *)bundleID;
 
 @end
-
 
 /**
  * @class FIRDynamicLinkItunesConnectAnalyticsParameters
@@ -237,7 +251,6 @@ FIR_SWIFT_NAME(DynamicLinkItunesConnectAnalyticsParameters)
 
 @end
 
-
 /**
  * @class FIRDynamicLinkAndroidParameters
  * @abstract The Dynamic Link Android parameters.
@@ -273,7 +286,7 @@ FIR_SWIFT_NAME(DynamicLinkAndroidParameters)
  *     to a generated Dynamic Link URL.
  */
 + (instancetype)parametersWithPackageName:(NSString *)packageName
-NS_SWIFT_UNAVAILABLE("Use initWithPackageName()");
+    NS_SWIFT_UNAVAILABLE("Use initWithPackageName()");
 
 /**
  * @method initWithPackageName:
@@ -285,7 +298,6 @@ NS_SWIFT_UNAVAILABLE("Use initWithPackageName()");
 - (instancetype)initWithPackageName:(NSString *)packageName;
 
 @end
-
 
 /**
  * @class FIRDynamicLinkSocialMetaTagParameters
@@ -420,7 +432,6 @@ FIR_SWIFT_NAME(DynamicLinkComponentsOptions)
 
 @end
 
-
 /**
  * @class FIRDynamicLinkComponents
  * @abstract The class used for Dynamic Link URL generation; supports creation of short and long
@@ -503,8 +514,9 @@ FIR_SWIFT_NAME(DynamicLinkComponents)
  * @param domain Domain of your App. This value must be equal to your assigned domain from Firebase
  *     Console.
  */
-+ (instancetype)componentsWithLink:(NSURL *)link domain:(NSString *)domain
-      NS_SWIFT_UNAVAILABLE("Use init(link:domain:)");
++ (instancetype)componentsWithLink:(NSURL *)link
+                            domain:(NSString *)domain
+    NS_SWIFT_UNAVAILABLE("Use init(link:domain:)");
 
 /**
  * @method initWithLink:domain:
@@ -526,7 +538,7 @@ FIR_SWIFT_NAME(DynamicLinkComponents)
  *     guaranteed to be executed once and on the main thread.
  */
 + (void)shortenURL:(NSURL *)url
-           options:(FIRDynamicLinkComponentsOptions * _Nullable)options
+           options:(FIRDynamicLinkComponentsOptions *_Nullable)options
         completion:(FIRDynamicLinkShortenerCompletion)completion;
 
 /**

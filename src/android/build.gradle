@@ -1,24 +1,31 @@
-
 buildscript {
     repositories {
+        google()
+        jcenter()
         mavenCentral()
     }
     dependencies {
-
+        classpath 'com.android.tools.build:gradle:+'
+        classpath 'com.google.gms:google-services:4.1.0'
     }
 }
 repositories {
+    google()
     mavenCentral()
     maven {
         url "https://maven.google.com"
     }
 }
+
 dependencies {
     compile 'me.leolin:ShortcutBadger:1.1.4@aar'
-    implementation 'com.google.firebase:firebase-core:16.0.4'
-    implementation 'com.google.firebase:firebase-auth:16.0.5'
-    implementation 'com.google.firebase:firebase-config:16.1.0'
-    implementation 'com.google.firebase:firebase-perf:16.1.2'
-    implementation 'com.google.firebase:firebase-analytics:16.0.4'
-    implementation 'com.google.firebase:firebase-dynamic-links:16.1.2'
+    compile 'com.google.firebase:firebase-auth:+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.5@aar') {
+       transitive = true
+    }
 }
+
+cdvPluginPostBuildExtras.add({
+    apply plugin: 'com.google.gms.google-services'
+    apply plugin: 'io.fabric'
+})
