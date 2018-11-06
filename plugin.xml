@@ -51,10 +51,10 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-		<framework src="com.google.firebase:firebase-core:+" />
-		<framework src="com.google.firebase:firebase-messaging:+" />
-		<framework src="com.crashlytics.sdk.android:crashlytics:+" />
-		<framework src="com.google.firebase:firebase-config:+" />
+		<framework src="com.google.firebase:firebase-core:16.0.4" />
+		<framework src="com.google.firebase:firebase-messaging:17.3.4" />
+		<framework src="com.crashlytics.sdk.android:crashlytics:2.9.5" />
+		<framework src="com.google.firebase:firebase-config:16.1.0" />
 	</platform>
 
 	<platform name="ios">
