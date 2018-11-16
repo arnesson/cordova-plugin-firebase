@@ -48,13 +48,13 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-		<framework src="com.google.gms:google-services:3.1.0" />
-		<framework src="com.google.android.gms:play-services-tagmanager:15.0.2" />
-		<framework src="com.google.firebase:firebase-core:15.0.2" />
-		<framework src="com.google.firebase:firebase-messaging:15.0.2" />
-		<framework src="com.google.firebase:firebase-crash:15.0.2" />
-		<framework src="com.google.firebase:firebase-config:15.0.2" />
-		<framework src="com.google.firebase:firebase-perf:15.0.0" />
+		<framework src="com.google.gms:google-services:3.1.1" />
+		<framework src="com.google.android.gms:play-services-tagmanager:16.0.4" />
+		<framework src="com.google.firebase:firebase-core:16.0.4" />
+		<framework src="com.google.firebase:firebase-messaging:17.3.4" />
+		<framework src="com.google.firebase:firebase-crash:16.2.1" />
+		<framework src="com.google.firebase:firebase-config:16.1.0" />
+		<framework src="com.google.firebase:firebase-perf:16.2.0" />
 
 	</platform>
 
