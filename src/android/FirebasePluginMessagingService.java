@@ -41,6 +41,19 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
     }
 
     /**
+     * Called when a new token for the default Firebase project is generated.
+     *
+     * This is invoked after app install when a token is first generated, and again if the token changes.
+     *
+     * @param token The token used for sending messages to this application instance. This token is the same as the one retrieved by getInstanceId().
+     */
+    @Override
+    public void onNewToken(String token) {
+        Log.d(TAG, "New FCM Token: " + token);
+        FirebasePlugin.sendToken(token);
+    }
+
+    /**
      * Called when message is received.
      *
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
