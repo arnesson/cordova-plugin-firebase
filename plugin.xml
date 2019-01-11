@@ -62,7 +62,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework src="com.google.firebase:firebase-perf:+" />
 	</platform>
 
-	<platform name="ios">
+	<!-- @author:david we don't use Firebase on iOS -->
+	<!-- <platform name="ios">
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
@@ -109,7 +110,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/Protobuf.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework" />
 		<framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseABTesting.framework" />
-	</platform>
+	</platform> -->
 
 	<platform name="browser">
 		<js-module name="FirebasePlugin" src="www/firebase-browser.js">
