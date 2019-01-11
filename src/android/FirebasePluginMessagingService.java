@@ -89,6 +89,27 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             if (TextUtils.isEmpty(text)) {
                 text = data.get("body");
             }
+
+            /**
+             * @custom:zenput Due to misalignments between the data that Pushwoosh sends and what this plugin looks for,
+             * we need to shuffle some data values around.
+             */
+
+            String pushwooshHeader = ""; // sometimes Pushwoosh sends the title as "header"
+
+            // Pushwoosh sends the body as 'title'
+            if (!TextUtils.isEmpty(title) && TextUtils.isEmpty(text)) {
+                text = title;
+                title = pushwooshHeader;
+            }
+
+            if (!TextUtils.isEmpty(pushwooshHeader)) {
+                title = pushwooshHeader;
+            }
+
+            if (TextUtils.isEmpty(title)) {
+                title = "Zenput";
+            }
         }
 
         if (TextUtils.isEmpty(id)) {
