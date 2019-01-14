@@ -364,7 +364,10 @@ public class FirebasePlugin extends CordovaPlugin {
             FirebasePlugin.sendNotification(data, this.cordova.getActivity().getApplicationContext());
         }
 
-        this.getUrlFromDynamicLink(intent, null);
+        final String intentString = intent.getDataString();
+        if (intentString != null && intent.getScheme() != null) {
+            this.getUrlFromDynamicLink(intent, null);
+        }
 
     }
 
@@ -394,7 +397,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     if ( callbackContext != null && deepLink != null ){
                         callbackContext.success(deepLink.toString());
-                    }else{
+                    }else if(deepLink != null){
                         runHandleOpenURLJs(deepLink.toString(), intent.getScheme());
                     }
                 })
@@ -402,7 +405,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     Uri deepLink = intent.getData();
                     if ( callbackContext != null && deepLink != null ){
                         callbackContext.success(deepLink.toString());
-                    }else{
+                    }else if(deepLink != null){
                         runHandleOpenURLJs(deepLink.toString(), intent.getScheme());
                     }
                 });
