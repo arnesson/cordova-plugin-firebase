@@ -92,6 +92,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/ios/FirebasePlugin.m" />
 
 
+		<pods-config ios-min-version="9.0" use-frameworks="true"/>
 		<framework src="Firebase/Core" type="podspec" spec="5.15.0"/>
 		<framework src="Firebase/Auth" type="podspec" spec="5.15.0"/>
 		<framework src="Firebase/Messaging" type="podspec" spec="5.15.0"/>
