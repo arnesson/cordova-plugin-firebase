@@ -167,3 +167,12 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
 };
+
+exports.logMessage = function (message, success, error) {
+    exec(success, error, "FirebasePlugin", "logMessage", [message]);
+};
+
+exports.sendCrash = function (success, error) {
+    exec(success, error, "FirebasePlugin", "sendCrash", []);
+};
+

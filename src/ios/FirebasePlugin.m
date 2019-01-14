@@ -293,6 +293,18 @@ static FirebasePlugin *firebasePlugin;
     }];
 }
 
+- (void)logMessage:(CDVInvokedUrlCommand*)command{
+    NSString* message = [command argumentAtIndex:0 withDefault:@""];
+    if(message)
+    {
+        CLSNSLog(@"%@",message);
+    }
+}
+
+- (void)sendCrash:(CDVInvokedUrlCommand*)command{
+    [[Crashlytics sharedInstance] crash];
+}
+
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand *)command {
     NSString* userId = [command.arguments objectAtIndex:0];
 
