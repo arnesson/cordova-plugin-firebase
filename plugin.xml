@@ -65,6 +65,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</platform>
 
 	<platform name="ios">
+		<pods-config ios-min-version="8.0" use-frameworks="true"/>
+
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
