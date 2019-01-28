@@ -17,13 +17,15 @@ Download your container-config json file from Tag Manager and add a resource-fil
 
 # Debug
 
-## Firebase
+## Android 
+
+### Firebase
 
 `adb shell setprop log.tag.FA VERBOSE`
 `adb shell setprop log.tag.FA-SVC VERBOSE`
 `adb logcat -v time -s FA FA-SVC`
 
-## Firebase and GoogleTagManager
+### Firebase and GoogleTagManager
 
 `adb shell setprop log.tag.FA VERBOSE`
 `adb shell setprop log.tag.FA-SVC VERBOSE`
