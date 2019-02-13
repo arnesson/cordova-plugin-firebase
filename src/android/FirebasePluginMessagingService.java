@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +23,9 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
@@ -97,6 +102,19 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             id = Integer.toString(n);
         }
 
+        Bitmap image=null;
+        Bitmap iconBig=null;
+
+        String imageUrl=  data.get("imageUrl");
+        if (!TextUtils.isEmpty(imageUrl)){
+            image= getBitmapfromUrl(imageUrl);
+        }
+
+        String iconBigUrl=  data.get("iconBigUrl");
+        if (!TextUtils.isEmpty(iconBigUrl)){
+            iconBig= getBitmapfromUrl(iconBigUrl);
+        }
+
         Log.d(TAG, "From: " + remoteMessage.getFrom());
         Log.d(TAG, "Notification Message id: " + id);
         Log.d(TAG, "Notification Message Title: " + title);
@@ -107,11 +125,31 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         // TODO: Add option to developer to configure if show notification when app on foreground
         if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (data != null && !data.isEmpty())) {
             boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
-            sendNotification(id, title, text, data, showNotification, sound, lights);
+            sendNotification(id, title, text, iconBig,image,data, showNotification, sound, lights);
         }
     }
 
-    private void sendNotification(String id, String title, String messageBody, Map<String, String> data, boolean showNotification, String sound, String lights) {
+    /*
+     *To get a Bitmap image from the URL received
+     * */
+    private Bitmap getBitmapfromUrl(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap bitmap = BitmapFactory.decodeStream(input);
+            return bitmap;
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+
+        }
+    }
+    private void sendNotification(String id, String title, String messageBody, Bitmap iconbig,Bitmap image, Map<String, String> data, boolean showNotification, String sound, String lights) {
         Bundle bundle = new Bundle();
         for (String key : data.keySet()) {
             bundle.putString(key, data.get(key));
@@ -136,6 +174,19 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent)
                     .setPriority(NotificationCompat.PRIORITY_MAX);
+
+
+            if (iconbig != null){
+                notificationBuilder.setLargeIcon(iconbig);
+            }
+
+            if (image != null){
+                if (iconbig == null) {
+                    notificationBuilder.setLargeIcon(image);
+                }
+                notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(image).bigLargeIcon(null));
+            }
+
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
             if (resID != 0) {
@@ -195,15 +246,15 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 }
 
                 if (!channelExists) {
-                    NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+                NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
                     channel.enableLights(true);
                     channel.enableVibration(true);
                     channel.setShowBadge(true);
                     if (lights != null) {
                         channel.setLightColor(lightArgb);
                     }
-                    notificationManager.createNotificationChannel(channel);
-                }
+                notificationManager.createNotificationChannel(channel);
+            }
             }
 
             notificationManager.notify(id.hashCode(), notification);
