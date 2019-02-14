@@ -51,3 +51,27 @@ On Android Lollipop and above you can also set the accent color for the notifica
     <color name="accent">#FF00FFFF</color>
 </resources>
 ```
+
+## My Background Notification Icon Still Does Not Work
+
+Are you testing with the console on Firebase?  If so, your notification is not being sent as a Data payload.  Your 
+notification MUST be sent as "data" payload in order to trigger sendNotification in FirebasePlugin, and correctly 
+set your notification icon.  In order to test your implementation, use a REST client (like Advanced REST Client 
+for Chrome) to post a notification to https://fcm.googleapis.com/fcm/send.  Set HEADERS to 
+
+```
+content-type: application/json
+authorization: key=YOURAPIKEY.
+```
+
+Set the body as follows:
+```
+{"data":{
+"body" : "Hello from web",
+"title": "REST Client",
+"imageUrl" : OPTIONAL FOR PR1001,
+"iconBigUrl" : OPTIONAL FOR PR1001
+},
+"to": DEVICETOKEN
+}
+```
