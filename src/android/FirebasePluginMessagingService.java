@@ -78,6 +78,10 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         String id = "";
         String sound = "";
         String lights = "";
+        String imageUrl="";
+        String iconBigUrl="";
+        String pingbackUrl="";
+
         Map<String, String> data = remoteMessage.getData();
 
         if (remoteMessage.getNotification() != null) {
@@ -90,6 +94,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             id = data.get("id");
             sound = data.get("sound");
             lights = data.get("lights"); //String containing hex ARGB color, miliseconds on, miliseconds off, example: '#FFFF00FF,1000,3000'
+            imageUrl=  data.get("imageUrl");
+            iconBigUrl=  data.get("iconBigUrl");
+            pingbackUrl= data.get("pingbackUrl");
 
             if (TextUtils.isEmpty(text)) {
                 text = data.get("body");
@@ -102,15 +109,14 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             id = Integer.toString(n);
         }
 
+
         Bitmap image=null;
         Bitmap iconBig=null;
 
-        String imageUrl=  data.get("imageUrl");
         if (!TextUtils.isEmpty(imageUrl)){
             image= getBitmapfromUrl(imageUrl);
         }
 
-        String iconBigUrl=  data.get("iconBigUrl");
         if (!TextUtils.isEmpty(iconBigUrl)){
             iconBig= getBitmapfromUrl(iconBigUrl);
         }
@@ -125,7 +131,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         // TODO: Add option to developer to configure if show notification when app on foreground
         if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (data != null && !data.isEmpty())) {
             boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
-            sendNotification(id, title, text, iconBig,image,data, showNotification, sound, lights);
+            sendNotification(id, pingbackUrl,title, text, iconBig,image,data, showNotification, sound, lights);
+
+
         }
     }
 
@@ -149,7 +157,26 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         }
     }
-    private void sendNotification(String id, String title, String messageBody, Bitmap iconbig,Bitmap image, Map<String, String> data, boolean showNotification, String sound, String lights) {
+
+    private void pingbackUrl(String pingbackUrl){
+        if (!TextUtils.isEmpty(pingbackUrl)) {
+            try {
+                URL url = new URL(pingbackUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                connection.disconnect();
+
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+
+            }
+        }
+    }
+    private void sendNotification(String id, String pingbackUrl, String title, String messageBody, Bitmap iconbig, Bitmap image, Map<String, String> data, boolean showNotification, String sound, String lights) {
         Bundle bundle = new Bundle();
         for (String key : data.keySet()) {
             bundle.putString(key, data.get(key));
@@ -222,6 +249,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 int accentID = getResources().getIdentifier("accent", "color", getPackageName());
                 notificationBuilder.setColor(getResources().getColor(accentID, null));
+
             }
 
             Notification notification = notificationBuilder.build();
@@ -258,11 +286,13 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             }
 
             notificationManager.notify(id.hashCode(), notification);
+            pingbackUrl(pingbackUrl);
         } else {
             bundle.putBoolean("tap", false);
             bundle.putString("title", title);
             bundle.putString("body", messageBody);
             FirebasePlugin.sendNotification(bundle, this.getApplicationContext());
+            pingbackUrl(pingbackUrl);
         }
     }
 }
