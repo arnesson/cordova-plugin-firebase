@@ -2,5 +2,6 @@ framework module FirebaseAuth {
   umbrella header "FirebaseAuth.h"
   export *
   module * { export *}
+  link framework "SafariServices"
   link framework "Security"
 }
