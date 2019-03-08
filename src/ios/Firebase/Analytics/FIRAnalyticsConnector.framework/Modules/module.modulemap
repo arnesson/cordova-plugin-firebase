@@ -1,5 +1,0 @@
-framework module FIRAnalyticsConnector {
-  export *
-  module * { export *}
-  link framework "Security"
-  link framework "SystemConfiguration"}

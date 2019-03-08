@@ -1,8 +1,0 @@
-framework module FirebaseDynamicLinks {
-  umbrella header "FirebaseDynamicLinks.h"
-  export *
-  module * { export *}
-  link framework "AssetsLibrary"
-  link framework "MessageUI"
-  link framework "QuartzCore"
-}

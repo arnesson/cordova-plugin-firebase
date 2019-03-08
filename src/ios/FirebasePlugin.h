@@ -1,5 +1,6 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
+#import <WebKit/WebKit.h>
 
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
@@ -21,6 +22,10 @@
 - (void)sendToken:(NSString*)token;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
+- (void)logMessage:(CDVInvokedUrlCommand*)command;
+- (void)sendNonFatalCrash:(CDVInvokedUrlCommand*)command;
+- (void)sendCrash:(CDVInvokedUrlCommand*)command;
+- (void)recordError:(CDVInvokedUrlCommand*)command;
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand*)command;
 - (void)setScreenName:(CDVInvokedUrlCommand*)command;
 - (void)setUserId:(CDVInvokedUrlCommand*)command;

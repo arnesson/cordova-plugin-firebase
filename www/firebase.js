@@ -150,8 +150,15 @@ exports.startTrace = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "startTrace", [name]);
 };
 
-exports.incrementCounter = function (name, counterNamed, success, error) {
-  exec(success, error, "FirebasePlugin", "incrementCounter", [name, counterNamed]);
+exports.incrementMetric = function (name, counterNamed, increment, success, error) {
+	if( typeof increment == 'function' ){
+        error = success;
+        success = increment;
+        increment = 1;
+    }else if (typeof increment !== 'number'){
+		increment = 1;
+	}
+    exec(success, error, "FirebasePlugin", "incrementMetric", [name, counterNamed, increment]);
 };
 
 exports.stopTrace = function (name, success, error) {
@@ -188,6 +195,32 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
+};
+
+exports.logMessage = function (message, success, error) {
+    exec(success, error, "FirebasePlugin", "logMessage", [message]);
+};
+
+exports.recordError = function (userInfo, code, domain, success, error) {
+    if( typeof domain == 'function' ){
+        error = success;
+        success = domain;
+        domain = null;
+    }
+    exec(success, error, "FirebasePlugin", "recordError", [userInfo, code, domain]);
+};
+
+exports.sendNonFatalCrash = function (message, stack, domain, success, error) {
+    if( typeof domain == 'function' ){
+        error = success;
+        success = domain;
+        domain = null;
+    }
+    exec(success, error, "FirebasePlugin", "sendNonFatalCrash", [message, stack, domain]);
+};
+
+exports.sendCrash = function (success, error) {
+    exec(success, error, "FirebasePlugin", "sendCrash", []);
 };
 
 if ( cordova.platformId == "android" ){

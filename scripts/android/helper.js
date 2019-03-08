@@ -1,118 +1,261 @@
-var fs = require("fs");
-var path = require("path");
+var fs          = require("fs");
+var path        = require("path");
+var parseString = require("xml2js").parseString;
+
+var buildGradleFile = path.join("platforms", "android", "app", "build.gradle");
 
 function rootBuildGradleExists() {
-  var target = path.join("platforms", "android", "build.gradle");
-  return fs.existsSync(target);
+	return fs.existsSync(buildGradleFile);
 }
 
 /*
  * Helper function to read the build.gradle that sits at the root of the project
  */
 function readRootBuildGradle() {
-  var target = path.join("platforms", "android", "build.gradle");
-  return fs.readFileSync(target, "utf-8");
+	return fs.readFileSync(buildGradleFile, "utf-8");
 }
 
 /*
  * Added a dependency on 'com.google.gms' based on the position of the know 'com.android.tools.build' dependency in the build.gradle
  */
-function addDependencies(buildGradle) {
-  // find the known line to match
-  var match = buildGradle.match(/^(\s*)classpath 'com.android.tools.build(.*)/m);
-  var whitespace = match[1];
-  
-  // modify the line to add the necessary dependencies
-  var googlePlayDependency = whitespace + 'classpath \'com.google.gms:google-services:4.1.0\' // google-services dependency from cordova-plugin-firebase';
-  var fabricDependency = whitespace + 'classpath \'io.fabric.tools:gradle:1.25.4\' // fabric dependency from cordova-plugin-firebase'
-  var modifiedLine = match[0] + '\n' + googlePlayDependency + '\n' + fabricDependency;
-  
-  // modify the actual line
-  return buildGradle.replace(/^(\s*)classpath 'com.android.tools.build(.*)/m, modifiedLine);
+function addDependencies(buildGradle, useDependency) {
+	if ( !useDependency[0] || buildGradle.indexOf('classpath \'com.google.gms:google-services:') > -1 )
+		return buildGradle;
+
+	// find the known line to match
+	var match      = buildGradle.match(/^(\s*)classpath 'com.android.tools.build(.*)/m);
+	var whitespace = match[1];
+
+	var modifiedLine = '';
+	var comment = '';
+	useDependency.forEach(function(dependency){
+		comment = '// dependency from cordova-plugin-firebase';
+		if ( dependency.indexOf('com.android.tools.build:gradle') > -1 )
+			comment = '';
+		modifiedLine += whitespace + 'classpath \'' + dependency + '\' '+comment+' \n';
+	});
+
+	// modify the actual line
+	return buildGradle.replace(/^(\s*)classpath 'com.android.tools.build(.*)/m, modifiedLine);
 }
 
 /*
  * Add 'google()' and Crashlytics to the repository repo list
  */
 function addRepos(buildGradle) {
-  // find the known line to match
-  var match = buildGradle.match(/^(\s*)jcenter\(\)/m);
-  var whitespace = match[1];
+	// find the known line to match
+	var match = buildGradle.match(/^(\s*)jcenter\(\)/m);
+	var whitespace = match[1];
 
-  // modify the line to add the necessary repo
-  // Crashlytics goes under buildscripts which is the first grouping in the file
-  var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase'
-  var modifiedLine = match[0] + '\n' + fabricMavenRepo;
+	// modify the line to add the necessary repo
+	// Crashlytics goes under buildscripts which is the first grouping in the file
 
-  // modify the actual line
-  buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+	if ( buildGradle.indexOf('Fabrics Maven repository from cordova-plugin-firebase') == -1 ){
+		var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase'
+		var modifiedLine = fabricMavenRepo + '\n' + match[0];
+		// modify the actual line
+		buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+	}
 
-  // update the all projects grouping
-  var allProjectsIndex = buildGradle.indexOf('allprojects');
-  if (allProjectsIndex > 0) {
-    // split the string on allprojects because jcenter is in both groups and we need to modify the 2nd instance
-    var firstHalfOfFile = buildGradle.substring(0, allProjectsIndex);
-    var secondHalfOfFile = buildGradle.substring(allProjectsIndex);
+	if ( buildGradle.indexOf('Google\'s Maven repository from cordova-plugin-firebase') > -1 )
+		return buildGradle;
 
-    // Add google() to the allprojects section of the string
-    match = secondHalfOfFile.match(/^(\s*)jcenter\(\)/m);
-    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
-    modifiedLine = match[0] + '\n' + googlesMavenRepo;
-    // modify the part of the string that is after 'allprojects'
-    secondHalfOfFile = secondHalfOfFile.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+	// update the all projects grouping
+	var allProjectsIndex = buildGradle.indexOf('allprojects');
+	if (allProjectsIndex > 0) {
+		// split the string on allprojects because jcenter is in both groups and we need to modify the 2nd instance
+		var firstHalfOfFile = buildGradle.substring(0, allProjectsIndex);
+		var secondHalfOfFile = buildGradle.substring(allProjectsIndex);
 
-    // recombine the modified line
-    buildGradle = firstHalfOfFile + secondHalfOfFile;
-  } else {
-    // this should not happen, but if it does, we should try to add the dependency to the buildscript
-    match = buildGradle.match(/^(\s*)jcenter\(\)/m);
-    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
-    modifiedLine = match[0] + '\n' + googlesMavenRepo;
-    // modify the part of the string that is after 'allprojects'
-    buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
-  }
+		// Add google() to the allprojects section of the string
+		match = secondHalfOfFile.match(/^(\s*)jcenter\(\)/m);
+		var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+		modifiedLine =  googlesMavenRepo + '\n' + match[0];
+		// modify the part of the string that is after 'allprojects'
+		secondHalfOfFile = secondHalfOfFile.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
 
-  return buildGradle;
+		// recombine the modified line
+		buildGradle = firstHalfOfFile + secondHalfOfFile;
+	} else {
+		// this should not happen, but if it does, we should try to add the dependency to the buildscript
+		match = buildGradle.match(/^(\s*)jcenter\(\)/m);
+		var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+		modifiedLine = googlesMavenRepo + '\n' + match[0];
+		// modify the part of the string that is after 'allprojects'
+		buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+	}
+
+	return buildGradle;
+}
+
+/*
+ * Add the frameworks
+ */
+function addFrameworks(buildGradle, useFrameworks){
+
+	// Remove Firebase's frameworks
+	buildGradle = buildGradle.replace(/ *\/\/ FIREBASE FRAMEWORKS START[^)]*FIREBASE FRAMEWORKS END */g, '');
+
+	//
+	var match = buildGradle.match(/^(\s*)\/\/ SUB-PROJECT DEPENDENCIES END(.*)/m);
+	var whitespace = match[1];
+
+	var lines = whitespace+'\/\/ SUB-PROJECT DEPENDENCIES END'
+		+'\n'
+		+'\n'+whitespace+'\/\/ FIREBASE FRAMEWORKS START'
+		+'\n'+whitespace+'implementation \'me.leolin:ShortcutBadger:1.1.4@aar\'';
+
+	useFrameworks.forEach(function(framework){
+		lines += '\n'+whitespace+'implementation \''+ framework +'\'';
+	});
+
+	lines += '\n'+whitespace+'\/\/ FIREBASE FRAMEWORKS END'+'\n';
+
+	return buildGradle.replace(/^(\s*)\/\/ SUB-PROJECT DEPENDENCIES END(.*)/m, lines);
 }
 
 /*
  * Helper function to write to the build.gradle that sits at the root of the project
  */
 function writeRootBuildGradle(contents) {
-  var target = path.join("platforms", "android", "build.gradle");
-  fs.writeFileSync(target, contents);
+	fs.writeFileSync(buildGradleFile, contents);
+}
+
+/*
+ * Load Android Frameworks
+ */
+function loadAndroidDependencyAndFrameworks(context, callback){
+	var useFrameworks = [];
+	var useDependency  = [];
+	var pluginXML     = fs.readFileSync(context.opts.plugin.pluginInfo.filepath,{encoding: 'utf8'});
+	var configXML     = null;
+	try{
+		configXML = fs.readFileSync(path.join(context.opts.projectRoot,'config.xml'),{encoding: 'utf8'});
+	}catch(e){
+		var configXML     = null;
+	}
+	readConfigXML(pluginXML, function(pluginDependency, pluginFrameworks){
+		// console.log(pluginFrameworks);
+		readConfigXML(configXML, function(configDependency, configFrameworks){
+			// console.log(configFrameworks);
+			// the framework written in config xml takes precedence
+			pluginFrameworks.forEach(function(framework){
+				if ( typeof framework == 'string' ){
+					var fname = framework.split(/:|@/);
+					fname     = fname[0] + ( typeof fname[1] == 'string' ?  ":" + fname[1] : "");
+					useFrameworks.push( configFrameworks.find(function(element){ return element.indexOf(fname) > -1 }) || framework) ;
+				}
+			});
+
+			pluginDependency.forEach(function(dependecy){
+				if ( typeof dependecy == 'string' ){
+					var fname = dependecy.split(/:|@/);
+					fname     = fname[0] + ( typeof fname[1] == 'string' ?  ":" + fname[1] : "");
+					useDependency.push( configDependency.find(function(element){ return element.indexOf(fname) > -1 }) || dependecy) ;
+				}
+			});
+
+			// DONE
+			callback(useDependency, useFrameworks);
+		});
+	});
+}
+
+
+/*
+ * Reads the specifications for the frameworks
+ */
+function readConfigXML(xml, callback){
+	parseString(xml, function (err, result) {
+		var frameworks = [];
+		var dependency  = [];
+		var platforms  = [];
+		if ( result && result.plugin && result.plugin.platform){
+			platforms = result.plugin.platform;
+		}else if ( result && result.widget && result.widget.platform ){
+			platforms = result.widget.platform;
+		}
+
+		var platform;
+		platforms.forEach(function(anPlatform){
+			if ( anPlatform && anPlatform.$ && anPlatform.$.name == 'android'){
+				platform = anPlatform;
+			}
+		});
+
+		if (platform && platform["framework-implementation"] && platform["framework-implementation"].length > 0 ){
+			platform["framework-implementation"].forEach(function(framework){
+				if ( framework && framework.$ && framework.$.name){
+					frameworks.push(framework.$.name);
+				}
+			});
+		}
+		if (platform && platform["dependency-classpath"] && platform["dependency-classpath"].length > 0 ){
+			platform["dependency-classpath"].forEach(function(d){
+				if ( d && d.$ && d.$.name){
+					dependency.push(d.$.name);
+				}
+			});
+		}
+
+		callback(dependency, frameworks);
+	});
 }
 
 module.exports = {
 
-  modifyRootBuildGradle: function() {
-    // be defensive and don't crash if the file doesn't exist
+	modifyRootBuildGradle: function(context) {
+		// be defensive and don't crash if the file doesn't exist
+		if (!rootBuildGradleExists) {
+			return;
+		}
+
+		loadAndroidDependencyAndFrameworks(context, function(useDependency, useFrameworks){
+			var buildGradle = readRootBuildGradle();
+
+			// Add Google Play Services Dependency
+			buildGradle = addDependencies(buildGradle, useDependency);
+
+			// Add Google's Maven Repo
+			buildGradle = addRepos(buildGradle);
+
+			// Append plugin
+
+			var applyPluginGService = 'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase';
+			var applyPluginIoFabric = 'apply plugin: \'io.fabric\' // from cordova-plugin-firebase';
+
+			if ( buildGradle.indexOf(applyPluginGService) == -1 )
+				buildGradle = buildGradle +'\n\n'+applyPluginGService;
+
+			if ( buildGradle.indexOf(applyPluginIoFabric) == -1 )
+				buildGradle = buildGradle +'\n'+applyPluginIoFabric+'\n';
+
+
+			// Add framework dependecy
+			buildGradle = addFrameworks(buildGradle, useFrameworks);
+
+
+			writeRootBuildGradle(buildGradle);
+		});
+
+
+	},
+
+  restoreRootBuildGradle: function(context) {
+	// be defensive and don't crash if the file doesn't exist
     if (!rootBuildGradleExists) {
       return;
     }
 
-    var buildGradle = readRootBuildGradle();
-
-    // Add Google Play Services Dependency
-    buildGradle = addDependencies(buildGradle);
-  
-    // Add Google's Maven Repo
-    buildGradle = addRepos(buildGradle);
-
-    writeRootBuildGradle(buildGradle);
-  },
-
-  restoreRootBuildGradle: function() {
-    // be defensive and don't crash if the file doesn't exist
-    if (!rootBuildGradleExists) {
-      return;
-    }
 
     var buildGradle = readRootBuildGradle();
+
+	// Remove Firebase's frameworks
+	buildGradle = buildGradle.replace(/ *\/\/ FIREBASE FRAMEWORKS START[^)]*FIREBASE FRAMEWORKS END */g, '');
 
     // remove any lines we added
     buildGradle = buildGradle.replace(/(?:^|\r?\n)(.*)cordova-plugin-firebase*?(?=$|\r?\n)/g, '');
-  
+
     writeRootBuildGradle(buildGradle);
   }
 };

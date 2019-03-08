@@ -246,7 +246,15 @@ public class FirebasePlugin extends CordovaPlugin {
             // clear the intent if the app start up with custom url scheme
             Intent intent = this.cordova.getActivity().getIntent();
             intent.setData(null);
-		};
+		} else if (action.equals("logMessage")) {
+            this.logMessage(args, callbackContext);
+            return true;
+        }  else if (action.equals("sendNonFatalCrash")) {
+			this.sendNonFatalCrash(args, callbackContext);
+		} else if (action.equals("sendCrash")) {
+            this.sendCrash(args, callbackContext);
+            return true;
+        };
 
         return false;
     }
@@ -704,6 +712,60 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
+	private void logMessage(final JSONArray data,
+                        final CallbackContext callbackContext) {
+		this.cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+		        String message = data.optString(0);
+		        Crashlytics.log(message);
+		        callbackContext.success();
+			}
+		});
+    }
+
+	private void sendNonFatalCrash(final JSONArray data,
+								   final CallbackContext callbackContext) {
+		this.cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (data.length() >= 2) {
+					// well, we got more, let's asume arg 2 was a stack trace
+					try {
+						JSONArray stackTrace = data.getJSONArray(1);
+
+						StackTraceElement[] trace = new StackTraceElement[stackTrace.length()];
+						for(int i = 0; i < stackTrace.length(); i++) {
+	 						JSONObject elem = stackTrace.getJSONObject(i);
+
+	 						trace[i] = new StackTraceElement("undefined", elem.getString("functionName"),elem.getString("fileName"), elem.getInt("lineNumber"));
+	 					}
+
+						JavaScriptException ex = new JavaScriptException(data.getString(0));
+	                    ex.setStackTrace(trace);
+
+	                    Crashlytics.logException(ex);
+					} catch (JSONException e) {
+						Crashlytics.logException(e);
+					}
+				} else {
+					Crashlytics.logException(new Throwable(data.optString(0, "No Message Provided")));
+				}
+			}
+		});
+	}
+
+    private void sendCrash(final JSONArray data,
+						   final CallbackContext callbackContext) {
+
+		this.cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				throw new RuntimeException("This is a crash");
+			}
+		});
+	}
 
     private void setCrashlyticsUserId(final CallbackContext callbackContext, final String userId) {
         cordova.getActivity().runOnUiThread(new Runnable() {
