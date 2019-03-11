@@ -3,10 +3,19 @@
 
 var fs = require('fs');
 
-fs.unlinkSync('./plugins/cordova-plugin-firebase/src/ios/GoogleService-Info.plist');
+function directoryExists(path) {
+    try {
+        return fs.statSync(path).isDirectory();
+    } catch (e) {
+        return false;
+    }
+}
 
-fs.writeFileSync('./plugins/cordova-plugin-firebase/src/ios/GoogleService-Info.plist', fs.readFileSync('./GoogleService-Info.plist'));
+if (directoryExists('platforms/ios')) {
+	fs.unlinkSync('./plugins/cordova-plugin-firebase/src/ios/GoogleService-Info.plist');
 
+	fs.writeFileSync('./plugins/cordova-plugin-firebase/src/ios/GoogleService-Info.plist', fs.readFileSync('./GoogleService-Info.plist'));
+}
 module.exports = function (context) {
   require('./after_prepare')(context);
 };
