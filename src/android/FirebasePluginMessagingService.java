@@ -117,40 +117,110 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             bundle.putString(key, data.get(key));
         }
 
-        if (showNotification) {
-            Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
-            intent.putExtras(bundle);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    if (showNotification) {
+        Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
+        intent.putExtras(bundle);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            String channelId = this.getStringResource("default_notification_channel_id");
-            String channelName = this.getStringResource("default_notification_channel_name");
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
-            notificationBuilder
+        String channelId = "FBApp-" + getPackageName(); // Create one for the app, don't use default.  this.getStringResource("default_notification_channel_id");
+        String channelName = "Sound-" + sound; //notificationChannel is only created/built once. Lets create one per sound file so we can switch sounds
+        Uri soundPath = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        if (sound != null) {
+            Log.d(TAG, "sound before path is: " + sound);
+            // Place your .mp3 in res/raw using resource-file in your config.xml
+            soundPath = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "//" + sound);
+            Log.d(TAG, "Parsed sound is: " + soundPath.toString());
+        } else {
+            Log.d(TAG, "Sound was null ");
+        }
+
+        String imageThumbail = null;
+        Log.d(TAG, "Notification Message Oreo compatibility version v1 ");
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            Log.d(TAG, "Notification Message is Oreo and above, using notification channel");
+
+            Notification.Builder notificationBuilder =
+                new Notification.Builder(this /*MyApplication.getInstance().getApplicationContext()*/, channelId /*NOTIFICATION_CHANNEL_ID */)
+                    .setSmallIcon(getApplicationInfo().icon)
+                    //.setPriority(Notification.PRIORITY_MAX) // this is deprecated in API 26 but you can still use for below 26. check below update for 26 API
+                    //.setSound(defaultSoundUri)
+                    .setContentIntent(pendingIntent);
+
+            NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+            // Configure the notification channel.
+            AudioAttributes att = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+
+            notificationChannel.setSound(soundPath, att);
+            notificationChannel.setDescription(messageBody);
+
+            int lightArgb = 0;
+            if (lights != null) {
+                /*
+                try {
+                    String[] lightsComponents = lights.replaceAll("\\s", "").split(",");
+                    if (lightsComponents.length == 3) {
+                        lightArgb = Color.parseColor(lightsComponents[0]);
+                        int lightOnMs = Integer.parseInt(lightsComponents[1]);
+                        int lightOffMs = Integer.parseInt(lightsComponents[2]);
+
+                        notificationBuilder.setLights(lightArgb, lightOnMs, lightOffMs);
+                    }
+                } catch (Exception e) {
+                }
+                */
+                notificationChannel.enableLights(true);
+                notificationChannel.setLightColor(Color.RED);
+            } else {
+                notificationChannel.enableLights(false);
+                notificationChannel.setLightColor(Color.RED);
+
+            }
+
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000, 200, 1000, 200, 1000});
+            notificationChannel.enableVibration(true);
+            notificationManager.createNotificationChannel(notificationChannel);
+            /*
+            if (imageThumbnail != null) {
+                notificationBuilder.setStyle(new Notification.BigPictureStyle()
+                    .bigPicture(imageThumbnail).setSummaryText(messageBody));
+            }
+            */
+
+            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+
+        } else {
+            NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this /*MyApplication.getInstance().getApplicationContext()*/)
+                    .setSmallIcon(getApplicationInfo().icon)
                     .setContentTitle(title)
                     .setContentText(messageBody)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
                     .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
-                    .setContentIntent(pendingIntent)
-                    .setPriority(NotificationCompat.PRIORITY_MAX);
+                    .setPriority(Notification.PRIORITY_MAX) // this is deprecated in API 26 but you can still use for below 26. check below update for 26 API
+                    .setSound(soundPath) // which may be default
+                    .setContentIntent(pendingIntent);
+            /*
+            if (imageThumbnail != null) {
+                notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
+                    .bigPicture(imageThumbnail).setSummaryText(messageBody));
+            }
+            */
 
             int resID = getResources().getIdentifier("notification_icon", "drawable", getPackageName());
             if (resID != 0) {
                 notificationBuilder.setSmallIcon(resID);
             } else {
                 notificationBuilder.setSmallIcon(getApplicationInfo().icon);
-            }
-
-            if (sound != null) {
-                Log.d(TAG, "sound before path is: " + sound);
-                Uri soundPath = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getPackageName() + "/raw/" + sound);
-                Log.d(TAG, "Parsed sound is: " + soundPath.toString());
-                notificationBuilder.setSound(soundPath);
-            } else {
-                Log.d(TAG, "Sound was null ");
             }
 
             int lightArgb = 0;
@@ -168,45 +238,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 }
             }
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                int accentID = getResources().getIdentifier("accent", "color", getPackageName());
-                notificationBuilder.setColor(getResources().getColor(accentID, null));
-            }
 
-            Notification notification = notificationBuilder.build();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                int iconID = android.R.id.icon;
-                int notiID = getResources().getIdentifier("notification_big", "drawable", getPackageName());
-                if (notification.contentView != null) {
-                    notification.contentView.setImageViewResource(iconID, notiID);
-                }
-            }
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 
-            // Since android Oreo notification channel is needed.
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                List<NotificationChannel> channels = notificationManager.getNotificationChannels();
-
-                boolean channelExists = false;
-                for (int i = 0; i < channels.size(); i++) {
-                    if (channelId.equals(channels.get(i).getId())) {
-                        channelExists = true;
-                    }
-                }
-
-                if (!channelExists) {
-                    NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-                    channel.enableLights(true);
-                    channel.enableVibration(true);
-                    channel.setShowBadge(true);
-                    if (lights != null) {
-                        channel.setLightColor(lightArgb);
-                    }
-                    notificationManager.createNotificationChannel(channel);
-                }
-            }
-
-            notificationManager.notify(id.hashCode(), notification);
         } else {
             bundle.putBoolean("tap", false);
             bundle.putString("title", title);
