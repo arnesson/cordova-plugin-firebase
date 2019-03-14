@@ -1,5 +1,0 @@
-framework module gRPC-RxLibrary {
-  umbrella header "gRPC-RxLibrary.h"
-  export *
-  module * { export *}
-}

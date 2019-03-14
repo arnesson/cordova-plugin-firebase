@@ -18,6 +18,7 @@ import android.graphics.Color;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -67,18 +68,18 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        String title;
-        String text;
-        String id;
-        String sound = null;
-        String lights = null;
+        String title = "";
+        String text = "";
+        String id = "";
+        String sound = "";
+        String lights = "";
         Map<String, String> data = remoteMessage.getData();
 
         if (remoteMessage.getNotification() != null) {
             title = remoteMessage.getNotification().getTitle();
             text = remoteMessage.getNotification().getBody();
             id = remoteMessage.getMessageId();
-        } else {
+        } else if (data != null) {
             title = data.get("title");
             text = data.get("text");
             id = data.get("id");
@@ -104,11 +105,10 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         Log.d(TAG, "Notification Message Lights: " + lights);
 
         // TODO: Add option to developer to configure if show notification when app on foreground
-        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (!data.isEmpty())) {
+        if (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title) || (data != null && !data.isEmpty())) {
             boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback()) && (!TextUtils.isEmpty(text) || !TextUtils.isEmpty(title));
             sendNotification(id, title, text, data, showNotification, sound, lights);
         }
-
     }
 
     private void sendNotification(String id, String title, String messageBody, Map<String, String> data, boolean showNotification, String sound, String lights) {
@@ -153,11 +153,12 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 Log.d(TAG, "Sound was null ");
             }
 
+            int lightArgb = 0;
             if (lights != null) {
                 try {
                     String[] lightsComponents = lights.replaceAll("\\s", "").split(",");
                     if (lightsComponents.length == 3) {
-                        int lightArgb = Color.parseColor(lightsComponents[0]);
+                        lightArgb = Color.parseColor(lightsComponents[0]);
                         int lightOnMs = Integer.parseInt(lightsComponents[1]);
                         int lightOffMs = Integer.parseInt(lightsComponents[2]);
 
@@ -170,7 +171,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 int accentID = getResources().getIdentifier("accent", "color", getPackageName());
                 notificationBuilder.setColor(getResources().getColor(accentID, null));
-                
             }
 
             Notification notification = notificationBuilder.build();
@@ -185,8 +185,25 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
             // Since android Oreo notification channel is needed.
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
-                notificationManager.createNotificationChannel(channel);
+                List<NotificationChannel> channels = notificationManager.getNotificationChannels();
+
+                boolean channelExists = false;
+                for (int i = 0; i < channels.size(); i++) {
+                    if (channelId.equals(channels.get(i).getId())) {
+                        channelExists = true;
+                    }
+                }
+
+                if (!channelExists) {
+                    NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+                    channel.enableLights(true);
+                    channel.enableVibration(true);
+                    channel.setShowBadge(true);
+                    if (lights != null) {
+                        channel.setLightColor(lightArgb);
+                    }
+                    notificationManager.createNotificationChannel(channel);
+                }
             }
 
             notificationManager.notify(id.hashCode(), notification);

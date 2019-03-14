@@ -24,9 +24,12 @@ NS_SWIFT_NAME(Performance)
 @property(nonatomic, assign, getter=isDataCollectionEnabled) BOOL dataCollectionEnabled;
 
 /**
- * Controls the instrumentation of the app to capture performance data. When this value is set to
- * NO, the app will not be instrumented to collect performance data (in scenarios like app_start,
- * networking monitoring). Default is YES.
+ * Controls the instrumentation of the app to capture performance data. Setting this value to NO has
+ * immediate effect only if it is done so before calling [FIRApp configure]. Otherwise it takes
+ * effect after the app starts again the next time.
+ *
+ * If set to NO, the app will not be instrumented to collect performance
+ * data (in scenarios like app_start, networking monitoring). Default is YES.
  *
  * This setting is persisted, and is applied on future invocations of your application. Once
  * explicitly set, it overrides any settings in your Info.plist.

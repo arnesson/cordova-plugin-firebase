@@ -8,7 +8,7 @@
     "url": "https://github.com/arnesson/cordova-plugin-firebase"
   },
   "name": "cordova-plugin-firebase",
-  "version": "1.0.5",
+  "version": "2.0.5",
   "description": "Cordova plugin for Google Firebase",
   "cordova": {
     "id": "cordova-plugin-firebase",
@@ -30,20 +30,20 @@
   ],
   "scripts": {
     "version": "node ./bump-version.js && git add -A plugin.xml",
-    "postversion": "git push && git push --tags && npm publish",
+    "postversion": "git push && git push --tags && npm publish --verbose",
     "test": "npm run test:ios && npm run test:android && npm run test:browser",
     "test:android": "npm run test:cordova@6.5.0:android@6.4.0 && npm run test:cordova@7.1.0:android@7.1.0 && npm run test:cordova@8.0.0:android@7.1.0",
-    "test:browser": "npm run test:cordova@6.5.0:browser@6.4.0 && npm run test:cordova@7.1.0:browser@7.1.0 && npm run test:cordova@8.0.0:browser@7.1.0",
+    "test:browser": "npm run test:cordova@6.5.0:browser@5.0.3 && npm run test:cordova@7.1.0:browser@5.0.3 && npm run test:cordova@8.0.0:browser@5.0.3",
     "test:ios": "npm run test:cordova@6.5.0:ios@4.5.4 && npm run test:cordova@7.1.0:ios@4.5.4 && npm run test:cordova@8.0.0:ios@4.5.4",
-    "test:cordova@6.5.0:ios@4.5.4": "sh ./test/test-default.sh 6.5.0 ios 4.5.4",
-    "test:cordova@7.1.0:ios@4.5.4": "sh ./test/test-default.sh 7.1.0 ios 4.5.4",
-    "test:cordova@8.0.0:ios@4.5.4": "sh ./test/test-default.sh 8.0.0 ios 4.5.4",
-    "test:cordova@6.5.0:android@6.4.0": "sh ./test/test-default.sh 6.5.0 android 6.4.0 && sh ./test/test-with-2-plugins.sh 6.5.0 android 6.4.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release",
-    "test:cordova@7.1.0:android@7.1.0": "sh ./test/test-default.sh 7.1.0 android 7.1.0 && sh ./test/test-with-2-plugins.sh 7.1.0 android 7.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release",
-    "test:cordova@8.0.0:android@7.1.0": "sh ./test/test-default.sh 8.0.0 android 7.1.0 && sh ./test/test-with-2-plugins.sh 8.0.0 android 7.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release",
-    "test:cordova@6.5.0:browser@5.0.3": "sh ./test/test-default.sh 6.5.0 browser 5.0.3",
-    "test:cordova@7.1.0:browser@5.0.3": "sh ./test/test-default.sh 7.1.0 browser 5.0.3",
-    "test:cordova@8.0.0:browser@5.0.3": "sh ./test/test-default.sh 8.0.0 browser 5.0.3"
+    "test:cordova@6.5.0:ios@4.5.4": "bash ./test/test-default.sh 6.5.0 ios 4.5.4",
+    "test:cordova@7.1.0:ios@4.5.4": "bash ./test/test-default.sh 7.1.0 ios 4.5.4",
+    "test:cordova@8.0.0:ios@4.5.4": "bash ./test/test-default.sh 8.0.0 ios 4.5.4",
+    "test:cordova@6.5.0:android@6.4.0": "bash ./test/test-default.sh 6.5.0 android 6.4.0 && bash ./test/test-with-3-plugins.sh 6.5.0 android 6.4.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release",
+    "test:cordova@7.1.0:android@7.1.0": "bash ./test/test-default.sh 7.1.0 android 7.1.0 && bash ./test/test-with-3-plugins.sh 7.1.0 android 7.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release",
+    "test:cordova@8.0.0:android@7.1.0": "bash ./test/test-default.sh 8.0.0 android 7.1.0 && bash ./test/test-with-3-plugins.sh 8.0.0 android 7.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release",
+    "test:cordova@6.5.0:browser@5.0.3": "bash ./test/test-default.sh 6.5.0 browser 5.0.3",
+    "test:cordova@7.1.0:browser@5.0.3": "bash ./test/test-default.sh 7.1.0 browser 5.0.3",
+    "test:cordova@8.0.0:browser@5.0.3": "bash ./test/test-default.sh 8.0.0 browser 5.0.3"
   },
   "dependencies": {}
 }
