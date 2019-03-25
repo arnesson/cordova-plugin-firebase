@@ -132,17 +132,46 @@ exports.setDefaults = function (defaults, namespace, success, error) {
   exec(success, error, "FirebasePlugin", "setDefaults", args);
 };
 
+exports.enabeldPerformance  = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "enabeldPerformance", [enabled]);
+};
+
+exports.isPerformanceEnabled  = function (success, error) {
+	var oSuccess = success;
+	success = function(enabled){
+		if (typeof oSuccess == 'function'){
+			oSuccess(enabled === "true");
+		}
+	}
+	exec(success, error, "FirebasePlugin", "isPerformanceEnabled", []);
+};
+
 exports.startTrace = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "startTrace", [name]);
 };
 
-exports.incrementCounter = function (name, counterNamed, success, error) {
-  exec(success, error, "FirebasePlugin", "incrementCounter", [name, counterNamed]);
+exports.incrementMetric = function (name, counterNamed, increment, success, error) {
+	if( typeof increment == 'function' ){
+        error = success;
+        success = increment;
+        increment = 1;
+    }else if (typeof increment !== 'number'){
+		increment = 1;
+	}
+    exec(success, error, "FirebasePlugin", "incrementMetric", [name, counterNamed, increment]);
 };
 
 exports.stopTrace = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "stopTrace", [name]);
 };
+
+exports.startTraceHTTP = function (url, method, payloadSize, success, error ){
+    exec(success, error, "FirebasePlugin", "startTraceHTTP", [url, method, payloadSize]);
+}
+
+exports.stopTraceHTTP = function (traceId, statusCode, contentType, payloadSize, success, error ){
+    exec(success, error, "FirebasePlugin", "stopTraceHTTP", [traceId, statusCode, contentType, payloadSize]);
+}
 
 exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
   exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
@@ -167,3 +196,50 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
 };
+
+exports.logMessage = function (message, success, error) {
+    exec(success, error, "FirebasePlugin", "logMessage", [message]);
+};
+
+exports.recordError = function (userInfo, code, domain, success, error) {
+    if( typeof domain == 'function' ){
+        error = success;
+        success = domain;
+        domain = null;
+    }
+    exec(success, error, "FirebasePlugin", "recordError", [userInfo, code, domain]);
+};
+
+exports.sendNonFatalCrash = function (message, stack, domain, success, error) {
+    if( typeof domain == 'function' ){
+        error = success;
+        success = domain;
+        domain = null;
+    }
+    exec(success, error, "FirebasePlugin", "sendNonFatalCrash", [message, stack, domain]);
+};
+
+exports.sendCrash = function (success, error) {
+    exec(success, error, "FirebasePlugin", "sendCrash", []);
+};
+
+if ( cordova.platformId == "android" ){
+    var remainingAttempts = 10;
+    var waitForAndCallHandlerFunction = function waitForAndCallHandlerFunction(url) {
+        if (typeof window.handleOpenURL === "function") {
+            // Clear the intent when we have a handler (note that this is only done when the preference 'CustomURLSchemePluginClearsAndroidIntent' is 'true' in config.xml
+            cordova.exec(
+              null,
+              null,
+              "FirebasePlugin",
+              "clearIntentUrlScheme",
+              []);
+            window.handleOpenURL(url);
+        } else if (remainingAttempts-- > 0) {
+            setTimeout(function(){waitForAndCallHandlerFunction(url);}, 500);
+        }
+    }
+    document.addEventListener("deviceready", function triggerOpenURL() {
+        cordova.exec(waitForAndCallHandlerFunction,null,"FirebasePlugin","checkIntentUrlScheme",[]);
+    }, false);
+}

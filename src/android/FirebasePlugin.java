@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Base64;
@@ -18,8 +19,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.perf.metrics.HttpMetric;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -37,19 +41,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 // Firebase PhoneAuth
 import java.util.concurrent.TimeUnit;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -70,28 +76,31 @@ public class FirebasePlugin extends CordovaPlugin {
     @Override
     protected void pluginInitialize() {
         final Context context = this.cordova.getActivity().getApplicationContext();
-        final Bundle extras = this.cordova.getActivity().getIntent().getExtras();
-        this.cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                Log.d(TAG, "Starting Firebase plugin");
-                FirebaseApp.initializeApp(context);
-                mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-                mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
-                if (extras != null && extras.size() > 1) {
-                    if (FirebasePlugin.notificationStack == null) {
-                        FirebasePlugin.notificationStack = new ArrayList<Bundle>();
-                    }
-                    if (extras.containsKey("google.message_id")) {
-                        extras.putBoolean("tap", true);
-                        notificationStack.add(extras);
-                    }
+
+        final Intent intent = this.cordova.getActivity().getIntent();
+        final Bundle extras = intent.getExtras();
+
+        this.cordova.getThreadPool().execute(() -> {
+            Log.d(TAG, "Starting Firebase plugin");
+            FirebaseApp.initializeApp(context);
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+            mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
+            if (extras != null && extras.size() > 1) {
+                if (FirebasePlugin.notificationStack == null) {
+                    FirebasePlugin.notificationStack = new ArrayList<Bundle>();
+                }
+                if (extras.containsKey("google.message_id")) {
+                    extras.putBoolean("tap", true);
+                    notificationStack.add(extras);
                 }
             }
         });
     }
 
+
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+
         if (action.equals("getInstanceId")) {
             this.getInstanceId(callbackContext);
             return true;
@@ -183,14 +192,35 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("verifyPhoneNumber")) {
             this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
             return true;
-        } else if (action.equals("startTrace")) {
+        }else if (action.equals("enabeldPerformance")) {
+            this.enabeldPerformance(callbackContext, args.getBoolean(0) );
+        }else if (action.equals("isPerformanceEnabled")) {
+            this.isPerformanceEnabled(callbackContext);
+        }else if (action.equals("startTrace")) {
             this.startTrace(callbackContext, args.getString(0));
             return true;
-        } else if (action.equals("incrementCounter")) {
-            this.incrementCounter(callbackContext, args.getString(0), args.getString(1));
+        } else if (action.equals("incrementMetric")) {
+            this.incrementMetric(callbackContext, args.getString(0), args.getString(1));
             return true;
         } else if (action.equals("stopTrace")) {
             this.stopTrace(callbackContext, args.getString(0));
+            return true;
+        }else if (action.equals("startTraceHTTP")) {
+            String url = args.getString(0);
+            String method = args.getString(1);
+            long requestPayloadSize = 0;
+            if ( !args.isNull(2) )
+                requestPayloadSize = args.getLong(2);
+            this.startTraceHTTP(callbackContext, url, method, requestPayloadSize);
+            return true;
+        }else if (action.equals("stopTraceHTTP")) {
+            String traceId = args.getString(0);
+            int statusCode = args.getInt(1);
+            String contentType = args.getString(2);
+            long responsePayloadSize = 0;
+            if ( !args.isNull(3) )
+                responsePayloadSize = args.getLong(3);
+            this.stopTraceHTTP(callbackContext, traceId, statusCode, contentType, responsePayloadSize);
             return true;
         } else if (action.equals("setAnalyticsCollectionEnabled")) {
             this.setAnalyticsCollectionEnabled(callbackContext, args.getBoolean(0));
@@ -201,7 +231,30 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("clearAllNotifications")) {
             this.clearAllNotifications(callbackContext);
             return true;
-        }
+		} else if (action.equals("checkIntentUrlScheme")){
+            // check if the starup with custom url scheme
+            final Intent intent = this.cordova.getActivity().getIntent();
+            final String intentString = intent.getDataString();
+            if (intentString != null && intent.getScheme() != null) {
+                // callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, intentString));
+                this.getUrlFromDynamicLink(intent, callbackContext);
+            } else {
+                callbackContext.error("App was not started via the launchmyapp URL scheme. Ignoring this errorcallback is the best approach.");
+            }
+            return  true;
+        } else if (action.equals("clearIntentUrlScheme")){
+            // clear the intent if the app start up with custom url scheme
+            Intent intent = this.cordova.getActivity().getIntent();
+            intent.setData(null);
+		} else if (action.equals("logMessage")) {
+            this.logMessage(args, callbackContext);
+            return true;
+        }  else if (action.equals("sendNonFatalCrash")) {
+			this.sendNonFatalCrash(args, callbackContext);
+		} else if (action.equals("sendCrash")) {
+            this.sendCrash(args, callbackContext);
+            return true;
+        };
 
         return false;
     }
@@ -318,6 +371,138 @@ public class FirebasePlugin extends CordovaPlugin {
             data.putBoolean("tap", true);
             FirebasePlugin.sendNotification(data, this.cordova.getActivity().getApplicationContext());
         }
+
+        final String intentString = intent.getDataString();
+        if (intentString != null && intent.getScheme() != null) {
+            this.getUrlFromDynamicLink(intent, null);
+        }
+
+    }
+
+    private  void runHandleOpenURLJs(String url, String scheme){
+        this.cordova.getActivity().runOnUiThread(() -> {
+            if (url != null && scheme != null) {
+                try {
+                    StringWriter writer = new StringWriter(url.length() * 2);
+                    escapeJavaStyleString(writer, url, true, false);
+                    webView.loadUrl("javascript:window.handleOpenURL('" + URLEncoder.encode(writer.toString()) + "')");
+                } catch (IOException ignore) {}
+
+            }
+        });
+    }
+
+    private void getUrlFromDynamicLink(Intent intent, final CallbackContext callbackContext){
+
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(intent)
+                .addOnSuccessListener(this.cordova.getActivity(), (PendingDynamicLinkData pendingDynamicLinkData) -> {
+                    // Get deep link from result (may be null if no link is found)
+                    Uri deepLink = intent.getData();
+                    if (pendingDynamicLinkData != null) {
+                        deepLink = pendingDynamicLinkData.getLink();
+                    }
+
+                    if ( callbackContext != null && deepLink != null ){
+                        callbackContext.success(deepLink.toString());
+                    }else if(deepLink != null){
+                        runHandleOpenURLJs(deepLink.toString(), intent.getScheme());
+                    }
+                })
+                .addOnFailureListener(this.cordova.getActivity(),(Exception e) -> {
+                    Uri deepLink = intent.getData();
+                    if ( callbackContext != null && deepLink != null ){
+                        callbackContext.success(deepLink.toString());
+                    }else if(deepLink != null){
+                        runHandleOpenURLJs(deepLink.toString(), intent.getScheme());
+                    }
+                });
+
+    }
+
+    // Taken from commons StringEscapeUtils
+    private static void escapeJavaStyleString(Writer out, String str, boolean escapeSingleQuote,  boolean escapeForwardSlash) throws IOException {
+
+        if (out == null) {
+            throw new IllegalArgumentException("The Writer must not be null");
+        }
+        if (str == null) {
+            return;
+        }
+        int sz;
+        sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            char ch = str.charAt(i);
+
+            // handle unicode
+            if (ch > 0xfff) {
+                out.write("\\u" + hex(ch));
+            } else if (ch > 0xff) {
+                out.write("\\u0" + hex(ch));
+            } else if (ch > 0x7f) {
+                out.write("\\u00" + hex(ch));
+            } else if (ch < 32) {
+                switch (ch) {
+                    case '\b':
+                        out.write('\\');
+                        out.write('b');
+                        break;
+                    case '\n':
+                        out.write('\\');
+                        out.write('n');
+                        break;
+                    case '\t':
+                        out.write('\\');
+                        out.write('t');
+                        break;
+                    case '\f':
+                        out.write('\\');
+                        out.write('f');
+                        break;
+                    case '\r':
+                        out.write('\\');
+                        out.write('r');
+                        break;
+                    default:
+                        if (ch > 0xf) {
+                            out.write("\\u00" + hex(ch));
+                        } else {
+                            out.write("\\u000" + hex(ch));
+                        }
+                        break;
+                }
+            } else {
+                switch (ch) {
+                    case '\'':
+                        if (escapeSingleQuote) {
+                            out.write('\\');
+                        }
+                        out.write('\'');
+                        break;
+                    case '"':
+                        out.write('\\');
+                        out.write('"');
+                        break;
+                    case '\\':
+                        out.write('\\');
+                        out.write('\\');
+                        break;
+                    case '/':
+                        if (escapeForwardSlash) {
+                            out.write('\\');
+                        }
+                        out.write('/');
+                        break;
+                    default:
+                        out.write(ch);
+                        break;
+                }
+            }
+        }
+    }
+
+    private static String hex(char ch) {
+        return Integer.toHexString(ch).toUpperCase(Locale.ENGLISH);
     }
 
     // DEPRECTED - alias of getToken
@@ -456,20 +641,49 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
-            throws JSONException {
+    private void parseDataBundle(Bundle bundle, String key, Object value) throws JSONException{
+        if ( value instanceof  Float ){
+            bundle.putFloat(key, ((Number) value).floatValue());
+        } else if (value instanceof Integer ){
+            bundle.putInt(key, ((Number) value).intValue() );
+        } else if ( value instanceof Double) {
+            bundle.putDouble(key, ((Number) value).doubleValue() );
+        } else if ( value instanceof  Long ){
+            bundle.putLong(key, ((Number) value).longValue() );
+        } else if ( value instanceof JSONArray ){
+            ArrayList aList = new ArrayList();
+            JSONArray ja    = (JSONArray)value;
+
+            for (int i=0; i < ja.length(); i++){
+                aList.add( this.makeBundle(ja.getJSONObject(i)) );
+            }
+
+            bundle.putParcelableArrayList(key, aList);
+
+        }else if ( value instanceof  JSONObject ){
+            bundle.putBundle(key, this.makeBundle( (JSONObject)value ) );
+        }else {
+            bundle.putString(key, value.toString());
+        }
+    }
+
+    private Bundle makeBundle(JSONObject params) throws JSONException{
         final Bundle bundle = new Bundle();
         Iterator iter = params.keys();
         while (iter.hasNext()) {
             String key = (String) iter.next();
             Object value = params.get(key);
 
-            if (value instanceof Integer || value instanceof Double) {
-                bundle.putFloat(key, ((Number) value).floatValue());
-            } else {
-                bundle.putString(key, value.toString());
-            }
+            this.parseDataBundle(bundle, key, value);
+
         }
+        return bundle;
+    }
+
+    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
+            throws JSONException {
+
+        final Bundle bundle = this.makeBundle(params);
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -498,6 +712,60 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
+	private void logMessage(final JSONArray data,
+                        final CallbackContext callbackContext) {
+		this.cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+		        String message = data.optString(0);
+		        Crashlytics.log(message);
+		        callbackContext.success();
+			}
+		});
+    }
+
+	private void sendNonFatalCrash(final JSONArray data,
+								   final CallbackContext callbackContext) {
+		this.cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (data.length() >= 2) {
+					// well, we got more, let's asume arg 2 was a stack trace
+					try {
+						JSONArray stackTrace = data.getJSONArray(1);
+
+						StackTraceElement[] trace = new StackTraceElement[stackTrace.length()];
+						for(int i = 0; i < stackTrace.length(); i++) {
+	 						JSONObject elem = stackTrace.getJSONObject(i);
+
+	 						trace[i] = new StackTraceElement("undefined", elem.getString("functionName"),elem.getString("fileName"), elem.getInt("lineNumber"));
+	 					}
+
+						JavaScriptException ex = new JavaScriptException(data.getString(0));
+	                    ex.setStackTrace(trace);
+
+	                    Crashlytics.logException(ex);
+					} catch (JSONException e) {
+						Crashlytics.logException(e);
+					}
+				} else {
+					Crashlytics.logException(new Throwable(data.optString(0, "No Message Provided")));
+				}
+			}
+		});
+	}
+
+    private void sendCrash(final JSONArray data,
+						   final CallbackContext callbackContext) {
+
+		this.cordova.getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				throw new RuntimeException("This is a crash");
+			}
+		});
+	}
 
     private void setCrashlyticsUserId(final CallbackContext callbackContext, final String userId) {
         cordova.getActivity().runOnUiThread(new Runnable() {
@@ -747,7 +1015,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             try {
                                 String verificationId = null;
                                 String code = null;
-								
+
                                 Field[] fields = credential.getClass().getDeclaredFields();
                                 for (Field field : fields) {
                                     Class type = field.getType();
@@ -814,7 +1082,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
-	
+
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration
                             TimeUnit.SECONDS, // Unit of timeout
@@ -827,7 +1095,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-	
+
     private static String getPrivateField(PhoneAuthCredential credential, Field field) {
         try {
             field.setAccessible(true);
@@ -841,7 +1109,19 @@ public class FirebasePlugin extends CordovaPlugin {
     // Firebase Performace
     //
 
-    private HashMap<String, Trace> traces = new HashMap<String, Trace>();
+    private HashMap<String, Trace> traces           = new HashMap<String, Trace>();
+    private  HashMap<String, HttpMetric> httpTraces = new HashMap<String, HttpMetric>();
+
+
+    private void isPerformanceEnabled(final CallbackContext callbackContext){
+        FirebasePerformance fp = FirebasePerformance.getInstance();
+        callbackContext.success( fp.isPerformanceCollectionEnabled() ? "true" : "false" );
+    }
+
+    private void enabeldPerformance(final CallbackContext callbackContext, Boolean enabled){
+        FirebasePerformance.getInstance().setPerformanceCollectionEnabled( enabled );
+        callbackContext.success();
+    }
 
     private void startTrace(final CallbackContext callbackContext, final String name) {
         final FirebasePlugin self = this;
@@ -849,13 +1129,19 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
 
+                    FirebasePerformance fp = FirebasePerformance.getInstance();
+                    if (!fp.isPerformanceCollectionEnabled()){
+                        callbackContext.error("Firebase Performance is not enabled");
+                    }
+
+
                     Trace myTrace = null;
                     if (self.traces.containsKey(name)) {
                         myTrace = self.traces.get(name);
                     }
 
                     if (myTrace == null) {
-                        myTrace = FirebasePerformance.getInstance().newTrace(name);
+                        myTrace = fp.newTrace(name);
                         myTrace.start();
                         self.traces.put(name, myTrace);
                     }
@@ -870,7 +1156,11 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void incrementCounter(final CallbackContext callbackContext, final String name, final String counterNamed) {
+    private void incrementMetric(final CallbackContext callbackContext, final String name, final String metricNamed){
+        this.incrementMetric(callbackContext, name, metricNamed, 1);
+    }
+
+    private void incrementMetric(final CallbackContext callbackContext, final String name, final String metricNamed, final long incrementBy) {
         final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -882,7 +1172,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     }
 
                     if (myTrace != null && myTrace instanceof Trace) {
-                        myTrace.incrementCounter(counterNamed);
+                        myTrace.incrementMetric(metricNamed, incrementBy);
                         callbackContext.success();
                     } else {
                         callbackContext.error("Trace not found");
@@ -922,6 +1212,115 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
+    private void startTraceHTTP(final CallbackContext callbackContext, final String url, final String method, final long payloadSize){
+
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    FirebasePerformance fp = FirebasePerformance.getInstance();
+                    if (!fp.isPerformanceCollectionEnabled()){
+                        callbackContext.error("Firebase Performance is not enabled");
+                    }
+
+
+                    HttpMetric myTrace = null;
+                    String aMethod = null;
+
+                    switch (method.toUpperCase()){
+                        case "GET":
+                            aMethod = FirebasePerformance.HttpMethod.GET;
+                            break;
+                        case "PUT":
+                            aMethod = FirebasePerformance.HttpMethod.PUT;
+                            break;
+                        case "POST":
+                            aMethod = FirebasePerformance.HttpMethod.POST;
+                            break;
+                        case "DELETE":
+                            aMethod = FirebasePerformance.HttpMethod.DELETE;
+                            break;
+                        case "HEAD":
+                            aMethod = FirebasePerformance.HttpMethod.HEAD;
+                            break;
+                        case "PATCH":
+                            aMethod = FirebasePerformance.HttpMethod.PATCH;
+                            break;
+                        case "OPTIONS":
+                            aMethod = FirebasePerformance.HttpMethod.OPTIONS;
+                            break;
+                        case "TRACE":
+                            aMethod = FirebasePerformance.HttpMethod.TRACE;
+                            break;
+                        case "CONNECT":
+                            aMethod = FirebasePerformance.HttpMethod.CONNECT;
+                            break;
+                    }
+
+                    if ( aMethod == null){
+                        callbackContext.error("The HTTP method is not compatible");
+                        return;
+                    }
+
+
+                    myTrace = fp.newHttpMetric(url, aMethod);
+
+                    if ( payloadSize > 0 )
+                        myTrace.setRequestPayloadSize(payloadSize);
+
+                    myTrace.start();
+
+                    String traceName = myTrace.toString();
+                    self.httpTraces.put(traceName, myTrace);
+
+                    callbackContext.success(traceName);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+
+    }
+
+    private void stopTraceHTTP(final CallbackContext callbackContext, final String traceId, final int responseCode, final String contentType, final long payLoadSize){
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    HttpMetric myTrace = null;
+                    if (self.httpTraces.containsKey(traceId)) {
+                        myTrace = self.httpTraces.get(traceId);
+                    }
+
+                    if (myTrace != null) { //
+
+                        myTrace.setResponseContentType(contentType);
+                        myTrace.setResponsePayloadSize(payLoadSize);
+                        myTrace.setHttpResponseCode(responseCode);
+                        myTrace.stop();
+
+                        self.httpTraces.remove(traceId);
+                        callbackContext.success();
+
+                    } else {
+                        callbackContext.error("Trace not found");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+
+    // End performace
 
     private void setAnalyticsCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
         final FirebasePlugin self = this;

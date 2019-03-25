@@ -10,10 +10,10 @@ matrix:
     language: android
     android:
       components:
-      - tools-26.0.0
-      - platform-tools-26.0.0
-      - build-tools-26.0.0
-      - android-26.0.0
+      - tools-28.0.0
+      - platform-tools-28.0.3
+      - build-tools-28.0.3
+      - android-28.0.0
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -26,77 +26,15 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="6.4.0"
-
-  - os: linux
-    sudo: false
-    language: android
-    android:
-      components:
-      - tools-26.0.0
-      - platform-tools-26.0.0
-      - build-tools-26.0.0
-      - android-26.0.0
-      - extra-google-google_play_services
-      - extra-google-m2repository
-      - extra-android-m2repository
-    addons:
-      apt:
-        packages:
-        - oracle-java8-installer
-        - oracle-java8-set-default
-    licenses:
-    - android-sdk-preview-license-.+
-    - android-sdk-license-.+
-    - google-gdk-license-.+
-    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
-
-  - os: linux
-    sudo: false
-    language: android
-    android:
-      components:
-      - tools-26.0.0
-      - platform-tools-26.0.0
-      - build-tools-26.0.0
-      - android-26.0.0
-      - extra-google-google_play_services
-      - extra-google-m2repository
-      - extra-android-m2repository
-    addons:
-      apt:
-        packages:
-        - oracle-java8-installer
-        - oracle-java8-set-default
-    licenses:
-    - android-sdk-preview-license-.+
-    - android-sdk-license-.+
-    - google-gdk-license-.+
-    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+    env: CORDOVA_VERSION="8.1.2" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.4"
 
   - os: osx
     language: objective-c
     osx_image: xcode9.4
-    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
-
-  - os: osx
-    language: objective-c
-    osx_image: xcode9.4
-    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
-
-  - os: osx
-    language: objective-c
-    osx_image: xcode9.4
-    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.4"
+    env: CORDOVA_VERSION="8.1.2" CORDOVA_PLATFORM="ios" CORDOVA_PLATFORM_VERSION="4.5.5"
 
   - os: linux
-    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
-
-  - os: linux
-    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
-
-  - os: linux
-    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
+    env: CORDOVA_VERSION="8.1.2" CORDOVA_PLATFORM="browser" CORDOVA_PLATFORM_VERSION="5.0.3"
 
 before_install:
 - nvm install 8

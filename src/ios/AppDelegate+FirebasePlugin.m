@@ -145,6 +145,81 @@
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity restorationHandler:
+#if defined(__IPHONE_12_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_12_0)
+    (nonnull void (^)(NSArray<id<UIUserActivityRestoring>> *_Nullable))restorationHandler {
+#else
+    (nonnull void (^)(NSArray *_Nullable))restorationHandler {
+#endif  // __IPHONE_12_0
+
+    __block NSURL *urlForSend = userActivity.webpageURL;
+    dispatch_block_t triggerHandleOpenUrl = ^(void) {
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:urlForSend]];
+    };
+
+
+    BOOL handled = [[FIRDynamicLinks dynamicLinks] handleUniversalLink:userActivity.webpageURL completion:^(FIRDynamicLink * _Nullable dynamicLink, NSError * _Nullable error) {
+        if ( dynamicLink ){
+            urlForSend = dynamicLink.url;
+        }
+        triggerHandleOpenUrl();
+    }];
+
+
+
+    if ( [[userActivity.webpageURL host] rangeOfString:@"page.link"].location == NSNotFound ) {
+        triggerHandleOpenUrl();
+    }
+
+    return handled;
+
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString *, id> *)options {
+
+    return [self application:app
+                 openURL:url
+                 sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+                 annotation:options[UIApplicationOpenURLOptionsAnnotationKey]];
+}
+
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+
+    NSURL *urlForSend = url; // Initialize with current url
+    dispatch_block_t triggerHandleOpenUrl = ^(void) {
+        NSMutableDictionary * openURLData = [[NSMutableDictionary alloc] init];
+        [openURLData setValue:urlForSend forKey:@"url"];
+        if (sourceApplication) {
+            [openURLData setValue:sourceApplication forKey:@"sourceApplication"];
+        }
+
+        if (annotation) {
+            [openURLData setValue:annotation forKey:@"annotation"];
+        }
+
+        // all plugins will get the notification, and their handlers will be called
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:urlForSend]];
+        [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLWithAppSourceAndAnnotationNotification object:openURLData]];
+    };
+
+
+    FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+
+    // check if url passed is a Firebase Dynamic Link
+    if (dynamicLink) {
+        // Recover the url or deeplink from Firebase Dynamic Link
+        urlForSend = dynamicLink.url;
+        triggerHandleOpenUrl();
+        return YES;
+    }
+
+    triggerHandleOpenUrl();
+    return NO;
+}
+
+
 // [START ios_10_data_message]
 // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
 // To enable direct data messages, you can set [Messaging messaging].shouldEstablishDirectChannel to YES.

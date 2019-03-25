@@ -13,7 +13,8 @@ From android version 21 (Lollipop) notifications were changed, needing a separat
 If you only target Lollipop and above, you don't need to setup both.  
 Thankfully using the version dependant asset selections, we can make one build/apk supporting all target platforms.  
 `<projectroot>/res/native/android/res/values/styles.xml`
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <!-- inherit from the holo theme -->
@@ -26,7 +27,8 @@ Thankfully using the version dependant asset selections, we can make one build/a
 ```
 and  
 `<projectroot>/res/native/android/res/values-v21/styles.xml`
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <!-- inherit from the material theme -->
@@ -43,7 +45,8 @@ and
 On Android Lollipop and above you can also set the accent color for the notification by adding a color setting.
 
 `<projectroot>/res/native/android/res/values/colors.xml`
-```
+
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#FFFFFF00</color>

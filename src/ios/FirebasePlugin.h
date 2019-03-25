@@ -1,5 +1,6 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
+#import <WebKit/WebKit.h>
 
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
@@ -21,6 +22,10 @@
 - (void)sendToken:(NSString*)token;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
+- (void)logMessage:(CDVInvokedUrlCommand*)command;
+- (void)sendNonFatalCrash:(CDVInvokedUrlCommand*)command;
+- (void)sendCrash:(CDVInvokedUrlCommand*)command;
+- (void)recordError:(CDVInvokedUrlCommand*)command;
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand*)command;
 - (void)setScreenName:(CDVInvokedUrlCommand*)command;
 - (void)setUserId:(CDVInvokedUrlCommand*)command;
@@ -28,9 +33,13 @@
 - (void)fetch:(CDVInvokedUrlCommand*)command;
 - (void)activateFetched:(CDVInvokedUrlCommand*)command;
 - (void)getValue:(CDVInvokedUrlCommand*)command;
+- (void)enabeldPerformance:(CDVInvokedUrlCommand*)command;
+- (void)isPerformanceEnabled:(CDVInvokedUrlCommand*)command;
 - (void)startTrace:(CDVInvokedUrlCommand*)command;
 - (void)incrementCounter:(CDVInvokedUrlCommand*)command;
 - (void)stopTrace:(CDVInvokedUrlCommand*)command;
+- (void)startTraceHTTP:(CDVInvokedUrlCommand*)command;
+- (void)stopTraceHTTP:(CDVInvokedUrlCommand*)command;
 - (void)setAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)setPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command;
@@ -38,5 +47,6 @@
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
+@property (nonatomic, readwrite) NSMutableDictionary* httpTraces;
 
 @end
