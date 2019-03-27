@@ -42,6 +42,10 @@ Download your Firebase configuration files, GoogleService-Info.plist for iOS and
 ### PhoneGap Build
 Hooks do not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see `src/ios` and `src/android`) with your actual ones, as well as hard coding your app id and api key in `plugin.xml`.
 
+### cordova-lib@9 support
+If you are using `cordova-cli@9` (i.e. `cordova-lib@9`) then you might need to install the `xcode` npm module dependency separately. To 
+do that, just run this command `npm i xcode --save-dev` in your app.
+
 ### Google Play Services
 Your build may fail if you are installing multiple plugins that use Google Play Services.  This is caused by the plugins installing different versions of the Google Play Services library.  This can be resolved by installing [cordova-android-play-services-gradle-release](https://github.com/dpa99c/cordova-android-play-services-gradle-release).
 
