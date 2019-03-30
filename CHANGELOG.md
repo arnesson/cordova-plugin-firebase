@@ -1,3 +1,24 @@
+# Version 5.0.0
+* *BREAKING CHANGES*
+    * `onNotificationOpen()` renamed to `onMessageReceived()`
+    * Changed key names for custom notification properties in FCM data messages to display system notifications in foreground.
+    * Message payload is always delivered to `onMessageReceived()` for both data and notification messages.
+    * `messageType` key indicates type of FCM message: `notification` or `data`
+    * `tap` is only set when `messageType` is `notification`
+    * Explicit dependency on `cordova-plugin-androidx-adapter` since Android implementation uses AndroidX so is incompatible with Android Support Library.
+    * Set `remote-notification` background mode in native Xcode project for iOS.
+    * Reworked plugin documentation.
+* Support customisable display of system notifications while app is in foreground for both notification and data messages (both Android & iOS).
+* Set default color accent and notification channel for FCM notifications.
+* Add support for default and custom notification channels for Android 8+
+    * Customise importance, visibility, LED light, badge number, notification sound and vibration pattern 
+* Calling `logError()` on Android now also logs to native logcat (as well as a non-fatal error to remote Crashlytics service).
+* Fix `logError()` on iOS to log non-fatal error to remote Crashyltics service.
+* Implement stubs for `hasPermission()` and `grantPermission()` on Android so they both return true in to the success callback.
+* Rationalise permission check/request on iOS.
+* Remove legacy support for iOS 9 and below.
+* Support overridable default color accent for Android notification icons via `ANDROID_ICON_ACCENT` plugin variable.
+    
 # Version 4.0.0
 * *BREAKING CHANGE:* set min supported versions to `cordova@9` and `cordova-ios@5`.
     * Drop dependency on cordova-plugin-cocoapodsx to install pod dependencies.

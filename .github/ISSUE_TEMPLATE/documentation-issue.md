@@ -1,25 +1,20 @@
 <!--
 WARNING: Failure to follow the issue template guidelines below will result in the issue being immediately closed.
 
-Only feature requests should be opened here.
+Only documentation issues should be opened here.
 
+Before opening an issue, please check a similar issue is not already open (or closed). Duplicates or near-duplicates will be closed immediately.
 -->
 
 
-# Feature request
-<!--
-Feature requests should include as much detail as possible:
-
-- A descriptive title 
-- A description of the problem you're trying to solve, including why you think this is a problem
-- An overview of the suggested solution
-- Use case: why should this be implemented?
-- If the feature changes current behavior, reasons why your solution is better
-- Relevant links, e.g.
-    - Stack Overflow post illustrating a solution
-    - Code within a Github repo that illustrates a solution
-    - Native API documentation for proposed feature
+# Documentation issue
+<!-- 
+Describe the issue with the documentation or the request for documentation changes.
+- Please give reasons why the change is necessary.
+- If the change is trivial or you are able to make it, please consider making a Pull Request containing the necessary changes.
 -->
+
+
 
 
 <!--

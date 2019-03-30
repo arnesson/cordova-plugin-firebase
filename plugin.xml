@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebasex" version="4.0.0"
+<plugin id="cordova-plugin-firebasex" version="5.0.0"
 		xmlns="http://apache.org/cordova/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -7,6 +7,7 @@
 	<license>MIT</license>
 
 	<dependency id="cordova-plugin-androidx" version="^1.0.2" />
+	<dependency id="cordova-plugin-androidx-adapter" version="^1.1.0" />
 
 	<engines>
 		<engine name="cordova" version=">=9" />
@@ -39,7 +40,9 @@
 					<action android:name="com.google.firebase.MESSAGING_EVENT"/>
 				</intent-filter>
 			</service>
-			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"></receiver>
+			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"/>
+			<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/accent" />
+			<meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="@string/default_notification_channel_id"/>
 		</config-file>
 		<resource-file src="src/android/google-services.json" target="."/>
 		<resource-file src="src/android/cordova-plugin-firebase-strings.xml" target="res/values/cordova-plugin-firebase-strings.xml" />
@@ -48,7 +51,13 @@
 		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiver.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
+
+
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
+		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
+		<config-file target="res/values/colors.xml" parent="/resources">
+			<color name="accent">$ANDROID_ICON_ACCENT</color>
+		</config-file>
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 
@@ -94,6 +103,11 @@
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
+		<config-file target="*-Info.plist" parent="UIBackgroundModes">
+			<array>
+				<string>remote-notification</string>
+			</array>
+		</config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />
 
@@ -117,12 +131,6 @@
 			</pods>
 		</podspec>
 
-	</platform>
-
-	<platform name="browser">
-		<js-module name="FirebasePlugin" src="www/firebase-browser.js">
-			<clobbers target="FirebasePlugin" />
-		</js-module>
 	</platform>
 
 	<hook type="after_prepare" src="scripts/after_prepare.js" />
