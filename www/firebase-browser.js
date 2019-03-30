@@ -157,3 +157,21 @@ exports.clearAllNotifications = function (success, error) {
     success();
   }
 };
+
+exports.createChannel = function (options, success, error) {
+  if (typeof success === 'function') {
+    success();
+  }
+};
+
+exports.deleteChannel = function (channelID, success, error) {
+  if (typeof success === 'function') {
+    success();
+  }
+};
+
+exports.listChannels = function (success, error) {
+  if (typeof success === 'function') {
+    success();
+  }
+};
