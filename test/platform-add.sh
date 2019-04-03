@@ -9,6 +9,7 @@ PLATFORM_VERSION=$3
 FOLDER=".build-$PLATFORM"
 rm -rf $FOLDER
 
+npm install xcode --no-save
 npm install "cordova@$CORDOVA_VERSION" --no-save
 ./node_modules/.bin/cordova create $FOLDER com.github.cordova_plugin_firebase HelloWorld
 
