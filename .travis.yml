@@ -26,7 +26,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="6.5.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="6.4.0"
+    env: CORDOVA_VERSION="9.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="8.0.0"
 
   - os: linux
     sudo: false
