@@ -117,6 +117,12 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             bundle.putString(key, data.get(key));
         }
 
+        if (!FirebasePlugin.inBackground()) {
+            bundle.putBoolean("foreground", true);
+        } else {
+            bundle.putBoolean("foreground", false);
+        }
+
         if (showNotification) {
             Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
             intent.putExtras(bundle);
