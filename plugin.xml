@@ -11,6 +11,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	</engines>
 
 	<platform name="android">
+        <preference name="GOOGLE_SERVICES_VERSION" default="3.2.0"/>
+        <preference name="GMS_VERSION_TAGMANAGER" default="11.8.0"/>
+        <preference name="FIREBASE_VERSION_AUTH" default="11.8.0"/>
+        <preference name="FIREBASE_VERSION_CONFIG" default="11.8.0"/>
+        <preference name="FIREBASE_VERSION_CORE" default="11.8.0"/>
+        <preference name="FIREBASE_VERSION_DYNAMIC_LINKS" default="11.8.0"/>
+        <preference name="FIREBASE_VERSION_MESSAGING" default="11.8.0"/>
+        <preference name="FIREBASE_VERSION_PERF" default="11.8.0"/>
+
 		<hook type="after_plugin_install" src="scripts/android/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/android/before_plugin_uninstall.js" />
 
@@ -55,11 +64,11 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-		<framework src="com.google.android.gms:play-services-tagmanager:+" />
-		<framework src="com.google.firebase:firebase-core:+" />
-		<framework src="com.google.firebase:firebase-messaging:+" />
-		<framework src="com.google.firebase:firebase-config:+" />
-		<framework src="com.google.firebase:firebase-perf:+" />
+		<framework src="com.google.android.gms:play-services-tagmanager:$GMS_VERSION_TAGMANAGER" />
+		<framework src="com.google.firebase:firebase-core:$FIREBASE_VERSION_CORE" />
+		<framework src="com.google.firebase:firebase-messaging:$FIREBASE_VERSION_MESSAGING" />
+		<framework src="com.google.firebase:firebase-config:$FIREBASE_VERSION_CONFIG" />
+		<framework src="com.google.firebase:firebase-perf:$FIREBASE_VERSION_PERF" />
 	</platform>
 
 	<platform name="ios">

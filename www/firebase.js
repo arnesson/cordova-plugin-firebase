@@ -113,6 +113,11 @@ exports.getValue = function (key, namespace, success, error) {
   exec(success, error, "FirebasePlugin", "getValue", args);
 };
 
+exports.getKeysAndValuesWithPrefix = function (prefix, success, error) {
+  var args = [prefix];
+  exec(success, error, "FirebasePlugin", "getKeysAndValuesWithPrefix", args);
+};
+
 exports.getInfo = function (success, error) {
   exec(success, error, "FirebasePlugin", "getInfo", []);
 };
@@ -166,4 +171,13 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
+};
+
+exports.onDynamicLink = function(success, error) {
+    // TODO
+    // exec(success, error, "FirebasePlugin", "onDynamicLink", []);
+};
+exports.setConfigSettings = function (settings, success, error) {
+    // TODO
+    // exec(success, error, "FirebasePlugin", "setConfigSettings", [settings]);
 };
