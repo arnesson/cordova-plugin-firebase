@@ -49,7 +49,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+    env: CORDOVA_VERSION="7.1.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.1"
 
   - os: linux
     sudo: false
@@ -72,7 +72,7 @@ matrix:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
     - google-gdk-license-.+
-    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.0"
+    env: CORDOVA_VERSION="8.0.0" CORDOVA_PLATFORM="android" CORDOVA_PLATFORM_VERSION="7.1.1"
 
   - os: osx
     language: objective-c
@@ -104,5 +104,5 @@ before_install:
 - if [[ "$CORDOVA_PLATFORM" == "android" ]]; then yes | sdkmanager "build-tools;26.0.0" "platforms;android-26" ; fi
 
 script:
-- bash ./test/test-default.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION
-- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then bash ./test/test-with-3-plugins.sh $CORDOVA_VERSION $CORDOVA_PLATFORM $CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release; fi
+- bash ./test/test-default.sh ~$CORDOVA_VERSION $CORDOVA_PLATFORM ~$CORDOVA_PLATFORM_VERSION
+- if [[ "$CORDOVA_PLATFORM" == "android" ]]; then bash ./test/test-with-3-plugins.sh ~$CORDOVA_VERSION $CORDOVA_PLATFORM ~$CORDOVA_PLATFORM_VERSION cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release; fi

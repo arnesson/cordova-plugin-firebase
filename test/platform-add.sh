@@ -9,9 +9,10 @@ PLATFORM_VERSION=$3
 FOLDER=".build-$PLATFORM"
 rm -rf $FOLDER
 
-npm install "cordova@$CORDOVA_VERSION" --no-save
-./node_modules/.bin/cordova create $FOLDER com.github.cordova_plugin_firebase HelloWorld
+npm install -g "cordova@$CORDOVA_VERSION"
+cordova create $FOLDER com.github.cordova_plugin_firebase HelloWorld
+cp ./test/google-services.json $FOLDER
 
 cd $FOLDER
 
-../node_modules/.bin/cordova platform add "$PLATFORM@$PLATFORM_VERSION"
+cordova platform add "$PLATFORM@$PLATFORM_VERSION"

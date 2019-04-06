@@ -9,4 +9,4 @@ PLATFORM_VERSION=$3
 FOLDER=".build-$PLATFORM"
 cd $FOLDER
 
-../node_modules/.bin/cordova build $PLATFORM
+cordova build $PLATFORM
