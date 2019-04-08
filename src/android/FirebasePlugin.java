@@ -1,11 +1,17 @@
 package org.apache.cordova.firebase;
 
 import android.app.NotificationManager;
+import android.app.NotificationChannel;
+import android.content.ContentResolver;
 import android.content.ComponentName;
+import android.net.Uri;
+import android.media.AudioAttributes;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
@@ -42,6 +48,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 // Firebase PhoneAuth
 import java.util.concurrent.TimeUnit;
@@ -200,6 +207,15 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("clearAllNotifications")) {
             this.clearAllNotifications(callbackContext);
+            return true;
+        } else if (action.equals("createChannel")) {
+            this.createChannel(callbackContext, args.getJSONObject(0));
+            return true;
+        } else if (action.equals("deleteChannel")) {
+            this.deleteChannel(callbackContext, args.getString(0));
+            return true;
+        } else if (action.equals("listChannels")) {
+            this.listChannels(callbackContext);
             return true;
         }
 
@@ -963,6 +979,111 @@ public class FirebasePlugin extends CordovaPlugin {
                     NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                     nm.cancelAll();
                     callbackContext.success();
+                } catch (Exception e) {
+                    Crashlytics.log(e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void createChannel(final CallbackContext callbackContext, final JSONObject options) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    // only call on Android O and above
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Context context = cordova.getActivity();
+                        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        String packageName = context.getPackageName();
+                        NotificationChannel channel = new NotificationChannel(options.getString("id"),
+                            options.optString("description", ""),
+                            options.optInt("importance", NotificationManager.IMPORTANCE_DEFAULT));
+
+                        int lightColor = options.optInt("lightColor", -1);
+                        if (lightColor != -1) {
+                            channel.enableLights(true);
+                            channel.setLightColor(lightColor);
+                        }
+
+                        int visibility = options.optInt("visibility", NotificationCompat.VISIBILITY_PUBLIC);
+                        channel.setLockscreenVisibility(visibility);
+
+                        boolean badge = options.optBoolean("badge", true);
+                        channel.setShowBadge(badge);
+
+                        String sound = options.optString("sound", "default");
+                        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build();
+                        if ("ringtone".equals(sound)) {
+                            channel.setSound(android.provider.Settings.System.DEFAULT_RINGTONE_URI, audioAttributes);
+                        } else if (sound != null && !sound.contentEquals("default")) {
+                            Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/" + sound);
+                            channel.setSound(soundUri, audioAttributes);
+                        } else {
+                            channel.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI, audioAttributes);
+                        }
+
+                        // If vibration settings is an array set vibration pattern, else set enable vibration.
+                        JSONArray pattern = options.optJSONArray("vibration");
+                        if (pattern != null) {
+                            int patternLength = pattern.length();
+                            long[] patternArray = new long[patternLength];
+                            for (int i = 0; i < patternLength; i++) {
+                                patternArray[i] = pattern.optLong(i);
+                            }
+                            channel.setVibrationPattern(patternArray);
+                        } else {
+                            boolean vibrate = options.optBoolean("vibration", true);
+                            channel.enableVibration(vibrate);
+                        }
+
+                        nm.createNotificationChannel(channel);
+                    }
+                    callbackContext.success();
+                } catch (Exception e) {
+                    Crashlytics.log(e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void deleteChannel(final CallbackContext callbackContext, final String channelID) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    // only call on Android O and above
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Context context = cordova.getActivity();
+                        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        nm.deleteNotificationChannel(channelID);
+                    }
+                    callbackContext.success();
+                } catch (Exception e) {
+                    Crashlytics.log(e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void listChannels(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    JSONArray channels = new JSONArray();
+                    // only call on Android O and above
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Context context = cordova.getActivity();
+                        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        List<NotificationChannel> notificationChannels = nm.getNotificationChannels();
+                        for (NotificationChannel notificationChannel : notificationChannels) {
+                            JSONObject channel = new JSONObject();
+                            channel.put("id", notificationChannel.getId());
+                            channel.put("description", notificationChannel.getDescription());
+                            channels.put(channel);
+                        }
+                    }
+                    callbackContext.success(channels);
                 } catch (Exception e) {
                     Crashlytics.log(e.getMessage());
                 }
