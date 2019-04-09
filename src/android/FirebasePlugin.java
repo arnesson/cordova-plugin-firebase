@@ -167,6 +167,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.getValue(callbackContext, args.getString(0), null);
             }
             return true;
+        } else if (action.equals("getKeysAndValuesWithPrefix")) {
+            this.getKeysAndValuesWithPrefix(callbackContext, args.getString(0));
+            return true;
         } else if (action.equals("getInfo")) {
             this.getInfo(callbackContext);
             return true;
@@ -638,6 +641,30 @@ public class FirebasePlugin extends CordovaPlugin {
         }
       });
     }
+
+    private void getKeysAndValuesWithPrefix(final CallbackContext callbackContext, final String prefix) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseRemoteConfig rc = FirebaseRemoteConfig.getInstance();
+                    Set<String> keySet = rc.getKeysByPrefix(prefix);
+
+                    JSONObject result = new JSONObject();
+
+                    for (String key: keySet) {
+                        FirebaseRemoteConfigValue value = rc.getValue(key);
+                        result.put(key, value.asString());
+                    }
+
+                    callbackContext.success(result);
+                } catch (Exception e) {
+                    Crashlytics.logException(e);
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
 
     private void getInfo(final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
