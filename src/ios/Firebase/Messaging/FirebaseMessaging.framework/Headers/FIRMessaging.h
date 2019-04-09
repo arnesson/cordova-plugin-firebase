@@ -59,7 +59,7 @@ typedef void (^FIRMessagingTopicOperationCompletion)(NSError *_Nullable error);
 
 /**
  *  The completion handler invoked once the data connection with FIRMessaging is
- *  established.  The data connection is used to send a continous stream of
+ *  established.  The data connection is used to send a continuous stream of
  *  data and all the FIRMessaging data notifications arrive through this connection.
  *  Once the connection is established we invoke the callback with `nil` error.
  *  Correspondingly if we get an error while trying to establish a connection
@@ -189,6 +189,10 @@ typedef NS_ENUM(NSUInteger, FIRMessagingError) {
 
   /// Some parameters of the request were invalid.
   FIRMessagingErrorInvalidRequest = 7,
+
+  /// Topic name is invalid for subscription/unsubscription.
+  FIRMessagingErrorInvalidTopicName = 8,
+
 } NS_SWIFT_NAME(MessagingError);
 
 /// Status for the downstream message received by the app.
@@ -233,11 +237,16 @@ NS_SWIFT_NAME(MessagingMessageInfo)
 NS_SWIFT_NAME(MessagingRemoteMessage)
 @interface FIRMessagingRemoteMessage : NSObject
 
+/// The message ID of downstream message.
+@property(nonatomic, readonly, copy) NSString *messageID;
 /// The downstream message received by the application.
 @property(nonatomic, readonly, strong) NSDictionary *appData;
+
 @end
 
 @class FIRMessaging;
+@class FIRMessagingExtensionHelper;
+
 /**
  * A protocol to handle token update or data message delivery from FCM.
  *
@@ -257,9 +266,11 @@ NS_SWIFT_NAME(MessagingDelegate)
     didReceiveRegistrationToken:(NSString *)fcmToken
     NS_SWIFT_NAME(messaging(_:didReceiveRegistrationToken:));
 
-/// This method is called on iOS 10 devices to handle data messages received via FCM through its
-/// direct channel (not via APNS). For iOS 9 and below, the FCM data message is delivered via the
-/// UIApplicationDelegate's -application:didReceiveRemoteNotification: method.
+/// This method is called on iOS 10+ devices to handle data messages received via FCM
+/// direct channel (not via APNS). For iOS 9 and below, the direct channel data message
+/// is handled by the UIApplicationDelegate's -application:didReceiveRemoteNotification: method.
+/// You can enable all direct channel data messages to be delivered in FIRMessagingDelegate
+/// by setting the flag `useMessagingDelegateForDirectMessages` to true.
 - (void)messaging:(FIRMessaging *)messaging
     didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage
     NS_SWIFT_NAME(messaging(_:didReceive:))
@@ -274,14 +285,14 @@ NS_SWIFT_NAME(MessagingDelegate)
  *  registration token from FIRInstanceID. This token authorizes an
  *  app server to send messages to an app instance.
  *
- *  In order to receive FIRMessaging messages, declare `application:didReceiveRemoteNotification:`.
+ *  In order to receive FIRMessaging messages, declare
+ *  `application:didReceiveRemoteNotification::fetchCompletionHandler:`.
  */
 NS_SWIFT_NAME(Messaging)
 @interface FIRMessaging : NSObject
 
 /**
- * Delegate to handle FCM token refreshes, and remote data messages received via FCM for devices
- * running iOS 10 or above.
+ * Delegate to handle FCM token refreshes, and remote data messages received via FCM direct channel.
  */
 @property(nonatomic, weak, nullable) id<FIRMessagingDelegate> delegate;
 
@@ -298,12 +309,40 @@ NS_SWIFT_NAME(Messaging)
  */
 @property(nonatomic, readonly) BOOL isDirectChannelEstablished;
 
+/*
+ * Whether direct channel message should only use FIRMessagingDelegate messaging(_:didReceive:)
+ * for message delivery callback. The default value is false. If you need to change
+ * the default, set FirebaseMessagingUseMessagingDelegateForDirectChannel to true in
+ * your application’s Info.plist.
+ *
+ * If false, the message via direct channel for iOS 9 and below is still delivered in
+ * `-UIApplicationDelegate application(_:didReceiveRemoteNotification:fetchCompletionHandler:)`,
+ * and the FIRMessagingRemoteMessage object and its associated data will be unavailable.
+ * For iOS 10 and above, it is still delivered in `FIRMessagingDelegate messaging(_:didReceive:)`.
+ *
+ * If true, the data message sent by direct channel will be delivered via
+ * `FIRMessagingDelegate messaging(_:didReceive:)` and across all iOS versions.
+ */
+@property(nonatomic, assign) BOOL useMessagingDelegateForDirectChannel
+  __deprecated_msg("This is soon to be deprecated. All direct messages will by default delivered in `FIRMessagingDelegate messaging(_:didReceive:)` across all iOS versions");
+
 /**
  *  FIRMessaging
  *
  *  @return An instance of FIRMessaging.
  */
 + (instancetype)messaging NS_SWIFT_NAME(messaging());
+
+/**
+ * FIRMessagingExtensionHelper
+ *
+ * Use FIRMessagingExtensionHelper to populate rich UI contents for your notifications.
+ * e.g. If an image URL is set in your notification payload or on the console, call
+ * FIRMessagingExtensionHelper API to render it on your notification.
+ *
+ * @return An instance of FIRMessagingExtensionHelper that handles the extensions API.
+ */
++ (FIRMessagingExtensionHelper *)extensionHelper NS_SWIFT_NAME(serviceExtension()) NS_AVAILABLE_IOS(10.0);
 
 /**
  *  Unavailable. Use +messaging instead.
@@ -410,7 +449,7 @@ NS_SWIFT_NAME(Messaging)
     NS_SWIFT_NAME(deleteFCMToken(forSenderID:completion:));
 
 
-#pragma mark - Connect
+#pragma mark - FCM Direct Channel
 
 /**
  *  Create a FIRMessaging data connection which will be used to send the data notifications

@@ -1,5 +1,5 @@
 framework module nanopb {
-  umbrella header "nanopb.h"
-  export *
-  module * { export *}
+umbrella header "nanopb.h"
+export *
+module * { export * }
 }
