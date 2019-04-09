@@ -10,6 +10,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<engine name="cordova" version=">=3.2.0" />
 	</engines>
 
+    <preference name="APP_DOMAIN" />
+    <preference name="APP_PATH" default ="/" />
+
 	<platform name="android">
         <preference name="GOOGLE_SERVICES_VERSION" default="3.2.0"/>
         <preference name="GMS_VERSION_TAGMANAGER" default="11.8.0"/>
@@ -53,6 +56,17 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</service>
 			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"></receiver>
 		</config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application/activity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="$APP_DOMAIN" android:pathPrefix="$APP_PATH"/>
+                <data android:scheme="https" android:host="$APP_DOMAIN" android:pathPrefix="$APP_PATH"/>
+            </intent-filter>
+        </config-file>
+
 		<resource-file src="src/android/google-services.json" target="."/>
 		<resource-file src="src/android/cordova-plugin-firebase-strings.xml" target="res/values/cordova-plugin-firebase-strings.xml" />
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase" />
@@ -90,6 +104,18 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
 		</config-file>
+
+        <config-file parent="com.apple.developer.associated-domains" target="*/Entitlements-Debug.plist">
+            <array>
+                <string>applinks:$APP_DOMAIN</string>
+            </array>
+        </config-file>
+
+        <config-file parent="com.apple.developer.associated-domains" target="*/Entitlements-Release.plist">
+            <array>
+                <string>applinks:$APP_DOMAIN</string>
+            </array>
+        </config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />
 
