@@ -3,6 +3,13 @@
 #import "Firebase.h"
 #import <objc/runtime.h>
 
+#if __has_include(<BatchBridge/Batch.h>)
+#define NEEDS_BATCH_PATCH 1
+#import <BatchBridge/Batch.h>
+#else
+#define NEEDS_BATCH_PATCH 0
+#endif
+
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
 
@@ -15,6 +22,16 @@
 
 #define kApplicationInBackgroundKey @"applicationInBackground"
 #define kDelegateKey @"delegate"
+
+
+#if NEEDS_BATCH_PATCH
+// --- Begin Batch Firebase cold start workaround ---
+@interface BAPushCenter : NSObject
++ (BAPushCenter*)instance;
+@property NSDictionary* startPushUserInfo;
+@end
+// --- End Batch Firebase cold start workaround ---
+#endif
 
 @implementation AppDelegate (FirebasePlugin)
 
@@ -177,6 +194,14 @@
     NSLog(@"%@", mutableUserInfo);
 
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+
+#if NEEDS_BATCH_PATCH
+    // --- Begin Batch Firebase cold start workaround ---
+    if ([BAPushCenter class]) {
+        [BAPushCenter instance].startPushUserInfo = userInfo;
+    }
+    // --- End Batch Firebase cold start workaround ---
+#endif
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
@@ -189,6 +214,14 @@
     NSLog(@"%@", mutableUserInfo);
     completionHandler(UIBackgroundFetchResultNewData);
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+
+#if NEEDS_BATCH_PATCH
+    // --- Begin Batch Firebase cold start workaround ---
+    if ([BAPushCenter class]) {
+        [BAPushCenter instance].startPushUserInfo = userInfo;
+    }
+    // --- End Batch Firebase cold start workaround ---
+#endif
 }
 
 // [START ios_10_data_message]
@@ -228,6 +261,10 @@
 
     completionHandler(UNNotificationPresentationOptionAlert);
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+
+#if NEEDS_BATCH_PATCH
+    [BatchPush handleUserNotificationCenter:center willPresentNotification:notification willShowSystemForegroundAlert:NO];
+#endif
 }
 
 - (void) userNotificationCenter:(UNUserNotificationCenter *)center
