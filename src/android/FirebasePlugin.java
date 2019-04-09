@@ -1,23 +1,25 @@
 package org.apache.cordova.firebase;
 
 import android.app.NotificationManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
+
 import java.lang.reflect.Field;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -46,10 +48,7 @@ import java.util.Set;
 // Firebase PhoneAuth
 import java.util.concurrent.TimeUnit;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -66,6 +65,7 @@ public class FirebasePlugin extends CordovaPlugin {
     private static ArrayList<Bundle> notificationStack = null;
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
+    private static CallbackContext dynamicLinkCallbackContext;
 
     @Override
     protected void pluginInitialize() {
@@ -200,6 +200,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("clearAllNotifications")) {
             this.clearAllNotifications(callbackContext);
+            return true;
+        } else if (action.equals("onDynamicLink")) {
+            this.onDynamicLink(callbackContext);
             return true;
         }
 
@@ -747,7 +750,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             try {
                                 String verificationId = null;
                                 String code = null;
-								
+
                                 Field[] fields = credential.getClass().getDeclaredFields();
                                 for (Field field : fields) {
                                     Class type = field.getType();
@@ -814,7 +817,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
-	
+
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration
                             TimeUnit.SECONDS, // Unit of timeout
@@ -827,7 +830,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-	
+
     private static String getPrivateField(PhoneAuthCredential credential, Field field) {
         try {
             field.setAccessible(true);
@@ -969,4 +972,45 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
+
+    //
+    // Dynamic Links
+    //
+
+    private void onDynamicLink(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                FirebasePlugin.dynamicLinkCallbackContext = callbackContext;
+                respondWithDynamicLink(cordova.getActivity().getIntent());
+            }
+        });
+    }
+
+    private void respondWithDynamicLink(Intent intent) {
+        FirebaseDynamicLinks.getInstance().getDynamicLink(intent)
+                .addOnSuccessListener(cordova.getActivity(), new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        if (pendingDynamicLinkData != null) {
+                            Uri deepLink = pendingDynamicLinkData.getLink();
+
+                            if (deepLink != null) {
+                                JSONObject response = new JSONObject();
+                                try {
+                                    response.put("deepLink", deepLink);
+                                    response.put("clickTimestamp", pendingDynamicLinkData.getClickTimestamp());
+
+                                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, response);
+                                    pluginResult.setKeepCallback(true);
+                                    dynamicLinkCallbackContext.sendPluginResult(pluginResult);
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "Fail to handle dynamic link data", e);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
 }

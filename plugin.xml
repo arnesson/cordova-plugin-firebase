@@ -14,7 +14,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <preference name="APP_PATH" default ="/" />
 
 	<platform name="android">
-        <preference name="GOOGLE_SERVICES_VERSION" default="3.2.0"/>
         <preference name="GMS_VERSION_TAGMANAGER" default="11.8.0"/>
         <preference name="FIREBASE_VERSION_AUTH" default="11.8.0"/>
         <preference name="FIREBASE_VERSION_CONFIG" default="11.8.0"/>
@@ -80,6 +79,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 		<framework src="com.google.android.gms:play-services-tagmanager:$GMS_VERSION_TAGMANAGER" />
 		<framework src="com.google.firebase:firebase-core:$FIREBASE_VERSION_CORE" />
+		<framework src="com.google.firebase:firebase-dynamic-links:$FIREBASE_VERSION_DYNAMIC_LINKS" />
 		<framework src="com.google.firebase:firebase-messaging:$FIREBASE_VERSION_MESSAGING" />
 		<framework src="com.google.firebase:firebase-config:$FIREBASE_VERSION_CONFIG" />
 		<framework src="com.google.firebase:firebase-perf:$FIREBASE_VERSION_PERF" />
