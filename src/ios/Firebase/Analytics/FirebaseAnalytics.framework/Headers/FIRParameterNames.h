@@ -392,8 +392,20 @@ static NSString *const kFIRParameterShipping NS_SWIFT_NAME(AnalyticsParameterShi
 ///       // ...
 ///     };
 /// </pre>
+///
+/// <b>This constant has been deprecated. Use Method constant instead.</b>
 static NSString *const kFIRParameterSignUpMethod NS_SWIFT_NAME(AnalyticsParameterSignUpMethod) =
     @"sign_up_method";
+
+/// A particular approach used in an operation; for example, "facebook" or "email" in the context
+/// of a sign_up or login event.  (NSString).
+/// <pre>
+///     NSDictionary *params = @{
+///       kFIRParameterMethod : @"google",
+///       // ...
+///     };
+/// </pre>
+static NSString *const kFIRParameterMethod NS_SWIFT_NAME(AnalyticsParameterMethod) = @"method";
 
 /// The origin of your traffic, such as an Ad network (for example, google) or partner (urban
 /// airship). Identify the advertiser, site, publication, etc. that is sending traffic to your

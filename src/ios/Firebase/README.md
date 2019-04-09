@@ -1,7 +1,3 @@
-# MODIFICATIONS
-
-This is a pruned copy of the 5.7.0 version of the Firebase SDK Frameworks.  Any Frameworks that aren't currently used have been removed (along with duplicate Framework references) to reduce the size of the directory.  
-
 # Firebase iOS SDKs
 
 This directory contains the full Firebase distribution, packaged as static
@@ -78,11 +74,11 @@ NOTE: If you are upgrading FirebaseAnalytics from before Firebase 5.5.0,
 
 ## Analytics
   - FirebaseAnalytics.framework
+  - FIRAnalyticsConnector.framework
   - FirebaseCoreDiagnostics.framework
   - FirebaseCore.framework
   - FirebaseInstanceID.framework
   - GoogleAppMeasurement.framework
-  - MeasurementNanoPB.framework
   - GoogleUtilities.framework
   - nanopb.framework
 ## ABTesting (~> Analytics)
@@ -103,13 +99,11 @@ NOTE: If you are upgrading FirebaseAnalytics from before Firebase 5.5.0,
 ## DynamicLinks (~> Analytics)
   - FirebaseDynamicLinks.framework
 ## Firestore (~> Analytics)
-  - BoringSSL.framework
+  - BoringSSL-GRPC.framework
   - FirebaseFirestore.framework
   - Protobuf.framework
-  - gRPC.framework
+  - gRPC-C++.framework
   - gRPC-Core.framework
-  - gRPC-ProtoRPC.framework
-  - gRPC-RxLibrary.framework
   - leveldb-library.framework
 
   You'll also need to add the resources in the
@@ -118,8 +112,11 @@ NOTE: If you are upgrading FirebaseAnalytics from before Firebase 5.5.0,
 ## Functions (~> Analytics)
   - FirebaseFunctions.framework
   - GTMSessionFetcher.framework
+## InAppMessaging (~> Analytics)
+  - FirebaseInAppMessaging.framework
 ## InAppMessagingDisplay (~> Analytics)
   - FirebaseInAppMessaging.framework
+  - FirebaseInAppMessagingDisplay.framework
 
   You'll also need to add the resources in the
   Resources directory into your target's main
@@ -145,6 +142,15 @@ NOTE: If you are upgrading FirebaseAnalytics from before Firebase 5.5.0,
   - FirebaseMLModelInterpreter.framework
   - GTMSessionFetcher.framework
   - tensorflow_lite.framework
+## MLNLLanguageID (~> Analytics)
+  - FirebaseMLCommon.framework
+  - FirebaseMLNLLanguageID.framework
+  - FirebaseMLNaturalLanguage.framework
+  - GTMSessionFetcher.framework
+## MLNaturalLanguage (~> Analytics)
+  - FirebaseMLCommon.framework
+  - FirebaseMLNaturalLanguage.framework
+  - GTMSessionFetcher.framework
 ## MLVision (~> Analytics)
   - FirebaseMLCommon.framework
   - FirebaseMLVision.framework
@@ -218,7 +224,9 @@ NOTE: If you are upgrading FirebaseAnalytics from before Firebase 5.5.0,
   Resources directory into your target's main
   bundle.
 ## Performance (~> Analytics)
+  - FirebaseABTesting.framework
   - FirebasePerformance.framework
+  - FirebaseRemoteConfig.framework
   - GTMSessionFetcher.framework
   - GoogleToolboxForMac.framework
   - Protobuf.framework
@@ -247,47 +255,49 @@ CocoaPods.
 
            CocoaPod           | Version
 ----------------------------- | -------
-BoringSSL                     | 10.0.6
-Firebase                      | 5.7.0
+BoringSSL-GRPC                | 0.0.2
+Firebase                      | 5.16.0
 FirebaseABTesting             | 2.0.0
-FirebaseAnalytics             | 5.1.1
-FirebaseAuth                  | 5.0.3
+FirebaseAnalytics             | 5.5.0
+FirebaseAnalyticsInterop      | 1.1.0
+FirebaseAuth                  | 5.3.0
 FirebaseAuthInterop           | 1.0.0
-FirebaseCore                  | 5.1.2
+FirebaseCore                  | 5.2.0
 FirebaseCrash                 | 3.1.1
-FirebaseDatabase              | 5.0.2
-FirebaseDynamicLinks          | 3.0.2
-FirebaseFirestore             | 0.13.2
-FirebaseFunctions             | 2.1.0
-FirebaseInAppMessaging        | 0.11.0
-FirebaseInstanceID            | 3.2.1
-FirebaseInvites               | 3.0.0
-FirebaseMLCommon              | 0.11.0
-FirebaseMLModelInterpreter    | 0.11.0
-FirebaseMLVision              | 0.11.0
-FirebaseMLVisionBarcodeModel  | 0.11.0
-FirebaseMLVisionFaceModel     | 0.11.0
-FirebaseMLVisionLabelModel    | 0.11.0
-FirebaseMLVisionTextModel     | 0.11.0
-FirebaseMessaging             | 3.1.1
-FirebasePerformance           | 2.1.1
-FirebaseRemoteConfig          | 3.0.1
-FirebaseStorage               | 3.0.1
+FirebaseDatabase              | 5.1.0
+FirebaseDynamicLinks          | 3.4.0
+FirebaseFirestore             | 1.0.0
+FirebaseFunctions             | 2.2.0
+FirebaseInAppMessaging        | 0.12.1
+FirebaseInAppMessagingDisplay | 0.12.2
+FirebaseInstanceID            | 3.4.0
+FirebaseInvites               | 3.0.1
+FirebaseMLCommon              | 0.14.0
+FirebaseMLModelInterpreter    | 0.14.0
+FirebaseMLNLLanguageID        | 0.14.0
+FirebaseMLNaturalLanguage     | 0.14.0
+FirebaseMLVision              | 0.14.0
+FirebaseMLVisionBarcodeModel  | 0.14.0
+FirebaseMLVisionFaceModel     | 0.14.0
+FirebaseMLVisionLabelModel    | 0.14.0
+FirebaseMLVisionTextModel     | 0.14.0
+FirebaseMessaging             | 3.3.0
+FirebasePerformance           | 2.2.2
+FirebaseRemoteConfig          | 3.1.0
+FirebaseStorage               | 3.1.0
 GTMOAuth2                     | 1.1.6
-GTMSessionFetcher             | 1.2.0
-Google-Mobile-Ads-SDK         | 7.32.0
-GoogleAPIClientForREST        | 1.3.6
-GoogleAppMeasurement          | 5.1.1
+GTMSessionFetcher             | 1.2.1
+Google-Mobile-Ads-SDK         | 7.37.0
+GoogleAPIClientForREST        | 1.3.7
+GoogleAppMeasurement          | 5.5.0
 GoogleMobileVision            | 1.5.0
-GoogleSignIn                  | 4.2.0
-GoogleToolboxForMac           | 2.1.4
-GoogleUtilities               | 5.2.2
+GoogleSignIn                  | 4.4.0
+GoogleToolboxForMac           | 2.2.0
+GoogleUtilities               | 5.3.7
 Protobuf                      | 3.6.1
-TensorFlowLite                | 0.1.7
-gRPC                          | 1.14.1
-gRPC-Core                     | 1.14.1
-gRPC-ProtoRPC                 | 1.14.1
-gRPC-RxLibrary                | 1.14.1
+TensorFlowLite                | 1.12.0
+gRPC-C++                      | 0.0.6
+gRPC-Core                     | 1.17.0
 leveldb-library               | 1.20
-nanopb                        | 0.3.8
+nanopb                        | 0.3.901
 
