@@ -32,8 +32,31 @@
 
 + (void)load {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
-    Method swizzled = class_getInstanceMethod(self, @selector(application:swizzledDidFinishLaunchingWithOptions:));
+    Method swizzled = class_getInstanceMethod(self, @selector(firebase_plugin_application:didFinishLaunchingWithOptions:));
     method_exchangeImplementations(original, swizzled);
+
+    /**
+     * We want to implement application:continueUserActivity:restorationHandler: while calling other plugins
+     * implementations if there are any.
+     * The easiest way is to setup a dummy implememtation if there are none, the swizzle it as normal
+     */
+    SEL cuaSel = @selector(application:continueUserActivity:restorationHandler:);
+    SEL szCuaSel = @selector(firebase_plugin_application:continueUserActivity:restorationHandler:);
+
+    Method cuaMethod = class_getInstanceMethod(self, cuaSel);
+    Method szCuaMethod = class_getInstanceMethod(self, szCuaSel);
+
+    if (!cuaMethod) {
+        // Create method that always returns NO if application:continueUserActivity:restorationHandler: is not implemented
+        IMP newImplementation = imp_implementationWithBlock(^(__unsafe_unretained id self, va_list argp) {
+            return NO;
+        });
+        class_addMethod(self, cuaSel, newImplementation, method_getTypeEncoding(szCuaMethod));
+        cuaMethod = class_getInstanceMethod(self, cuaSel);
+    }
+
+    // Now exchange implementation with the original method or the dummy method
+    method_exchangeImplementations(cuaMethod, szCuaMethod);
 }
 
 - (void)setApplicationInBackground:(NSNumber *)applicationInBackground {
@@ -44,22 +67,22 @@
     return objc_getAssociatedObject(self, kApplicationInBackgroundKey);
 }
 
-- (BOOL)application:(UIApplication *)application swizzledDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
+- (BOOL)firebase_plugin_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [self firebase_plugin_application:application didFinishLaunchingWithOptions:launchOptions];
 
     // get GoogleService-Info.plist file path
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    
+
     // if file is successfully found, use it
     if(filePath){
         NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
         // create firebase configure options passing .plist as content
         FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
-        
+
         // configure FIRApp with options
         [FIRApp configureWithOptions:options];
     }
-    
+
     // no .plist found, try default App
     if (![FIRApp defaultApp] && !filePath) {
         NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
@@ -80,6 +103,29 @@
     self.applicationInBackground = @(YES);
 
     return YES;
+}
+
+- (BOOL)firebase_plugin_application:(UIApplication *)application
+        continueUserActivity:(NSUserActivity *)userActivity
+          restorationHandler:(void (^)(NSArray *))restorationHandler {
+   FirebasePlugin* firPlugin = [self.viewController getCommandInstance:@"FirebasePlugin"];
+
+    BOOL handled = [[FIRDynamicLinks dynamicLinks]
+                    handleUniversalLink:userActivity.webpageURL
+                    completion:^(FIRDynamicLink * _Nullable dynamicLink, NSError * _Nullable error) {
+                        NSLog(@"FIRDynamicLink: %@", dynamicLink);
+                        if (dynamicLink) {
+                            [firPlugin postDynamicLink:dynamicLink];
+                        }
+                    }];
+
+    if (handled) {
+        return YES;
+    }
+
+    return [self firebase_plugin_application:application
+                 continueUserActivity:userActivity
+                   restorationHandler:restorationHandler];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

@@ -174,8 +174,7 @@ exports.clearAllNotifications = function (success, error) {
 };
 
 exports.onDynamicLink = function(success, error) {
-    // TODO
-    // exec(success, error, "FirebasePlugin", "onDynamicLink", []);
+    exec(success, error, "FirebasePlugin", "onDynamicLink", []);
 };
 exports.setConfigSettings = function (settings, success, error) {
     // TODO

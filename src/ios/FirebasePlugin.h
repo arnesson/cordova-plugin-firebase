@@ -39,4 +39,10 @@
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
 
+// Dynamic Links
+@property (nonatomic, copy) NSString *dynamicLinkCallbackId;
+@property (nonatomic, retain) NSDictionary* cachedDynamicLinkData;
+- (void)onDynamicLink:(CDVInvokedUrlCommand *)command;
+- (void)postDynamicLink:(FIRDynamicLink*) dynamicLink;
+
 @end
