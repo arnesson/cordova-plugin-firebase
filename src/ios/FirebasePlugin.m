@@ -332,6 +332,32 @@ static FirebasePlugin *firebasePlugin;
     }];
 }
 
+- (void)setConfigSettings:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSDictionary *settings = [command.arguments objectAtIndex:0];
+
+        BOOL devMode = [[settings objectForKey:@"developerModeEnabled"] boolValue];
+
+        FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+        remoteConfig.configSettings = [[FIRRemoteConfigSettings alloc] initWithDeveloperModeEnabled:devMode];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)setDefaults:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSDictionary *defaults = [command.arguments objectAtIndex:0];
+
+        FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+        [remoteConfig setDefaults:defaults];
+
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
 - (void)fetch:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
           FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];

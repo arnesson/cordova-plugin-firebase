@@ -176,7 +176,3 @@ exports.clearAllNotifications = function (success, error) {
 exports.onDynamicLink = function(success, error) {
     exec(success, error, "FirebasePlugin", "onDynamicLink", []);
 };
-exports.setConfigSettings = function (settings, success, error) {
-    // TODO
-    // exec(success, error, "FirebasePlugin", "setConfigSettings", [settings]);
-};
