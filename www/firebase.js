@@ -60,6 +60,18 @@ exports.logError = function (message, success, error) {
   exec(success, error, "FirebasePlugin", "logError", [message]);
 };
 
+exports.logJavascriptError = function(message, fileName, stackFrames, success, error) {
+    exec(success, error, "FirebasePlugin", "logJavascriptError", [message, fileName, stackFrames]);
+};
+
+exports.logUserError = function(message, dictionary, success, error) {
+    exec(success, error, "FirebasePlugin", "logUserError", [message, dictionary]);
+};
+
+exports.setCrashlyticsValue = function(name, value, success, error) {
+    exec(success, error, "FirebasePlugin", "setCrashlyticsValue", [name, value]);
+};
+
 exports.setCrashlyticsUserId = function (userId, success, error) {
     exec(success, error, "FirebasePlugin", "setCrashlyticsUserId", [userId]);
 };

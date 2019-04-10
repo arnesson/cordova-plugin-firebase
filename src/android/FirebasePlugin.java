@@ -131,7 +131,16 @@ public class FirebasePlugin extends CordovaPlugin {
         } else if (action.equals("logError")) {
             this.logError(callbackContext, args.getString(0));
             return true;
-        }else if(action.equals("setCrashlyticsUserId")){
+        } else if (action.equals("logJavascriptError")) {
+            this.logJavascriptError(callbackContext, args.getString(0), args.getString(1), args.getJSONArray(2));
+            return true;
+        } else if (action.equals("logUserError")) {
+            this.logUserError(callbackContext, args.getString(0), args.getJSONObject(1));
+            return true;
+        } else if (action.equals("setCrashlyticsValue")) {
+            this.setCrashlyticsValue(callbackContext, args.getString(0), args.getString(1));
+            return true;
+        } else if(action.equals("setCrashlyticsUserId")){
             this.setCrashlyticsUserId(callbackContext, args.getString(0));
             return true;
         } else if (action.equals("setScreenName")) {
@@ -499,6 +508,73 @@ public class FirebasePlugin extends CordovaPlugin {
                 } catch (Exception e) {
                     Crashlytics.log(e.getMessage());
                     e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void logJavascriptError(final CallbackContext callbackContext, final String message, final String fileName, final JSONArray jsonStackFrames) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    ArrayList<StackTraceElement> stackFrameArray = new ArrayList<StackTraceElement>();
+                    int length = jsonStackFrames.length();
+                    for (int i = 0 ; i < length ; i++) {
+                        JSONObject jsonFrame = jsonStackFrames.getJSONObject(i);
+                        String declaringClass = "JSSymbol";
+                        String methodName = jsonFrame.optString("functionName", "noFunctionName");
+                        String fileName = jsonFrame.optString("fileName", "noFileName");
+                        int lineNumber = jsonFrame.optInt("lineNumber", 0);
+
+                        int lastIndex = fileName.lastIndexOf('/') + 1;
+                        String lastFileName = fileName.substring(lastIndex, fileName.length());
+
+                        StackTraceElement ste = new StackTraceElement(declaringClass, methodName, lastFileName, lineNumber);
+                        stackFrameArray.add(ste);
+                    }
+
+                    StackTraceElement[] stackFrames = stackFrameArray.toArray(new StackTraceElement[stackFrameArray.size()]);
+
+                    Exception exception = new JSException(message, null, stackFrames);
+
+                    Crashlytics.logException(exception);
+
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void logUserError(final CallbackContext callbackContext, final String message, final JSONObject dictionary) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    Exception exception = new Exception(message, new Throwable(dictionary.toString()));
+
+                    Crashlytics.logException(exception);
+
+                    callbackContext.success();
+                } catch (Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void setCrashlyticsValue(final CallbackContext callbackContext, final String key, final String value) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+
+                    Crashlytics.setString(key, value);
+
+                    callbackContext.success();
+                } catch (Exception e) {
                     callbackContext.error(e.getMessage());
                 }
             }

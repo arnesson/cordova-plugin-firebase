@@ -293,6 +293,58 @@ static FirebasePlugin *firebasePlugin;
     }];
 }
 
+- (void)logJavascriptError:(CDVInvokedUrlCommand *)command {
+    NSString *message = [command.arguments objectAtIndex:0];
+    // FileName is unused for now
+    NSArray *stackTrace = [command.arguments objectAtIndex:2];
+
+    NSMutableArray<CLSStackFrame*> *stackFrames = [NSMutableArray array];
+
+    if (stackTrace) {
+        for (NSDictionary *stackItem in stackTrace) {
+            NSString *functionName = [stackItem objectForKey:@"functionName"];
+            NSString *fileName = [stackItem objectForKey:@"fileName"];
+            uint32_t lineNumber = [[stackItem objectForKey:@"lineNumber"] intValue];
+            uint32_t columnNumber = [[stackItem objectForKey:@"columnNumber"] intValue];
+
+            CLSStackFrame *stackFrame = [CLSStackFrame stackFrameWithSymbol:functionName];
+            stackFrame.fileName = fileName;
+            stackFrame.lineNumber = lineNumber;
+            stackFrame.offset = columnNumber;
+
+            [stackFrames addObject:stackFrame];
+        }
+    }
+
+    [[Crashlytics sharedInstance] recordCustomExceptionName:@"JavascriptError" reason:message frameArray:stackFrames];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)logUserError:(CDVInvokedUrlCommand *)command {
+    NSString *message = [command.arguments objectAtIndex:1];
+    NSDictionary *userInfo = [command.arguments objectAtIndex:1];
+
+    NSError *error = [NSError errorWithDomain:message code:0 userInfo:userInfo];
+    [[Crashlytics sharedInstance] recordError:error];
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)setCrashlyticsValue:(CDVInvokedUrlCommand *)command {
+    NSString *key = [command.arguments objectAtIndex:0];
+    NSObject *value = [command.arguments objectAtIndex:1];
+
+    if (key && value) {
+        [[Crashlytics sharedInstance] setObjectValue:value forKey:key];
+    }
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand *)command {
     NSString* userId = [command.arguments objectAtIndex:0];
 
