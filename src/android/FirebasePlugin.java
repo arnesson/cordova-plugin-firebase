@@ -515,7 +515,6 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private class JSException extends Exception {
-        @TargetApi(24)
         public JSException(String message, Throwable cause, StackTraceElement[] stackFrames) {
             super(message, cause, true, true);
             setStackTrace(stackFrames);
