@@ -107,6 +107,7 @@ static FirebasePlugin *firebasePlugin;
 
 
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
     UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
     [[UNUserNotificationCenter currentNotificationCenter]
         requestAuthorizationWithOptions:authOptions
@@ -114,14 +115,12 @@ static FirebasePlugin *firebasePlugin;
 
             if (![NSThread isMainThread]) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
-                    [[FIRMessaging messaging] setDelegate:self];
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
 
                     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus: granted ? CDVCommandStatus_OK : CDVCommandStatus_ERROR];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 });
             } else {
-                [[FIRMessaging messaging] setDelegate:self];
                 [[UIApplication sharedApplication] registerForRemoteNotifications];
                 CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
