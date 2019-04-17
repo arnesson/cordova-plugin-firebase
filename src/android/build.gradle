@@ -24,6 +24,8 @@ dependencies {
 }
 
 cdvPluginPostBuildExtras.add({
-    apply plugin: 'com.google.gms.google-services'
+    if(project.plugins.findPlugin("com.google.gms.google-services") == null) {
+        apply plugin: 'com.google.gms.google-services'
+    }
     apply plugin: 'io.fabric'
 })
