@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
@@ -86,6 +87,18 @@ public class FirebasePlugin extends CordovaPlugin {
                         notificationStack.add(extras);
                     }
                 }
+
+                // Fetch initial FCM token
+                // This used to be done through FirebaseInstanceIdService, which has been deprecated.
+                // The replacement FirebaseMessagingService.onNewToken is not called for the first token.
+                FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+                    @Override
+                    public void onSuccess(InstanceIdResult instanceIdResult) {
+                        String token = instanceIdResult.getToken();
+                        Log.d(TAG, "FCM Token initialized: " + token);
+                        sendToken(token);
+                    }
+                });
             }
         });
     }
