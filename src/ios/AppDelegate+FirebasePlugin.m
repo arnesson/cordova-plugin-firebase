@@ -49,17 +49,17 @@
 
     // get GoogleService-Info.plist file path
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    
+
     // if file is successfully found, use it
     if(filePath){
         NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
         // create firebase configure options passing .plist as content
         FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
-        
+
         // configure FIRApp with options
         [FIRApp configureWithOptions:options];
     }
-    
+
     // no .plist found, try default App
     if (![FIRApp defaultApp] && !filePath) {
         NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
@@ -125,6 +125,8 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
+    NSLog(@"Foreground didReceiveRemoteNotification ???");
+
     [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
 
     // Print full message.
@@ -135,6 +137,8 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+
+    NSLog(@"BACKGROUND didReceiveRemoteNotification !!!");
 
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
@@ -180,7 +184,12 @@
     // Print full message.
     NSLog(@"%@", mutableUserInfo);
 
-    completionHandler(UNNotificationPresentationOptionAlert);
+    if (self.applicationInBackground || [FirebasePlugin.firebasePlugin foregroundEnabled]) {
+      completionHandler(UNNotificationPresentationOptionAlert);
+    } else {
+      completionHandler(UNNotificationPresentationOptionNone);
+    }
+
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 

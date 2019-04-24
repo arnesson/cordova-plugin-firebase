@@ -24,6 +24,12 @@ exports.getId = function (success, error) {
 
 exports.onNotificationOpen = function (success, error) {};
 
+exports.enableForegroundNotifications = function (success, error) {
+  if (typeof success === 'function') {
+    success();
+  }
+};
+
 exports.onTokenRefresh = function (success, error) {};
 
 exports.grantPermission = function (success, error) {
