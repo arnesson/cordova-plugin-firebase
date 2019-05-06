@@ -125,8 +125,6 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
-    NSLog(@"Foreground didReceiveRemoteNotification ???");
-
     [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
 
     // Print full message.
@@ -137,8 +135,6 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-
-    NSLog(@"BACKGROUND didReceiveRemoteNotification !!!");
 
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
 
@@ -184,7 +180,8 @@
     // Print full message.
     NSLog(@"%@", mutableUserInfo);
 
-    if (self.applicationInBackground || [FirebasePlugin.firebasePlugin foregroundEnabled]) {
+    if ([self.applicationInBackground isEqualToNumber: @(YES)]
+        || [[FirebasePlugin.firebasePlugin foregroundEnabled] isEqualToNumber: @(YES)]) {
       completionHandler(UNNotificationPresentationOptionAlert);
     } else {
       completionHandler(UNNotificationPresentationOptionNone);
