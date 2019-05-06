@@ -63,6 +63,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static final String KEY = "badge";
 
     private static boolean inBackground = true;
+    private static boolean foregroundEnabled = false;
     private static ArrayList<Bundle> notificationStack = null;
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
@@ -121,6 +122,9 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("onNotificationOpen")) {
             this.onNotificationOpen(callbackContext);
+            return true;
+        } else if (action.equals("enableForegroundNotifications")) {
+            this.enableForegroundNotifications(callbackContext);
             return true;
         } else if (action.equals("onTokenRefresh")) {
             this.onTokenRefresh(callbackContext);
@@ -241,6 +245,11 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
+    private void enableForegroundNotifications(final CallbackContext callbackContext) {
+        FirebasePlugin.foregroundEnabled = true;
+        callbackContext.success();
+    }
+
     private void onTokenRefresh(final CallbackContext callbackContext) {
         FirebasePlugin.tokenRefreshCallbackContext = callbackContext;
 
@@ -304,6 +313,10 @@ public class FirebasePlugin extends CordovaPlugin {
 
     public static boolean inBackground() {
         return FirebasePlugin.inBackground;
+    }
+
+    public static boolean foregroundEnabled() {
+        return FirebasePlugin.foregroundEnabled;
     }
 
     public static boolean hasNotificationsCallback() {
@@ -747,7 +760,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             try {
                                 String verificationId = null;
                                 String code = null;
-								
+
                                 Field[] fields = credential.getClass().getDeclaredFields();
                                 for (Field field : fields) {
                                     Class type = field.getType();
@@ -814,7 +827,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
-	
+
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration
                             TimeUnit.SECONDS, // Unit of timeout
@@ -827,7 +840,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-	
+
     private static String getPrivateField(PhoneAuthCredential credential, Field field) {
         try {
             field.setAccessible(true);

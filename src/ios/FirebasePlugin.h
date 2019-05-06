@@ -16,6 +16,7 @@
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)unregister:(CDVInvokedUrlCommand*)command;
 - (void)onNotificationOpen:(CDVInvokedUrlCommand*)command;
+- (void)enableForegroundNotifications:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)sendToken:(NSString*)token;
@@ -38,5 +39,6 @@
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
+@property (nonatomic, strong) NSNumber *foregroundEnabled;
 
 @end

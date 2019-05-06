@@ -42,6 +42,7 @@ Notification flow:
 
 1. App is in foreground:
     1. User receives the notification data in the JavaScript callback without any notification on the device itself (this is the normal behaviour of push notifications, it is up to you, the developer, to notify the user)
+    2. Alternatively, you may call enableForegroundNotifications() during app startup, and then user will receive notification messages in the device notification bar, even when the app is in the foreground.
 2. App is in background:
     1. User receives the notification message in its device notification bar
     2. User taps the notification and the app opens
@@ -50,6 +51,13 @@ Notification flow:
 Notification icon on Android:
 
 [Changing notification icon](NOTIFICATIONS.md#changing-notification-icon)
+
+## enableForegroundNotifications
+
+Turn on foreground notifications:
+```
+window.FirebasePlugin.enableForegroundNotifications();
+```
 
 ## grantPermission (iOS only)
 
