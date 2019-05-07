@@ -91,26 +91,12 @@ exports.fetch = function (cacheExpirationSeconds, success, error) {
   exec(success, error, "FirebasePlugin", "fetch", args);
 };
 
-exports.getByteArray = function (key, namespace, success, error) {
-  var args = [key];
-  if (typeof namespace === 'string') {
-    args.push(namespace);
-  } else {
-    error = success;
-    success = namespace;
-  }
-  exec(success, error, "FirebasePlugin", "getByteArray", args);
+exports.getByteArray = function (key, success, error) {
+  exec(success, error, "FirebasePlugin", "getByteArray", [key]);
 };
 
-exports.getValue = function (key, namespace, success, error) {
-  var args = [key];
-  if (typeof namespace === 'string') {
-    args.push(namespace);
-  } else {
-    error = success;
-    success = namespace;
-  }
-  exec(success, error, "FirebasePlugin", "getValue", args);
+exports.getValue = function (key, success, error) {
+  exec(success, error, "FirebasePlugin", "getValue", [key]);
 };
 
 exports.getInfo = function (success, error) {
@@ -121,15 +107,8 @@ exports.setConfigSettings = function (settings, success, error) {
   exec(success, error, "FirebasePlugin", "setConfigSettings", [settings]);
 };
 
-exports.setDefaults = function (defaults, namespace, success, error) {
-  var args = [defaults];
-  if (typeof namespace === 'string') {
-    args.push(namespace);
-  } else {
-    error = success;
-    success = namespace;
-  }
-  exec(success, error, "FirebasePlugin", "setDefaults", args);
+exports.setDefaults = function (defaults, success, error) {
+  exec(success, error, "FirebasePlugin", "setDefaults", [defaults]);
 };
 
 exports.startTrace = function (name, success, error) {
