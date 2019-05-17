@@ -33,7 +33,7 @@ module.exports = {
      * The ID of the plugin; this should match the ID in plugin.xml.
      */
   getPluginId: function () {
-    return "cordova-plugin-firebase";
+    return "cordova-plugin-firebase-lib";
   },
 
   copyKey: function (platform) {

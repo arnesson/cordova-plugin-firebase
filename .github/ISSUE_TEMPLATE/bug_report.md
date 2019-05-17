@@ -24,7 +24,7 @@ If applicable, add screenshots to help explain your problem.
 If applicable, provide console logs showing the errors being reported.
 
 **Plugin Version**
-Run `cordova plugin list` to find out what version of cordova-plugin-firebase you are running with
+Run `cordova plugin list` to find out what version of `cordova-plugin-firebase-lib` you are running with
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]

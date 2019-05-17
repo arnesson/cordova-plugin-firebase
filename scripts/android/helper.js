@@ -23,8 +23,8 @@ function addDependencies(buildGradle) {
   var whitespace = match[1];
   
   // modify the line to add the necessary dependencies
-  var googlePlayDependency = whitespace + 'classpath \'com.google.gms:google-services:4.2.0\' // google-services dependency from cordova-plugin-firebase';
-  var fabricDependency = whitespace + 'classpath \'io.fabric.tools:gradle:1.25.4\' // fabric dependency from cordova-plugin-firebase'
+  var googlePlayDependency = whitespace + 'classpath \'com.google.gms:google-services:4.2.0\' // google-services dependency from cordova-plugin-firebase-lib';
+  var fabricDependency = whitespace + 'classpath \'io.fabric.tools:gradle:1.25.4\' // fabric dependency from cordova-plugin-firebase-lib';
   var modifiedLine = match[0] + '\n' + googlePlayDependency + '\n' + fabricDependency;
   
   // modify the actual line
@@ -41,7 +41,7 @@ function addRepos(buildGradle) {
 
   // modify the line to add the necessary repo
   // Crashlytics goes under buildscripts which is the first grouping in the file
-  var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase'
+  var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase-lib'
   var modifiedLine = match[0] + '\n' + fabricMavenRepo;
 
   // modify the actual line
@@ -56,7 +56,7 @@ function addRepos(buildGradle) {
 
     // Add google() to the allprojects section of the string
     match = secondHalfOfFile.match(/^(\s*)jcenter\(\)/m);
-    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase-lib';
     modifiedLine = match[0] + '\n' + googlesMavenRepo;
     // modify the part of the string that is after 'allprojects'
     secondHalfOfFile = secondHalfOfFile.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
@@ -66,7 +66,7 @@ function addRepos(buildGradle) {
   } else {
     // this should not happen, but if it does, we should try to add the dependency to the buildscript
     match = buildGradle.match(/^(\s*)jcenter\(\)/m);
-    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase';
+    var googlesMavenRepo = whitespace + 'google() // Google\'s Maven repository from cordova-plugin-firebase-lib';
     modifiedLine = match[0] + '\n' + googlesMavenRepo;
     // modify the part of the string that is after 'allprojects'
     buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
@@ -111,7 +111,7 @@ module.exports = {
     var buildGradle = readRootBuildGradle();
 
     // remove any lines we added
-    buildGradle = buildGradle.replace(/(?:^|\r?\n)(.*)cordova-plugin-firebase*?(?=$|\r?\n)/g, '');
+    buildGradle = buildGradle.replace(/(?:^|\r?\n)(.*)cordova-plugin-firebase-lib*?(?=$|\r?\n)/g, '');
   
     writeRootBuildGradle(buildGradle);
   }

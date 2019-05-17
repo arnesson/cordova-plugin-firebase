@@ -1,17 +1,18 @@
 {
+  "name": "cordova-plugin-firebase-lib",
+  "version": "3.0.0",
   "author": {
-    "name": "Robert Arnesson"
+    "name": "Wiz Panda Techno Solutions",
+    "url": "https://www.wizpanda.com/"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arnesson/cordova-plugin-firebase"
+    "url": "https://github.com/wizpanda/cordova-plugin-firebase-lib"
   },
-  "name": "cordova-plugin-firebase",
-  "version": "2.0.5",
   "description": "Cordova plugin for Google Firebase",
   "cordova": {
-    "id": "cordova-plugin-firebase",
+    "id": "cordova-plugin-firebase-lib",
     "platforms": [
       "android",
       "ios",

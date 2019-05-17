@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * This hook makes sure projects using [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase)
+ * This hook makes sure projects using [cordova-plugin-firebase-lib](https://github.com/wizpanda/cordova-plugin-firebase-lib)
  * will build properly and have the required key files copied to the proper destinations when the app is build on Ionic Cloud using the package command.
  * Credits: https://github.com/arnesson.
  */
