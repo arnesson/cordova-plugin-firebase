@@ -1,5 +1,7 @@
 # Cordova Firebase Plugin2
 
+[![npm version](https://badge.fury.io/js/cordova-plugin-firebase-lib.svg)](https://badge.fury.io/js/cordova-plugin-firebase-lib)
+
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 
 ## Difference from the fork repository
