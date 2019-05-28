@@ -32,8 +32,10 @@ function addDependencies(buildGradle, useDependency) {
 		comment = '// dependency from cordova-plugin-firebase';
 		if ( dependency.indexOf('com.android.tools.build:gradle') > -1 )
 			comment = '';
-		modifiedLine += whitespace + 'classpath \'' + dependency + '\' '+comment+' \n';
+		modifiedLine += whitespace + 'classpath \'' + dependency + '\' '+comment+'\n';
 	});
+
+	modifiedLine = modifiedLine.substr(0, modifiedLine.length-1 );
 
 	// modify the actual line
 	return buildGradle.replace(/^(\s*)classpath 'com.android.tools.build(.*)/m, modifiedLine);
@@ -96,12 +98,16 @@ function addFrameworks(buildGradle, useFrameworks){
 	// Remove Firebase's frameworks
 	buildGradle = buildGradle.replace(/ *\/\/ FIREBASE FRAMEWORKS START[^)]*FIREBASE FRAMEWORKS END */g, '');
 
-	//
-	var match = buildGradle.match(/^(\s*)\/\/ SUB-PROJECT DEPENDENCIES END(.*)/m);
+	var match      = buildGradle.match(/^(\s*)\/\/ SUB-PROJECT DEPENDENCIES END(.*)/m);
 	var whitespace = match[1];
 
-	var lines = whitespace+'\/\/ SUB-PROJECT DEPENDENCIES END'
-		+'\n'
+	var index1 = buildGradle.search(whitespace+"\/\/ SUB-PROJECT DEPENDENCIES END");
+	var index2 = buildGradle.search(/}*def promptForReleaseKeyPassword()/);
+
+	buildGradle = buildGradle.substring(0, index1) + "==STR_REPLACE==\n}\n\n"+buildGradle.substring(index2,buildGradle.length);
+
+		var lines = whitespace+'\/\/ SUB-PROJECT DEPENDENCIES END'
+			+'\n'
 		+'\n'+whitespace+'\/\/ FIREBASE FRAMEWORKS START'
 		+'\n'+whitespace+'implementation \'me.leolin:ShortcutBadger:1.1.4@aar\'';
 
@@ -109,9 +115,10 @@ function addFrameworks(buildGradle, useFrameworks){
 		lines += '\n'+whitespace+'implementation \''+ framework +'\'';
 	});
 
-	lines += '\n'+whitespace+'\/\/ FIREBASE FRAMEWORKS END'+'\n';
+	lines += '\n'+whitespace+'\/\/ FIREBASE FRAMEWORKS END';
 
-	return buildGradle.replace(/^(\s*)\/\/ SUB-PROJECT DEPENDENCIES END(.*)/m, lines);
+	return buildGradle.replace(/==STR_REPLACE==/i, lines);
+	// return buildGradle.replace(/^(\s*)\/\/ SUB-PROJECT DEPENDENCIES END(.*)/m, lines);
 }
 
 /*
@@ -221,14 +228,18 @@ module.exports = {
 
 			// Append plugin
 
-			var applyPluginGService = 'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase';
-			var applyPluginIoFabric = 'apply plugin: \'io.fabric\' // from cordova-plugin-firebase';
+			var applyPluginGService    = 'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase';
+			var applyPluginIoFabric    = 'apply plugin: \'io.fabric\' // from cordova-plugin-firebase';
+			var applyPluginPerformance = 'apply plugin: \'com.google.firebase.firebase-perf\' // from cordova-plugin-firebase';
 
 			if ( buildGradle.indexOf(applyPluginGService) == -1 )
-				buildGradle = buildGradle +'\n\n'+applyPluginGService;
+				buildGradle = buildGradle +'\n'+applyPluginGService;
 
 			if ( buildGradle.indexOf(applyPluginIoFabric) == -1 )
-				buildGradle = buildGradle +'\n'+applyPluginIoFabric+'\n';
+				buildGradle = buildGradle +'\n'+applyPluginIoFabric;
+
+			if ( buildGradle.indexOf(applyPluginPerformance) == -1 )
+				buildGradle = buildGradle +'\n'+applyPluginPerformance;
 
 
 			// Add framework dependecy

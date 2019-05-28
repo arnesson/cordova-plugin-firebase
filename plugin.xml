@@ -37,11 +37,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 					<action android:name="com.google.firebase.MESSAGING_EVENT"/>
 				</intent-filter>
 			</service>
-			<service android:name="org.apache.cordova.firebase.FirebasePluginInstanceIDService">
-				<intent-filter>
-					<action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-				</intent-filter>
-			</service>
 			<receiver android:name="org.apache.cordova.firebase.OnNotificationOpenReceiver"></receiver>
 		</config-file>
 		<resource-file src="src/android/google-services.json" target="."/>
@@ -49,26 +44,26 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/JavaScriptException.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/OnNotificationOpenReceiver.java" target-dir="src/org/apache/cordova/firebase" />
-		<source-file src="src/android/FirebasePluginInstanceIDService.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessagingService.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiver.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
-		<dependency-classpath name="com.android.tools.build:gradle:3.3.0" />
+		<dependency-classpath name="com.android.tools.build:gradle:3.4.1" />
 		<dependency-classpath name="com.google.gms:google-services:4.2.0" />
-		<dependency-classpath name="io.fabric.tools:gradle:1.26.1" />
+		<dependency-classpath name="io.fabric.tools:gradle:1.29.0" />
+		<dependency-classpath name="com.google.firebase:perf-plugin:1.2.1" />
 
 		<framework-implementation name="com.google.android.gms:play-services-analytics-impl:16.0.7" />
 		<framework-implementation name="com.google.android.gms:play-services-measurement-base@[16.0.4]" />
-		<framework-implementation name="com.google.firebase:firebase-core:16.0.7" />
-		<framework-implementation name="com.google.firebase:firebase-auth:16.1.0" />
-		<framework-implementation name="com.google.firebase:firebase-messaging:17.3.4" />
-		<framework-implementation name="com.google.firebase:firebase-config:16.1.3" />
-		<framework-implementation name="com.google.firebase:firebase-perf:16.2.3" />
-		<framework-implementation name="com.google.firebase:firebase-dynamic-links:16.1.5" />
-		<framework-implementation name="com.google.android.gms:play-services-tagmanager:16.0.7" />
-		<framework-implementation name="com.crashlytics.sdk.android:crashlytics:2.9.8" />
+		<framework-implementation name="com.google.firebase:firebase-core:16.0.9" />
+		<framework-implementation name="com.google.firebase:firebase-auth:17.0.0" />
+		<framework-implementation name="com.google.firebase:firebase-messaging:18.0.0" />
+		<framework-implementation name="com.google.firebase:firebase-config:17.0.0" />
+		<framework-implementation name="com.google.firebase:firebase-perf:17.0.0" />
+		<framework-implementation name="com.google.firebase:firebase-dynamic-links:17.0.0" />
+		<framework-implementation name="com.google.android.gms:play-services-tagmanager:16.0.8" />
+		<framework-implementation name="com.crashlytics.sdk.android:crashlytics:2.10.0" />
 
 	</platform>
 
