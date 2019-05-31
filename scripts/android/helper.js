@@ -21,7 +21,6 @@ function readRootBuildGradle() {
 function addDependencies(buildGradle, useDependency) {
 	if ( !useDependency[0] || buildGradle.indexOf('classpath \'com.google.gms:google-services:') > -1 )
 		return buildGradle;
-
 	// find the known line to match
 	var match      = buildGradle.match(/^(\s*)classpath 'com.android.tools.build(.*)/m);
 	var whitespace = match[1];
@@ -226,25 +225,17 @@ module.exports = {
 			// Add Google's Maven Repo
 			buildGradle = addRepos(buildGradle);
 
-			// Append plugin
+			//  Append plugins
+			var firebasePlugins =
+				'apply plugin: \'com.android.application\'\n'+
+				'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase\n'+
+				'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase\n'+
+				'apply plugin: \'com.google.firebase.firebase-perf\' // from cordova-plugin-firebase\n';
 
-			var applyPluginGService    = 'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase';
-			var applyPluginIoFabric    = 'apply plugin: \'io.fabric\' // from cordova-plugin-firebase';
-			var applyPluginPerformance = 'apply plugin: \'com.google.firebase.firebase-perf\' // from cordova-plugin-firebase';
-
-			if ( buildGradle.indexOf(applyPluginGService) == -1 )
-				buildGradle = buildGradle +'\n'+applyPluginGService;
-
-			if ( buildGradle.indexOf(applyPluginIoFabric) == -1 )
-				buildGradle = buildGradle +'\n'+applyPluginIoFabric;
-
-			if ( buildGradle.indexOf(applyPluginPerformance) == -1 )
-				buildGradle = buildGradle +'\n'+applyPluginPerformance;
-
+			buildGradle = buildGradle.replace(/apply plugin: \'com.android.application\'\n/m, firebasePlugins);
 
 			// Add framework dependecy
 			buildGradle = addFrameworks(buildGradle, useFrameworks);
-
 
 			writeRootBuildGradle(buildGradle);
 		});
