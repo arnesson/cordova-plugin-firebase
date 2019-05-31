@@ -229,7 +229,7 @@ module.exports = {
 			var firebasePlugins =
 				'apply plugin: \'com.android.application\'\n'+
 				'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase\n'+
-				'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase\n'+
+				'apply plugin: \'io.fabric\' // from cordova-plugin-firebase\n'+
 				'apply plugin: \'com.google.firebase.firebase-perf\' // from cordova-plugin-firebase\n';
 
 			buildGradle = buildGradle.replace(/apply plugin: \'com.android.application\'\n/m, firebasePlugins);
