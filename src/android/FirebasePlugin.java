@@ -485,10 +485,10 @@ public class FirebasePlugin extends CordovaPlugin {
                         for(int i = 0; i < stackTrace.length(); i++) {
                             JSONObject elem = stackTrace.getJSONObject(i);
                             trace[i] = new StackTraceElement(
-                                    "undefined",
-                                    elem.getString("functionName"),
-                                    elem.getString("fileName"),
-                                    elem.getInt("lineNumber")
+                                "undefined",
+                                elem.optString("functionName", "undefined"),
+                                elem.optString("fileName", "undefined"),
+                                elem.optInt("lineNumber", -1)
                             );
                         }
 
@@ -751,7 +751,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             try {
                                 String verificationId = null;
                                 String code = null;
-								
+
                                 Field[] fields = credential.getClass().getDeclaredFields();
                                 for (Field field : fields) {
                                     Class type = field.getType();
@@ -818,7 +818,7 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
-	
+
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration
                             TimeUnit.SECONDS, // Unit of timeout
@@ -831,7 +831,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-	
+
     private static String getPrivateField(PhoneAuthCredential credential, Field field) {
         try {
             field.setAccessible(true);

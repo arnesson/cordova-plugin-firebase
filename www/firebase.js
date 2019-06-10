@@ -59,11 +59,13 @@ exports.logEvent = function (name, params, success, error) {
 exports.logError = function (message, stackTrace, success, error) {
     var args = [message];
     // "stackTrace" is an optional arg that's an array of objects.
-    if (typeof stackTrace === 'function') {
-        error = success;
-        success = stackTrace;
-    } else {
-        args.push(stackTrace);
+    if (stackTrace) {
+        if (typeof stackTrace === 'function') {
+            error = success;
+            success = stackTrace;
+        } else {
+            args.push(stackTrace);
+        }
     }
     exec(success, error, "FirebasePlugin", "logError", args);
 };
