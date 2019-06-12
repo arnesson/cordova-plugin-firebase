@@ -287,8 +287,27 @@ static FirebasePlugin *firebasePlugin;
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
-        CLSNSLog(@"%@", errorMessage);
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] init];
+        CDVCommandStatus status = CDVCommandStatus_OK;
+        
+        @try {
+            // We can optionally be passed a stack trace from stackTrace.js which we'll put in userInfo.
+            if ([command.arguments count] > 1) {
+                NSArray *stack = [command.arguments objectAtIndex:1];
+                int lineNum = 1;
+                for (NSDictionary *entry in stack) {
+                    NSString *key = [NSString stringWithFormat:@"Stack_line_%02d", lineNum++];
+                    userInfo[key] = entry[@"source"];
+                }
+            }
+        } @catch (NSException *exception) {
+            CLSNSLog(@"Exception in logError: %@, original error: %@", exception.description, errorMessage);
+            status = CDVCommandStatus_ERROR;
+        }
+        
+        NSError *error = [NSError errorWithDomain:errorMessage code:0 userInfo:userInfo];
+        [CrashlyticsKit recordError:error];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:status];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
