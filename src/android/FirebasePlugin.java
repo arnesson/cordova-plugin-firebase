@@ -10,6 +10,14 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
 
+import android.annotation.TargetApi;
+import android.app.NotificationChannel;
+import android.content.ContentResolver;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+import android.media.AudioAttributes;
+import android.net.Uri;
+
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 import java.lang.reflect.Field;
@@ -62,10 +70,83 @@ public class FirebasePlugin extends CordovaPlugin {
     private final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
 
+    private final String BADGE = "badge";
+    private final String CHANNEL_DESCRIPTION = "description";
+    private final String CHANNEL_ID = "id";
+    private final String CHANNEL_IMPORTANCE = "importance";
+    private final String CHANNEL_LIGHT_COLOR = "lightColor";
+    private final String CHANNEL_VIBRATION = "vibration";
+    private final String SOUND = "sound";
+    private final String SOUND_DEFAULT = "default";
+    private final String SOUND_RINGTONE = "ringtone";
+    private final String VISIBILITY = "visibility";
+
     private static boolean inBackground = true;
     private static ArrayList<Bundle> notificationStack = null;
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
+
+    /**
+     * Gets the application context from cordova's main activity.
+     *
+     * @return the application context
+     */
+    private Context getApplicationContext() {
+      return this.cordova.getActivity().getApplicationContext();
+    }
+
+    @TargetApi(26)
+    private void createChannel(JSONObject channel) throws JSONException {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        final NotificationManager notificationManager = (NotificationManager) cordova.getActivity()
+            .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String packageName = getApplicationContext().getPackageName();
+        NotificationChannel mChannel = new NotificationChannel(channel.getString(CHANNEL_ID),
+            channel.optString(CHANNEL_DESCRIPTION, ""),
+            channel.optInt(CHANNEL_IMPORTANCE, NotificationManager.IMPORTANCE_DEFAULT));
+
+        int lightColor = channel.optInt(CHANNEL_LIGHT_COLOR, -1);
+        if (lightColor != -1) {
+          mChannel.setLightColor(lightColor);
+        }
+
+        int visibility = channel.optInt(VISIBILITY, NotificationCompat.VISIBILITY_PUBLIC);
+        mChannel.setLockscreenVisibility(visibility);
+
+        boolean badge = channel.optBoolean(BADGE, true);
+        mChannel.setShowBadge(badge);
+
+        String sound = channel.optString(SOUND, "default");
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build();
+        if (SOUND_RINGTONE.equals(sound)) {
+          mChannel.setSound(android.provider.Settings.System.DEFAULT_RINGTONE_URI, audioAttributes);
+        } else if (sound != null && !sound.contentEquals(SOUND_DEFAULT)) {
+          Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/" + sound);
+          mChannel.setSound(soundUri, audioAttributes);
+        } else {
+          mChannel.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI, audioAttributes);
+        }
+
+        // If vibration settings is an array set vibration pattern, else set enable vibration.
+        JSONArray pattern = channel.optJSONArray(CHANNEL_VIBRATION);
+        if (pattern != null) {
+          int patternLength = pattern.length();
+          long[] patternArray = new long[patternLength];
+          for (int i = 0; i < patternLength; i++) {
+            patternArray[i] = pattern.optLong(i);
+          }
+          mChannel.setVibrationPattern(patternArray);
+        } else {
+          boolean vibrate = channel.optBoolean(CHANNEL_VIBRATION, true);
+          mChannel.enableVibration(vibrate);
+        }
+
+        notificationManager.createNotificationChannel(mChannel);
+      }
+    }
 
     @Override
     protected void pluginInitialize() {
@@ -188,6 +269,14 @@ public class FirebasePlugin extends CordovaPlugin {
             return true;
         } else if (action.equals("clearAllNotifications")) {
             this.clearAllNotifications(callbackContext);
+            return true;
+        } else if (action.equals("createChannel")) {
+            try {
+                this.createChannel(args.getJSONObject(0));
+                callbackContext.success();
+            } catch (JSONException e) {
+                callbackContext.error(e.getMessage());
+            }
             return true;
         }
 
