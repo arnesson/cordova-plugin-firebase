@@ -146,6 +146,8 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
 };
+
+// For Android O only
 exports.createChannel = function (success, error, channel) {
     exec(success, error, 'FirebasePlugin', 'createChannel', [channel]);
 };
