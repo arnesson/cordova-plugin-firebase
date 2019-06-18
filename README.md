@@ -4,6 +4,10 @@
 
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 
+## 4.0.0 - Breaking Change
+
+Minimum `v8.0.0` of `cordova-android` is now required. View https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13 for details.
+
 ## Difference from the fork repository
 
 Maintained by [Wiz Panda](https://www.wizpanda.com/).
@@ -26,7 +30,7 @@ For the changes on the next versions, please check the [CHANGELOG.md](https://gi
 ## Supported Cordova Versions
 
 - cordova: `>= 7`
-- cordova-android: `>= 7.0.0`
+- cordova-android: `>= 8.0.0`
 - cordova-ios: `>= 4.5.5`
 
 ## Installation
