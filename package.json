@@ -46,6 +46,7 @@
     "test:cordova@8.0.0:browser@5.0.3": "bash ./test/test-default.sh 8.0.0 browser 5.0.3"
   },
   "dependencies": {
-    "xcode": "^2.0.0"
+    "xcode": "^2.0.0",
+    "cordova-lib":"^9.0.0"
   }
 }
