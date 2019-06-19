@@ -1,6 +1,6 @@
 {
     "name": "cordova-plugin-firebase-lib",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "author": {
         "name": "Wiz Panda Techno Solutions",
         "url": "https://www.wizpanda.com/"
@@ -30,6 +30,7 @@
         "phone auth"
     ],
     "scripts": {
+        "preversion": "git add CHANGELOG.md",
         "version": "node ./bump-version.js && git add -A plugin.xml",
         "postversion": "git push && git push --tags && npm publish --verbose",
         "test": "npm run test:ios && npm run test:android && npm run test:browser",

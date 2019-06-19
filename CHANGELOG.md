@@ -1,10 +1,15 @@
 # Change Log
 
-## Version 3.0.1
+## v3.2.0
+
+1. Added ability to log JavaScript stacktrace with a new method `logJSError`. Thanks to [distinctdan](https://github.com/distinctdan) for
+ [PR#8](https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/8).
+
+## v3.1.0
 
 1. Add `createChannel` function for Android O.
 
-## Version 3.0.0
+## v3.0.0
 
 First version under [Wiz Panda](https://www.wizpanda.com/).
 
