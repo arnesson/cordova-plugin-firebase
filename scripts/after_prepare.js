@@ -7,16 +7,16 @@
  * will build properly and have the required key files copied to the proper destinations when the app is build on Ionic Cloud using the package command.
  * Credits: https://github.com/arnesson.
  */
-var fs = require('fs');
-var utilities = require("./lib/utilities");
+const fs = require('fs');
+const utilities = require("./lib/utilities");
 
-var config = fs.readFileSync('config.xml').toString();
-var name = utilities.getValue(config, 'name');
+const config = fs.readFileSync('config.xml').toString();
+const name = utilities.getValue(config, 'name');
 
-var IOS_DIR = 'platforms/ios';
-var ANDROID_DIR = 'platforms/android';
+const IOS_DIR = 'platforms/ios';
+const ANDROID_DIR = 'platforms/android';
 
-var PLATFORM = {
+const PLATFORM = {
   IOS: {
     dest: [
       IOS_DIR + '/' + name + '/Resources/GoogleService-Info.plist',
@@ -44,7 +44,7 @@ var PLATFORM = {
 
 module.exports = function (context) {
   //get platform from the context supplied by cordova
-  var platforms = context.opts.platforms;
+  const platforms = context.opts.platforms;
   // Copy key files to their platform specific folders
   if (platforms.indexOf('ios') !== -1 && utilities.directoryExists(IOS_DIR)) {
     console.log('Preparing Firebase on iOS');
