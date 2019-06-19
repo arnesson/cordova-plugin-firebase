@@ -64,7 +64,7 @@ exports.logEvent = function (name, params, success, error) {
     }
 };
 
-xports.logError = function (message, success, error) {
+exports.logError = function (message, success, error) {
     if (typeof success === 'function') {
         success();
     }
