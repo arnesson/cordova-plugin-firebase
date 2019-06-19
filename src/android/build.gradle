@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     compile 'me.leolin:ShortcutBadger:1.1.4@aar'
-    compile 'com.google.firebase:firebase-auth:+'
+    compile 'com.google.firebase:firebase-auth:16.2.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
        transitive = true
     }
