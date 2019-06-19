@@ -8,7 +8,6 @@
  * Credits: https://github.com/arnesson.
  */
 var fs = require('fs');
-var path = require('path');
 var utilities = require("./lib/utilities");
 
 var config = fs.readFileSync('config.xml').toString();
