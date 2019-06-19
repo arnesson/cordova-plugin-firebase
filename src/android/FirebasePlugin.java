@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.core.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
 
@@ -14,7 +14,7 @@ import android.annotation.TargetApi;
 import android.app.NotificationChannel;
 import android.content.ContentResolver;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.media.AudioAttributes;
 import android.net.Uri;
 
