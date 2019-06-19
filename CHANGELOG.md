@@ -1,6 +1,10 @@
 # Change Log
 
-## v4.4.0 - Breaking Change
+## v4.0.1
+
+1. Fixed typo in `firebase-browser.js`
+
+## v4.0.0 - Breaking Change
 
 1. Stop supporting `cordova-android 7.x.x`. Minimum `cordova-android 8.0.0` is required.
 2. Fix the failing build due to breaking changes released by Google Firebase on Jun 17, 2019.
