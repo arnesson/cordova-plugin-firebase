@@ -64,8 +64,11 @@ exports.logEvent = function (name, params, success, error) {
     }
 };
 
-exports.logError = function (message, success, error) {
-    if (typeof success === 'function') {
+exports.logError = function (message, stackTrace, success, error) {
+    // "stackTrace" is an optional arg and is an array of objects.
+    if (typeof stackTrace === 'function') {
+        stackTrace();
+    } else if (typeof success === 'function') {
         success();
     }
 };
