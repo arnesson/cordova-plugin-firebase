@@ -1,5 +1,9 @@
 # Change Log
 
+## v3.3.0
+
+1. Backward compatibility fixes to support breaking changes released by Google Firebase on Jun 17, 2019.
+
 ## v3.2.0
 
 1. Added ability to log JavaScript stacktrace with a new method `logJSError`. Thanks to [distinctdan](https://github.com/distinctdan) for
