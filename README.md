@@ -32,7 +32,7 @@ To install the latest version, run the following in your terminal:
 cordova plugin add cordova-plugin-firebase-lib --save
 ```
 
-### For `cordova-android 7.x.x`
+### For `cordova-android <= 7.1.4`
 
 Run the following in your terminal:
 
@@ -52,7 +52,7 @@ Or add the following in your `config.xml`:
 - cordova-android: `>= 8.0.0`
 - cordova-ios: `>= 4.5.5`
 
-### Guides
+## Guides
 
 1. Great installation and setup guide [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
 
@@ -63,8 +63,8 @@ Download your Firebase configuration files:
 * `GoogleService-Info.plist` for iOS and
 * `google-services.json` for Android
 
-And place them in the root folder of your cordova project. Check out this [firebase article](https://support.google
-.com/firebase/answer/7015592) for details on how to download the files.
+And place them in the root folder of your cordova project. Check out this [firebase article](https://support.google.com/firebase/answer/7015592)
+for details on how to download the files.
 
 ```bash
 - my-cordova-project/
