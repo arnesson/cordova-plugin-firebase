@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 3.0.1
+
+1. Add `createChannel` function for Android O.
+
 ## Version 3.0.0
 
 First version under [Wiz Panda](https://www.wizpanda.com/).

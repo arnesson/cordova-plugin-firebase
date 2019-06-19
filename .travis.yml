@@ -1,5 +1,7 @@
 env:
   global:
+    - ANDROID_API_LEVEL=28
+    - ANDROID_BUILD_TOOLS_VERSION=28.0.3
     - JAVA_HOME=/usr/lib/jvm/java-8-oracle
     - LANG=en_US.UTF-8
 
@@ -10,10 +12,10 @@ matrix:
     language: android
     android:
       components:
-      - tools-26.0.0
-      - platform-tools-26.0.0
-      - build-tools-26.0.0
-      - android-26.0.0
+      - tools
+      - platform-tools
+      - build-tools
+      - android
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -33,10 +35,10 @@ matrix:
     language: android
     android:
       components:
-      - tools-26.0.0
-      - platform-tools-26.0.0
-      - build-tools-26.0.0
-      - android-26.0.0
+      - tools
+      - platform-tools
+      - build-tools
+      - android
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
@@ -56,10 +58,10 @@ matrix:
     language: android
     android:
       components:
-      - tools-26.0.0
-      - platform-tools-26.0.0
-      - build-tools-26.0.0
-      - android-26.0.0
+      - tools
+      - platform-tools
+      - build-tools
+      - android
       - extra-google-google_play_services
       - extra-google-m2repository
       - extra-android-m2repository
