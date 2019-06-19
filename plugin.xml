@@ -6,7 +6,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<license>MIT</license>
 
-	<dependency id="cordova-plugin-cocoapod-support" url="https://github.com/dpa99c/cordova-plugin-cocoapods-support.git" />
+	<dependency id="cordova-plugin-cocoapod-supportx" version="^1.6.1" />
 
 	<engines>
 		<engine name="cordova" version=">=3.2.0" />
