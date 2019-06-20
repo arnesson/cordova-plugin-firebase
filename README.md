@@ -16,6 +16,17 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 - cordova-android: `>= 6.4`
 - cordova-ios: `>= 4`
 
+## Migrating from cordova-plugin-firebase
+If you already have [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) installed in your Cordova project, you need to completely remove it before installing this plugin otherwise they will conflict and cause build errors in your project. The safest way of doing this is as follows:
+
+    rm -Rf platforms/android
+    cordova plugin rm cordova-plugin-firebase
+    rm -Rf plugins/ node_modules/
+    npm install
+    cordova plugin add cordova-plugin-firebasex
+    cordova platform add android
+    
+
 ## Installation
 Install the plugin by adding it to your project's config.xml:
 ```
