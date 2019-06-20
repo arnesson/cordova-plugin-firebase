@@ -1,3 +1,20 @@
+* Merge [PR #7](https://github.com/dpa99c/cordova-plugin-firebase/pull/7): use `<pod>` instead of deprecated `<<framework type="podspec">`
+
+# Version 2.0.6
+* Use Cocoapods to satisfy iOS Firebase SDK (rather than bundling with plugin). See https://github.com/arnesson/cordova-plugin-firebase/pull/972.
+* Add support for logMessage() and sendCrash() functions (ported from cordova-fabric-plugin)
+* Bump version of Crashlytics library on Android to current latest (v2.9.8 - Dec 2018)
+* Bump Firebase SDK versions in iOS PodSpecs to latest version (v5.15.0)
+* Remove redundant build-extras.gradle
+* Set minimum iOS version to 9.0 in podspec
+* Remove unnecessary extra <config-file> block which can lead to race condition
+* Fixes issues cause by Firebase SDK updates on 5 April 2019 (https://firebase.google.com/support/release-notes/android#update_-_april_05_2019) which removed deprecated API features causing Android build failures.
+See https://github.com/arnesson/cordov 
+* Fix compatibility with cordova@9 CLI
+* Add explicit dependency on cordova-lib to prevent build error on iOS. Fixes #2.
+
+---> **FORKED FROM `cordova-plugin-firebase` AS `cordova-plugin-firebasex`** <---
+
 # Version 2.0.5
 
 ### Bug Fixes
