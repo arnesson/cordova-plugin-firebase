@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin id="cordova-plugin-firebasex" version="2.0.6"
-xmlns="http://apache.org/cordova/ns/plugins/1.0"
-xmlns:android="http://schemas.android.com/apk/res/android">
+		xmlns="http://apache.org/cordova/ns/plugins/1.0"
+		xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
 
 	<license>MIT</license>
@@ -26,9 +26,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</feature>
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/*">
-				<uses-permission android:name="android.permission.INTERNET" />
-				<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-				<uses-permission android:name="android.permission.WAKE_LOCK" />
+			<uses-permission android:name="android.permission.INTERNET" />
+			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+			<uses-permission android:name="android.permission.WAKE_LOCK" />
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
@@ -70,7 +70,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</feature>
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Debug.plist">
-		    <string>development</string>
+			<string>development</string>
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
@@ -85,13 +85,15 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
 
 		<pods-config ios-min-version="9.0" use-frameworks="true"/>
-		<framework src="Firebase/Core" type="podspec" spec="5.15.0"/>
-		<framework src="Firebase/Auth" type="podspec" spec="5.15.0"/>
-		<framework src="Firebase/Messaging" type="podspec" spec="5.15.0"/>
-		<framework src="Firebase/Performance" type="podspec" spec="5.15.0"/>
-		<framework src="Firebase/RemoteConfig" type="podspec" spec="5.15.0"/>
-		<framework src="Fabric" type="podspec" spec="1.9.0"/>
-		<framework src="Crashlytics" type="podspec" spec="3.12.0"/>
+
+		<pod name="Firebase/Core" spec="5.15.0" />
+		<pod name="Firebase/Auth" spec="5.15.0" />
+		<pod name="Firebase/Messaging" spec="5.15.0" />
+		<pod name="Firebase/Performance" spec="5.15.0" />
+		<pod name="Firebase/RemoteConfig" spec="5.15.0" />
+		<pod name="Fabric" spec="1.9.0" />
+		<pod name="Crashlytics" spec="3.12.0" />
+
 	</platform>
 
 	<platform name="browser">
