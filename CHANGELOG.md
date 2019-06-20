@@ -1,3 +1,8 @@
+# Version 2.1.0
+* Update Android source to use AndroidX class names and adds dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) for forward compatibility with future versions of Firebase libraries on Android.
+* Pins Firebase and Crashlytics Gradle dependencies to latest major version (to prevent build failures due to unexpected changes in subsequent major versions).
+* Set minimum supported versions to `cordova@8+`, `cordova-android@8+`, `cordova-ios@4+`.
+
 # Version 2.0.7
 * Merge [PR #7](https://github.com/dpa99c/cordova-plugin-firebase/pull/7): use `<pod>` instead of deprecated `<<framework type="podspec">`. Resolves [#5](https://github.com/dpa99c/cordova-plugin-firebase/issues/5).
 
