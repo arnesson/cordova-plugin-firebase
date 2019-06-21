@@ -37,62 +37,6 @@ or by running:
 cordova plugin add cordova-plugin-firebasex
 ```
 
-### Specifying dependent library versions
-This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android and Cocoapods on iOS.
-By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned Android & iOS versions as `<preference>`'s, for example:
-
-    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="17.0.0" />
-
-These defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
-
-    cordova plugin add cordova-plugin-firebasex --variable ANDROID_FIREBASE_CORE_VERSION=1.2.3
-    
-Or you can specify them as plugin variables in your `config.xml`, for example:
-
-    <plugin name="cordova-plugin-firebasex" spec="^2.0.7">
-        <variable name="ANDROID_FIREBASE_CORE_VERSION" value="1.2.3" />
-    </plugin>
-    
-The following plugin variables are use to specify the follow Gradle dependency versions on Android:
-
-- `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION` => `com.google.android.gms:play-services-tagmanager`
-- `ANDROID_FIREBASE_CORE_VERSION` => `com.google.firebase:firebase-core`
-- `ANDROID_FIREBASE_MESSAGING_VERSION` => `com.google.firebase:firebase-messaging`
-- `ANDROID_FIREBASE_CONFIG_VERSION` => `com.google.firebase:firebase-config`
-- `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
-- `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
-- `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
-- `ANDROID_SHORTCUTBADGER_VERSION` => `me.leolin:ShortcutBadger`
-
-The following plugin variables are use to specify the follow Cocoapods dependency versions on iOS:
-
-- `IOS_FIREBASE_CORE_VERSION` => `Firebase/Core`
-- `IOS_FIREBASE_AUTH_VERSION` => `Firebase/Auth`
-- `IOS_FIREBASE_MESSAGING_VERSION` => `Firebase/Messaging`
-- `IOS_FIREBASE_PERFORMANCE_VERSION` => `Firebase/Performance`
-- `IOS_FIREBASE_REMOTECONFIG_VERSION` => `Firebase/RemoteConfig`
-- `IOS_FABRIC_VERSION` => `Fabric`
-- `IOS_CRASHLYTICS_VERSION` => `Crashlytics`
-
-For example, to explicitly specify all the component versions at plugin install time:
-
-    cordova plugin add cordova-plugin-firebasex \
-        --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \
-        --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0 \
-        --variable ANDROID_FIREBASE_MESSAGING_VERSION=19.0.0 \
-        --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0 \
-        --variable ANDROID_FIREBASE_PERF_VERSION=18.0.0 \
-        --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0 \
-        --variable ANDROID_CRASHLYTICS_VERSION=2.9.8 \
-        --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
-        --variable IOS_FIREBASE_CORE_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_AUTH_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_MESSAGING_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.15.0 \
-        --variable IOS_FABRIC_VERSION=1.9.0 \
-        --variable IOS_CRASHLYTICS_VERSION=3.12.0
-
 ## AndroidX
 This plugin has been migrated to use [AndroidX (Jetpack)](https://developer.android.com/jetpack/androidx/migrate) which is the successor to the [Android Support Library](https://developer.android.com/topic/libraries/support-library/index).
 This is implemented by adding a dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) which enables AndroidX in the Android platform of a Cordova project.

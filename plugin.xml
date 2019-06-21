@@ -52,25 +52,14 @@
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-
-		<!-- Default versions for Gradle dependencies -->
-		<preference name="ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" default="17.0.0" />
-		<preference name="ANDROID_FIREBASE_CORE_VERSION" default="17.0.0" />
-		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="19.0.0" />
-		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="18.0.0" />
-		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="18.0.0" />
-		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="18.0.0" />
-		<preference name="ANDROID_CRASHLYTICS_VERSION" default="2.9.8" />
-		<preference name="ANDROID_SHORTCUTBADGER_VERSION" default="1.1.22" />
-
-		<framework src="com.google.android.gms:play-services-tagmanager:$ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" />
-		<framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION" />
-		<framework src="com.google.firebase:firebase-messaging:$ANDROID_FIREBASE_MESSAGING_VERSION" />
-		<framework src="com.google.firebase:firebase-config:$ANDROID_FIREBASE_CONFIG_VERSION" />
-		<framework src="com.google.firebase:firebase-perf:$ANDROID_FIREBASE_PERF_VERSION" />
-		<framework src="com.google.firebase:firebase-auth:$ANDROID_FIREBASE_AUTH_VERSION" />
-		<framework src="com.crashlytics.sdk.android:crashlytics:$ANDROID_CRASHLYTICS_VERSION" />
-		<framework src="me.leolin:ShortcutBadger:$ANDROID_SHORTCUTBADGER_VERSION" />
+		<framework src="com.google.android.gms:play-services-tagmanager:17.+" />
+		<framework src="com.google.firebase:firebase-core:17.+" />
+		<framework src="com.google.firebase:firebase-messaging:19.+" />
+		<framework src="com.google.firebase:firebase-config:18.+" />
+		<framework src="com.google.firebase:firebase-perf:18.+" />
+		<framework src="com.google.firebase:firebase-auth:18.+" />
+		<framework src="com.crashlytics.sdk.android:crashlytics:2.+" />
+		<framework src="me.leolin:ShortcutBadger:1.+" />
 
 	</platform>
 
@@ -104,21 +93,13 @@
 
 		<pods-config ios-min-version="9.0" use-frameworks="true"/>
 
-		<preference name="IOS_FIREBASE_CORE_VERSION" default="5.15.0" />
-		<preference name="IOS_FIREBASE_AUTH_VERSION" default="5.15.0" />
-		<preference name="IOS_FIREBASE_MESSAGING_VERSION" default="5.15.0" />
-		<preference name="IOS_FIREBASE_PERFORMANCE_VERSION" default="5.15.0" />
-		<preference name="IOS_FIREBASE_REMOTECONFIG_VERSION" default="5.15.0" />
-		<preference name="IOS_FABRIC_VERSION" default="1.9.0" />
-		<preference name="IOS_CRASHLYTICS_VERSION" default="3.12.0" />
-
-		<pod name="Firebase/Core" spec="$IOS_FIREBASE_CORE_VERSION" />
-		<pod name="Firebase/Auth" spec="$IOS_FIREBASE_AUTH_VERSION" />
-		<pod name="Firebase/Messaging" spec="$IOS_FIREBASE_MESSAGING_VERSION" />
-		<pod name="Firebase/Performance" spec="$IOS_FIREBASE_PERFORMANCE_VERSION" />
-		<pod name="Firebase/RemoteConfig" spec="$IOS_FIREBASE_REMOTECONFIG_VERSION" />
-		<pod name="Fabric" spec="$IOS_FABRIC_VERSION" />
-		<pod name="Crashlytics" spec="$IOS_CRASHLYTICS_VERSION" />
+		<pod name="Firebase/Core" spec="5.15.0" />
+		<pod name="Firebase/Auth" spec="5.15.0" />
+		<pod name="Firebase/Messaging" spec="5.15.0" />
+		<pod name="Firebase/Performance" spec="5.15.0" />
+		<pod name="Firebase/RemoteConfig" spec="5.15.0" />
+		<pod name="Fabric" spec="1.9.0" />
+		<pod name="Crashlytics" spec="3.12.0" />
 
 	</platform>
 
