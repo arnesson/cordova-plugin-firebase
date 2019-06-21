@@ -1,3 +1,8 @@
+# Version 2.1.2
+* Revert: Support user-overriding of default Android Gradle & iOS Cocoapods versions using plugin variables.
+    * Since it's not working on iOS due to Cocoapods plugin dependency.
+    * Need to fix that plugin to handle plugin variables then reinstate this change in a major version release.
+
 # Version 2.1.1
 * Support user-overriding of default Android Gradle & iOS Cocoapods versions using plugin variables.
 
