@@ -76,21 +76,21 @@ The following plugin variables are use to specify the follow Cocoapods dependenc
 
 For example, to explicitly specify all the component versions at plugin install time:
 
-    cordova plugin add cordova-plugin-firebasex
-        --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0
-        --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0
-        --variable ANDROID_FIREBASE_MESSAGING_VERSION=19.0.0
-        --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0
-        --variable ANDROID_FIREBASE_PERF_VERSION=18.0.0
-        --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0
-        --variable ANDROID_CRASHLYTICS_VERSION=2.9.8
-        --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22
-        --variable IOS_FIREBASE_CORE_VERSION=5.15.0
-        --variable IOS_FIREBASE_AUTH_VERSION=5.15.0
-        --variable IOS_FIREBASE_MESSAGING_VERSION=5.15.0
-        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.15.0
-        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.15.0
-        --variable IOS_FABRIC_VERSION=1.9.0
+    cordova plugin add cordova-plugin-firebasex \
+        --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \
+        --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0 \
+        --variable ANDROID_FIREBASE_MESSAGING_VERSION=19.0.0 \
+        --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0 \
+        --variable ANDROID_FIREBASE_PERF_VERSION=18.0.0 \
+        --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0 \
+        --variable ANDROID_CRASHLYTICS_VERSION=2.9.8 \
+        --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
+        --variable IOS_FIREBASE_CORE_VERSION=5.15.0 \
+        --variable IOS_FIREBASE_AUTH_VERSION=5.15.0 \
+        --variable IOS_FIREBASE_MESSAGING_VERSION=5.15.0 \
+        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.15.0 \
+        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.15.0 \
+        --variable IOS_FABRIC_VERSION=1.9.0 \
         --variable IOS_CRASHLYTICS_VERSION=3.12.0
 
 ## AndroidX
