@@ -85,11 +85,11 @@ For example, to explicitly specify all the component versions at plugin install 
         --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0 \
         --variable ANDROID_CRASHLYTICS_VERSION=2.9.8 \
         --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
-        --variable IOS_FIREBASE_CORE_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_AUTH_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_MESSAGING_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.15.0 \
-        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.15.0 \
+        --variable IOS_FIREBASE_CORE_VERSION=5.20.2 \
+        --variable IOS_FIREBASE_AUTH_VERSION=5.20.2 \
+        --variable IOS_FIREBASE_MESSAGING_VERSION=5.20.2 \
+        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.20.2 \
+        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.20.2 \
         --variable IOS_FABRIC_VERSION=1.9.0 \
         --variable IOS_CRASHLYTICS_VERSION=3.12.0
 
