@@ -4,6 +4,24 @@
 
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 
+## Table of Contents
+
+- [4.0.0 - Breaking Change](#400---breaking-change)
+- [Difference from the fork repository](#difference-from-the-fork-repository)
+- [Installation](#installation)
+  * [For `cordova-android >= 8.x.x`](#for-cordova-android--8xx)
+  * [For `cordova-android <= 7.1.4`](#for-cordova-android--714)
+- [Supported Cordova Versions](#supported-cordova-versions)
+- [Guides](#guides)
+  * [Setup](#setup)
+        * [IMPORTANT NOTES](#important-notes)
+  * [PhoneGap Build](#phonegap-build)
+  * [cordova-lib@9 support](#cordova-lib9-support)
+  * [Google Play Services](#google-play-services)
+- [Google Tag Manager](#google-tag-manager)
+- [Configuring Notifications](#configuring-notifications)
+- [API](#api)
+
 ## 4.0.0 - Breaking Change
 
 Minimum `v8.0.0` of `cordova-android` is now required. View https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13 for details.

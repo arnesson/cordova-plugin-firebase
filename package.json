@@ -49,5 +49,8 @@
     },
     "dependencies": {
         "xcode": "^2.0.0"
+    },
+    "devDependencies": {
+        "markdown-toc": "^1.2.0"
     }
 }

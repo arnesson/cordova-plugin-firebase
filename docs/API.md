@@ -1,6 +1,47 @@
 # JavaScript API
 
-The list of available methods for this plugin is described below.
+The list of available methods for this plugin.
+
+## Table of Contents
+
+- [Firebase Cloud Messaging (Push Notifications)](#firebase-cloud-messaging-push-notifications)
+  * [getToken](#gettoken)
+  * [onTokenRefresh](#ontokenrefresh)
+  * [onNotificationOpen](#onnotificationopen)
+    + [Notification flow:](#notification-flow)
+  * [grantPermission (iOS only)](#grantpermission-ios-only)
+  * [hasPermission](#haspermission)
+  * [setBadgeNumber](#setbadgenumber)
+  * [getBadgeNumber](#getbadgenumber)
+  * [clearAllNotifications](#clearallnotifications)
+  * [subscribe to a topic](#subscribe-to-a-topic)
+  * [unsubscribe from a topic](#unsubscribe-from-a-topic)
+  * [unregister](#unregister)
+- [Firebase Analytics](#firebase-analytics)
+  * [logEvent](#logevent)
+  * [setScreenName](#setscreenname)
+  * [setUserId](#setuserid)
+  * [setUserProperty](#setuserproperty)
+  * [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled)
+- [Firebase Crashlytics](#firebase-crashlytics)
+  * [setCrashlyticsUserId](#setcrashlyticsuserid)
+  * [logError](#logerror)
+- [Firebase Auth](#firebase-auth)
+  * [verifyPhoneNumber](#verifyphonenumber)
+      - [Android](#android)
+      - [iOS](#ios)
+- [Firebase Remote Config](#firebase-remote-config)
+  * [fetch](#fetch)
+  * [activateFetched](#activatefetched)
+  * [getValue](#getvalue)
+  * [getByteArray (Android only)](#getbytearray-android-only)
+  * [getInfo (Android only)](#getinfo-android-only)
+  * [setConfigSettings (Android only)](#setconfigsettings-android-only)
+  * [setDefaults (Android only)](#setdefaults-android-only)
+- [Firebase Performance](#firebase-performance)
+  * [startTrace](#starttrace)
+  * [incrementCounter](#incrementcounter)
+  * [stopTrace](#stoptrace)
 
 ## Firebase Cloud Messaging (Push Notifications)
 
