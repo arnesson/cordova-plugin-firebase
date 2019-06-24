@@ -4,6 +4,27 @@
 
 This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
 
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [4.0.0 - Breaking Change](#400---breaking-change)
+- [Difference from the fork repository](#difference-from-the-fork-repository)
+- [Installation](#installation)
+  * [Uninstall the original firebase plugin](#uninstall-the-original-firebase-plugin)
+  * [For `cordova-android >= 8.x.x`](#for-cordova-android--8xx)
+  * [For `cordova-android <= 7.1.4`](#for-cordova-android--714)
+  * [AndroidX](#androidx)
+- [Supported Cordova Versions](#supported-cordova-versions)
+- [Guides](#guides)
+  * [Setup](#setup)
+        * [IMPORTANT NOTES](#important-notes)
+  * [PhoneGap Build](#phonegap-build)
+  * [Google Play Services](#google-play-services)
+- [Docs](#docs)
+  * [API](#api)
+  * [Google Tag Manager](#google-tag-manager)
+  * [Configuring Notifications](#configuring-notifications)
+
 ## 4.0.0 - Breaking Change
 
 Minimum `v8.0.0` of `cordova-android` is now required. View https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13 for details.
@@ -14,12 +35,19 @@ Maintained by [Wiz Panda](https://www.wizpanda.com/).
 
 The [author](https://github.com/arnesson) did a great job on the plugin. But seems not to be maintaining the changes. So we at **Wiz Panda**
 thought to maintain the repository with the latest changes & fixes so the others can take benefit of the Firebase in their cordova 
-application.
-
-To see a full list of changes done after we started maintaining this fork, please see the [Releases](https://github.com/wizpanda/cordova-plugin-firebase-lib/releases)
-or read the [CHANGELOG.md](https://github.com/wizpanda/cordova-plugin-firebase-lib/blob/master/CHANGELOG.md#v300)
+application. To see a full list of changes done after we started maintaining this fork, please see the [Releases](https://github
+.com/wizpanda/cordova-plugin-firebase-lib/releases) or read the [CHANGELOG.md](https://github.com/wizpanda/cordova-plugin-firebase-lib/blob/master/CHANGELOG.md#v300)
 
 ## Installation
+
+### Uninstall the original firebase plugin
+
+If you are using the [original](https://github.com/arnesson/cordova-plugin-firebase) firebase plugin, remove it first:
+
+```bash
+rm -rf platforms/android
+cordova plugin remove cordova-plugin-firebase
+```
 
 ### For `cordova-android >= 8.x.x`
 
@@ -44,6 +72,20 @@ Or add the following in your `config.xml`:
 
 ```xml
 <plugin name="cordova-plugin-firebase-lib" spec="^3.3.0" />
+```
+
+### AndroidX
+
+Because of the major breaking release by Google Firebase on [Jun 17, 2019](https://developers.google.com/android/guides/releases#june_17_2019)
+this plugin has been migrated to use [AndroidX](https://developer.android.com/jetpack/androidx/migrate). AndroidX is a major improvement 
+to the original Android [Support Library](https://developer.android.com/topic/libraries/support-library/index).
+
+If any of your Cordova app includes any plugin which is still using legacy Android Support Library, then installing this plugin might 
+break your build. For that install the following plugins:
+
+```bash
+cordova plugin add cordova-plugin-androidx
+cordova plugin add cordova-plugin-androidx-adapter
 ```
 
 ## Supported Cordova Versions
@@ -85,23 +127,21 @@ for details on how to download the files.
 ### PhoneGap Build
 Hooks do not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do that is to make a private fork of this plugin and replace the placeholder config files (see `src/ios` and `src/android`) with your actual ones, as well as hard coding your app id and api key in `plugin.xml`.
 
-### cordova-lib@9 support
-If you are using `cordova-cli@9` (i.e. `cordova-lib@9`) then you might need to install the `xcode` npm module dependency separately. To 
-do that, just run this command `npm i xcode --save-dev` in your app.
-
 ### Google Play Services
 Your build may fail if you are installing multiple plugins that use Google Play Services.  This is caused by the plugins installing different versions of the Google Play Services library.  This can be resolved by installing [cordova-android-play-services-gradle-release](https://github.com/dpa99c/cordova-android-play-services-gradle-release).
 
 If your build is still failing, you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release).  For more info, read the following [comment](https://github.com/dpa99c/cordova-plugin-request-location-accuracy/issues/50#issuecomment-390025013) about locking down the specific versions for play services and firebase. It is suggested to use `+` instead of `15.+` to ensure the correct versions are used.
 
-## Google Tag Manager
+## Docs
+
+### API
+
+See the full [API](docs/API.md) docs available for this plugin.
+
+### Google Tag Manager
 
 Checkout our [guide](docs/GOOGLE_TAG_MANAGER.md) for info on setting up Google Tag Manager.
 
-## Configuring Notifications
+### Configuring Notifications
 
 Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons and colors.
-
-## API
-
-See the full [API](docs/API.md) available for this plugin.
