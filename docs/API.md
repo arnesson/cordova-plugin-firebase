@@ -219,14 +219,17 @@ window.FirebasePlugin.logError("Any JS error message", function () {
 });
 ```
 
-Optionally, you can pass a JavaScript error stacktrace which will be parsed and included in the Crashlytics web console.
+Optionally, you can pass a JavaScript error stacktrace from [StackTrace.js](https://www.stacktracejs.com/)  which will be parsed and included in the Crashlytics web console. Unfortunately, on iOS, setting custom stack traces isn't natively supported, so the stack lines are logged as key/value pairs instead, which show up in the `Keys` section of an error in the firebase console.
 
 ```javascript
-window.FirebasePlugin.logError("Any JS error message", ["stacktrace"], function () {
-    // Optional function for success callback
-}, function () {
-    // Optional function for error callback
-});
+StackTrace.fromError(error, {offline: true})
+    .then(function(stack) {
+        window.FirebasePlugin.logError("Any JS error message", stack, function () {
+            // Optional function for success callback
+        }, function () {
+            // Optional function for error callback
+        });
+    }
 ```
 
 ## Firebase Auth
