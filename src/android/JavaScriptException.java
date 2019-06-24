@@ -21,6 +21,10 @@ public class JavaScriptException extends Exception {
     }
 
     private void handleStacktrace(JSONArray stackTrace) throws JSONException {
+        if (stackTrace == null) {
+            return;
+        }
+
         StackTraceElement[] trace = new StackTraceElement[stackTrace.length()];
 
         for (int i = 0; i < stackTrace.length(); i++) {

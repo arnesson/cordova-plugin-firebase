@@ -567,7 +567,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void logError(final CallbackContext callbackContext, final JSONArray args) throws JSONException {
-        String message = args.getString(0);
+        final String message = args.getString(0);
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
