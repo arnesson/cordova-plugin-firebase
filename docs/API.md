@@ -1,11 +1,55 @@
-# API
+# JavaScript API
 
-The list of available methods for this plugin is described below.
+The list of available methods for this plugin.
 
-## getToken
+## Table of Contents
+
+- [Firebase Cloud Messaging (Push Notifications)](#firebase-cloud-messaging-push-notifications)
+  * [getToken](#gettoken)
+  * [onTokenRefresh](#ontokenrefresh)
+  * [onNotificationOpen](#onnotificationopen)
+    + [Notification flow:](#notification-flow)
+  * [grantPermission (iOS only)](#grantpermission-ios-only)
+  * [hasPermission](#haspermission)
+  * [setBadgeNumber](#setbadgenumber)
+  * [getBadgeNumber](#getbadgenumber)
+  * [clearAllNotifications](#clearallnotifications)
+  * [subscribe to a topic](#subscribe-to-a-topic)
+  * [unsubscribe from a topic](#unsubscribe-from-a-topic)
+  * [unregister](#unregister)
+- [Firebase Analytics](#firebase-analytics)
+  * [logEvent](#logevent)
+  * [setScreenName](#setscreenname)
+  * [setUserId](#setuserid)
+  * [setUserProperty](#setuserproperty)
+  * [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled)
+- [Firebase Crashlytics](#firebase-crashlytics)
+  * [setCrashlyticsUserId](#setcrashlyticsuserid)
+  * [logError](#logerror)
+- [Firebase Auth](#firebase-auth)
+  * [verifyPhoneNumber](#verifyphonenumber)
+      - [Android](#android)
+      - [iOS](#ios)
+- [Firebase Remote Config](#firebase-remote-config)
+  * [fetch](#fetch)
+  * [activateFetched](#activatefetched)
+  * [getValue](#getvalue)
+  * [getByteArray (Android only)](#getbytearray-android-only)
+  * [getInfo (Android only)](#getinfo-android-only)
+  * [setConfigSettings (Android only)](#setconfigsettings-android-only)
+  * [setDefaults (Android only)](#setdefaults-android-only)
+- [Firebase Performance](#firebase-performance)
+  * [startTrace](#starttrace)
+  * [incrementCounter](#incrementcounter)
+  * [stopTrace](#stoptrace)
+
+## Firebase Cloud Messaging (Push Notifications)
+
+### getToken
 
 Get the device token (id):
-```
+
+```javascript
 window.FirebasePlugin.getToken(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
@@ -15,10 +59,11 @@ window.FirebasePlugin.getToken(function(token) {
 ```
 Note that token will be null if it has not been established yet
 
-## onTokenRefresh
+### onTokenRefresh
 
 Register for token changes:
-```
+
+```javascript
 window.FirebasePlugin.onTokenRefresh(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
@@ -28,127 +73,165 @@ window.FirebasePlugin.onTokenRefresh(function(token) {
 ```
 This is the best way to get a valid token for the device as soon as the token is established
 
-## onNotificationOpen
+### onNotificationOpen
 
 Register notification callback:
-```
+
+```javascript
 window.FirebasePlugin.onNotificationOpen(function(notification) {
     console.log(notification);
 }, function(error) {
     console.error(error);
 });
 ```
-Notification flow:
 
-1. App is in foreground:
+#### Notification flow:
+
+1. **App is in foreground**:
     1. User receives the notification data in the JavaScript callback without any notification on the device itself (this is the normal behaviour of push notifications, it is up to you, the developer, to notify the user)
-2. App is in background:
+2. **App is in background**:
     1. User receives the notification message in its device notification bar
     2. User taps the notification and the app opens
     3. User receives the notification data in the JavaScript callback
 
-Notification icon on Android:
+To change notification icon on **Android**, see [Changing notification icon](NOTIFICATIONS.md#changing-notification-icon)
 
-[Changing notification icon](NOTIFICATIONS.md#changing-notification-icon)
-
-## grantPermission (iOS only)
+### grantPermission (iOS only)
 
 Grant permission to receive push notifications (will trigger prompt):
-```
+```javascript
 window.FirebasePlugin.grantPermission();
 ```
-## hasPermission
+### hasPermission
 
 Check permission to receive push notifications:
-```
+
+```javascript
 window.FirebasePlugin.hasPermission(function(data){
     console.log(data.isEnabled);
 });
 ```
 
-## setBadgeNumber
+### setBadgeNumber
 
 Set a number on the icon badge:
-```
-window.FirebasePlugin.setBadgeNumber(3);
-```
 
-Set 0 to clear the badge
-```
+```javascript
+window.FirebasePlugin.setBadgeNumber(3);
+// Set 0 to clear the badge
 window.FirebasePlugin.setBadgeNumber(0);
 ```
 
-## getBadgeNumber
+### getBadgeNumber
 
 Get icon badge number:
-```
+```javascript
 window.FirebasePlugin.getBadgeNumber(function(n) {
     console.log(n);
 });
 ```
 
-## clearAllNotifications
+### clearAllNotifications
 
 Clear all pending notifications from the drawer:
-```
+```javascript
 window.FirebasePlugin.clearAllNotifications();
 ```
 
-## subscribe
+### subscribe to a topic
 
-Subscribe to a topic:
-```
+```javascript
 window.FirebasePlugin.subscribe("example");
 ```
 
-## unsubscribe
+### unsubscribe from a topic
 
-Unsubscribe from a topic:
-```
+```javascript
 window.FirebasePlugin.unsubscribe("example");
 ```
 
-## unregister
+### unregister
 
 Unregister from firebase, used to stop receiving push notifications. Call this when you logout user from your app. :
-```
+```javascript
 window.FirebasePlugin.unregister();
 ```
 
-## logEvent
+## Firebase Analytics
 
-Log an event using Analytics:
-```
+### logEvent
+
+```javascript
 window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
 ```
 
-## setCrashlyticsUserId
+### setScreenName
+
+Set the name of the current screen in Analytics:
+
+```javascript
+window.FirebasePlugin.setScreenName("Home");
+```
+
+### setUserId
+
+Set a user id for use in Analytics:
+```javascript
+window.FirebasePlugin.setUserId("user_id");
+```
+
+### setUserProperty
+
+Set a user property for use in Analytics:
+```javascript
+window.FirebasePlugin.setUserProperty("name", "value");
+```
+
+### setAnalyticsCollectionEnabled
+
+Enable/disable analytics collection
+
+```javascript
+window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+```
+
+## Firebase Crashlytics
+
+### setCrashlyticsUserId
 
 Set Crashlytics user identifier.
 - https://firebase.google.com/docs/crashlytics/customize-crash-reports?authuser=0#set_user_ids
 
-## setScreenName
-
-Set the name of the current screen in Analytics:
-```
-window.FirebasePlugin.setScreenName("Home");
+```javascript
+window.FirebasePlugin.setCrashlyticsUserId("your-custom-user-id");
 ```
 
-## setUserId
+### logError
 
-Set a user id for use in Analytics:
-```
-window.FirebasePlugin.setUserId("user_id");
-```
+Log any JavaScript error using Crashlytics:
 
-## setUserProperty
-
-Set a user property for use in Analytics:
-```
-window.FirebasePlugin.setUserProperty("name", "value");
+```javascript
+window.FirebasePlugin.logError("Any JS error message", function () {
+    // Optional function for success callback
+}, function () {
+    // Optional function for error callback
+});
 ```
 
-## verifyPhoneNumber
+Optionally, you can pass a JavaScript error stacktrace which will be parsed and included in the Crashlytics web console.
+
+```javascript
+window.FirebasePlugin.logError("Any JS error message", ["stacktrace"], function () {
+    // Optional function for success callback
+}, function () {
+    // Optional function for error callback
+});
+```
+
+## Firebase Auth
+
+### verifyPhoneNumber
 
 Request a verification ID and send a SMS with a verification code. Use them to construct a credential to sign in the user (in your app).
 - https://firebase.google.com/docs/auth/android/phone-auth
@@ -171,11 +254,13 @@ When using node.js Firebase Admin-SDK, follow this tutorial:
 - https://firebase.google.com/docs/auth/admin/create-custom-tokens
 
 Pass back your custom generated token and call
-```js
+```javascript
 firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 ```
+
 instead of
-```
+
+```javascript
 firebase.auth().signInWithCredential(credential)
 ```
 **YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
@@ -184,7 +269,7 @@ If this process is too complex for you, use this awesome plugin
 
 It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
 
-```
+```javascript
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
     console.log(credential);
 
@@ -206,17 +291,21 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
 ```
 
 
-### Android
+##### Android
 To use this auth you need to configure your app SHA hash in the android app configuration in the firebase console.
 See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
 
-### iOS
+##### iOS
 Setup your push notifications first, and verify that they are arriving on your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
 
-## fetch
+
+## Firebase Remote Config
+
+### fetch
 
 Fetch Remote Config parameter values for your app:
-```
+
+```javascript
 window.FirebasePlugin.fetch(function () {
     // success callback
 }, function () {
@@ -230,10 +319,10 @@ window.FirebasePlugin.fetch(600, function () {
 });
 ```
 
-## activateFetched
+### activateFetched
 
 Activate the Remote Config fetched config:
-```
+```javascript
 window.FirebasePlugin.activateFetched(function(activated) {
     // activated will be true if there was a fetched config activated,
     // or false if no fetched config was found, or the fetched config was already activated.
@@ -243,10 +332,10 @@ window.FirebasePlugin.activateFetched(function(activated) {
 });
 ```
 
-## getValue
+### getValue
 
 Retrieve a Remote Config value:
-```
+```javascript
 window.FirebasePlugin.getValue("key", function(value) {
     console.log(value);
 }, function(error) {
@@ -254,10 +343,10 @@ window.FirebasePlugin.getValue("key", function(value) {
 });
 ```
 
-## getByteArray (Android only)
+### getByteArray (Android only)
 **NOTE: byte array is only available for SDK 19+**
 Retrieve a Remote Config byte array:
-```
+```javascript
 window.FirebasePlugin.getByteArray("key", function(bytes) {
     // a Base64 encoded string that represents the value for "key"
     console.log(bytes.base64);
@@ -268,10 +357,10 @@ window.FirebasePlugin.getByteArray("key", function(bytes) {
 });
 ```
 
-## getInfo (Android only)
+### getInfo (Android only)
 
 Get the current state of the FirebaseRemoteConfig singleton object:
-```
+```javascript
 window.FirebasePlugin.getInfo(function(info) {
     // the status of the developer mode setting (true/false)
     console.log(info.configSettings.developerModeEnabled);
@@ -288,20 +377,20 @@ window.FirebasePlugin.getInfo(function(info) {
 });
 ```
 
-## setConfigSettings (Android only)
+### setConfigSettings (Android only)
 
 Change the settings for the FirebaseRemoteConfig object's operations:
-```
+```javascript
 var settings = {
     developerModeEnabled: true
 }
 window.FirebasePlugin.setConfigSettings(settings);
 ```
 
-## setDefaults (Android only)
+### setDefaults (Android only)
 
 Set defaults in the Remote Config:
-```
+```javascript
 // define defaults
 var defaults = {
     // map property name to value in Remote Config defaults
@@ -319,15 +408,17 @@ var defaults = {
 window.FirebasePlugin.setDefaults(defaults);
 ```
 
-## startTrace
+## Firebase Performance
+
+### startTrace
 
 Start a trace.
 
-```
+```javascript
 window.FirebasePlugin.startTrace("test trace", success, error);
 ```
 
-## incrementCounter
+### incrementCounter
 
 To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
 
@@ -335,20 +426,10 @@ To count the performance-related events that occur in your app (such as cache hi
 window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 ```
 
-## stopTrace
+### stopTrace
 
 Stop the trace
 
-```
+```javascript
 window.FirebasePlugin.stopTrace("test trace");
-```
-
-## setAnalyticsCollectionEnabled
-
-Enable/disable analytics collection
-
-```
-window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
-
-window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
 ```

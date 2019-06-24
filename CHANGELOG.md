@@ -1,10 +1,28 @@
 # Change Log
 
-## Version 3.0.1
+## v4.0.1
+
+1. Fixed typo in `firebase-browser.js`
+
+## v4.0.0 - Breaking Change
+
+1. Stop supporting `cordova-android 7.x.x`. Minimum `cordova-android 8.0.0` is required.
+2. Fix the failing build due to breaking changes released by Google Firebase on Jun 17, 2019.
+
+## v3.3.0
+
+1. Backward compatibility fixes to support breaking changes released by Google Firebase on Jun 17, 2019.
+
+## v3.2.0
+
+1. Added ability to log JavaScript stacktrace with a new method `logJSError`. Thanks to [distinctdan](https://github.com/distinctdan) for
+ [PR#8](https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/8).
+
+## v3.1.0
 
 1. Add `createChannel` function for Android O.
 
-## Version 3.0.0
+## v3.0.0
 
 First version under [Wiz Panda](https://www.wizpanda.com/).
 
