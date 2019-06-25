@@ -6,7 +6,8 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
+<!-- toc -->
+
 - [4.0.0 - Breaking Change](#400---breaking-change)
 - [Difference from the fork repository](#difference-from-the-fork-repository)
 - [Installation](#installation)
@@ -24,6 +25,8 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
   * [API](#api)
   * [Google Tag Manager](#google-tag-manager)
   * [Configuring Notifications](#configuring-notifications)
+
+<!-- tocstop -->
 
 ## 4.0.0 - Breaking Change
 
