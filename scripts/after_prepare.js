@@ -12,6 +12,9 @@ const utilities = require("./lib/utilities");
 
 const config = fs.readFileSync('config.xml').toString();
 const name = utilities.getValue(config, 'name');
+if(name.includes("&amp;")){
+    name = name.replace(/&amp;/g, '&');
+}
 
 const IOS_DIR = 'platforms/ios';
 const ANDROID_DIR = 'platforms/android';
