@@ -1,3 +1,6 @@
+# Version 3.0.5
+* Bump min version of cordova-plugin-cocoapod-supportx to 1.7.2 which fixes bug when using a plugin variable to specify the `ios-min-version` in `<pods-config>`
+
 # Version 3.0.4
 * Bump min version of cordova-plugin-cocoapod-supportx to 1.7.1 which supports using a plugin variable to specify the `ios-min-version` in `<pods-config>`
 
