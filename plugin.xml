@@ -102,7 +102,8 @@
 		<source-file src="src/ios/FirebasePlugin.m" />
 
 
-		<pods-config ios-min-version="9.0" use-frameworks="true"/>
+		<preference name="IOS_MIN_VERSION" default="9.0" />
+		<pods-config ios-min-version="$IOS_MIN_VERSION" use-frameworks="true"/>
 
 		<preference name="IOS_FIREBASE_CORE_VERSION" default="5.20.2" />
 		<preference name="IOS_FIREBASE_AUTH_VERSION" default="5.20.2" />
