@@ -1,3 +1,6 @@
+# Version 3.0.4
+* Bump min version of cordova-plugin-cocoapod-supportx to 1.7.1 which supports using a plugin variable to specify the `ios-min-version` in `<pods-config>`
+
 # Version 3.0.3
 * Implement didReceiveRegistrationToken delegate for iOS. Resolves [#16](https://github.com/dpa99c/cordova-plugin-firebase/issues/16).
 * Document dependency on Cocoapods. Resolves [#15](https://github.com/dpa99c/cordova-plugin-firebase/issues/15).
