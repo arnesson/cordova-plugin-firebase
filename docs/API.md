@@ -4,6 +4,18 @@ The list of available methods for this plugin.
 
 ## Table of Contents
 
+<!-- toc -->
+
+- [Firebase Analytics](#firebase-analytics)
+  * [logEvent](#logevent)
+  * [setScreenName](#setscreenname)
+  * [setUserId](#setuserid)
+  * [setUserProperty](#setuserproperty)
+  * [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled)
+- [Firebase Auth](#firebase-auth)
+  * [verifyPhoneNumber](#verifyphonenumber)
+      - [Android](#android)
+      - [iOS](#ios)
 - [Firebase Cloud Messaging (Push Notifications)](#firebase-cloud-messaging-push-notifications)
   * [getToken](#gettoken)
   * [onTokenRefresh](#ontokenrefresh)
@@ -17,19 +29,13 @@ The list of available methods for this plugin.
   * [subscribe to a topic](#subscribe-to-a-topic)
   * [unsubscribe from a topic](#unsubscribe-from-a-topic)
   * [unregister](#unregister)
-- [Firebase Analytics](#firebase-analytics)
-  * [logEvent](#logevent)
-  * [setScreenName](#setscreenname)
-  * [setUserId](#setuserid)
-  * [setUserProperty](#setuserproperty)
-  * [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled)
 - [Firebase Crashlytics](#firebase-crashlytics)
   * [setCrashlyticsUserId](#setcrashlyticsuserid)
   * [logError](#logerror)
-- [Firebase Auth](#firebase-auth)
-  * [verifyPhoneNumber](#verifyphonenumber)
-      - [Android](#android)
-      - [iOS](#ios)
+- [Firebase Performance](#firebase-performance)
+  * [startTrace](#starttrace)
+  * [incrementCounter](#incrementcounter)
+  * [stopTrace](#stoptrace)
 - [Firebase Remote Config](#firebase-remote-config)
   * [fetch](#fetch)
   * [activateFetched](#activatefetched)
@@ -38,10 +44,116 @@ The list of available methods for this plugin.
   * [getInfo (Android only)](#getinfo-android-only)
   * [setConfigSettings (Android only)](#setconfigsettings-android-only)
   * [setDefaults (Android only)](#setdefaults-android-only)
-- [Firebase Performance](#firebase-performance)
-  * [startTrace](#starttrace)
-  * [incrementCounter](#incrementcounter)
-  * [stopTrace](#stoptrace)
+
+<!-- tocstop -->
+
+## Firebase Analytics
+
+### logEvent
+
+```javascript
+window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
+```
+
+### setScreenName
+
+Set the name of the current screen in Analytics:
+
+```javascript
+window.FirebasePlugin.setScreenName("Home");
+```
+
+### setUserId
+
+Set a user id for use in Analytics:
+```javascript
+window.FirebasePlugin.setUserId("user_id");
+```
+
+### setUserProperty
+
+Set a user property for use in Analytics:
+```javascript
+window.FirebasePlugin.setUserProperty("name", "value");
+```
+
+### setAnalyticsCollectionEnabled
+
+Enable/disable analytics collection
+
+```javascript
+window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+```
+
+## Firebase Auth
+
+### verifyPhoneNumber
+
+Request a verification ID and send a SMS with a verification code. Use them to construct a credential to sign in the user (in your app).
+- https://firebase.google.com/docs/auth/android/phone-auth
+- https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
+- https://firebase.google.com/docs/reference/js/firebase.User#linkWithCredential
+
+**NOTE: This will only work on physical devices.**
+
+iOS will return: credential (string)
+Android will return:
+credential.verificationId (object and with key verificationId)
+credential.instantVerification (boolean)
+credential.code (string) (note that this key only exists if instantVerification is true)
+
+You need to use device plugin in order to access the right key.
+
+IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that case it doesn't make sense to ask for an sms code as you won't receive one. In this case you'll get a credential.verificationId and a credential.code where code is the auto received verification code that would normally be sent via sms. To log in using this procedure you must pass this code to PhoneAuthProvider.credential(verificationId, code). You'll find an implementation example further below.
+
+When using node.js Firebase Admin-SDK, follow this tutorial:
+- https://firebase.google.com/docs/auth/admin/create-custom-tokens
+
+Pass back your custom generated token and call
+```javascript
+firebase.auth().signInWithCustomToken(customTokenFromYourServer);
+```
+
+instead of
+
+```javascript
+firebase.auth().signInWithCredential(credential)
+```
+**YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
+If this process is too complex for you, use this awesome plugin
+- https://github.com/chemerisuk/cordova-plugin-firebase-authentication
+
+It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
+
+```javascript
+window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
+    console.log(credential);
+
+    // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
+    var code = credential.instantVerification ? credential.code : inputField.value.toString();
+
+    var verificationId = credential.verificationId;
+
+    var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+
+    // sign in with the credential
+    firebase.auth().signInWithCredential(credential);
+
+    // OR link to an account
+    firebase.auth().currentUser.linkWithCredential(credential)
+}, function(error) {
+    console.error(error);
+});
+```
+
+
+##### Android
+To use this auth you need to configure your app SHA hash in the android app configuration in the firebase console.
+See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+
+##### iOS
+Setup your push notifications first, and verify that they are arriving on your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
 
 ## Firebase Cloud Messaging (Push Notifications)
 
@@ -157,45 +269,6 @@ Unregister from firebase, used to stop receiving push notifications. Call this w
 window.FirebasePlugin.unregister();
 ```
 
-## Firebase Analytics
-
-### logEvent
-
-```javascript
-window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
-```
-
-### setScreenName
-
-Set the name of the current screen in Analytics:
-
-```javascript
-window.FirebasePlugin.setScreenName("Home");
-```
-
-### setUserId
-
-Set a user id for use in Analytics:
-```javascript
-window.FirebasePlugin.setUserId("user_id");
-```
-
-### setUserProperty
-
-Set a user property for use in Analytics:
-```javascript
-window.FirebasePlugin.setUserProperty("name", "value");
-```
-
-### setAnalyticsCollectionEnabled
-
-Enable/disable analytics collection
-
-```javascript
-window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
-window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
-```
-
 ## Firebase Crashlytics
 
 ### setCrashlyticsUserId
@@ -219,7 +292,9 @@ window.FirebasePlugin.logError("Any JS error message", function () {
 });
 ```
 
-Optionally, you can pass a JavaScript error stacktrace from [StackTrace.js](https://www.stacktracejs.com/)  which will be parsed and included in the Crashlytics web console. Unfortunately, on iOS, setting custom stack traces isn't natively supported, so the stack lines are logged as key/value pairs instead, which show up in the `Keys` section of an error in the firebase console.
+Optionally, you can pass a JavaScript error stacktrace from [StackTrace.js](https://www.stacktracejs.com/) which will be parsed and 
+included in the Crashlytics web console. Unfortunately, on iOS, setting custom stack traces isn't natively supported, so the stack lines 
+are logged as key/value pairs instead, which show up in the `Keys` section of an error in the firebase console.
 
 ```javascript
 StackTrace.fromError(error, {offline: true})
@@ -229,78 +304,34 @@ StackTrace.fromError(error, {offline: true})
         }, function () {
             // Optional function for error callback
         });
-    }
+    });
 ```
 
-## Firebase Auth
+## Firebase Performance
 
-### verifyPhoneNumber
+### startTrace
 
-Request a verification ID and send a SMS with a verification code. Use them to construct a credential to sign in the user (in your app).
-- https://firebase.google.com/docs/auth/android/phone-auth
-- https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
-- https://firebase.google.com/docs/reference/js/firebase.User#linkWithCredential
-
-**NOTE: This will only work on physical devices.**
-
-iOS will return: credential (string)
-Android will return:
-credential.verificationId (object and with key verificationId)
-credential.instantVerification (boolean)
-credential.code (string) (note that this key only exists if instantVerification is true)
-
-You need to use device plugin in order to access the right key.
-
-IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that case it doesn't make sense to ask for an sms code as you won't receive one. In this case you'll get a credential.verificationId and a credential.code where code is the auto received verification code that would normally be sent via sms. To log in using this procedure you must pass this code to PhoneAuthProvider.credential(verificationId, code). You'll find an implementation example further below.
-
-When using node.js Firebase Admin-SDK, follow this tutorial:
-- https://firebase.google.com/docs/auth/admin/create-custom-tokens
-
-Pass back your custom generated token and call
-```javascript
-firebase.auth().signInWithCustomToken(customTokenFromYourServer);
-```
-
-instead of
+Start a trace.
 
 ```javascript
-firebase.auth().signInWithCredential(credential)
+window.FirebasePlugin.startTrace("test trace", success, error);
 ```
-**YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
-If this process is too complex for you, use this awesome plugin
-- https://github.com/chemerisuk/cordova-plugin-firebase-authentication
 
-It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
+### incrementCounter
+
+To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
+
+```
+window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
+```
+
+### stopTrace
+
+Stop the trace
 
 ```javascript
-window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
-    console.log(credential);
-
-    // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
-    var code = credential.instantVerification ? credential.code : inputField.value.toString();
-
-    var verificationId = credential.verificationId;
-
-    var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-
-    // sign in with the credential
-    firebase.auth().signInWithCredential(credential);
-
-    // OR link to an account
-    firebase.auth().currentUser.linkWithCredential(credential)
-}, function(error) {
-    console.error(error);
-});
+window.FirebasePlugin.stopTrace("test trace");
 ```
-
-
-##### Android
-To use this auth you need to configure your app SHA hash in the android app configuration in the firebase console.
-See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
-
-##### iOS
-Setup your push notifications first, and verify that they are arriving on your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
-
 
 ## Firebase Remote Config
 
@@ -409,30 +440,4 @@ var defaults = {
 }
 // set defaults
 window.FirebasePlugin.setDefaults(defaults);
-```
-
-## Firebase Performance
-
-### startTrace
-
-Start a trace.
-
-```javascript
-window.FirebasePlugin.startTrace("test trace", success, error);
-```
-
-### incrementCounter
-
-To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
-
-```
-window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
-```
-
-### stopTrace
-
-Stop the trace
-
-```javascript
-window.FirebasePlugin.stopTrace("test trace");
 ```

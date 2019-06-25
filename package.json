@@ -31,7 +31,7 @@
     ],
     "scripts": {
         "preversion": "git add CHANGELOG.md && npx markdown-toc -i README.md && npx markdown-toc -i docs/API.md",
-        "version": "node ./bump-version.js && git add -A plugin.xml && git add README.md && git add API/*.md",
+        "version": "node ./bump-version.js && git add -A plugin.xml && git add README.md && git add docs/*.md",
         "postversion": "git push && git push --tags && npm publish --verbose",
         "test": "npm run test:ios && npm run test:android && npm run test:browser",
         "test:android": "npm run test:cordova@7.1.0:android@7.1.0 && npm run test:cordova@8.0.0:android@7.1.0 && npm run test:cordova@9.0.0:android@8.0.0",

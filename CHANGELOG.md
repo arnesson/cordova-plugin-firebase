@@ -1,5 +1,11 @@
 # Change Log
 
+## v4.1.0
+
+1. Breaking change: Removed method `logJSError` (introduced in v3.2.0) and merged that into `logError` message.
+2. Android: Handling a few edge cases for `logError` method.
+3. Docs: Generating "Table of Contents" for README & API docs.
+
 ## v4.0.1
 
 1. Fixed typo in `firebase-browser.js`
