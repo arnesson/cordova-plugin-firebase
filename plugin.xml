@@ -7,8 +7,9 @@
     <license>MIT</license>
 
     <engines>
-        <engine name="cordova" version=">=7.0.0"/>
+        <engine name="cordova" version=">=9.0.0"/>
         <engine name="cordova-android" version=">=8.0.0"/>
+        <engine name="cordova-ios" version=">=5.0.1"/>
     </engines>
 
     <platform name="android">
@@ -66,6 +67,7 @@
             <clobbers target="FirebasePlugin"/>
         </js-module>
         <config-file parent="/*" target="config.xml">
+            <preference name="deployment-target" value="10.0"/>
             <feature name="FirebasePlugin">
                 <param name="ios-package" value="FirebasePlugin"/>
                 <param name="onload" value="true"/>
@@ -85,26 +87,20 @@
         <header-file src="src/ios/FirebasePlugin.h"/>
         <source-file src="src/ios/FirebasePlugin.m"/>
 
-        <header-file src="src/ios/Firebase/Firebase.h"/>
-
-        <framework custom="true" src="src/ios/Crashlytics/Crashlytics.framework"/>
-        <framework custom="true" src="src/ios/Crashlytics/Fabric.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/GoogleAppMeasurement.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/MeasurementNanoPB.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCore.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseAnalytics.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/GoogleUtilities.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/nanopb.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseInstanceID.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Analytics/FirebaseCoreDiagnostics.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Auth/GTMSessionFetcher.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Auth/FirebaseAuth.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Messaging/FirebaseMessaging.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Performance/GoogleToolboxForMac.framework"/>
-        <framework custom="true" src="src/ios/Firebase/Performance/FirebasePerformance.framework"/>
-        <framework custom="true" src="src/ios/Firebase/RemoteConfig/Protobuf.framework"/>
-        <framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseRemoteConfig.framework"/>
-        <framework custom="true" src="src/ios/Firebase/RemoteConfig/FirebaseABTesting.framework"/>
+        <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git"/>
+            </config>
+            <pods>
+                <pod name="Firebase/Core" spec="~> 6.1.0"/>
+                <pod name="Firebase/Auth" spec="~> 6.1.0"/>
+                <pod name="Firebase/Messaging" spec="~> 6.1.0"/>
+                <pod name="Firebase/Performance" spec="~> 6.1.0"/>
+                <pod name="Firebase/RemoteConfig" spec="~> 6.1.0"/>
+                <pod name="Fabric" spec="1.10.2"/>
+                <pod name="Crashlytics" spec="3.13.2"/>
+            </pods>
+        </podspec>
     </platform>
 
     <platform name="browser">
