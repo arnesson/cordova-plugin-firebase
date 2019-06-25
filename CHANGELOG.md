@@ -1,3 +1,6 @@
+# Version 3.0.2
+* Update legacy Xpath reference to `<application>` element in `AndroidManifest.xml`
+
 # Version 3.0.1
 * Bump default iOS Firebase SDK version to 5.20.2 (https://firebase.google.com/support/release-notes/ios#version_5202_-_april_10_2019). Resolves [#8](https://github.com/dpa99c/cordova-plugin-firebase/issues/8).
 
