@@ -28,10 +28,6 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 
 <!-- tocstop -->
 
-## 4.0.0 - Breaking Change
-
-Minimum `v8.0.0` of `cordova-android` is now required. View https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13 for details.
-
 ## Difference from the fork repository
 
 Maintained by [Wiz Panda](https://www.wizpanda.com/).
@@ -40,6 +36,48 @@ The [author](https://github.com/arnesson) did a great job on the plugin. But see
 thought to maintain the repository with the latest changes & fixes so the others can take benefit of the Firebase in their cordova 
 application. To see a full list of changes done after we started maintaining this fork, please see the [Releases](https://github
 .com/wizpanda/cordova-plugin-firebase-lib/releases) or read the [CHANGELOG.md](https://github.com/wizpanda/cordova-plugin-firebase-lib/blob/master/CHANGELOG.md#v300)
+
+## Major Releases
+
+In the last week from Jun 17, 2019 to Jun 25, 2019, we released three major versions of this plugin so that developers across the globe, 
+who are using different versions of `cordova-lib`, `cordova-android` & `cordova-ios` can use different version of this plugin without 
+needing to upgrade these 3 dependencies immediately.
+
+So here are the three major releases of this plugin:
+
+### v5.x
+
+1. CocoaPods is used to manage Firebase dependencies for iOS
+
+#### Supported Cordova Platforms
+
+- cordova-cli: `>= 9.0.0`
+- cordova-lib: `>= 9.0.0` (Will be used automatically by `cordova-cli`)
+- cordova-android: `>= 8.0.0`
+- cordova-ios: `>= 5.0.1`
+
+### v4.x
+
+1. Minimum `v8.0.0` of `cordova-android` is now required. View [#13](https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13) for details.
+2. Using latest versions of Firebase Android dependencies.
+
+#### Supported Cordova Platforms
+
+- cordova: `>= 8.0.0`
+- cordova-lib: `>= 8.0.0` (Will be used automatically by `cordova-cli`)
+- cordova-android: `>= 8.0.0`
+- cordova-ios: `>= 4.5.5`
+
+### v3.x
+
+1. Using last [released](https://firebase.google.com/support/release-notes/android#update_-_may_31_2019) Firebase Android dependencies 
+which was released before Jun 17, 2019.
+
+#### Supported Cordova Platforms
+
+- cordova: `>= 7.0.0`
+- cordova-android: `>= 7.0.0` (Might work on `cordova-android 6.x` versions)
+- cordova-ios: `>= 4.5.5` (Might work on old `cordova-ios` versions)
 
 ## Installation
 
@@ -90,12 +128,6 @@ break your build. For that install the following plugins:
 cordova plugin add cordova-plugin-androidx
 cordova plugin add cordova-plugin-androidx-adapter
 ```
-
-## Supported Cordova Versions
-
-- cordova: `>= 8`
-- cordova-android: `>= 8.0.0`
-- cordova-ios: `>= 4.5.5`
 
 ## Guides
 
