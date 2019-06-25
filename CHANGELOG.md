@@ -1,5 +1,10 @@
 # Change Log
 
+## v5.0.0
+
+1. iOS: Using CocoaPods to manage Firebase dependencies hence requires `cordova-cli` to be minimum `v9.0.0`.
+2. Docs: Detailed instructions to get the Cordova environment versions and different major releases to be used.
+
 ## v4.1.0
 
 1. Breaking change: Removed method `logJSError` (introduced in v3.2.0) and merged that into `logError` message.
