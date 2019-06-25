@@ -1,3 +1,9 @@
+# Version 3.0.3
+* Implement didReceiveRegistrationToken delegate for iOS. Resolves [#16](https://github.com/dpa99c/cordova-plugin-firebase/issues/16).
+* Document dependency on Cocoapods. Resolves [#15](https://github.com/dpa99c/cordova-plugin-firebase/issues/15).
+* Make min iOS version configurable. Resolves [#14](https://github.com/dpa99c/cordova-plugin-firebase/issues/14).
+
+
 # Version 3.0.2
 * Update legacy Xpath reference to `<application>` element in `AndroidManifest.xml`
 
