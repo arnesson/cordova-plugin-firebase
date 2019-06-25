@@ -6,7 +6,7 @@
 
 	<license>MIT</license>
 
-	<dependency id="cordova-plugin-cocoapod-supportx" version="^1.7.0" />
+	<dependency id="cordova-plugin-cocoapod-supportx" version="^1.7.1" />
 	<dependency id="cordova-plugin-androidx" version="^1.0.2" />
 
 	<engines>
