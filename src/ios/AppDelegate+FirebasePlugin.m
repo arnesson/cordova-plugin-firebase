@@ -68,6 +68,7 @@
 
     // [START set_messaging_delegate]
     [FIRMessaging messaging].delegate = self;
+    [FIRMessaging messaging].shouldEstablishDirectChannel = true;
     // [END set_messaging_delegate]
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
     self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
@@ -83,12 +84,12 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [self connectToFcm];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = true;
     self.applicationInBackground = @(NO);
     }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[FIRMessaging messaging] disconnect];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
     self.applicationInBackground = @(YES);
     NSLog(@"Disconnected from FCM");
 }
@@ -102,24 +103,15 @@
     // Note that this callback will be fired everytime a new token is generated, including the first
     // time. So if you need to retrieve the token as soon as it is available this is where that
     // should be done.
-    NSString *refreshedToken = [[FIRInstanceID instanceID] token];
-    NSLog(@"InstanceID token: %@", refreshedToken);
-
-    // Connect to FCM since connection may have failed when attempted before having a token.
-    [self connectToFcm];
-    [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
-}
-
-- (void)connectToFcm {
-    [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
-        if (error != nil) {
-            NSLog(@"Unable to connect to FCM. %@", error);
-        } else {
-            NSLog(@"Connected to FCM.");
-            NSString *refreshedToken = [[FIRInstanceID instanceID] token];
+    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
+                                                        NSError * _Nullable error) {
+        if (error == nil) {
+            NSString *refreshedToken = result.token;
             NSLog(@"InstanceID token: %@", refreshedToken);
+            [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
         }
     }];
+    
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
