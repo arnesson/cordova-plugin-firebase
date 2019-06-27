@@ -137,6 +137,7 @@ This plugin depends on [cordova-plugin-cocoapod-supportx](https://github.com/dpa
 Therefore please make sure you have Cocopods installed in your iOS build environemnt - setup instructions can be found [here](https://cocoapods.org/).
 Also make sure your local Cocoapods repo is up-to-date by running `pod repo update`.
 
+If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
 
 ## Guides
 Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
