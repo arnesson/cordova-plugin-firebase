@@ -4,10 +4,6 @@ exports.getVerificationID = function (number, success, error) {
     exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
 
-exports.getInstanceId = function (success, error) {
-    exec(success, error, "FirebasePlugin", "getInstanceId", []);
-};
-
 exports.getId = function (success, error) {
     exec(success, error, "FirebasePlugin", "getId", []);
 };

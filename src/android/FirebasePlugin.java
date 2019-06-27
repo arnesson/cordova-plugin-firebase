@@ -178,10 +178,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("getInstanceId")) {
-            this.getInstanceId(callbackContext);
-            return true;
-        } else if (action.equals("getId")) {
+        if (action.equals("getId")) {
             this.getId(callbackContext);
             return true;
         } else if (action.equals("getToken")) {
@@ -400,20 +397,6 @@ public class FirebasePlugin extends CordovaPlugin {
             data.putBoolean("tap", true);
             FirebasePlugin.sendNotification(data, this.cordova.getActivity().getApplicationContext());
         }
-    }
-
-    // DEPRECTED - alias of getToken
-    private void getInstanceId(final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    String token = FirebaseInstanceId.getInstance().getToken();
-                    callbackContext.success(token);
-                } catch (Exception e) {
-                    callbackContext.error(e.getMessage());
-                }
-            }
-        });
     }
 
     private void getId(final CallbackContext callbackContext) {

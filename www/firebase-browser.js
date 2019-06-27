@@ -4,12 +4,6 @@ exports.getVerificationID = function (number, success, error) {
     }
 };
 
-exports.getInstanceId = function (success, error) {
-    if (typeof success === 'function') {
-        success();
-    }
-};
-
 exports.getToken = function (success, error) {
     if (typeof success === 'function') {
         success();
