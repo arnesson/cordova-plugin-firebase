@@ -8,6 +8,9 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 
 <!-- toc -->
 
+- [Prerequisites](#prerequisites)
+  * [For Android App](#for-android-app)
+  * [For iOS App](#for-ios-app)
 - [Difference from the fork repository](#difference-from-the-fork-repository)
 - [Confirm your Cordova environment versions](#confirm-your-cordova-environment-versions)
 - [Major Releases](#major-releases)
@@ -32,6 +35,19 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
   * [Configuring Notifications](#configuring-notifications)
 
 <!-- tocstop -->
+
+## Prerequisites
+
+### For Android App
+
+1. Android Studio
+2. Check more here at https://firebase.google.com/docs/android/setup#prerequisites
+
+### For iOS App
+
+1. Xcode 10.1 or later.
+2. CocoaPods 1.4.0 or later.
+3. Check more here at https://firebase.google.com/docs/ios/setup#prerequisites
 
 ## Difference from the fork repository
 

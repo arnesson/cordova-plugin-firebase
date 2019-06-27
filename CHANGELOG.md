@@ -1,5 +1,10 @@
 # Change Log
 
+## v5.1.0
+
+1. iOS: Downgrading the Firebase iOS dependency to 5.x to make the iOS app build fixed.
+2. Common: Removed deprecated `getInstanceId` method. Use `getToken` instead.
+
 ## v5.0.0
 
 1. iOS: Using CocoaPods to manage Firebase dependencies hence requires `cordova-cli` to be minimum `v9.0.0`.
