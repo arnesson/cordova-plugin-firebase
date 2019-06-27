@@ -2,14 +2,16 @@
 <plugin id="cordova-plugin-firebase-lib" version="5.0.0"
         xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
-    <name>Google Firebase Plugin</name>
 
+    <name>Google Firebase Plugin</name>
+    <description>Cordova plugin for Firebase integration</description>
+    <keywords>cordova</keywords>
     <license>MIT</license>
 
     <engines>
         <engine name="cordova" version=">=9.0.0"/>
         <engine name="cordova-android" version=">=8.0.0"/>
-        <engine name="cordova-ios" version=">=5.0.1"/>
+        <engine name="cordova-ios" version=">=5.0.0"/>
     </engines>
 
     <platform name="android">
@@ -91,12 +93,12 @@
             <config>
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
-            <pods>
-                <pod name="Firebase/Core" spec="~> 6.1.0"/>
-                <pod name="Firebase/Auth" spec="~> 6.1.0"/>
-                <pod name="Firebase/Messaging" spec="~> 6.1.0"/>
-                <pod name="Firebase/Performance" spec="~> 6.1.0"/>
-                <pod name="Firebase/RemoteConfig" spec="~> 6.1.0"/>
+            <pods use-frameworks="true">
+                <pod name="Firebase/Core" spec="5.20.2"/>
+                <pod name="Firebase/Auth" spec="5.20.2"/>
+                <pod name="Firebase/Messaging" spec="5.20.2"/>
+                <pod name="Firebase/Performance" spec="5.20.2"/>
+                <pod name="Firebase/RemoteConfig" spec="5.20.2"/>
                 <pod name="Fabric" spec="1.10.2"/>
                 <pod name="Crashlytics" spec="3.13.2"/>
             </pods>
