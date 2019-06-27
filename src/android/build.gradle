@@ -19,4 +19,9 @@ repositories {
 cdvPluginPostBuildExtras.add({
     apply plugin: 'com.google.gms.google-services'
     apply plugin: 'io.fabric'
+
+    // Enable Crashlytics NDK reporting
+    crashlytics {
+        enableNdk true
+    }
 })
