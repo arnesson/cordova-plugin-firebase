@@ -1,26 +1,25 @@
-const fs = require("fs");
-const path = require("path");
-const utilities = require("../lib/utilities");
-const xcode = require("xcode");
+const fs = require('fs');
+const path = require('path');
+const xcode = require('xcode');
+const chalk = require('chalk');
+const utilities = require('../lib/utilities');
 
 /**
  * This is used as the display text for the build phase block in XCode as well as the
  * inline comments inside of the .pbxproj file for the build script phase block.
  */
-const comment = "\"Crashlytics\"";
+const comment = '"Crashlytics"';
 
 module.exports = {
 
     /**
-     * Used to get the path to the XCode project's .pbxproj file.
-     *
-     * @param {object} context - The Cordova context.
-     * @returns The path to the XCode project's .pbxproj file.
+     * @returns string path to the XCode project's .pbxproj file.
      */
-    getXcodeProjectPath: function (context) {
-        const appName = utilities.getAppName(context);
-
-        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
+    getXcodeProjectPath: function () {
+        const appName = utilities.getAppName();
+        const xcodeProjectPath = path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
+        console.log(chalk.blue.bold('Xcode project path:', xcodeProjectPath));
+        return xcodeProjectPath;
     },
 
     /**
