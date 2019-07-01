@@ -50,6 +50,10 @@ module.exports = function (context) {
   if (platforms.indexOf('ios') !== -1 && utilities.directoryExists(IOS_DIR)) {
     console.log('Preparing Firebase on iOS');
     utilities.copyKey(PLATFORM.IOS);
+
+    var helper = require("./ios/helper");
+    var xcodeProjectPath = helper.getXcodeProjectPath(context);
+    helper.ensureRunpathSearchPath(context, xcodeProjectPath);
   }
   if (platforms.indexOf('android') !== -1 && utilities.directoryExists(ANDROID_DIR)) {
     console.log('Preparing Firebase on Android');
