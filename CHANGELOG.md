@@ -1,3 +1,6 @@
+# Version 3.0.8
+* \[iOS\] Add support for stripping debug symbols for libraries included via Cocoapods. Resolves [#28](https://github.com/dpa99c/cordova-plugin-firebase/issues/28).
+
 # Version 3.0.7
 * \[iOS\] Ensure runpath search path contains `$(inherited)` to avoid build warnings/issues. Resolves [#25](https://github.com/dpa99c/cordova-plugin-firebase/issues/25).
 
