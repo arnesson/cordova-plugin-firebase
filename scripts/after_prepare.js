@@ -35,16 +35,26 @@ const PLATFORM = {
 };
 
 module.exports = function (context) {
+    const log = console.log;
     // Get platform from the context supplied by cordova
     const platforms = context.opts.platforms;
 
     // Copy key files to their platform specific folders
     if (platforms.indexOf('ios') !== -1 && utilities.directoryExists(IOS_DIR)) {
-        console.log(chalk.green.bold('Preparing Firebase on iOS'));
+        log(chalk.green.bold('Preparing Firebase on iOS'));
         utilities.copyKey(PLATFORM.IOS);
+
+        const rightPath = './platforms/ios/' + name + '.xcworkspace';
+        const wrongPath = './platforms/ios/' + name + '.xcodeproj';
+
+        log(chalk.bold.red.underline('\nIMPORTANT:'));
+        log(chalk.green('Please make sure you open', chalk.bold(rightPath), 'instead of', chalk.bold(wrongPath),
+            'if you are using Xcode to build.'));
+        log(chalk.green('Alternatively, you can simply run', chalk.bold('open -a Xcode platforms/ios')));
     }
+
     if (platforms.indexOf('android') !== -1 && utilities.directoryExists(ANDROID_DIR)) {
-        console.log(chalk.green.bold('Preparing Firebase on Android'));
+        log(chalk.green.bold('Preparing Firebase on Android'));
         utilities.copyKey(PLATFORM.ANDROID);
     }
 };
