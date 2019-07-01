@@ -166,6 +166,14 @@ cordova plugin add cordova-plugin-androidx
 cordova plugin add cordova-plugin-androidx-adapter
 ```
 
+### CocoaPods
+
+This plugin uses [CocoaPods](https://cocoapods.org/) to manage the iOS Firebase dependencies. So please note the following two points:
+
+1. If you are building your app using Xcode, please open `platform/ios/my-cordova-project.xcworkspace` instead of 
+`platform/ios/my-cordova-project.xcodeproj` so that the Xcode can load both Cordova app & the Pods.
+2. Your repo needs to be up to date. To keep it up to date, run `pod repo update` anywhere in your terminal.
+
 ### Guides
 
 1. Great installation and setup guide [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
@@ -193,9 +201,9 @@ for details on how to download the files.
 
 ### Important Notes
 
-- This plugin uses a hook (after prepare) that copies the configuration files to the right place, namely 
+- This plugin uses a hook (`after_prepare`) that copies the configuration files to the right place, namely 
 `platforms/ios/my-cordova-project/Resources` for iOS and `platforms/android` for Android.
-- Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
+- Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or build.
 
 ### PhoneGap Build
 
