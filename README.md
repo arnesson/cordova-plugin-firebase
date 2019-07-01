@@ -24,6 +24,7 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
   * [Uninstall the original firebase plugin](#uninstall-the-original-firebase-plugin)
   * [Install this plugin](#install-this-plugin)
   * [AndroidX](#androidx)
+  * [CocoaPods](#cocoapods)
   * [Guides](#guides)
   * [Setup](#setup)
   * [Important Notes](#important-notes)

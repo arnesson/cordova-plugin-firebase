@@ -1,5 +1,10 @@
 # Change Log
 
+## v5.1.1
+
+1. Common: Handling ampersand in app name.
+2. Build: Improving JavaScript code and logging more information.
+
 ## v5.1.0
 
 1. iOS: Downgrading the Firebase iOS dependency to 5.x to make the iOS app build fixed.
