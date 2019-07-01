@@ -139,6 +139,12 @@ Also make sure your local Cocoapods repo is up-to-date by running `pod repo upda
 
 If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
 
+You can list the pod dependencies in your Cordova iOS project by installing [cocoapods-dependencies](https://github.com/segiddins/cocoapods-dependencies):
+
+    sudo gem install cocoapods-dependencies
+    cd platforms/ios/
+    pod dependencies
+
 ## Guides
 Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
 
