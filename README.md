@@ -23,8 +23,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [Android](#android)
     - [AndroidX](#androidx)
   - [iOS](#ios)
-    - [iOS minimum version](#ios-minimum-version)
-    - [Cocoapods](#cocoapods)
     - [Strip debug symbols](#strip-debug-symbols)
 - [Guides](#guides)
 - [Setup](#setup)
@@ -91,16 +89,6 @@ The following plugin variables are use to specify the follow Gradle dependency v
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
 - `ANDROID_SHORTCUTBADGER_VERSION` => `me.leolin:ShortcutBadger`
 
-The following plugin variables are use to specify the follow Cocoapods dependency versions on iOS:
-
-- `IOS_FIREBASE_CORE_VERSION` => `Firebase/Core`
-- `IOS_FIREBASE_AUTH_VERSION` => `Firebase/Auth`
-- `IOS_FIREBASE_MESSAGING_VERSION` => `Firebase/Messaging`
-- `IOS_FIREBASE_PERFORMANCE_VERSION` => `Firebase/Performance`
-- `IOS_FIREBASE_REMOTECONFIG_VERSION` => `Firebase/RemoteConfig`
-- `IOS_FABRIC_VERSION` => `Fabric`
-- `IOS_CRASHLYTICS_VERSION` => `Crashlytics`
-
 For example, to explicitly specify all the component versions at plugin install time:
 
     cordova plugin add cordova-plugin-firebasex \
@@ -113,13 +101,6 @@ For example, to explicitly specify all the component versions at plugin install 
         --variable ANDROID_CRASHLYTICS_VERSION=2.10.1 \
         --variable ANDROID_CRASHLYTICS_NDK_VERSION=2.1.0 \
         --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
-        --variable IOS_FIREBASE_CORE_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_AUTH_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_MESSAGING_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.20.2 \
-        --variable IOS_FABRIC_VERSION=1.9.0 \
-        --variable IOS_CRASHLYTICS_VERSION=3.12.0
 
 ## Usage notes
 ### Android
@@ -133,37 +114,16 @@ Therefore if your project includes any plugins which are dependent on the legacy
 This plugin will dynamically migrate any plugin code from the Android Support Library to AndroidX equivalents.
 
 ### iOS
-#### iOS minimum version
-This plugin sets a default minimum iOS version in the Pod file (see `<preference name="IOS_MIN_VERSION">` in `plugin.xml`) which can be overriden using a plugin variable of the same name, e.g.:
-
-    cordova plugin add cordova-plugin-firebasex --variable IOS_MIN_VERSION=10.0
-
-#### Cocoapods
-This plugin depends on [cordova-plugin-cocoapod-supportx](https://github.com/dpa99c/cordova-plugin-cocoapods-support) which adds Cordova support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satify the iOS Firebase SDK library dependencies.
-
-Therefore please make sure you have Cocopods installed in your iOS build environemnt - setup instructions can be found [here](https://cocoapods.org/).
-Also make sure your local Cocoapods repo is up-to-date by running `pod repo update`.
-
-If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
-
-You can list the pod dependencies in your Cordova iOS project by installing [cocoapods-dependencies](https://github.com/segiddins/cocoapods-dependencies):
-
-    sudo gem install cocoapods-dependencies
-    cd platforms/ios/
-    pod dependencies
-
 #### Strip debug symbols
 If your iOS app build contains too many debug symbols (i.e. because you include lots of libraries via a Cocoapods), you might get an error (e.g. [issue #28](https://github.com/dpa99c/cordova-plugin-firebase/issues/28)) when you upload your binary to App Store Connect, e.g.:
 
     ITMS-90381: Too many symbol files - These symbols have no corresponding slice in any binary [16EBC8AC-DAA9-39CF-89EA-6A58EB5A5A2F.symbols, 1B105D69-2039-36A4-A04D-96C1C5BAF235.symbols, 476EACDF-583B-3B29-95B9-253CB41097C8.symbols, 9789B03B-6774-3BC9-A8F0-B9D44B08DCCB.symbols, 983BAE60-D245-3291-9F9C-D25E610846AC.symbols].
 
-To prevent this, you can set the `IOS_STRIP_DEBUG` plugin variable which prevents symbolification of all libraries included via Cocoapods (see here)[https://stackoverflow.com/a/48518656/777265]:
+To prevent this, you'll need to edit the `platforms/ios/Podfile` to add a config block to prevent symbolification of all libraries included via Cocoapods - (see here)[https://stackoverflow.com/a/48518656/777265]
 
-    cordova plugin add cordova-plugin-firebasex --variable IOS_STRIP_DEBUG=true
+Then run `pod install` from `platforms/ios/`
 
-By default this preference is set to `false`.
-
-Note: if you enable this setting, any crashes that occur within libraries included via Cocopods will not be recorded in Crashlytics or other crash reporting services.
+Note: if you do this, any crashes that occur within libraries included via Cocopods will not be recorded in Crashlytics or other crash reporting services.
 
 ## Guides
 Great installation and setup guide by Medium.com - [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
