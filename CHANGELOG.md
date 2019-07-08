@@ -1,3 +1,10 @@
+# Version 4.0.0
+* *BREAKING CHANGE:* set min supported versions to `cordova@9` and `cordova-ios@5`.
+    * Drop dependency on cordova-plugin-cocoapodsx to install pod dependencies.
+    * Instead  update plugin.xml to use podspec formatting as required by cordova-ios@5.
+    * Remove iOS plugin variables as these are not (currently) supported by cordova-ios@5
+    * Resolves [#22](https://github.com/dpa99c/cordova-plugin-firebase/issues/22).
+
 # Version 3.0.8
 * \[iOS\] Add support for stripping debug symbols for libraries included via Cocoapods. Resolves [#28](https://github.com/dpa99c/cordova-plugin-firebase/issues/28).
 
