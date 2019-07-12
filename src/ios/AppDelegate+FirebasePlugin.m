@@ -49,17 +49,17 @@
 
     // get GoogleService-Info.plist file path
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    
+
     // if file is successfully found, use it
     if(filePath){
         NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
         // create firebase configure options passing .plist as content
         FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
-        
+
         // configure FIRApp with options
         [FIRApp configureWithOptions:options];
     }
-    
+
     // no .plist found, try default App
     if (![FIRApp defaultApp] && !filePath) {
         NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
@@ -154,17 +154,23 @@
 #endif  // __IPHONE_12_0
 
     __block NSURL *urlForSend = userActivity.webpageURL;
-    dispatch_block_t triggerHandleOpenUrl = ^(void) {
+    void (^triggerHandleOpenUrl)(void) = ^{
+        if ( urlForSend == nil )
+            return;
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:urlForSend]];
     };
 
 
-    BOOL handled = [[FIRDynamicLinks dynamicLinks] handleUniversalLink:userActivity.webpageURL completion:^(FIRDynamicLink * _Nullable dynamicLink, NSError * _Nullable error) {
-        if ( dynamicLink ){
-            urlForSend = dynamicLink.url;
-        }
-        triggerHandleOpenUrl();
-    }];
+
+    BOOL handled = false;
+    #if __has_include(<FirebaseDynamicLinks/FirebaseDynamicLinks.h>)
+        handled = [[FIRDynamicLinks dynamicLinks] handleUniversalLink:userActivity.webpageURL completion:^(FIRDynamicLink * _Nullable dynamicLink, NSError * _Nullable error) {
+            if ( dynamicLink ){
+                urlForSend = dynamicLink.url;
+            }
+            triggerHandleOpenUrl();
+        }];
+    #endif
 
 
 
@@ -187,8 +193,11 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
 
-    NSURL *urlForSend = url; // Initialize with current url
-    dispatch_block_t triggerHandleOpenUrl = ^(void) {
+	__block NSURL *urlForSend = nil; // Initialize with current url
+    void (^triggerHandleOpenUrl)(void) = ^{
+        if ( urlForSend == nil )
+            return;
+
         NSMutableDictionary * openURLData = [[NSMutableDictionary alloc] init];
         [openURLData setValue:urlForSend forKey:@"url"];
         if (sourceApplication) {
@@ -204,17 +213,19 @@
         [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLWithAppSourceAndAnnotationNotification object:openURLData]];
     };
 
+    #if __has_include(<FirebaseDynamicLinks/FirebaseDynamicLinks.h>)
+        FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
 
-    FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
+        // check if url passed is a Firebase Dynamic Link
+        if (dynamicLink) {
+            // Recover the url or deeplink from Firebase Dynamic Link
+            urlForSend = dynamicLink.url;
+            triggerHandleOpenUrl();
+            return YES;
+        }
+    #endif
 
-    // check if url passed is a Firebase Dynamic Link
-    if (dynamicLink) {
-        // Recover the url or deeplink from Firebase Dynamic Link
-        urlForSend = dynamicLink.url;
-        triggerHandleOpenUrl();
-        return YES;
-    }
-
+    urlForSend = url;
     triggerHandleOpenUrl();
     return NO;
 }

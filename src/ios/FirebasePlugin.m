@@ -43,7 +43,7 @@ static FirebasePlugin *firebasePlugin;
 	NSString* allowFileAccess = [self.commandDelegate.settings objectForKey:[@"FirebasePluginAllowFileAccess" lowercaseString]];
     if ([self.webView isKindOfClass:WKWebView.class] && [allowFileAccess isEqualToString:@"true"]){
         WKWebView *wkWebView = (WKWebView *) self.webView;
-        [wkWebView.configuration.preferences setValue:@"true" forKey:@"allowFileAccessFromFileURLs"];
+        [wkWebView.configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
     }
 }
 

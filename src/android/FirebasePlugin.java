@@ -730,8 +730,10 @@ public class FirebasePlugin extends CordovaPlugin {
 						StackTraceElement[] trace = new StackTraceElement[stackTrace.length()];
 						for(int i = 0; i < stackTrace.length(); i++) {
 	 						JSONObject elem = stackTrace.getJSONObject(i);
-
-	 						trace[i] = new StackTraceElement("undefined", elem.getString("functionName"),elem.getString("fileName"), elem.getInt("lineNumber"));
+							String functionName = elem.has("functionName") ? elem.getString("functionName") : "";
+							String fileName     = elem.has("fileName")     ? elem.getString("fileName")     : "";
+							int lineNumber      = elem.has("lineNumber")   ? elem.getInt("lineNumber")      : 0;
+	 						trace[i] = new StackTraceElement("undefined", functionName, fileName, lineNumber);
 	 					}
 
 						JavaScriptException ex = new JavaScriptException(data.getString(0));
