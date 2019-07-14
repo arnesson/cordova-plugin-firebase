@@ -129,27 +129,20 @@ cordova plugin remove cordova-plugin-firebase
 
 ### Install this plugin
 
-**For `cordova-cli >= 9.x.x` && (`cordava-ios >= 5.0.1` || `cordava-android >= 8.x.x`)**
-
-Use the latest major releases just by running:
+|  #  | Plugin version | Cordova CLI | Cordova Android | Cordova iOS | CocoaPods |
+| --- | -------------- | ----------- | --------------- | ----------- | --------- |
+|  1  | Latest         | >= 9.0.0    | >= 8.0.0        | >= 5.0.1    | >= 1.4.0  |
+|  2  | 4.1.0          | <= 8.1.1    | >= 8.0.0        | <= 4.5.5    | N/A       |
+|  3  | 3.3.0          | <= 7.1.0    | <= 7.1.4        | <= 4.5.5    | N/A       |
 
 ```bash
+#1 - Use the latest major release
 cordova plugin add cordova-plugin-firebase-lib
-```
 
-**For `cordova-cli <= 8.1.1` && (`cordava-ios <= 4.5.5` || `cordova-android >= 8.x.x`)** 
-
-Use the v4.x release by running:
-
-```bash
+#2 - Use the v4.x release
 cordova plugin add cordova-plugin-firebase-lib@4.1.0 --save
-```
 
-**For `cordova-cli <= 7.1.0` && (`cordava-ios <= 4.5.5` || `cordova-android <= 7.1.4`)**
-
-Run the following in your terminal:
-
-```bash
+#3 - Use the v3.x release
 cordova plugin add cordova-plugin-firebase-lib@3.3.0 --save
 ```
 
