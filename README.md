@@ -1,4 +1,4 @@
-# Cordova Firebase Plugin2
+# Cordova Firebase Plugin
 
 [![npm version](https://badge.fury.io/js/cordova-plugin-firebase-lib.svg)](https://badge.fury.io/js/cordova-plugin-firebase-lib)
 
@@ -8,18 +8,15 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 
 <!-- toc -->
 
+- [Difference from the fork repository](#difference-from-the-fork-repository)
 - [Prerequisites](#prerequisites)
   * [For Android App](#for-android-app)
   * [For iOS App](#for-ios-app)
-- [Difference from the fork repository](#difference-from-the-fork-repository)
 - [Confirm your Cordova environment versions](#confirm-your-cordova-environment-versions)
-- [Major Releases](#major-releases)
+- [Major Releases and Supported Cordova Platforms](#major-releases-and-supported-cordova-platforms)
   * [v5.x](#v5x)
-    + [Supported Cordova Platforms](#supported-cordova-platforms)
   * [v4.x](#v4x)
-    + [Supported Cordova Platforms](#supported-cordova-platforms-1)
   * [v3.x](#v3x)
-    + [Supported Cordova Platforms](#supported-cordova-platforms-2)
 - [Installation & Setup](#installation--setup)
   * [Uninstall the original firebase plugin](#uninstall-the-original-firebase-plugin)
   * [Install this plugin](#install-this-plugin)
@@ -37,6 +34,16 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 
 <!-- tocstop -->
 
+## Difference from the fork repository
+
+Maintained by [Wiz Panda](https://www.wizpanda.com/).
+
+The [author](https://github.com/arnesson) did a great job on the plugin. But seems not to be maintaining the changes. So we at **Wiz Panda**
+thought to maintain the repository with the latest changes & fixes so the others can take benefit of the Firebase in their cordova 
+application. To see a full list of changes done after we started maintaining this fork, please see the
+[Releases](https://github.com/wizpanda/cordova-plugin-firebase-lib/releases) or read the
+[CHANGELOG.md](https://github.com/wizpanda/cordova-plugin-firebase-lib/blob/master/CHANGELOG.md#v300)
+
 ## Prerequisites
 
 ### For Android App
@@ -49,16 +56,6 @@ This plugin brings push notifications, analytics, event tracking, crash reportin
 1. Xcode 10.1 or later.
 2. CocoaPods 1.4.0 or later.
 3. Check more here at https://firebase.google.com/docs/ios/setup#prerequisites
-
-## Difference from the fork repository
-
-Maintained by [Wiz Panda](https://www.wizpanda.com/).
-
-The [author](https://github.com/arnesson) did a great job on the plugin. But seems not to be maintaining the changes. So we at **Wiz Panda**
-thought to maintain the repository with the latest changes & fixes so the others can take benefit of the Firebase in their cordova 
-application. To see a full list of changes done after we started maintaining this fork, please see the
-[Releases](https://github.com/wizpanda/cordova-plugin-firebase-lib/releases) or read the
-[CHANGELOG.md](https://github.com/wizpanda/cordova-plugin-firebase-lib/blob/master/CHANGELOG.md#v300)
 
 ## Confirm your Cordova environment versions
 
@@ -75,7 +72,7 @@ Or grab it manually:
 2. For `cordova-android`, check the version in your `config.xml`. It should be like: `<engine name="android" spec="7.1.4" />`
 3. For `cordova-ios`, check the version in same `config.xml`. It should be like: `<engine name="ios" spec="4.5.5" />`
 
-## Major Releases
+## Major Releases and Supported Cordova Platforms
 
 In the last week from Jun 17, 2019 to Jun 25, 2019, we released three major versions of this plugin so that developers across the globe, 
 who are using different versions of `cordova-lib`, `cordova-android` & `cordova-ios` can use different version of this plugin without 
@@ -86,10 +83,8 @@ needing to upgrade these 3 dependencies immediately. So here are the three major
 1. CocoaPods is used to manage Firebase dependencies for iOS. We don't need `cordova-plugin-cocoapod-support` because `cordova-cli 9.x` 
 has better support of handling CocoaPods dependencies.
 
-#### Supported Cordova Platforms
-
 - cordova-cli: `>= 9.0.0`
-- cordova-lib: `>= 9.0.0` (Will be used automatically by `cordova-cli`)
+- cordova-lib: `>= 9.0.1` (Will be used automatically by `cordova-cli`)
 - cordova-android: `>= 8.0.0`
 - cordova-ios: `>= 5.0.1`
 
@@ -97,8 +92,6 @@ has better support of handling CocoaPods dependencies.
 
 1. Minimum `v8.0.0` of `cordova-android` is now required. View [#13](https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13) for details.
 2. Using latest versions of Firebase Android dependencies.
-
-#### Supported Cordova Platforms
 
 - cordova: `>= 8.0.0`
 - cordova-lib: `>= 8.0.0` (Will be used automatically by `cordova-cli`)
@@ -109,8 +102,6 @@ has better support of handling CocoaPods dependencies.
 
 1. Using last [released](https://firebase.google.com/support/release-notes/android#update_-_may_31_2019) Firebase Android dependencies 
 which was released before Jun 17, 2019.
-
-#### Supported Cordova Platforms
 
 - cordova: `>= 7.0.0`
 - cordova-android: `>= 7.0.0` (Might work on `cordova-android 6.x` versions)
