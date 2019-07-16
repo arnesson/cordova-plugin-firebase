@@ -117,9 +117,9 @@ cordova plugin add cordova-plugin-firebasex
 ```
 
 ### Supported Cordova Versions
-- cordova: `>= 8`
+- cordova: `>= 9`
 - cordova-android: `>= 8`
-- cordova-ios: `>= 4`
+- cordova-ios: `>= 5`
 
 ### Migrating from cordova-plugin-firebase
 If you already have [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) installed in your Cordova project, you need to completely remove it before installing this plugin otherwise they will conflict and cause build errors in your project. The safest way of doing this is as follows:
