@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 public class OnNotificationOpenReceiver extends BroadcastReceiver {
 
+    // Called on tapping foreground notification
     @Override
     public void onReceive(Context context, Intent intent) {
         PackageManager pm = context.getPackageManager();
@@ -17,7 +18,8 @@ public class OnNotificationOpenReceiver extends BroadcastReceiver {
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
         Bundle data = intent.getExtras();
-        data.putBoolean("tap", true);
+        if(!data.containsKey("messageType")) data.putString("messageType", "notification");
+        data.putString("tap", FirebasePlugin.inBackground() ? "background" : "foreground");
 
         FirebasePlugin.sendMessage(data, context);
 

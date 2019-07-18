@@ -116,7 +116,7 @@
 }
 
 //Tells the app that a remote notification arrived that indicates there is data to be fetched.
-// Called when a data message is arrives in the foreground and remote notifications permission has been granted
+// Called when a message arrives in the foreground and remote notifications permission has been granted
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
@@ -124,7 +124,6 @@
     NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
     if([aps objectForKey:@"alert"] != nil){
         [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
-        [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
     }else{
         [mutableUserInfo setValue:@"data" forKey:@"messageType"];
     }
@@ -157,11 +156,44 @@
     if(!showForegroundNotification){
         return;
     }
-    NSString* title = [messageData objectForKey:@"notification_title"];
-    NSString* body = [messageData objectForKey:@"notification_body"];
-    NSString* sound = [messageData objectForKey:@"notification_ios_sound"];
-    NSString* badge = [messageData objectForKey:@"notification_ios_badge"];
     
+    NSString* title = nil;
+    NSString* body = nil;
+    NSString* sound = nil;
+    NSString* badge = nil;
+    
+    // Extract APNS notification keys
+    NSDictionary* aps = [messageData objectForKey:@"aps"];
+    if([aps objectForKey:@"alert"] != nil){
+        NSDictionary* alert = [aps objectForKey:@"alert"];
+        if([alert objectForKey:@"title"] != nil){
+            title = [alert objectForKey:@"title"];
+        }
+        if([alert objectForKey:@"body"] != nil){
+            body = [alert objectForKey:@"body"];
+        }
+        if([aps objectForKey:@"sound"] != nil){
+            sound = [aps objectForKey:@"sound"];
+        }
+        if([aps objectForKey:@"badge"] != nil){
+            sound = [aps objectForKey:@"badge"];
+        }
+    }
+    
+    // Extract data notification keys
+    if([messageData objectForKey:@"notification_title"] != nil){
+        title = [messageData objectForKey:@"notification_title"];
+    }
+    if([messageData objectForKey:@"notification_body"] != nil){
+        body = [messageData objectForKey:@"notification_body"];
+    }
+    if([messageData objectForKey:@"notification_ios_sound"] != nil){
+        sound = [messageData objectForKey:@"notification_ios_sound"];
+    }
+    if([messageData objectForKey:@"notification_ios_badge"] != nil){
+        badge = [messageData objectForKey:@"notification_ios_badge"];
+    }
+   
     if(title == nil || body == nil){
         return;
     }
@@ -242,7 +274,6 @@
     NSDictionary* mutableUserInfo = [notification.request.content.userInfo mutableCopy];
     NSString* messageType = [mutableUserInfo objectForKey:@"messageType"];
     if(![messageType isEqualToString:@"data"]){
-        [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
         [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
     }
 
@@ -282,7 +313,7 @@
 }
 
 // Asks the delegate to process the user's response to a delivered notification.
-// Called when user taps on system notification causing launch/restore of app
+// Called when user taps on system notification
 - (void) userNotificationCenter:(UNUserNotificationCenter *)center
  didReceiveNotificationResponse:(UNNotificationResponse *)response
           withCompletionHandler:(void (^)(void))completionHandler
@@ -291,15 +322,25 @@
        didReceiveNotificationResponse:response
                 withCompletionHandler:completionHandler];
 
-    if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class]){
-        NSLog(@"didReceiveNotificationResponse: aborting as not a UNPushNotificationTrigger");
+    if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![response.notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
+        NSLog(@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger");
         return;
     }
-    
 
     NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
-    [mutableUserInfo setValue:@YES forKey:@"tap"];
-    [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
+    
+    NSString* tap;
+    if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){
+        tap = @"background";
+    }else{
+        tap = @"foreground";
+        
+    }
+    [mutableUserInfo setValue:tap forKey:@"tap"];
+    if([mutableUserInfo objectForKey:@"messageType"] == nil){
+        [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
+    }
+    
 
     // Print full message.
     NSLog(@"didReceiveNotificationResponse: %@", mutableUserInfo);

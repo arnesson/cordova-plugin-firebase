@@ -305,13 +305,13 @@ Note: only notification messages can be sent via the Firebase Console - data mes
 If the notification message arrives while the app is in the background/not running, it will be displayed as a system notification.
 No callback can be made by the plugin to the app when the message arrives since the display of the notification is entirely handled by the operating system.
 However if the user taps the system notification, this launches/resumes the app and the notification title, body and optional data payload is passed to the [onMessageReceived](#onMessageReceived) callback.
-When the `onMessageReceived` is called in response to a user tapping a system notification, it will be passed the property `tap: true`.
+
+When the `onMessageReceived` is called in response to a user tapping a system notification while the app is in the background/not running, it will be passed the property `tap: "background"`.
 
 
 ### Foreground notifications
 If the notification message arrives while the app is in running in the foreground, by default **it will NOT be displayed as a system notification**.
-Instead the notification message payload will be passed to the [onMessageReceived](#onMessageReceived) callback for the plugin to handle.
-When the `onMessageReceived` is called in response to a foreground notification, it will be passed the property `tap: false`.
+Instead the notification message payload will be passed to the [onMessageReceived](#onMessageReceived) callback for the plugin to handle (`tap` will not be set).
 
 If you include the `notification_foreground` key in the `data` payload, the plugin will also display a system notification upon receiving the notification messages while the app is running in the foreground.
 For example:
@@ -326,6 +326,8 @@ For example:
         "notification_foreground": "true",
       }
     }
+
+When the `onMessageReceived` is called in response to a user tapping a system notification while the app is in the foreground, it will be passed the property `tap: "foreground"`.
 
 You can set additional properties of the foreground notification using the same key names as for [Data Message Notifications](#data-message-notification-keys).
 
@@ -653,9 +655,6 @@ FCM data messages are sent as an arbitrary k/v structure and by default are pass
 
 **NOTE:** FCM data messages **cannot** be sent from the Firebase Console - they can only be sent via the FCM APIs.
 
-**IMPORTANT:** Data messages can only be received while your app is running in the foreground.
-If it's in the background or not running running, the app will not receive the data message.
-
 #### Data message notifications
 This plugin enables a data message to be displayed as a system notification.
 To have the app display a notification when the data message arrives, you need to set the `notification_foreground` key in the `data` section.
@@ -670,12 +669,16 @@ You can then set a `notification_title` and `notification_body`, for example:
         "foo" : "bar"
       }
     }
-
+    
 Additional platform-specific notification options can be set using the additional keys below (which are only relevant if the `notification_foreground` key is set).
 
 Note: [foreground notification messages](#foreground-notifications) can also make use of these keys.
 
 ##### Android data message notifications
+On Android:
+- Data messages that arrive while your app is running in the foreground or running in the background will be immediately passed to the `onMessageReceived()` Javascript handler in the Webview. 
+- Data messages (not containing notification keys) that arrive while your app is **not running** will be passed to the `onMessageReceived()` Javascript handler when the app is next launched.
+- Data messages containing notification keys that arrive while your app is running or **not running** will be displayed as a system notification.
 
 The following Android-specific keys are supported and should be placed inside the `data` section:
 
@@ -743,6 +746,31 @@ Example data message with Android notification keys:
     }
 
 ##### iOS data message notifications
+On iOS:
+- Data messages that arrive while your app is running in the foreground or running in the background will be immediately passed to the `onMessageReceived()` Javascript handler in the Webview. 
+- Data messages that arrive while your app is **not running** will **NOT be received by your app!**
+
+The following iOS-specific keys are supported and should be placed inside the `data` section:
+
+- `notification_ios_sound` - Sound to play when the notification is displayed
+    - To play a custom sound, set the name of the sound file bundled with your app, e.g.  `"sound": "my_sound.caf"` - see [iOS notification sound](#ios-notification-sound) for more info.
+    - To play the default notification sound, set `"sound": "default"`.
+    - To display a silent notification (no sound), omit the `sound` key from the message.
+- `notification_ios_badge` - Badge number to display on app icon on home screen.
+
+For example:
+
+    {
+      "name": "my_data",
+      "data" : {
+        "notification_foreground": "true",
+        "notification_body" : "Notification body",
+        "notification_title": "Notification title",
+        "notification_ios_sound": "my_sound.caf",
+        "notification_ios_badge": 1
+      }
+    } 
+
 
 ## Google Tag Manager
 Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
@@ -794,12 +822,17 @@ window.FirebasePlugin.onTokenRefresh(function(token) {
 This is the best way to get a valid token for the device as soon as the token is established
 
 #### onMessageReceived
-Registers a callback function to invoke when notification/data message is received by the app:
+Registers a callback function to invoke when: 
+- a notification or data message is received by the app
+- a system notification is tapped by the user
 ```
 window.FirebasePlugin.onMessageReceived(function(message) {
     console.log("Message type: " + message.messageType);
     if(message.messageType === "notification"){
-        console.log("Notification message received in " + (message.tap ? "background" : "foreground"));
+        console.log("Notification message received");
+        if(message.tap){
+            console.log("Tapped in " + message.tap);
+        }
     }
     console.dir(notification);
 }, function(error) {
@@ -809,7 +842,10 @@ window.FirebasePlugin.onMessageReceived(function(message) {
 
 The `message` object passed to the callback function will contain the full platform-specific FCM message payload along with the following keys:
 - `messageType=notification|data` - indicates if received message is a notification or data message
-- `tap=true|false` - if `messageType=notification`, indicates if message was received while app was in the foreground (`tap=false`) or while the app was in the background and the app was launched by the user tapping the system notification (`tap=true`). 
+- `tap=foreground|background` - set if the call to `onMessageReceived()` was initiated by user tapping on a system notification. 
+    - indicates if the system notification was tapped while the app was in the foreground or background.
+    - not set if no system notification was tapped (i.e. message was received directly from FCM rather than via a user tap on a system notification).
+ 
 
 Notification message flow:
 

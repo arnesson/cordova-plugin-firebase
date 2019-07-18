@@ -95,7 +95,8 @@ public class FirebasePlugin extends CordovaPlugin {
                             FirebasePlugin.notificationStack = new ArrayList<Bundle>();
                         }
                         if (extras.containsKey("google.message_id")) {
-                            extras.putBoolean("tap", true);
+                            extras.putString("messageType", "notification");
+                            extras.putString("tap", "background");
                             notificationStack.add(extras);
                         }
                     }
@@ -354,7 +355,8 @@ public class FirebasePlugin extends CordovaPlugin {
         super.onNewIntent(intent);
         final Bundle data = intent.getExtras();
         if (data != null && data.containsKey("google.message_id")) {
-            data.putBoolean("tap", true);
+            data.putString("messageType", "notification");
+            data.putString("tap", "background");
             FirebasePlugin.sendMessage(data, applicationContext);
         }
     }
