@@ -151,17 +151,33 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
         if (!TextUtils.isEmpty(body) || !TextUtils.isEmpty(title) || (data != null && !data.isEmpty())) {
             boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback() || foregroundNotification) && (!TextUtils.isEmpty(body) || !TextUtils.isEmpty(title));
-            sendMessage(data, messageType, id, title, body, showNotification, sound, vibrate, light, color, icon, channelId, priority, visibility);
+            sendMessage(remoteMessage, data, messageType, id, title, body, showNotification, sound, vibrate, light, color, icon, channelId, priority, visibility);
         }
     }
 
-    private void sendMessage(Map<String, String> data, String messageType, String id, String title, String body, boolean showNotification, String sound, String vibrate, String light, String color, String icon, String channelId, String priority, String visibility) {
+    private void sendMessage(RemoteMessage remoteMessage, Map<String, String> data, String messageType, String id, String title, String body, boolean showNotification, String sound, String vibrate, String light, String color, String icon, String channelId, String priority, String visibility) {
         Log.d(TAG, "sendMessage(): messageType="+messageType+"; showNotification="+showNotification+"; id="+id+"; title="+title+"; body="+body+"; sound="+sound+"; vibrate="+vibrate+"; light="+light+"; color="+color+"; icon="+icon+"; channel="+channelId+"; data="+data.toString());
         Bundle bundle = new Bundle();
         for (String key : data.keySet()) {
             bundle.putString(key, data.get(key));
         }
         bundle.putString("messageType", messageType);
+        this.putKVInBundle("id", id, bundle);
+        this.putKVInBundle("title", title, bundle);
+        this.putKVInBundle("body", body, bundle);
+        this.putKVInBundle("sound", sound, bundle);
+        this.putKVInBundle("vibrate", vibrate, bundle);
+        this.putKVInBundle("light", light, bundle);
+        this.putKVInBundle("color", color, bundle);
+        this.putKVInBundle("icon", icon, bundle);
+        this.putKVInBundle("channel_id", channelId, bundle);
+        this.putKVInBundle("priority", priority, bundle);
+        this.putKVInBundle("visibility", visibility, bundle);
+        this.putKVInBundle("show_notification", String.valueOf(showNotification), bundle);
+        this.putKVInBundle("from", remoteMessage.getFrom(), bundle);
+        this.putKVInBundle("collapse_key", remoteMessage.getCollapseKey(), bundle);
+        this.putKVInBundle("sent_time", String.valueOf(remoteMessage.getSentTime()), bundle);
+        this.putKVInBundle("ttl", String.valueOf(remoteMessage.getTtl()), bundle);
 
         if (showNotification) {
             Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
@@ -307,9 +323,14 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             Log.d(TAG, "show notification: "+notification.toString());
             notificationManager.notify(id.hashCode(), notification);
-        } else {
-            Log.d(TAG, "send data message: "+bundle.toString());
-            FirebasePlugin.sendMessage(bundle, this.getApplicationContext());
+        }
+        // Send to plugin
+        FirebasePlugin.sendMessage(bundle, this.getApplicationContext());
+    }
+
+    private void putKVInBundle(String k, String v, Bundle b){
+        if(v != null && !b.containsKey(k)){
+            b.putString(k, v);
         }
     }
 }
