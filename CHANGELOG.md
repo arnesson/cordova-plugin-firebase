@@ -1,3 +1,9 @@
+# Version 6.0.1
+* (Android) Expose notification message properties in message object sent to onMessageReceived().
+Ensure message is always sent to onMessageReceived(), regardless if it was tapped.
+Resolves [#52](https://github.com/dpa99c/cordova-plugin-firebasex/issues/52).
+
+
 # Version 6.0.0
 * *BREAKING CHANGES*
     * `onMessageReceived()` is now called when a message is received (data or notification) AND when a system notification is tapped (whether app is running or not)
