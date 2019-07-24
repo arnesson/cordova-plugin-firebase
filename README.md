@@ -351,6 +351,21 @@ In addition to the title and body of the notification message, Android system no
         - Importance
         - Visibility
     - See [createChannel](#createchannel) for details.
+    
+Note: on tapping a background notification, if your app is not running, only the `data` section of the notification message payload will be delivered to [onMessageReceived](#onMessageReceived).
+i.e. the notification title, body, etc. will not. Therefore if you need the properties of the notification message itself (e.g. title & body) to be delivered to [onMessageReceived](#onMessageReceived), you must duplicate these in the `data` section, e.g.:
+
+    {
+      "name": "my_notification",
+      "notification": {
+        "body": "Notification body",
+        "title": "Notification title"
+      },
+      "data": {
+        "notification_body": "Notification body",
+        "notification_title": "Notification title"
+      }
+    }  
 
 #### Android foreground notifications
 If the notification message arrives while the app is in the foreground, by default a system notification won't be displayed and the data will be passed to [onMessageReceived](#onMessageReceived).
@@ -841,12 +856,11 @@ window.FirebasePlugin.onMessageReceived(function(message) {
 });
 ```
 
-The `message` object passed to the callback function will contain the full platform-specific FCM message payload along with the following keys:
+The `message` object passed to the callback function will contain the platform-specific FCM message payload along with the following keys:
 - `messageType=notification|data` - indicates if received message is a notification or data message
 - `tap=foreground|background` - set if the call to `onMessageReceived()` was initiated by user tapping on a system notification. 
     - indicates if the system notification was tapped while the app was in the foreground or background.
     - not set if no system notification was tapped (i.e. message was received directly from FCM rather than via a user tap on a system notification).
- 
 
 Notification message flow:
 
