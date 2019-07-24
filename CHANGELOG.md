@@ -1,3 +1,8 @@
+# Version 6.0.2
+* (Android) Improved exception handling to prevent app crashes due to plugin exceptions.
+Document caveats of received message payload when notification message is received while app is not running on Android.
+Further resolves [#52](https://github.com/dpa99c/cordova-plugin-firebasex/issues/52).
+
 # Version 6.0.1
 * (Android) Expose notification message properties in message object sent to onMessageReceived().
 Ensure message is always sent to onMessageReceived(), regardless if it was tapped.
