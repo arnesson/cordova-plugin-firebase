@@ -7,4 +7,7 @@
 package-lock.json
 node_modules
 test
-cordova-plugin-firebase.code-workspace
+lib/
+.github/
+docs/
+cordova-plugin-firebase-lib.code-workspace

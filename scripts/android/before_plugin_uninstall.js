@@ -1,7 +1,6 @@
-var helper = require('./helper');
+const helper = require('./helper');
 
-module.exports = function(context) {
-
+module.exports = function () {
     // Remove the Gradle modifications that were added when the plugin was installed.
     helper.restoreRootBuildGradle();
 };
