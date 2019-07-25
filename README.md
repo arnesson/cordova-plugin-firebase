@@ -1,220 +1,36 @@
-# Cordova Firebase Plugin
+# We are moving & merging ...
 
-[![npm version](https://badge.fury.io/js/cordova-plugin-firebase-lib.svg)](https://badge.fury.io/js/cordova-plugin-firebase-lib)
+Since the breaking change released by Google Firebase on Jun 17th, 2019, [we](https://www.wizpanda.com) have been maintaining this 
+repository. From the same time, another guy [Dave Alden](https://github.com/dpa99c) from somewhere in the world 😄 is also maintaining 
+his fork https://github.com/dpa99c/cordova-plugin-firebasex. 
 
-This plugin brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project!
+Intention of both of us are same i.e. **to give back to the open-source community** and help developers of Cordova & Ionic frameworks so 
+that they can use the Google Firebase in their applications without a hitch. So both the repositories were being updated regularly and 
+new releases were being made.
 
-## Table of Contents
+This good though by both [Wiz Panda](https://www.wizpanda.com) & Dave resulted in developers of Cordova & Ionic getting confused & 
+diverted to two different repositories which will become a mess in the future. To prevent this, we discussed this in a
+[thread](https://github.com/dpa99c/cordova-plugin-firebasex/issues/47) raised by [hugoblanc](https://github.com/hugoblanc) and we all 
+together decided to archive this repository and divert the developers to Dave's fork.
 
-<!-- toc -->
+Dave has been quite active on his fork and he is doing a great job updating & improving the native codebase and documentations so:
 
-- [Difference from the fork repository](#difference-from-the-fork-repository)
-- [Prerequisites](#prerequisites)
-  * [For Android App](#for-android-app)
-  * [For iOS App](#for-ios-app)
-- [Confirm your Cordova environment versions](#confirm-your-cordova-environment-versions)
-- [Major Releases and Supported Cordova Platforms](#major-releases-and-supported-cordova-platforms)
-  * [v5.x](#v5x)
-  * [v4.x](#v4x)
-  * [v3.x](#v3x)
-- [Installation & Setup](#installation--setup)
-  * [Uninstall the original firebase plugin](#uninstall-the-original-firebase-plugin)
-  * [Install this plugin](#install-this-plugin)
-  * [AndroidX](#androidx)
-  * [CocoaPods](#cocoapods)
-  * [Guides](#guides)
-  * [Setup](#setup)
-  * [Important Notes](#important-notes)
-  * [PhoneGap Build](#phonegap-build)
-  * [Google Play Services](#google-play-services)
-- [Docs](#docs)
-  * [API Docs](#api-docs)
-  * [Google Tag Manager](#google-tag-manager)
-  * [Configuring Notifications](#configuring-notifications)
+## Requesting all the developers to start using [dpa99c/cordova-plugin-firebasex](https://github.com/dpa99c/cordova-plugin-firebasex) instead of this repository.
 
-<!-- tocstop -->
+One can still use the last version of this plugin i.e. `v5.1.1` and checkout the code at commit/tag
+https://github.com/wizpanda/cordova-plugin-firebase-lib/tree/v5.1.1 but please note, **no further updates, improvements will be made to 
+this repository. No PR will be accepted.**
 
-## Difference from the fork repository
+If this plugin helped you in any way in your development, you can thank us by doing any or all of the following:
 
-Maintained by [Wiz Panda](https://www.wizpanda.com/).
+1. Follow us on [LinkedIn](https://www.linkedin.com/company/wizpanda)
+2. Like our [Facebook page](https://www.facebook.com/wizpandatech/)
+3. Send us a [message](https://www.wizpanda.com/#contactUs)
 
-The [author](https://github.com/arnesson) did a great job on the plugin. But seems not to be maintaining the changes. So we at **Wiz Panda**
-thought to maintain the repository with the latest changes & fixes so the others can take benefit of the Firebase in their cordova 
-application. To see a full list of changes done after we started maintaining this fork, please see the
-[Releases](https://github.com/wizpanda/cordova-plugin-firebase-lib/releases) or read the
-[CHANGELOG.md](https://github.com/wizpanda/cordova-plugin-firebase-lib/blob/master/CHANGELOG.md#v300)
+Or
 
-## Prerequisites
+[![donate](https://user-images.githubusercontent.com/1804514/61858016-e0de0780-aee2-11e9-8697-1f3662b5c147.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FKF4YUN7R92U6&item_name=Cordova+Firebase+Plugin&currency_code=INR&source=url)
 
-### For Android App
+> We look forward to seeing you in our new spaces!
 
-1. Android Studio
-2. Check more here at https://firebase.google.com/docs/android/setup#prerequisites
-
-### For iOS App
-
-1. Xcode 10.1 or later.
-2. CocoaPods 1.4.0 or later.
-3. Check more here at https://firebase.google.com/docs/ios/setup#prerequisites
-
-## Confirm your Cordova environment versions
-
-Before you continue installing this plugin, please confirm your Cordova environment versions. You can either get everything by just 
-running:
-
-```bash
-cordova info
-```
-
-Or grab it manually:
-
-1. For `cordova-cli` & `cordova-lib`, run `cordova -v`. It should be something like: `9.0.0 (cordova-lib@9.0.1)`
-2. For `cordova-android`, check the version in your `config.xml`. It should be like: `<engine name="android" spec="7.1.4" />`
-3. For `cordova-ios`, check the version in same `config.xml`. It should be like: `<engine name="ios" spec="4.5.5" />`
-
-## Major Releases and Supported Cordova Platforms
-
-In the last week from Jun 17, 2019 to Jun 25, 2019, we released three major versions of this plugin so that developers across the globe, 
-who are using different versions of `cordova-lib`, `cordova-android` & `cordova-ios` can use different version of this plugin without 
-needing to upgrade these 3 dependencies immediately. So here are the three major releases of this plugin:
-
-### v5.x
-
-1. CocoaPods is used to manage Firebase dependencies for iOS. We don't need `cordova-plugin-cocoapod-support` because `cordova-cli 9.x` 
-has better support of handling CocoaPods dependencies.
-
-- cordova-cli: `>= 9.0.0`
-- cordova-lib: `>= 9.0.1` (Will be used automatically by `cordova-cli`)
-- cordova-android: `>= 8.0.0`
-- cordova-ios: `>= 5.0.1`
-
-### v4.x
-
-1. Minimum `v8.0.0` of `cordova-android` is now required. View [#13](https://github.com/wizpanda/cordova-plugin-firebase-lib/pull/13) for details.
-2. Using latest versions of Firebase Android dependencies.
-
-- cordova: `>= 8.0.0`
-- cordova-lib: `>= 8.0.0` (Will be used automatically by `cordova-cli`)
-- cordova-android: `>= 8.0.0`
-- cordova-ios: `>= 4.5.5`
-
-### v3.x
-
-1. Using last [released](https://firebase.google.com/support/release-notes/android#update_-_may_31_2019) Firebase Android dependencies 
-which was released before Jun 17, 2019.
-
-- cordova: `>= 7.0.0`
-- cordova-android: `>= 7.0.0` (Might work on `cordova-android 6.x` versions)
-- cordova-ios: `>= 4.5.5` (Might work on old `cordova-ios` versions)
-
-## Installation & Setup
-
-### Uninstall the original firebase plugin
-
-If you are using the [original](https://github.com/arnesson/cordova-plugin-firebase) firebase plugin, remove it first:
-
-```bash
-rm -rf platforms/android
-cordova plugin remove cordova-plugin-firebase
-```
-
-### Install this plugin
-
-|  #  | Plugin version | Cordova CLI | Cordova Android | Cordova iOS | CocoaPods |
-| --- | -------------- | ----------- | --------------- | ----------- | --------- |
-|  1  | Latest         | >= 9.0.0    | >= 8.0.0        | >= 5.0.1    | >= 1.4.0  |
-|  2  | 4.1.0          | <= 8.1.1    | >= 8.0.0        | <= 4.5.5    | N/A       |
-|  3  | 3.3.0          | <= 7.1.0    | <= 7.1.4        | <= 4.5.5    | N/A       |
-
-```bash
-#1 - Use the latest major release
-cordova plugin add cordova-plugin-firebase-lib
-
-#2 - Use the v4.x release
-cordova plugin add cordova-plugin-firebase-lib@4.1.0 --save
-
-#3 - Use the v3.x release
-cordova plugin add cordova-plugin-firebase-lib@3.3.0 --save
-```
-
-### AndroidX
-
-Because of the major breaking release by Google Firebase on [Jun 17, 2019](https://developers.google.com/android/guides/releases#june_17_2019)
-this plugin has been migrated to use [AndroidX](https://developer.android.com/jetpack/androidx/migrate). AndroidX is a major improvement 
-to the original Android [Support Library](https://developer.android.com/topic/libraries/support-library/index).
-
-If any of your Cordova app includes any plugin which is still using legacy Android Support Library, then installing this plugin might 
-break your build. For that install the following plugins:
-
-```bash
-cordova plugin add cordova-plugin-androidx
-cordova plugin add cordova-plugin-androidx-adapter
-```
-
-### CocoaPods
-
-This plugin uses [CocoaPods](https://cocoapods.org/) to manage the iOS Firebase dependencies. So please note the following two points:
-
-1. If you are building your app using Xcode, please open `platform/ios/my-cordova-project.xcworkspace` instead of 
-`platform/ios/my-cordova-project.xcodeproj` so that the Xcode can load both Cordova app & the Pods.
-2. Your repo needs to be up to date. To keep it up to date, run `pod repo update` anywhere in your terminal.
-
-### Guides
-
-1. Great installation and setup guide [https://medium.com/@felipepucinelli/how-to-add-push...](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821)
-
-### Setup
-
-Download your Firebase configuration files:
-
-- `GoogleService-Info.plist` for iOS and
-- `google-services.json` for Android
-
-And place them in the root folder of your Cordova app. Check out this [firebase article](https://support.google.com/firebase/answer/7015592)
-for details on how to download the files.
-
-```bash
-- my-cordova-project/
-    platforms/
-    plugins/
-    www/
-    config.xml
-    google-services.json       <--
-    GoogleService-Info.plist   <--
-    ...
-```
-
-### Important Notes
-
-- This plugin uses a hook (`after_prepare`) that copies the configuration files to the right place, namely 
-`platforms/ios/my-cordova-project/Resources` for iOS and `platforms/android` for Android.
-- Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or build.
-
-### PhoneGap Build
-
-Hooks do not work with PhoneGap Build. This means you will have to manually make sure the configuration files are included. One way to do
- that is to make a private fork of this plugin and replace the placeholder config files (see `src/ios` and `src/android`) with your 
- actual ones, as well as hard coding your app id and api key in `plugin.xml`.
-
-### Google Play Services
-Your build may fail if you are installing multiple plugins that use Google Play Services.  This is caused by the plugins installing 
-different versions of the Google Play Services library.  This can be resolved by installing
-[cordova-android-play-services-gradle-release](https://github.com/dpa99c/cordova-android-play-services-gradle-release).
-
-If your build is still failing, you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release).
-For more info, read the following [comment](https://github.com/dpa99c/cordova-plugin-request-location-accuracy/issues/50#issuecomment-390025013)
-about locking down the specific versions for play services and firebase. It is suggested to use `+` instead of `15.+` to ensure the correct versions are used.
-
-## Docs
-
-### API Docs
-
-See the full [API](docs/API.md) docs available for this plugin.
-
-### Google Tag Manager
-
-Checkout our [guide](docs/GOOGLE_TAG_MANAGER.md) for info on setting up Google Tag Manager.
-
-### Configuring Notifications
-
-Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons and colors.
+![Cordova + Firebase](https://user-images.githubusercontent.com/1804514/61858103-0e2ab580-aee3-11e9-8a44-8cf079b8acf8.png)
