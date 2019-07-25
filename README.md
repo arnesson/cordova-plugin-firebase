@@ -225,9 +225,9 @@ This plugin sets a default minimum iOS version in the Pod file (see `<preference
     cordova plugin add cordova-plugin-firebasex --variable IOS_MIN_VERSION=10.0
 
 #### Cocoapods
-This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satify the iOS Firebase SDK library dependencies.
+This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
-Therefore please make sure you have Cocopods installed in your iOS build environemnt - setup instructions can be found [here](https://cocoapods.org/).
+Therefore please make sure you have Cocoapods installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
 Also make sure your local Cocoapods repo is up-to-date by running `pod repo update`.
 
 If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
