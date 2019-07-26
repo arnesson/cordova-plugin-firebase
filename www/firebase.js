@@ -139,8 +139,18 @@ exports.sendCrash = function (success, error) {
     exec(success, error, "FirebasePlugin", "sendCrash", []);
 };
 
-exports.logError = function (message, success, error) {
-    exec(success, error, "FirebasePlugin", "logError", [message]);
+exports.logError = function (message, stackTrace, success, error) {
+  var args = [message];
+  // "stackTrace" is an optional arg that's an array of objects.
+  if (stackTrace) {
+    if (typeof stackTrace === 'function') {
+      error = success;
+      success = stackTrace;
+    } else {
+      args.push(stackTrace);
+    }
+  }
+  exec(success, error, "FirebasePlugin", "logError", args);
 };
 
 exports.setCrashlyticsUserId = function (userId, success, error) {
