@@ -212,7 +212,7 @@
                                  alert, @"alert",
                                  nil];
             
-            if([sound isEqualToString:@"default"]){
+            if(![sound isKindOfClass:[NSString class]] || [sound isEqualToString:@"default"]){
                 objNotificationContent.sound = [UNNotificationSound defaultSound];
                 [aps setValue:sound forKey:@"sound"];
             }else if(sound != nil){
