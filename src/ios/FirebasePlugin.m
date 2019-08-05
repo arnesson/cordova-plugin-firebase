@@ -155,21 +155,21 @@ static BOOL registeredForRemoteNotifications = NO;
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
     int number = [[command.arguments objectAtIndex:0] intValue];
 
-    [self.commandDelegate runInBackground:^{
+    dispatch_sync(dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:number];
-
+        
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    });
 }
 
 - (void)getBadgeNumber:(CDVInvokedUrlCommand *)command {
-    [self.commandDelegate runInBackground:^{
+    dispatch_sync(dispatch_get_main_queue(), ^{
         long badge = [[UIApplication sharedApplication] applicationIconBadgeNumber];
-
+        
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:badge];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    });
 }
 
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
@@ -476,13 +476,13 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command {
-	[self.commandDelegate runInBackground:^{
+    dispatch_sync(dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-
+        
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    });
 }
 
 # pragma mark - Stubs
