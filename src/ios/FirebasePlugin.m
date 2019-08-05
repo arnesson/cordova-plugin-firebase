@@ -22,6 +22,7 @@
 
 static NSInteger const kNotificationStackSize = 10;
 static FirebasePlugin *firebasePlugin;
+static BOOL registeredForRemoteNotifications = NO;
 
 + (FirebasePlugin *) firebasePlugin {
     return firebasePlugin;
@@ -30,6 +31,9 @@ static FirebasePlugin *firebasePlugin;
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
+    
+    // Check for permission and register for remote notifications if granted
+    [self _hasPermission:^(BOOL result) {}];
 }
 
 - (void)getId:(CDVInvokedUrlCommand *)command {
@@ -59,42 +63,60 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)hasPermission:(CDVInvokedUrlCommand *)command {
+    [self _hasPermission:^(BOOL enabled) {
+        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:enabled];
+        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+    }];
+}
+
+-(void)_hasPermission:(void (^)(BOOL result))completeBlock {
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
         BOOL enabled = NO;
         if (settings.alertSetting == UNNotificationSettingEnabled) {
             enabled = YES;
             [self registerForRemoteNotifications];
         }
-        NSLog(@"hasPermission: %@", enabled ? @"YES" : @"NO");
-        CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:enabled];
-        [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+        NSLog(@"_hasPermission: %@", enabled ? @"YES" : @"NO");
+        completeBlock(enabled);
     }];
 }
 
 - (void)grantPermission:(CDVInvokedUrlCommand *)command {
     NSLog(@"grantPermission");
-    [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate> _Nullable) self;
-    UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
-    [[UNUserNotificationCenter currentNotificationCenter]
-        requestAuthorizationWithOptions:authOptions
-        completionHandler:^(BOOL granted, NSError * _Nullable error) {
-        NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
-            if(granted){
-                [self registerForRemoteNotifications];
+    [self _hasPermission:^(BOOL enabled) {
+        if(enabled){
+            NSString* message = @"Permission is already granted - call hasPermission() to check before calling grantPermission()";
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:message];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }else{
+            [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate> _Nullable) self;
+            UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
+            [[UNUserNotificationCenter currentNotificationCenter]
+             requestAuthorizationWithOptions:authOptions
+             completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
+                if(granted){
+                    [self registerForRemoteNotifications];
+                }
+                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted] callbackId:command.callbackId];
             }
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted] callbackId:command.callbackId];
+             ];
         }
-    ];
+    }];
 }
 
 - (void)registerForRemoteNotifications {
     NSLog(@"registerForRemoteNotifications");
+    if(registeredForRemoteNotifications) return;
+    
     if (![NSThread isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
             [[UIApplication sharedApplication] registerForRemoteNotifications];
+            registeredForRemoteNotifications = YES;
         });
     } else {
         [[UIApplication sharedApplication] registerForRemoteNotifications];
+        registeredForRemoteNotifications = YES;
     }
 }
 
