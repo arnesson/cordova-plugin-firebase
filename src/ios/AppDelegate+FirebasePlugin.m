@@ -40,39 +40,44 @@
 
 - (BOOL)application:(UIApplication *)application swizzledDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
-
-    // get GoogleService-Info.plist file path
-    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
     
-    // if file is successfully found, use it
-    if(filePath){
-        NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
-        // create firebase configure options passing .plist as content
-        FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+    @try{
+        // get GoogleService-Info.plist file path
+        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
         
-        // configure FIRApp with options
-        [FIRApp configureWithOptions:options];
+        // if file is successfully found, use it
+        if(filePath){
+            NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
+            // create firebase configure options passing .plist as content
+            FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+            
+            // configure FIRApp with options
+            [FIRApp configureWithOptions:options];
+        }
+        
+        // no .plist found, try default App
+        if (![FIRApp defaultApp] && !filePath) {
+            NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
+            [FIRApp configure];
+        }
+
+        // Set FCM messaging delegate
+        [FIRMessaging messaging].delegate = self;
+        [FIRMessaging messaging].shouldEstablishDirectChannel = true;
+        
+        // Set UNUserNotificationCenter delegate
+        self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
+        [UNUserNotificationCenter currentNotificationCenter].delegate = self;
+
+        // Set NSNotificationCenter observer
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
+                                                     name:kFIRInstanceIDTokenRefreshNotification object:nil];
+
+        self.applicationInBackground = @(YES);
+        
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
     }
-    
-    // no .plist found, try default App
-    if (![FIRApp defaultApp] && !filePath) {
-        NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
-        [FIRApp configure];
-    }
-
-    // Set FCM messaging delegate
-    [FIRMessaging messaging].delegate = self;
-    [FIRMessaging messaging].shouldEstablishDirectChannel = true;
-    
-    // Set UNUserNotificationCenter delegate
-    self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
-    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
-
-    // Set NSNotificationCenter observer
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
-                                                 name:kFIRInstanceIDTokenRefreshNotification object:nil];
-
-    self.applicationInBackground = @(YES);
 
     return YES;
 }
@@ -81,7 +86,7 @@
     [FIRMessaging messaging].shouldEstablishDirectChannel = true;
     self.applicationInBackground = @(NO);
     NSLog(@"FCM direct channel = true");
-    }
+}
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     [FIRMessaging messaging].shouldEstablishDirectChannel = false;
@@ -92,22 +97,33 @@
 # pragma mark - FIRMessagingDelegate
 - (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken {
     NSLog(@"didReceiveRegistrationToken: %@", fcmToken);
-    [FirebasePlugin.firebasePlugin sendToken:fcmToken];
+    @try{
+        [FirebasePlugin.firebasePlugin sendToken:fcmToken];
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
 }
 
 - (void)tokenRefreshNotification:(NSNotification *)notification {
     // Note that this callback will be fired everytime a new token is generated, including the first
     // time. So if you need to retrieve the token as soon as it is available this is where that
     // should be done.
-    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
-                                                        NSError * _Nullable error) {
-        if (error == nil) {
-            NSString *refreshedToken = result.token;
-            NSLog(@"tokenRefreshNotification: %@", refreshedToken);
-            [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
-        }
-    }];
-    
+    @try{
+        [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
+                                                            NSError * _Nullable error) {
+            @try{
+                if (error == nil) {
+                    NSString *refreshedToken = result.token;
+                    NSLog(@"tokenRefreshNotification: %@", refreshedToken);
+                    [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
+                }
+            }@catch (NSException *exception) {
+                [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
@@ -120,33 +136,41 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
-    NSDictionary *mutableUserInfo = [userInfo mutableCopy];
-    NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
-    if([aps objectForKey:@"alert"] != nil){
-        [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
-    }else{
-        [mutableUserInfo setValue:@"data" forKey:@"messageType"];
-    }
+    @try{
+        NSDictionary *mutableUserInfo = [userInfo mutableCopy];
+        NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
+        if([aps objectForKey:@"alert"] != nil){
+            [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
+        }else{
+            [mutableUserInfo setValue:@"data" forKey:@"messageType"];
+        }
 
-    NSLog(@"didReceiveRemoteNotification: %@", mutableUserInfo);
-    
-    completionHandler(UIBackgroundFetchResultNewData);
-    [self processMessageForForegroundNotification:mutableUserInfo];
-    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+        NSLog(@"didReceiveRemoteNotification: %@", mutableUserInfo);
+        
+        completionHandler(UIBackgroundFetchResultNewData);
+        [self processMessageForForegroundNotification:mutableUserInfo];
+        [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
 }
 
 // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
 // Called when a data message is arrives in the foreground and remote notifications permission has been NOT been granted
 - (void)messaging:(FIRMessaging *)messaging didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage {
-    NSLog(@"didReceiveMessage: %@", remoteMessage.appData);
-    
-    NSDictionary* appData = [remoteMessage.appData mutableCopy];
-    [appData setValue:@"data" forKey:@"messageType"];
-    [self processMessageForForegroundNotification:appData];
- 
-    // This will allow us to handle FCM data-only push messages even if the permission for push
-    // notifications is yet missing. This will only work when the app is in the foreground.
-    [FirebasePlugin.firebasePlugin sendNotification:appData];
+    @try{
+        NSLog(@"didReceiveMessage: %@", remoteMessage.appData);
+        
+        NSDictionary* appData = [remoteMessage.appData mutableCopy];
+        [appData setValue:@"data" forKey:@"messageType"];
+        [self processMessageForForegroundNotification:appData];
+     
+        // This will allow us to handle FCM data-only push messages even if the permission for push
+        // notifications is yet missing. This will only work when the app is in the foreground.
+        [FirebasePlugin.firebasePlugin sendNotification:appData];
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
 }
 
 // Scans a message for keys which indicate a notification should be shown.
@@ -199,54 +223,58 @@
     }
     
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-        if (settings.alertSetting == UNNotificationSettingEnabled) {
-            UNMutableNotificationContent *objNotificationContent = [[UNMutableNotificationContent alloc] init];
-            objNotificationContent.title = [NSString localizedUserNotificationStringForKey:title arguments:nil];
-            objNotificationContent.body = [NSString localizedUserNotificationStringForKey:body arguments:nil];
-            
-            NSDictionary* alert = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                   title, @"title",
-                                   body, @"body"
-                                   , nil];
-            NSMutableDictionary* aps = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                 alert, @"alert",
-                                 nil];
-            
-            if([sound isEqualToString:@"default"]){
-                objNotificationContent.sound = [UNNotificationSound defaultSound];
-                [aps setValue:sound forKey:@"sound"];
-            }else if(sound != nil){
-                objNotificationContent.sound = [UNNotificationSound soundNamed:sound];
-                [aps setValue:sound forKey:@"sound"];
-            }
-            
-            if(badge != nil){
-                NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
-                f.numberStyle = NSNumberFormatterDecimalStyle;
-                objNotificationContent.badge = [f numberFromString:badge];
-                [aps setValue:badge forKey:@"badge"];
-            }
-            
-            
-            NSDictionary* userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                      @"true", @"notification_foreground",
-                                      @"data", @"messageType",
-                                      aps, @"aps"
-                                      , nil];
-            
-            objNotificationContent.userInfo = userInfo;
-            
-            UNTimeIntervalNotificationTrigger *trigger =  [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:0.1f repeats:NO];
-            UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"local_notification" content:objNotificationContent trigger:trigger];
-            [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
-                if (!error) {
-                    NSLog(@"Local Notification succeeded");
-                } else {
-                    NSLog(@"Local Notification failed: %@", error);
+        @try{
+            if (settings.alertSetting == UNNotificationSettingEnabled) {
+                UNMutableNotificationContent *objNotificationContent = [[UNMutableNotificationContent alloc] init];
+                objNotificationContent.title = [NSString localizedUserNotificationStringForKey:title arguments:nil];
+                objNotificationContent.body = [NSString localizedUserNotificationStringForKey:body arguments:nil];
+                
+                NSDictionary* alert = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                       title, @"title",
+                                       body, @"body"
+                                       , nil];
+                NSMutableDictionary* aps = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                     alert, @"alert",
+                                     nil];
+                
+                if(![sound isKindOfClass:[NSString class]] || [sound isEqualToString:@"default"]){
+                    objNotificationContent.sound = [UNNotificationSound defaultSound];
+                    [aps setValue:sound forKey:@"sound"];
+                }else if(sound != nil){
+                    objNotificationContent.sound = [UNNotificationSound soundNamed:sound];
+                    [aps setValue:sound forKey:@"sound"];
                 }
-            }];
-        }else{
-            NSLog(@"processMessageForForegroundNotification: cannot show notification as permission denied");
+                
+                if(badge != nil){
+                    NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
+                    f.numberStyle = NSNumberFormatterDecimalStyle;
+                    objNotificationContent.badge = [f numberFromString:badge];
+                    [aps setValue:badge forKey:@"badge"];
+                }
+                
+                
+                NSDictionary* userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                          @"true", @"notification_foreground",
+                                          @"data", @"messageType",
+                                          aps, @"aps"
+                                          , nil];
+                
+                objNotificationContent.userInfo = userInfo;
+                
+                UNTimeIntervalNotificationTrigger *trigger =  [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:0.1f repeats:NO];
+                UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"local_notification" content:objNotificationContent trigger:trigger];
+                [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+                    if (!error) {
+                        NSLog(@"Local Notification succeeded");
+                    } else {
+                        NSLog(@"Local Notification failed: %@", error);
+                    }
+                }];
+            }else{
+                NSLog(@"processMessageForForegroundNotification: cannot show notification as permission denied");
+            }
+        }@catch (NSException *exception) {
+            [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
         }
     }];
 }
@@ -260,55 +288,60 @@
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
-
-    [self.delegate userNotificationCenter:center
-              willPresentNotification:notification
-                withCompletionHandler:completionHandler];
-
-    if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
-        NSLog(@"willPresentNotification: aborting as not a supported UNNotificationTrigger");
-        return;
-    }
     
+    @try{
+        [self.delegate userNotificationCenter:center
+                  willPresentNotification:notification
+                    withCompletionHandler:completionHandler];
 
-    NSDictionary* mutableUserInfo = [notification.request.content.userInfo mutableCopy];
-    NSString* messageType = [mutableUserInfo objectForKey:@"messageType"];
-    if(![messageType isEqualToString:@"data"]){
-        [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
-    }
-
-    // Print full message.
-    NSLog(@"willPresentNotification: %@", mutableUserInfo);
-    
-    NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
-    bool showForegroundNotification = [mutableUserInfo objectForKey:@"notification_foreground"];
-    bool hasAlert = [aps objectForKey:@"alert"] != nil;
-    bool hasBadge = [aps objectForKey:@"badge"] != nil;
-    bool hasSound = [aps objectForKey:@"sound"] != nil;
-
-    if(showForegroundNotification){
-        NSLog(@"willPresentNotification: foreground notification alert=%@, badge=%@, sound=%@", hasAlert ? @"YES" : @"NO", hasBadge ? @"YES" : @"NO", hasSound ? @"YES" : @"NO");
-        if(hasAlert && hasBadge && hasSound){
-            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionBadge + UNNotificationPresentationOptionSound);
-        }else if(hasAlert && hasBadge){
-            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionBadge);
-        }else if(hasAlert && hasSound){
-            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
-        }else if(hasBadge && hasSound){
-            completionHandler(UNNotificationPresentationOptionBadge + UNNotificationPresentationOptionSound);
-        }else if(hasAlert){
-            completionHandler(UNNotificationPresentationOptionAlert);
-        }else if(hasBadge){
-            completionHandler(UNNotificationPresentationOptionBadge);
-        }else if(hasSound){
-            completionHandler(UNNotificationPresentationOptionSound);
+        if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
+            NSLog(@"willPresentNotification: aborting as not a supported UNNotificationTrigger");
+            return;
         }
-    }else{
-        NSLog(@"willPresentNotification: foreground notification not set");
-    }
-    
-    if(![messageType isEqualToString:@"data"]){
-        [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+        
+
+        NSDictionary* mutableUserInfo = [notification.request.content.userInfo mutableCopy];
+        NSString* messageType = [mutableUserInfo objectForKey:@"messageType"];
+        if(![messageType isEqualToString:@"data"]){
+            [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
+        }
+
+        // Print full message.
+        NSLog(@"willPresentNotification: %@", mutableUserInfo);
+        
+        NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
+        bool showForegroundNotification = [mutableUserInfo objectForKey:@"notification_foreground"];
+        bool hasAlert = [aps objectForKey:@"alert"] != nil;
+        bool hasBadge = [aps objectForKey:@"badge"] != nil;
+        bool hasSound = [aps objectForKey:@"sound"] != nil;
+
+        if(showForegroundNotification){
+            NSLog(@"willPresentNotification: foreground notification alert=%@, badge=%@, sound=%@", hasAlert ? @"YES" : @"NO", hasBadge ? @"YES" : @"NO", hasSound ? @"YES" : @"NO");
+            if(hasAlert && hasBadge && hasSound){
+                completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionBadge + UNNotificationPresentationOptionSound);
+            }else if(hasAlert && hasBadge){
+                completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionBadge);
+            }else if(hasAlert && hasSound){
+                completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
+            }else if(hasBadge && hasSound){
+                completionHandler(UNNotificationPresentationOptionBadge + UNNotificationPresentationOptionSound);
+            }else if(hasAlert){
+                completionHandler(UNNotificationPresentationOptionAlert);
+            }else if(hasBadge){
+                completionHandler(UNNotificationPresentationOptionBadge);
+            }else if(hasSound){
+                completionHandler(UNNotificationPresentationOptionSound);
+            }
+        }else{
+            NSLog(@"willPresentNotification: foreground notification not set");
+        }
+        
+        if(![messageType isEqualToString:@"data"]){
+            [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+        }
+        
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
     }
 }
 
@@ -318,36 +351,41 @@
  didReceiveNotificationResponse:(UNNotificationResponse *)response
           withCompletionHandler:(void (^)(void))completionHandler
 {
-    [self.delegate userNotificationCenter:center
-       didReceiveNotificationResponse:response
-                withCompletionHandler:completionHandler];
+    @try{
+        [self.delegate userNotificationCenter:center
+           didReceiveNotificationResponse:response
+                    withCompletionHandler:completionHandler];
 
-    if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![response.notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
-        NSLog(@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger");
-        return;
-    }
+        if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![response.notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
+            NSLog(@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger");
+            return;
+        }
 
-    NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
-    
-    NSString* tap;
-    if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){
-        tap = @"background";
-    }else{
-        tap = @"foreground";
+        NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
         
+        NSString* tap;
+        if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){
+            tap = @"background";
+        }else{
+            tap = @"foreground";
+            
+        }
+        [mutableUserInfo setValue:tap forKey:@"tap"];
+        if([mutableUserInfo objectForKey:@"messageType"] == nil){
+            [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
+        }
+        
+
+        // Print full message.
+        NSLog(@"didReceiveNotificationResponse: %@", mutableUserInfo);
+
+        [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+
+        completionHandler();
+        
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
     }
-    [mutableUserInfo setValue:tap forKey:@"tap"];
-    if([mutableUserInfo objectForKey:@"messageType"] == nil){
-        [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
-    }
-    
-
-    // Print full message.
-    NSLog(@"didReceiveNotificationResponse: %@", mutableUserInfo);
-
-    [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
-
-    completionHandler();
 }
 
 // Receive data message on iOS 10 devices.

@@ -3,6 +3,7 @@
 
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
+
 - (void)getVerificationID:(CDVInvokedUrlCommand*)command;
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
 - (void)getId:(CDVInvokedUrlCommand*)command;
@@ -35,6 +36,10 @@
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command;
 - (void)logMessage:(CDVInvokedUrlCommand*)command;
 - (void)sendCrash:(CDVInvokedUrlCommand*)command;
+
+- (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
+- (void) handlePluginExceptionWithoutContext: (NSException*) exception;
+
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
 - (void)setDefaultChannel:(CDVInvokedUrlCommand *)command;
 - (void)deleteChannel:(CDVInvokedUrlCommand *)command;
