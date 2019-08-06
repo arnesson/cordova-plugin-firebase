@@ -1,3 +1,16 @@
+# Version 6.0.3
+* (iOS) If grantPermission() is called when permission is already granted, return an error (rather than attempting to grant permission again which causes issues).
+    * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
+* (iOS) Run badge number operations on UI thread (instead of background thread).
+    * Resolves [#72](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/72)
+* (iOS) Handle situation where value of sound is not an NSString.    
+    * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
+* (iOS) Add try/catch handlers at all code entry points to handle unexpected exceptions in order to prevent app crashes. Log native exceptions to native and JS consoles.
+    * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
+* Remove `google-services.json` and `GoogleService-Info.plist` placeholders.
+    * See [#63](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/63)
+
+
 # Version 6.0.2
 * (Android) Improved exception handling to prevent app crashes due to plugin exceptions.
 Document caveats of received message payload when notification message is received while app is not running on Android.
