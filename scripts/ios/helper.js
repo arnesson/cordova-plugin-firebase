@@ -13,15 +13,11 @@ module.exports = {
 
     /**
      * Used to get the path to the XCode project's .pbxproj file.
-     *
-     * @param {object} context - The Cordova context.
-     * @returns The path to the XCode project's .pbxproj file.
      */
-    getXcodeProjectPath: function (context) {
-
-        var appName = utilities.getAppName(context);
-
-        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
+    getXcodeProjectPath: function (cb) {
+        utilities.getAppName(function(appName){
+            cb(path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj"));
+        });
     },
 
     /**
