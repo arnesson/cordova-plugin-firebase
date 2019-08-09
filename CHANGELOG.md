@@ -1,3 +1,10 @@
+# Version 6.0.4
+* Replace dependency on `cordova-lib` with `xml2js`.
+* (iOS) Restore placeholder GoogleService-Info.plist. 
+    * Partially reverts a9c66746ca3592f0eec217f7701d5835f33b43c5
+    * See [#74](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/74)
+* (iOS) Handle and report native logical errors.
+
 # Version 6.0.3
 * (iOS) If grantPermission() is called when permission is already granted, return an error (rather than attempting to grant permission again which causes issues).
     * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
