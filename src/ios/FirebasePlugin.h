@@ -39,6 +39,7 @@
 
 - (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
 - (void) handlePluginExceptionWithoutContext: (NSException*) exception;
+- (void)_logError: (NSString*)msg;
 
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
 - (void)setDefaultChannel:(CDVInvokedUrlCommand *)command;
