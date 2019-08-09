@@ -108,6 +108,8 @@
 			</array>
 		</config-file>
 
+		<resource-file src="src/ios/GoogleService-Info.plist" />
+
 		<header-file src="src/ios/AppDelegate+FirebasePlugin.h" />
 		<source-file src="src/ios/AppDelegate+FirebasePlugin.m" />
 		<header-file src="src/ios/FirebasePlugin.h" />
