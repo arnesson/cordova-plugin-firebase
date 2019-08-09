@@ -42,11 +42,10 @@ static BOOL registeredForRemoteNotifications = NO;
     FIRInstanceIDHandler handler = ^(NSString *_Nullable instID, NSError *_Nullable error) {
         @try {
             if (error) {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
             } else {
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:instID];
             }
-            
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -64,10 +63,14 @@ static BOOL registeredForRemoteNotifications = NO;
     @try {
         [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
                                                             NSError * _Nullable error) {
+            CDVPluginResult* pluginResult;
             if (error == nil) {
-                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result.token];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result.token];
+            }else{
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
             }
+            
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
@@ -122,10 +125,16 @@ static BOOL registeredForRemoteNotifications = NO;
                      completionHandler:^(BOOL granted, NSError * _Nullable error) {
                         @try {
                             NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
-                            if(granted){
-                                [self registerForRemoteNotifications];
+                            CDVPluginResult* pluginResult;
+                            if (error == nil) {
+                                if(granted){
+                                    [self registerForRemoteNotifications];
+                                }
+                                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted];
+                            }else{
+                                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
                             }
-                            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted] callbackId:command.callbackId];
+                            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                         }@catch (NSException *exception) {
                             [self handlePluginExceptionWithContext:exception :command];
                         }
@@ -253,12 +262,13 @@ static BOOL registeredForRemoteNotifications = NO;
 - (void)unregister:(CDVInvokedUrlCommand *)command {
     @try {
         [[FIRInstanceID instanceID] deleteIDWithHandler:^void(NSError *_Nullable error) {
-            if (error) {
-                NSLog(@"Unable to delete instance");
-            } else {
-                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            CDVPluginResult* pluginResult;
+            if (error == nil) {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            }else{
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
             }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
@@ -286,8 +296,13 @@ static BOOL registeredForRemoteNotifications = NO;
         [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
                                                             NSError * _Nullable error) {
             @try {
-                if (result.token != nil && error == nil) {
-                    [self sendToken:result.token];
+                if (error == nil) {
+                    if (result.token != nil && error == nil) {
+                        [self sendToken:result.token];
+                    }
+                }else{
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithContext:exception :command];
@@ -469,7 +484,9 @@ static BOOL registeredForRemoteNotifications = NO;
 
               [remoteConfig fetchWithExpirationDuration:expirationDuration completionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
                   CDVPluginResult *pluginResult;
-                  if (status == FIRRemoteConfigFetchStatusSuccess) {
+                  if (error != nil) {
+                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+                  }else if (status == FIRRemoteConfigFetchStatusSuccess) {
                       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                   } else {
                       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
@@ -479,7 +496,9 @@ static BOOL registeredForRemoteNotifications = NO;
           } else {
               [remoteConfig fetchWithCompletionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
                   CDVPluginResult *pluginResult;
-                  if (status == FIRRemoteConfigFetchStatusSuccess) {
+                  if (error != nil) {
+                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+                  }else if (status == FIRRemoteConfigFetchStatusSuccess) {
                       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                   } else {
                       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
@@ -500,7 +519,7 @@ static BOOL registeredForRemoteNotifications = NO;
              [remoteConfig activateWithCompletionHandler:^(NSError * _Nullable error) {
                  CDVPluginResult *pluginResult;
                  if (error != nil) {
-                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
                  } else {
                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                  }

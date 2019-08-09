@@ -116,6 +116,8 @@
                     NSString *refreshedToken = result.token;
                     NSLog(@"tokenRefreshNotification: %@", refreshedToken);
                     [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
+                }else{
+                    [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"tokenRefreshNotification: %@", error.description]];
                 }
             }@catch (NSException *exception) {
                 [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
@@ -267,7 +269,7 @@
                     if (!error) {
                         NSLog(@"Local Notification succeeded");
                     } else {
-                        NSLog(@"Local Notification failed: %@", error);
+                        [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"Local Notification failed: %@", error.description]];
                     }
                 }];
             }else{
@@ -280,7 +282,7 @@
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-  NSLog(@"didFailToRegisterForRemoteNotificationsWithError: %@", error);
+    [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"didFailToRegisterForRemoteNotificationsWithError: %@", error.description]];
 }
 
 // Asks the delegate how to handle a notification that arrived while the app was running in the foreground
@@ -295,7 +297,7 @@
                     withCompletionHandler:completionHandler];
 
         if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
-            NSLog(@"willPresentNotification: aborting as not a supported UNNotificationTrigger");
+            [FirebasePlugin.firebasePlugin _logError:@"willPresentNotification: aborting as not a supported UNNotificationTrigger"];
             return;
         }
         
