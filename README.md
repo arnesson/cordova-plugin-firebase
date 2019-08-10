@@ -162,6 +162,9 @@ You should be aware of the following breaking changes compared with `cordova-plu
      this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
      
 #### Ionic 3
+The above PR does not work for Ionic 3 so you (currently) can't use the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) Typescript wrapper with Ionic 3. 
+(i.e. `import { Firebase } from "@ionic-native/firebase"` will not work).
+
 To use `cordova-plugin-firebasex` with Ionic 3, you'll need to call its Javascript API directly from your Typescript app code, for example:
 
     (<any>window).FirebasePlugin.getToken(token => console.log(`token: ${token}`))
