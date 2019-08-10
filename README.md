@@ -149,7 +149,7 @@ You should be aware of the following breaking changes compared with `cordova-plu
 * Migrated to Cocoapods to satisfy Firebase SDK dependencies on iOS
 * `onNotificationOpen()` renamed to `onMessageReceived()`
     * `tap` parameter is only set when user taps on a notification (not when a message is received from FCM)
-    *`tap=foreground|background` instead of `tap=true|false`
+    * `tap=foreground|background` instead of `tap=true|false`
 * Adds support for foreground notifications and data notification messages
 
 #### Ionic 4
