@@ -22,6 +22,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [Installation](#installation)
     - [Supported Cordova Versions](#supported-cordova-versions)
     - [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase)
+      - [Breaking API changes](#breaking-api-changes)
+      - [Ionic 4](#ionic-4)
+      - [Ionic 3](#ionic-3)
   - [Build environment notes](#build-environment-notes)
     - [Specifying dependent library versions](#specifying-dependent-library-versions)
     - [PhoneGap Build](#phonegap-build)
@@ -131,11 +134,53 @@ If you already have [cordova-plugin-firebase](https://github.com/arnesson/cordov
     npm install
     cordova plugin add cordova-plugin-firebasex
     cordova platform add android
-    
+
+#### Breaking API changes    
 **IMPORTANT:** Recent versions of `cordova-plugin-firebasex` have made breaking changes to the plugin API in order to fix bugs or add more functionality.
 Therefore you can no longer directly substitute `cordova-plugin-firebasex` in place of `cordova-plugin-firebase` without making code changes.
-Please see the `CHANGELOG.md` for a list of breaking changes and see this plugin's documentation below for current API features.
+
+You should be aware of the following breaking changes compared with `cordova-plugin-firebase`:
+* Minimum supported Cordova versions
+    * `cordova@9` (CLI)
+    * `cordova-android@8` (Android platform)
+    * `cordova-ios@5` (iOS platform)
+* Migrated to AndroidX from legacy Android Support Library
+    * add dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) and [cordova-plugin-androidx-adapter](https://github.com/dpa99c/cordova-plugin-androidx-adapter)
+* Migrated to Cocoapods to satisfy Firebase SDK dependencies on iOS
+* `onNotificationOpen()` renamed to `onMessageReceived()`
+    * `tap` parameter is only set when user taps on a notification (not when a message is received from FCM)
+    *`tap=foreground|background` instead of `tap=true|false`
+* Adds support for foreground notifications and data notification messages
+
+#### Ionic 4
+[This PR](https://github.com/ionic-team/ionic-native/pull/3106) adds support for using `cordova-plugin-firebasex` with the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) Typescript wrapper
+
+     import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+     constructor(private firebase: FirebaseX)
+     
+     this.firebase.getToken().then(token => console.log(`The token is ${token}`))
+     this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
+     
+#### Ionic 3
+To use `cordova-plugin-firebasex` with Ionic 3, you'll need to call its Javascript API directly from your Typescript app code, for example:
+
+    (<any>window).FirebasePlugin.getToken(token => console.log(`token: ${token}`))
     
+    (<any>window).FirebasePlugin.onMessageReceived((message) => {
+        if (message.tap) { console.log(`Notification was tapped in the ${message.tap}`); }
+    })
+    
+If you want to make the `onMessageReceived()` JS API behave like the Ionic Native wrapper:
+
+    onNotificationOpen() {
+          return new Observable(observer => {
+                (window as any).FirebasePlugin.onMessageReceived((response) => {
+                    observer.next(response);
+                });
+           });
+    }
+    ...
+    this.onNotificationOpen().subscribe(data => console.log(`FCM message: ${data}`));
 
 ## Build environment notes
 
