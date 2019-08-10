@@ -153,13 +153,17 @@ You should be aware of the following breaking changes compared with `cordova-plu
 * Adds support for foreground notifications and data notification messages
 
 #### Ionic 4
-[This PR](https://github.com/ionic-team/ionic-native/pull/3106) adds support for using `cordova-plugin-firebasex` with the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) Typescript wrapper
+[This PR](https://github.com/ionic-team/ionic-native/pull/3106) adds an [Ionic Native firebase-x Typescript wrapper](https://github.com/ionic-team/ionic-native/blob/master/src/%40ionic-native/plugins/firebase-x/index.ts) for using `cordova-plugin-firebasex` with Ionic 4. 
+The API is similar to the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) wrapper.
 
-     import { FirebaseX } from "@ionic-native/firebase-x/ngx";
-     constructor(private firebase: FirebaseX)
+    ionic cordova plugin add cordova-plugin-firebasex
+    npm install @ionic-native/firebase-x
+
+    import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+    constructor(private firebase: FirebaseX)
      
-     this.firebase.getToken().then(token => console.log(`The token is ${token}`))
-     this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
+    this.firebase.getToken().then(token => console.log(`The token is ${token}`))
+    this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
      
 #### Ionic 3
 The above PR does not work for Ionic 3 so you (currently) can't use the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) Typescript wrapper with Ionic 3. 
