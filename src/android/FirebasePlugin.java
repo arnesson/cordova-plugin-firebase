@@ -403,7 +403,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(cordovaActivity);
                     boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
-                    callbackContext.success(areNotificationsEnabled);
+                    callbackContext.success(areNotificationsEnabled ? 1 : 0);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
