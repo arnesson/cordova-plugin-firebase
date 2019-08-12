@@ -150,6 +150,10 @@ You should be aware of the following breaking changes compared with `cordova-plu
 * `onNotificationOpen()` renamed to `onMessageReceived()`
     * `tap` parameter is only set when user taps on a notification (not when a message is received from FCM)
     * `tap=foreground|background` instead of `tap=true|false`
+* `hasPermission()` receives argument as a boolean (rather than an object with `isEnabled` key)
+    * e.g. `window.FirebasePlugin.hasPermission(function(hasPermission){
+               console.log("Permission is " + (hasPermission ? "granted" : "denied"));
+           });`
 * Adds support for foreground notifications and data notification messages
 
 #### Ionic 4
@@ -943,8 +947,9 @@ window.FirebasePlugin.grantPermission(function(hasPermission){
 });
 ```
 #### hasPermission
-Check permission to receive push notifications and return `hasPermission: true`.
-iOS only (Android will always return true).
+Check permission to receive push notifications and return the result to a callback function as boolean.
+On iOS, returns true is runtime permission for remote notifications is granted and enabled in Settings.
+On Android, returns true if remote notifications are enabled.
 ```
 window.FirebasePlugin.hasPermission(function(hasPermission){
     console.log("Permission is " + (hasPermission ? "granted" : "denied"));

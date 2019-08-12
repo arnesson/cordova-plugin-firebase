@@ -228,7 +228,7 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("setDefaultChannel")) {
                 this.setDefaultChannel(callbackContext, args.getJSONObject(0));
                 return true;
-            } else if (action.equals("hasPermission") || action.equals("grantPermission")) {
+            } else if (action.equals("grantPermission")) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 return true;
             }
@@ -403,9 +403,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(cordovaActivity);
                     boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
-                    JSONObject object = new JSONObject();
-                    object.put("isEnabled", areNotificationsEnabled);
-                    callbackContext.success(object);
+                    callbackContext.success(areNotificationsEnabled);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
