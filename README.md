@@ -346,6 +346,12 @@ Before reporting an issue with this plugin, please do the following:
 - if you are migrating from `cordova-plugin-firebase` to `cordova-plugin-firebasex` please make sure you have read the [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase) section.
 
 ## Cloud messaging
+<p align="center">
+  <a href="https://youtu.be/qLPhan9YUhQ"><img src="https://media.giphy.com/media/U70vu02o9yCFEffidf/200w_d.gif" /></a>
+  <span>&nbsp;</span>
+  <a href="https://youtu.be/35feCmGYSR4"><img src="https://media.giphy.com/media/Y4oFG0Awhd3TpnggHz/200w_d.gif" /></a>
+</p>
+
 There are 2 distinct types of messages that can be sent by Firebase Cloud Messaging (FCM):
 
 - [Notification messages](https://firebase.google.com/docs/cloud-messaging/concept-options#notifications)
