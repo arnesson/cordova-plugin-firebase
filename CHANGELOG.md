@@ -1,3 +1,11 @@
+# Version 6.0.6
+* Fix parameter type passed to hasPermission success callback for Android. Fixes [#83](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/83).
+
+# Version 6.0.5
+* Fix `hasPermission()` to return boolean result on Android (same as iOS).
+    * Update docs to flag this as a breaking change from `cordova-plugin-firebase`.
+    * Resolves [#81](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/81).
+
 # Version 6.0.4
 * Replace dependency on `cordova-lib` with `xml2js`.
 * (iOS) Restore placeholder GoogleService-Info.plist. 
