@@ -1,3 +1,8 @@
+# Version 6.0.7
+* Merge PR [#93](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/93): Update Fabric dependencies
+* Port code to apply IOS_STRIP_DEBUG plugin variable to Podfile into this plugin's hook scripts (from cordova-plugin-cocoapod-supportx).
+    * Fixes [#89](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/89).
+
 # Version 6.0.6
 * Fix parameter type passed to hasPermission success callback for Android. Fixes [#83](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/83).
 
