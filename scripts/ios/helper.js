@@ -166,5 +166,20 @@ module.exports = {
 
         // Finally, write the .pbxproj back out to disk.
         fs.writeFileSync(xcodeProjectPath, xcodeProject.writeSync());
+    },
+    stripDebugSymbols: function(){
+        var podFilePath = 'platforms/ios/Podfile',
+            podFile = fs.readFileSync(podFilePath).toString();
+        if(!podFile.match('DEBUG_INFORMATION_FORMAT')){
+            podFile += "\npost_install do |installer|\n" +
+                "    installer.pods_project.targets.each do |target|\n" +
+                "        target.build_configurations.each do |config|\n" +
+                "            config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf'\n" +
+                "        end\n" +
+                "    end\n" +
+                "end";
+            fs.writeFileSync(podFilePath, podFile);
+            console.log('cordova-plugin-firebasex: Applied IOS_STRIP_DEBUG to Podfile');
+        }
     }
 };
