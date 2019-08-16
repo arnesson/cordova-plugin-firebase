@@ -32,7 +32,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [AndroidX](#androidx)
     - [Google Play Services and Firebase libraries](#google-play-services-and-firebase-libraries)
     - [iOS-specific](#ios-specific)
-      - [iOS minimum version](#ios-minimum-version)
       - [Cocoapods](#cocoapods)
       - [Strip debug symbols](#strip-debug-symbols)
   - [Firebase config setup](#firebase-config-setup)
@@ -275,11 +274,6 @@ Similarly, if your build is failing because multiple plugins are installing diff
 you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release) to align these.  
 
 ### iOS-specific
-#### iOS minimum version
-This plugin sets a default minimum iOS version in the Pod file (see `<preference name="IOS_MIN_VERSION">` in `plugin.xml`) which can be overriden using a plugin variable of the same name, e.g.:
-
-    cordova plugin add cordova-plugin-firebasex --variable IOS_MIN_VERSION=10.0
-
 #### Cocoapods
 This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
