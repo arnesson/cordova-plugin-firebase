@@ -77,6 +77,19 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)getDeviceToken:(CDVInvokedUrlCommand *)command {
+    NSData* apnsToken = [FIRMessaging messaging].APNSToken;
+    CDVPluginResult *pluginResult;
+    if (apnsToken) {
+        NSString* hexToken = [[apnsToken.description componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet]invertedSet]]componentsJoinedByString:@""];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:hexToken];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:nil];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)hasPermission:(CDVInvokedUrlCommand *)command {
     @try {
         [self _hasPermission:^(BOOL enabled) {
