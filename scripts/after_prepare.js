@@ -16,6 +16,9 @@ var utilities = require("./lib/utilities");
 
 var config = fs.readFileSync('config.xml').toString();
 var name = utilities.getValue(config, 'name');
+if (name.includes('&amp;')) {
+    name = name.replace(/&amp;/g, '&');
+}
 var pluginVariables = {};
 
 var IOS_DIR = 'platforms/ios';
