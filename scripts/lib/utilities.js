@@ -24,7 +24,8 @@ module.exports = {
   getAppName: function(cb){
       var xml = fs.readFileSync("config.xml", 'utf-8');
       xml2js(xml, function(err, result){
-          cb(result.widget.name[0]);
+          var widgetName = typeof(result.widget.name[0]) === 'object' ? result.widget.name[0]._ : result.widget.name[0];
+          cb(widgetName);
       });
   },
 
