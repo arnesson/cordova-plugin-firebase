@@ -20,7 +20,7 @@ var pluginVariables = {};
 
 var IOS_DIR = 'platforms/ios';
 var ANDROID_DIR = 'platforms/android';
-var PLUGIN_ID = 'cordova-plugin-firebasex';
+var PLUGIN_ID = 'cordova-plugin-firebase';
 
 var PLATFORM = {
   IOS: {
