@@ -4,10 +4,6 @@ exports.getVerificationID = function (number, success, error) {
   exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
 
-exports.getInstanceId = function (success, error) {
-  exec(success, error, "FirebasePlugin", "getInstanceId", []);
-};
-
 exports.getId = function (success, error) {
   exec(success, error, "FirebasePlugin", "getId", []);
 };
@@ -16,20 +12,12 @@ exports.getToken = function (success, error) {
   exec(success, error, "FirebasePlugin", "getToken", []);
 };
 
-exports.onNotificationOpen = function (success, error) {
-  exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
+exports.onMessageReceived = function (success, error) {
+  exec(success, error, "FirebasePlugin", "onMessageReceived", []);
 };
 
 exports.onTokenRefresh = function (success, error) {
   exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
-};
-
-exports.grantPermission = function (success, error) {
-  exec(success, error, "FirebasePlugin", "grantPermission", []);
-};
-
-exports.hasPermission = function (success, error) {
-  exec(success, error, "FirebasePlugin", "hasPermission", []);
 };
 
 exports.setBadgeNumber = function (number, success, error) {
@@ -56,13 +44,7 @@ exports.logEvent = function (name, params, success, error) {
   exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
 
-exports.logError = function (message, success, error) {
-  exec(success, error, "FirebasePlugin", "logError", [message]);
-};
 
-exports.setCrashlyticsUserId = function (userId, success, error) {
-    exec(success, error, "FirebasePlugin", "setCrashlyticsUserId", [userId]);
-};
 
 exports.setScreenName = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "setScreenName", [name]);
@@ -145,4 +127,58 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
+};
+
+
+// Crashlytics
+exports.logMessage = function (message, success, error) {
+    exec(success, error, "FirebasePlugin", "logMessage", [message]);
+};
+
+exports.sendCrash = function (success, error) {
+    exec(success, error, "FirebasePlugin", "sendCrash", []);
+};
+
+exports.logError = function (message, stackTrace, success, error) {
+  var args = [message];
+  // "stackTrace" is an optional arg that's an array of objects.
+  if (stackTrace) {
+    if (typeof stackTrace === 'function') {
+      error = success;
+      success = stackTrace;
+    } else {
+      args.push(stackTrace);
+    }
+  }
+  exec(success, error, "FirebasePlugin", "logError", args);
+};
+
+exports.setCrashlyticsUserId = function (userId, success, error) {
+    exec(success, error, "FirebasePlugin", "setCrashlyticsUserId", [userId]);
+};
+
+// iOS-only
+exports.grantPermission = function (success, error) {
+  exec(success, error, "FirebasePlugin", "grantPermission", []);
+};
+
+exports.hasPermission = function (success, error) {
+  exec(success, error, "FirebasePlugin", "hasPermission", []);
+};
+
+// Android-only
+exports.setDefaultChannel = function (options, success, error) {
+    exec(success, error, "FirebasePlugin", "setDefaultChannel", [options]);
+};
+
+exports.createChannel = function (options, success, error) {
+  exec(success, error, "FirebasePlugin", "createChannel", [options]);
+};
+
+exports.deleteChannel = function (channelID, success, error) {
+  exec(success, error, "FirebasePlugin", "deleteChannel", [channelID]);
+};
+
+exports.listChannels = function (success, error) {
+  exec(success, error, "FirebasePlugin", "listChannels", []);
 };

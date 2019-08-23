@@ -1,3 +1,146 @@
+# Version 6.0.7
+* Merge PR [#93](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/93): Update Fabric dependencies
+* Port code to apply IOS_STRIP_DEBUG plugin variable to Podfile into this plugin's hook scripts (from cordova-plugin-cocoapod-supportx).
+    * Fixes [#89](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/89).
+
+# Version 6.0.6
+* Fix parameter type passed to hasPermission success callback for Android. Fixes [#83](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/83).
+
+# Version 6.0.5
+* Fix `hasPermission()` to return boolean result on Android (same as iOS).
+    * Update docs to flag this as a breaking change from `cordova-plugin-firebase`.
+    * Resolves [#81](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/81).
+
+# Version 6.0.4
+* Replace dependency on `cordova-lib` with `xml2js`.
+* (iOS) Restore placeholder GoogleService-Info.plist. 
+    * Partially reverts a9c66746ca3592f0eec217f7701d5835f33b43c5
+    * See [#74](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/74)
+* (iOS) Handle and report native logical errors.
+
+# Version 6.0.3
+* (iOS) If grantPermission() is called when permission is already granted, return an error (rather than attempting to grant permission again which causes issues).
+    * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
+* (iOS) Run badge number operations on UI thread (instead of background thread).
+    * Resolves [#72](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/72)
+* (iOS) Handle situation where value of sound is not an NSString.    
+    * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
+* (iOS) Add try/catch handlers at all code entry points to handle unexpected exceptions in order to prevent app crashes. Log native exceptions to native and JS consoles.
+    * See [#61](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/61)
+* Remove `google-services.json` and `GoogleService-Info.plist` placeholders.
+    * See [#63](See https://github.com/dpa99c/cordova-plugin-firebasex/issues/63)
+
+
+# Version 6.0.2
+* (Android) Improved exception handling to prevent app crashes due to plugin exceptions.
+Document caveats of received message payload when notification message is received while app is not running on Android.
+Further resolves [#52](https://github.com/dpa99c/cordova-plugin-firebasex/issues/52).
+
+# Version 6.0.1
+* (Android) Expose notification message properties in message object sent to onMessageReceived().
+Ensure message is always sent to onMessageReceived(), regardless if it was tapped.
+Resolves [#52](https://github.com/dpa99c/cordova-plugin-firebasex/issues/52).
+
+
+# Version 6.0.0
+* *BREAKING CHANGES*
+    * `onMessageReceived()` is now called when a message is received (data or notification) AND when a system notification is tapped (whether app is running or not)
+    * Resolves [#48](https://github.com/dpa99c/cordova-plugin-firebasex/issues/48).
+    * The `tap` parameter passed to `onMessageReceived()` is only set if a system notification is tapped
+        * If the system notification was tapped while the app is running in the foreground, the value will be `tap: "foreground"`
+        * If the system notification was tapped while the app is not running / in the background, the value will be `tap: "background"`     
+
+# Version 5.0.0
+* *BREAKING CHANGES*
+    * `onNotificationOpen()` renamed to `onMessageReceived()`
+    * Changed key names for custom notification properties in FCM data messages to display system notifications in foreground.
+    * Message payload is always delivered to `onMessageReceived()` for both data and notification messages.
+    * `messageType` key indicates type of FCM message: `notification` or `data`
+    * `tap` is only set when `messageType` is `notification`
+    * Explicit dependency on `cordova-plugin-androidx-adapter` since Android implementation uses AndroidX so is incompatible with Android Support Library.
+    * Set `remote-notification` background mode in native Xcode project for iOS.
+    * Reworked plugin documentation.
+* Support customisable display of system notifications while app is in foreground for both notification and data messages (both Android & iOS).
+* Set default color accent and notification channel for FCM notifications.
+* Add support for default and custom notification channels for Android 8+
+    * Customise importance, visibility, LED light, badge number, notification sound and vibration pattern 
+* Calling `logError()` on Android now also logs to native logcat (as well as a non-fatal error to remote Crashlytics service).
+* Fix `logError()` on iOS to log non-fatal error to remote Crashyltics service.
+* Implement stubs for `hasPermission()` and `grantPermission()` on Android so they both return true in to the success callback.
+* Rationalise permission check/request on iOS.
+* Remove legacy support for iOS 9 and below.
+* Support overridable default color accent for Android notification icons via `ANDROID_ICON_ACCENT` plugin variable.
+    
+# Version 4.0.0
+* *BREAKING CHANGE:* set min supported versions to `cordova@9` and `cordova-ios@5`.
+    * Drop dependency on cordova-plugin-cocoapodsx to install pod dependencies.
+    * Instead  update plugin.xml to use podspec formatting as required by cordova-ios@5.
+    * Remove iOS plugin variables as these are not (currently) supported by cordova-ios@5
+    * Resolves [#22](https://github.com/dpa99c/cordova-plugin-firebasex/issues/22).
+
+# Version 3.0.8
+* \[iOS\] Add support for stripping debug symbols for libraries included via Cocoapods. Resolves [#28](https://github.com/dpa99c/cordova-plugin-firebasex/issues/28).
+
+# Version 3.0.7
+* \[iOS\] Ensure runpath search path contains `$(inherited)` to avoid build warnings/issues. Resolves [#25](https://github.com/dpa99c/cordova-plugin-firebasex/issues/25).
+
+# Version 3.0.6
+* Update iOS to Firebase SDK v6.3.0 (from v5.20.2) - major version increment so update source code for breaking changes to API. Resolves [#9](https://github.com/dpa99c/cordova-plugin-firebasex/issues/9).
+* Add support for NDK crashlytics on Android. Resolves [#17](https://github.com/dpa99c/cordova-plugin-firebasex/issues/17).
+
+# Version 3.0.5
+* Bump min version of cordova-plugin-cocoapod-supportx to 1.7.2 which fixes bug when using a plugin variable to specify the `ios-min-version` in `<pods-config>`
+
+# Version 3.0.4
+* Bump min version of cordova-plugin-cocoapod-supportx to 1.7.1 which supports using a plugin variable to specify the `ios-min-version` in `<pods-config>`
+
+# Version 3.0.3
+* Implement didReceiveRegistrationToken delegate for iOS. Resolves [#16](https://github.com/dpa99c/cordova-plugin-firebasex/issues/16).
+* Document dependency on Cocoapods. Resolves [#15](https://github.com/dpa99c/cordova-plugin-firebasex/issues/15).
+* Make min iOS version configurable. Resolves [#14](https://github.com/dpa99c/cordova-plugin-firebasex/issues/14).
+
+
+# Version 3.0.2
+* Update legacy Xpath reference to `<application>` element in `AndroidManifest.xml`
+
+# Version 3.0.1
+* Bump default iOS Firebase SDK version to 5.20.2 (https://firebase.google.com/support/release-notes/ios#version_5202_-_april_10_2019). Resolves [#8](https://github.com/dpa99c/cordova-plugin-firebasex/issues/8).
+
+# Version 3.0.0
+* Reapply: Support user-overriding of default Android Gradle & iOS Cocoapods versions using plugin variables.
+
+# Version 2.1.2
+* Revert: Support user-overriding of default Android Gradle & iOS Cocoapods versions using plugin variables.
+    * Since it's not working on iOS due to Cocoapods plugin dependency.
+    * Need to fix that plugin to handle plugin variables then reinstate this change in a major version release.
+
+# Version 2.1.1
+* Support user-overriding of default Android Gradle & iOS Cocoapods versions using plugin variables.
+
+# Version 2.1.0
+* Update Android source to use AndroidX class names and adds dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) for forward compatibility with future versions of Firebase libraries on Android.
+    * Note: if you include other plugins in your project which reference the legacy Android Support Library, you'll still need to include [cordova-plugin-androidx-adapter](https://github.com/dpa99c/cordova-plugin-androidx-adapter) in your project to dynamically patch them.
+* Pins Firebase and Crashlytics Gradle dependencies to latest major version (to prevent build failures due to unexpected changes in subsequent major versions).
+* Set minimum supported versions to `cordova@8+`, `cordova-android@8+`, `cordova-ios@4+`.
+
+# Version 2.0.7
+* Merge [PR #7](https://github.com/dpa99c/cordova-plugin-firebasex/pull/7): use `<pod>` instead of deprecated `<<framework type="podspec">`. Resolves [#5](https://github.com/dpa99c/cordova-plugin-firebasex/issues/5).
+
+# Version 2.0.6
+* Use Cocoapods to satisfy iOS Firebase SDK (rather than bundling with plugin). See https://github.com/arnesson/cordova-plugin-firebase/pull/972.
+* Add support for logMessage() and sendCrash() functions (ported from cordova-fabric-plugin)
+* Bump version of Crashlytics library on Android to current latest (v2.9.8 - Dec 2018)
+* Bump Firebase SDK versions in iOS PodSpecs to latest version (v5.15.0)
+* Remove redundant build-extras.gradle
+* Set minimum iOS version to 9.0 in podspec
+* Remove unnecessary extra <config-file> block which can lead to race condition
+* Fixes issues cause by Firebase SDK updates on 5 April 2019 (https://firebase.google.com/support/release-notes/android#update_-_april_05_2019) which removed deprecated API features causing Android build failures.
+See https://github.com/arnesson/cordov 
+* Fix compatibility with cordova@9 CLI
+* Add explicit dependency on cordova-lib to prevent build error on iOS. Fixes #2.
+
+---> **FORKED FROM `cordova-plugin-firebase` AS `cordova-plugin-firebasex`** <---
+
 # Version 2.0.5
 
 ### Bug Fixes

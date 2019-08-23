@@ -3,9 +3,9 @@
 
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
+
 - (void)getVerificationID:(CDVInvokedUrlCommand*)command;
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
-- (void)getInstanceId:(CDVInvokedUrlCommand*)command;
 - (void)getId:(CDVInvokedUrlCommand*)command;
 - (void)getToken:(CDVInvokedUrlCommand*)command;
 - (void)grantPermission:(CDVInvokedUrlCommand*)command;
@@ -15,7 +15,7 @@
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)unregister:(CDVInvokedUrlCommand*)command;
-- (void)onNotificationOpen:(CDVInvokedUrlCommand*)command;
+- (void)onMessageReceived:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)sendToken:(NSString*)token;
@@ -34,6 +34,17 @@
 - (void)setAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)setPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command;
+- (void)logMessage:(CDVInvokedUrlCommand*)command;
+- (void)sendCrash:(CDVInvokedUrlCommand*)command;
+
+- (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
+- (void) handlePluginExceptionWithoutContext: (NSException*) exception;
+- (void)_logError: (NSString*)msg;
+
+- (void)createChannel:(CDVInvokedUrlCommand *)command;
+- (void)setDefaultChannel:(CDVInvokedUrlCommand *)command;
+- (void)deleteChannel:(CDVInvokedUrlCommand *)command;
+- (void)listChannels:(CDVInvokedUrlCommand *)command;
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;

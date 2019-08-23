@@ -1,11 +1,12 @@
 buildscript {
     repositories {
-        jcenter()
+        google()
         mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:+'
-        classpath 'com.google.gms:google-services:4.1.0'
+        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.google.gms:google-services:4.2.0'
     }
 }
 repositories {
@@ -15,15 +16,12 @@ repositories {
     }
 }
 
-dependencies {
-    compile 'me.leolin:ShortcutBadger:1.1.4@aar'
-    compile 'com.google.firebase:firebase-auth:+'
-    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
-       transitive = true
-    }
-}
-
 cdvPluginPostBuildExtras.add({
     apply plugin: 'com.google.gms.google-services'
     apply plugin: 'io.fabric'
+
+    // Enable Crashlytics NDK reporting
+    crashlytics {
+        enableNdk true
+    }
 })
