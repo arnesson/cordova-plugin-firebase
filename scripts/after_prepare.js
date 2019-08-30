@@ -110,8 +110,10 @@ module.exports = function (context) {
     parsePluginVariables().then(function(){
       if(pluginVariables['IOS_STRIP_DEBUG'] && pluginVariables['IOS_STRIP_DEBUG'] === 'true'){
         helper.stripDebugSymbols();
-        deferred.resolve();
       }
+      deferred.resolve();
+    }).catch(error => {
+      deferred.reject(error);
     });
   }else{
     deferred.resolve();
