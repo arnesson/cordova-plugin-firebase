@@ -12,8 +12,8 @@ exports.getToken = function (success, error) {
   exec(success, error, "FirebasePlugin", "getToken", []);
 };
 
-exports.getDeviceToken = function (success, error) {
-  exec(success, error, "FirebasePlugin", "getDeviceToken", []);
+exports.getAPNSToken = function (success, error) {
+  exec(success, error, "FirebasePlugin", "getAPNSToken", []);
 };
 
 exports.onMessageReceived = function (success, error) {

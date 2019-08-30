@@ -64,6 +64,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Notifications and data messages](#notifications-and-data-messages)
       - [getToken](#gettoken)
       - [onTokenRefresh](#ontokenrefresh)
+      - [getAPNSToken](#getapnstoken)
       - [onMessageReceived](#onmessagereceived)
       - [grantPermission](#grantpermission)
       - [hasPermission](#haspermission)
@@ -870,7 +871,7 @@ The plugin is capable of receiving push notifications and FCM data messages.
 See [Cloud messaging](#cloud-messaging) section for more.
 
 #### getToken
-Get the device token (id):
+Get the FCM device token (id):
 ```
 window.FirebasePlugin.getToken(function(token) {
     // save this server-side and use it to push notifications to this device
@@ -892,6 +893,18 @@ window.FirebasePlugin.onTokenRefresh(function(token) {
 });
 ```
 This is the best way to get a valid token for the device as soon as the token is established
+
+#### getAPNSToken
+iOS only.
+Get the APNS token.
+```
+window.FirebasePlugin.getAPNSToken(function(apnsToken) {
+    console.log(apnsToken);
+}, function(error) {
+    console.error(error);
+});
+```
+Note that token will be null if it has not been established yet.
 
 #### onMessageReceived
 Registers a callback function to invoke when: 

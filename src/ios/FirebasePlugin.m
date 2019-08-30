@@ -77,7 +77,7 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
-- (void)getDeviceToken:(CDVInvokedUrlCommand *)command {
+- (void)getAPNSToken:(CDVInvokedUrlCommand *)command {
     NSData* apnsToken = [FIRMessaging messaging].APNSToken;
     CDVPluginResult *pluginResult;
     if (apnsToken) {
