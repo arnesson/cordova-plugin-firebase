@@ -1,10 +1,14 @@
 buildscript {
     repositories {
         google()
+        maven {
+            url "https://maven.fabric.io/public"
+        }
         mavenCentral()
         jcenter()
     }
     dependencies {
+        classpath "io.fabric.tools:gradle:1.30.0"
         classpath 'com.android.tools.build:gradle:3.4.1'
         classpath 'com.google.gms:google-services:4.2.0'
     }
@@ -17,8 +21,9 @@ repositories {
 }
 
 cdvPluginPostBuildExtras.add({
-    apply plugin: 'com.google.gms.google-services'
-    apply plugin: 'io.fabric'
+    // Use class instead of id (string) to be able to apply plugin from non-root gradle file
+    apply plugin: com.google.gms.googleservices.GoogleServicesPlugin
+    apply plugin: com.crashlytics.tools.gradle.CrashlyticsPlugin
 
     // Enable Crashlytics NDK reporting
     crashlytics {
