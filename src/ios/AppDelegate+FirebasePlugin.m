@@ -143,6 +143,13 @@
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
         if([aps objectForKey:@"alert"] != nil){
             [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
+            NSString* tap;
+            if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){
+                tap = @"background";
+            }else{
+                tap = @"foreground";
+            }
+            [mutableUserInfo setValue:tap forKey:@"tap"];
         }else{
             [mutableUserInfo setValue:@"data" forKey:@"messageType"];
         }
