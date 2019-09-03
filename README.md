@@ -33,6 +33,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Google Play Services and Firebase libraries](#google-play-services-and-firebase-libraries)
     - [iOS-specific](#ios-specific)
       - [Cocoapods](#cocoapods)
+      - [Out-of-date pods](#out-of-date-pods)
       - [Strip debug symbols](#strip-debug-symbols)
   - [Firebase config setup](#firebase-config-setup)
   - [Example project](#example-project)
@@ -279,7 +280,6 @@ you can try installing [cordova-android-firebase-gradle-release](https://github.
 This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
 Therefore please make sure you have Cocoapods installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
-Also make sure your local Cocoapods repo is up-to-date by running `pod repo update`.
 
 If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
 
@@ -288,6 +288,13 @@ You can list the pod dependencies in your Cordova iOS project by installing [coc
     sudo gem install cocoapods-dependencies
     cd platforms/ios/
     pod dependencies
+    
+#### Out-of-date pods
+If you receive a build error such as this:
+
+    None of your spec sources contain a spec satisfying the dependencies: `Firebase/Analytics (~> 6.1.0), Firebase/Analytics (= 6.1.0, ~> 6.1.0)`.
+
+Make sure your local Cocoapods repo is up-to-date by running `pod repo update` then run `pod install` in `/your_project/platforms/ios/`.    
 
 #### Strip debug symbols
 If your iOS app build contains too many debug symbols (i.e. because you include lots of libraries via a Cocoapods), you might get an error (e.g. [issue #28](https://github.com/dpa99c/cordova-plugin-firebase/issues/28)) when you upload your binary to App Store Connect, e.g.:
