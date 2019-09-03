@@ -1003,6 +1003,7 @@ window.FirebasePlugin.unregister();
 
 
 #### setBadgeNumber
+iOS only.
 Set a number on the icon badge:
 ```
 window.FirebasePlugin.setBadgeNumber(3);
@@ -1013,13 +1014,18 @@ Set 0 to clear the badge
 window.FirebasePlugin.setBadgeNumber(0);
 ```
 
+Note: this function is no longer available on Android (see [#124](https://github.com/dpa99c/cordova-plugin-firebasex/issues/124))
+
 #### getBadgeNumber
+iOS only.
 Get icon badge number:
 ```
 window.FirebasePlugin.getBadgeNumber(function(n) {
     console.log(n);
 });
 ```
+
+Note: this function is no longer available on Android (see [#124](https://github.com/dpa99c/cordova-plugin-firebasex/issues/124))
 
 #### clearAllNotifications
 Clear all pending notifications from the drawer:

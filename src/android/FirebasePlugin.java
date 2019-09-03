@@ -125,13 +125,7 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("hasPermission")) {
                 this.hasPermission(callbackContext);
                 return true;
-            } else if (action.equals("setBadgeNumber")) {
-                this.setBadgeNumber(callbackContext, args.getInt(0));
-                return true;
-            } else if (action.equals("getBadgeNumber")) {
-                this.getBadgeNumber(callbackContext);
-                return true;
-            } else if (action.equals("subscribe")) {
+            }else if (action.equals("subscribe")) {
                 this.subscribe(callbackContext, args.getString(0));
                 return true;
             } else if (action.equals("unsubscribe")) {
@@ -231,7 +225,11 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("setDefaultChannel")) {
                 this.setDefaultChannel(callbackContext, args.getJSONObject(0));
                 return true;
-            } else if (action.equals("grantPermission")) {
+            } else if (action.equals("grantPermission")
+                    || action.equals("setBadgeNumber")
+                    || action.equals("getBadgeNumber")
+            ) {
+                // Stubs for other platform methods
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 return true;
             }
@@ -407,36 +405,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(cordovaActivity);
                     boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
                     callbackContext.success(areNotificationsEnabled ? 1 : 0);
-                } catch (Exception e) {
-                    handleExceptionWithContext(e, callbackContext);
-                }
-            }
-        });
-    }
-
-    private void setBadgeNumber(final CallbackContext callbackContext, final int number) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    SharedPreferences.Editor editor = cordovaActivity.getSharedPreferences(KEY, Context.MODE_PRIVATE).edit();
-                    editor.putInt(KEY, number);
-                    editor.apply();
-                    ShortcutBadger.applyCount(cordovaActivity, number);
-                    callbackContext.success();
-                } catch (Exception e) {
-                    handleExceptionWithContext(e, callbackContext);
-                }
-            }
-        });
-    }
-
-    private void getBadgeNumber(final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    SharedPreferences settings = cordovaActivity.getSharedPreferences(KEY, Context.MODE_PRIVATE);
-                    int number = settings.getInt(KEY, 0);
-                    callbackContext.success(number);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }

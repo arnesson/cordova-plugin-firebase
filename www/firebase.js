@@ -37,6 +37,7 @@ exports.unregister = function (success, error) {
   exec(success, error, "FirebasePlugin", "unregister", []);
 };
 
+// Notifications - iOS-only
 exports.setBadgeNumber = function (number, success, error) {
     exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
 };
@@ -45,7 +46,6 @@ exports.getBadgeNumber = function (success, error) {
     exec(success, error, "FirebasePlugin", "getBadgeNumber", []);
 };
 
-// Notifications - iOS-only
 exports.grantPermission = function (success, error) {
     exec(success, error, "FirebasePlugin", "grantPermission", []);
 };
