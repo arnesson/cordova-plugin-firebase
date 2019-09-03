@@ -248,7 +248,7 @@ static BOOL registeredForRemoteNotifications = NO;
 
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
     @try {
-        NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
+        NSString* topic = [NSString stringWithFormat:@"%@", [command.arguments objectAtIndex:0]];
 
         [[FIRMessaging messaging] subscribeToTopic: topic];
 
@@ -261,7 +261,7 @@ static BOOL registeredForRemoteNotifications = NO;
 
 - (void)unsubscribe:(CDVInvokedUrlCommand *)command {
     @try {
-        NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
+        NSString* topic = [NSString stringWithFormat:@"%@", [command.arguments objectAtIndex:0]];
 
         [[FIRMessaging messaging] unsubscribeFromTopic: topic];
 
