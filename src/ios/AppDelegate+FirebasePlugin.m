@@ -131,6 +131,9 @@
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [FIRMessaging messaging].APNSToken = deviceToken;
     NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken);
+    
+    // Set UNUserNotificationCenter delegate
+    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
 }
 
 //Tells the app that a remote notification arrived that indicates there is data to be fetched.
@@ -146,8 +149,6 @@
             NSString* tap;
             if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){
                 tap = @"background";
-            }else{
-                tap = @"foreground";
             }
             [mutableUserInfo setValue:tap forKey:@"tap"];
         }else{
@@ -193,7 +194,7 @@
     NSString* title = nil;
     NSString* body = nil;
     NSString* sound = nil;
-    NSString* badge = nil;
+    NSNumber* badge = nil;
     
     // Extract APNS notification keys
     NSDictionary* aps = [messageData objectForKey:@"aps"];
@@ -209,7 +210,7 @@
             sound = [aps objectForKey:@"sound"];
         }
         if([aps objectForKey:@"badge"] != nil){
-            sound = [aps objectForKey:@"badge"];
+            badge = [aps objectForKey:@"badge"];
         }
     }
     
@@ -255,9 +256,6 @@
                 }
                 
                 if(badge != nil){
-                    NSNumberFormatter* f = [[NSNumberFormatter alloc] init];
-                    f.numberStyle = NSNumberFormatterDecimalStyle;
-                    objNotificationContent.badge = [f numberFromString:badge];
                     [aps setValue:badge forKey:@"badge"];
                 }
                 
