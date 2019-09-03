@@ -44,11 +44,10 @@ module.exports = {
           var contents = fs.readFileSync(file).toString();
 
           try {
-            platform.dest.forEach(function (destinationPath) {
+              var destinationPath = platform.dest;
               var folder = destinationPath.substring(0, destinationPath.lastIndexOf('/'));
               fs.ensureDirSync(folder);
               fs.writeFileSync(destinationPath, contents);
-            });
           } catch (e) {
             // skip
           }

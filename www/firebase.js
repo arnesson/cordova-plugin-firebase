@@ -4,6 +4,7 @@ exports.getVerificationID = function (number, success, error) {
   exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
 
+// Notifications
 exports.getId = function (success, error) {
   exec(success, error, "FirebasePlugin", "getId", []);
 };
@@ -24,14 +25,6 @@ exports.onTokenRefresh = function (success, error) {
   exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };
 
-exports.setBadgeNumber = function (number, success, error) {
-  exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
-};
-
-exports.getBadgeNumber = function (success, error) {
-  exec(success, error, "FirebasePlugin", "getBadgeNumber", []);
-};
-
 exports.subscribe = function (topic, success, error) {
   exec(success, error, "FirebasePlugin", "subscribe", [topic]);
 };
@@ -44,11 +37,48 @@ exports.unregister = function (success, error) {
   exec(success, error, "FirebasePlugin", "unregister", []);
 };
 
+exports.setBadgeNumber = function (number, success, error) {
+    exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
+};
+
+exports.getBadgeNumber = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getBadgeNumber", []);
+};
+
+// Notifications - iOS-only
+exports.grantPermission = function (success, error) {
+    exec(success, error, "FirebasePlugin", "grantPermission", []);
+};
+
+exports.hasPermission = function (success, error) {
+    exec(success, error, "FirebasePlugin", "hasPermission", []);
+};
+
+// Notifications - Android-only
+exports.setDefaultChannel = function (options, success, error) {
+    exec(success, error, "FirebasePlugin", "setDefaultChannel", [options]);
+};
+
+exports.createChannel = function (options, success, error) {
+    exec(success, error, "FirebasePlugin", "createChannel", [options]);
+};
+
+exports.deleteChannel = function (channelID, success, error) {
+    exec(success, error, "FirebasePlugin", "deleteChannel", [channelID]);
+};
+
+exports.listChannels = function (success, error) {
+    exec(success, error, "FirebasePlugin", "listChannels", []);
+};
+
+// Analytics
+exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
+};
+
 exports.logEvent = function (name, params, success, error) {
   exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
-
-
 
 exports.setScreenName = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "setScreenName", [name]);
@@ -109,13 +139,11 @@ exports.stopTrace = function (name, success, error) {
   exec(success, error, "FirebasePlugin", "stopTrace", [name]);
 };
 
-exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
-  exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
-};
-
 exports.setPerformanceCollectionEnabled = function (enabled, success, error) {
   exec(success, error, "FirebasePlugin", "setPerformanceCollectionEnabled", [enabled]);
 };
+
+
 
 exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
   if (typeof timeOutDuration === 'function') {
@@ -135,6 +163,10 @@ exports.clearAllNotifications = function (success, error) {
 
 
 // Crashlytics
+exports.setCrashlyticsCollectionEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "setCrashlyticsCollectionEnabled", []);
+};
+
 exports.logMessage = function (message, success, error) {
     exec(success, error, "FirebasePlugin", "logMessage", [message]);
 };
@@ -161,28 +193,4 @@ exports.setCrashlyticsUserId = function (userId, success, error) {
     exec(success, error, "FirebasePlugin", "setCrashlyticsUserId", [userId]);
 };
 
-// iOS-only
-exports.grantPermission = function (success, error) {
-  exec(success, error, "FirebasePlugin", "grantPermission", []);
-};
 
-exports.hasPermission = function (success, error) {
-  exec(success, error, "FirebasePlugin", "hasPermission", []);
-};
-
-// Android-only
-exports.setDefaultChannel = function (options, success, error) {
-    exec(success, error, "FirebasePlugin", "setDefaultChannel", [options]);
-};
-
-exports.createChannel = function (options, success, error) {
-  exec(success, error, "FirebasePlugin", "createChannel", [options]);
-};
-
-exports.deleteChannel = function (channelID, success, error) {
-  exec(success, error, "FirebasePlugin", "deleteChannel", [channelID]);
-};
-
-exports.listChannels = function (success, error) {
-  exec(success, error, "FirebasePlugin", "listChannels", []);
-};

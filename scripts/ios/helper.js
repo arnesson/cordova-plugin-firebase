@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require("path");
 var utilities = require("../lib/utilities");
 var xcode = require("xcode");
+var plist = require('plist');
 
 /**
  * This is used as the display text for the build phase block in XCode as well as the
@@ -181,5 +182,28 @@ module.exports = {
             fs.writeFileSync(podFilePath, podFile);
             console.log('cordova-plugin-firebasex: Applied IOS_STRIP_DEBUG to Podfile');
         }
+    },
+    applyPluginVarsToPlists: function(googlePlistPath, appPlistPath, pluginVariables){
+        var googlePlist = plist.parse(fs.readFileSync(googlePlistPath, 'utf8')),
+            appPlist = plist.parse(fs.readFileSync(appPlistPath, 'utf8')),
+            googlePlistModified = false,
+            appPlistModified = false;
+
+        if(typeof pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== 'undefined'){
+            googlePlist["FIREBASE_ANALYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
+            appPlist["FirebaseScreenReportingEnabled"] = (pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== "false");
+            appPlistModified = googlePlistModified = true;
+        }
+        if(typeof pluginVariables['FIREBASE_PERFORMANCE_COLLECTION_ENABLED'] !== 'undefined'){
+            googlePlist["FIREBASE_PERFORMANCE_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_PERFORMANCE_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
+            googlePlistModified = true;
+        }
+        if(typeof pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== 'undefined'){
+            googlePlist["FIREBASE_CRASHLYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
+            googlePlistModified = true;
+        }
+
+        if(googlePlistModified) fs.writeFileSync(googlePlistPath, plist.build(googlePlist));
+        if(appPlistModified) fs.writeFileSync(appPlistPath, plist.build(appPlist));
     }
 };

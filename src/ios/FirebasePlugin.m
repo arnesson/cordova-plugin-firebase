@@ -658,6 +658,19 @@ static BOOL registeredForRemoteNotifications = NO;
      }];
 }
 
+- (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand *)command {
+     [self.commandDelegate runInBackground:^{
+         @try {
+             [Fabric with:@[[Crashlytics class]]];
+             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+         }@catch (NSException *exception) {
+             [self handlePluginExceptionWithContext:exception :command];
+         }
+     }];
+}
+
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command {
     [self runOnMainThread:^{
         @try {

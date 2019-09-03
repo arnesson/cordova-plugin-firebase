@@ -27,21 +27,16 @@ var PLUGIN_ID = 'cordova-plugin-firebasex';
 
 var PLATFORM = {
   IOS: {
-    dest: [
-      IOS_DIR + '/' + name + '/Resources/GoogleService-Info.plist',
-      IOS_DIR + '/' + name + '/Resources/Resources/GoogleService-Info.plist'
-    ],
+    dest: IOS_DIR + '/' + name + '/Resources/GoogleService-Info.plist',
     src: [
       'GoogleService-Info.plist',
       IOS_DIR + '/www/GoogleService-Info.plist',
       'www/GoogleService-Info.plist'
-    ]
+    ],
+    appPlist: IOS_DIR + '/' + name + '/'+name+'-Info.plist',
   },
   ANDROID: {
-    dest: [
-      ANDROID_DIR + '/google-services.json',
-      ANDROID_DIR + '/app/google-services.json'
-    ],
+    dest: ANDROID_DIR + '/app/google-services.json',
     src: [
       'google-services.json',
       ANDROID_DIR + '/assets/www/google-services.json',
@@ -114,6 +109,8 @@ module.exports = function (context) {
       if(pluginVariables['IOS_STRIP_DEBUG'] && pluginVariables['IOS_STRIP_DEBUG'] === 'true'){
         helper.stripDebugSymbols();
       }
+      helper.applyPluginVarsToPlists(PLATFORM.IOS.dest, PLATFORM.IOS.appPlist, pluginVariables);
+
       deferred.resolve();
     }).catch(error => {
       deferred.reject(error);

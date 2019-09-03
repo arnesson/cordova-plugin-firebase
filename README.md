@@ -26,16 +26,18 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Ionic 4](#ionic-4)
       - [Ionic 3](#ionic-3)
   - [Build environment notes](#build-environment-notes)
-    - [Specifying dependent library versions](#specifying-dependent-library-versions)
     - [PhoneGap Build](#phonegap-build)
     - [Android-specific](#android-specific)
+      - [Specifying dependent library versions](#specifying-dependent-library-versions)
       - [AndroidX](#androidx)
     - [Google Play Services and Firebase libraries](#google-play-services-and-firebase-libraries)
     - [iOS-specific](#ios-specific)
+      - [Specifying dependent library versions](#specifying-dependent-library-versions-1)
       - [Cocoapods](#cocoapods)
       - [Out-of-date pods](#out-of-date-pods)
       - [Strip debug symbols](#strip-debug-symbols)
   - [Firebase config setup](#firebase-config-setup)
+  - [Disable data collection on startup](#disable-data-collection-on-startup)
   - [Example project](#example-project)
   - [Reporting issues](#reporting-issues)
   - [Cloud messaging](#cloud-messaging)
@@ -87,6 +89,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [setUserId](#setuserid)
       - [setUserProperty](#setuserproperty)
     - [Crashlytics](#crashlytics)
+      - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
       - [setCrashlyticsUserId](#setcrashlyticsuserid)
       - [sendCrash](#sendcrash)
       - [logMessage](#logmessage)
@@ -104,6 +107,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [setConfigSettings](#setconfigsettings)
       - [setDefaults](#setdefaults)
     - [Performance](#performance)
+      - [setPerformanceCollectionEnabled](#setperformancecollectionenabled)
       - [startTrace](#starttrace)
       - [incrementCounter](#incrementcounter)
       - [stopTrace](#stoptrace)
@@ -196,13 +200,18 @@ If you want to make the `onMessageReceived()` JS API behave like the Ionic Nativ
 
 ## Build environment notes
 
-### Specifying dependent library versions
-This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android and Cocoapods on iOS.
-By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned Android & iOS versions as `<preference>`'s, for example:
+### PhoneGap Build
+This plugin will not work with Phonegap Build (and other remote cloud build envs) do not support Cordova hook scripts as they are used by this plugin to configure the native platform projects.
+        
+### Android-specific
+
+#### Specifying dependent library versions
+This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android.
+By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned versions as `<preference>`'s, for example:
 
     <preference name="ANDROID_FIREBASE_CORE_VERSION" default="17.0.0" />
 
-These defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
+The Android defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
 
     cordova plugin add cordova-plugin-firebasex --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0
     
@@ -224,16 +233,6 @@ The following plugin variables are use to specify the follow Gradle dependency v
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
 - `ANDROID_SHORTCUTBADGER_VERSION` => `me.leolin:ShortcutBadger`
 
-The following plugin variables are use to specify the follow Cocoapods dependency versions on iOS:
-
-- `IOS_FIREBASE_CORE_VERSION` => `Firebase/Core`
-- `IOS_FIREBASE_AUTH_VERSION` => `Firebase/Auth`
-- `IOS_FIREBASE_MESSAGING_VERSION` => `Firebase/Messaging`
-- `IOS_FIREBASE_PERFORMANCE_VERSION` => `Firebase/Performance`
-- `IOS_FIREBASE_REMOTECONFIG_VERSION` => `Firebase/RemoteConfig`
-- `IOS_FABRIC_VERSION` => `Fabric`
-- `IOS_CRASHLYTICS_VERSION` => `Crashlytics`
-
 For example, to explicitly specify all the component versions at plugin install time:
 
     cordova plugin add cordova-plugin-firebasex \
@@ -246,18 +245,7 @@ For example, to explicitly specify all the component versions at plugin install 
         --variable ANDROID_CRASHLYTICS_VERSION=2.10.1 \
         --variable ANDROID_CRASHLYTICS_NDK_VERSION=2.1.0 \
         --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
-        --variable IOS_FIREBASE_CORE_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_AUTH_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_MESSAGING_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.20.2 \
-        --variable IOS_FABRIC_VERSION=1.9.0 \
-        --variable IOS_CRASHLYTICS_VERSION=3.12.0
-
-### PhoneGap Build
-This plugin will not work with Phonegap Build (and other remote cloud build envs) do not support Cordova hook scripts as they are used by this plugin to configure the native platform projects.
         
-### Android-specific
 #### AndroidX
 This plugin has been migrated to use [AndroidX (Jetpack)](https://developer.android.com/jetpack/androidx/migrate) which is the successor to the [Android Support Library](https://developer.android.com/topic/libraries/support-library/index).
 This is implemented by adding a dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) which enables AndroidX in the Android platform of a Cordova project.
@@ -276,6 +264,15 @@ Similarly, if your build is failing because multiple plugins are installing diff
 you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release) to align these.  
 
 ### iOS-specific
+#### Specifying dependent library versions
+This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Cocoapods on iOS.
+This plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned iOS versions in the  `<pod>`'s, for example:
+
+    <pod name="Firebase/Core" spec="6.3.0"/>
+    
+**It is currently not possible to override these at plugin installation time** because `cordova@9`/`cordova-ios@5` does not support the use of plugin variables in the `<pod>`'s `spec` attribute.
+Therefore if you need to change the specified versions, you'll currently need to do this by forking the plugin and editing the `plugin.xml` to change the specified `spec` values.     
+
 #### Cocoapods
 This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
@@ -326,8 +323,29 @@ Check out this [firebase article](https://support.google.com/firebase/answer/701
     GoogleService-Info.plist   <--
     ...
 ```
-
 IMPORTANT: The Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
+
+## Disable data collection on startup
+By default, analytics, performance and Crashlytics data will begin being collected as soon as the app starts up.
+However, for data protection or privacy reasons, you may wish to disable data collection until such time as the user has granted their permission.
+
+To do this, set the following plugin variables to `false` at plugin install time:
+
+* `FIREBASE_ANALYTICS_COLLECTION_ENABLED`
+* `FIREBASE_PERFORMANCE_COLLECTION_ENABLED`
+* `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` 
+
+
+    cordova plugin add cordova-plugin-firebasex \
+        --variable FIREBASE_ANALYTICS_COLLECTION_ENABLED=false \ 
+        --variable FIREBASE_PERFORMANCE_COLLECTION_ENABLED=false \ 
+        --variable FIREBASE_CRASHLYTICS_COLLECTION_ENABLED=false
+
+This will disable data collection (on both Android & iOS) until you call [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled), [setPerformanceCollectionEnabled](#setperformancecollectionenabled) and [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled):
+
+       window.FirebasePlugin.setAnalyticsCollectionEnabled(true);
+       window.FirebasePlugin.setPerformanceCollectionEnabled(true);
+       window.FirebasePlugin.setCrashlyticsCollectionEnabled();
 
 ## Example project
 An example project repo exists to demonstrate and validate the functionality of this plugin:
@@ -1212,12 +1230,12 @@ The easiest way to set this up is by [streaming Firebase Analytics data into Big
 Note that until you set this up, all fine-grain event-level data is discarded by Firebase.
 
 #### setAnalyticsCollectionEnabled
-Enable/disable analytics collection (useful for GDPR/privacy settings).
+Manually enable/disable analytics data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
 
 ```
-window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics data collection
 
-window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics data collection
 ```
 
 #### logEvent
@@ -1248,6 +1266,15 @@ window.FirebasePlugin.setUserProperty("name", "value");
 By default this plugin will ensure fatal native crashes in your apps are reported via Firebase Crashlytics. 
 
 Note that for iOS you may need to [upload the dSYM](https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports?authuser=0) for you build before crashes are displayed in the Firebase console.
+
+#### setCrashlyticsCollectionEnabled
+Manually enable Crashlytics data collection if [disabled on app startup](#disable-data-collection-on-startup).
+
+```
+window.FirebasePlugin.setCrashlyticsCollectionEnabled();
+```
+
+Note: once enabled, Crashlytics data collection cannot be disabled during the app session.
 
 #### setCrashlyticsUserId
 Set Crashlytics user identifier.
@@ -1464,6 +1491,15 @@ window.FirebasePlugin.setDefaults(defaults);
 ```
 
 ### Performance
+
+#### setPerformanceCollectionEnabled
+Manually enable/disable performance data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
+
+```
+window.FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
+
+window.FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables performance data collection
+```
 
 #### startTrace
 

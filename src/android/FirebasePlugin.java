@@ -33,6 +33,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.Trace;
 
+import io.fabric.sdk.android.Fabric;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 import org.apache.cordova.CallbackContext;
@@ -91,7 +92,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     Log.d(TAG, "Starting Firebase plugin");
                     FirebaseApp.initializeApp(applicationContext);
                     mFirebaseAnalytics = FirebaseAnalytics.getInstance(applicationContext);
-                    mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
                     if (extras != null && extras.size() > 1) {
                         if (FirebasePlugin.notificationStack == null) {
                             FirebasePlugin.notificationStack = new ArrayList<Bundle>();
@@ -206,6 +206,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 return true;
             } else if (action.equals("setPerformanceCollectionEnabled")) {
                 this.setPerformanceCollectionEnabled(callbackContext, args.getBoolean(0));
+                return true;
+            } else if (action.equals("setCrashlyticsCollectionEnabled")) {
+                this.setCrashlyticsCollectionEnabled(callbackContext);
                 return true;
             } else if (action.equals("clearAllNotifications")) {
                 this.clearAllNotifications(callbackContext);
@@ -967,7 +970,6 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void setAnalyticsCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
-        final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -982,11 +984,25 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void setPerformanceCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
-        final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
                     FirebasePerformance.getInstance().setPerformanceCollectionEnabled(enabled);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void setCrashlyticsCollectionEnabled(final CallbackContext callbackContext) {
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    Fabric.with(self.applicationContext, new Crashlytics());
                     callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
