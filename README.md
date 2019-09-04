@@ -231,7 +231,6 @@ The following plugin variables are use to specify the follow Gradle dependency v
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
-- `ANDROID_SHORTCUTBADGER_VERSION` => `me.leolin:ShortcutBadger`
 
 For example, to explicitly specify all the component versions at plugin install time:
 
@@ -244,7 +243,6 @@ For example, to explicitly specify all the component versions at plugin install 
         --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0 \
         --variable ANDROID_CRASHLYTICS_VERSION=2.10.1 \
         --variable ANDROID_CRASHLYTICS_NDK_VERSION=2.1.0 \
-        --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
         
 #### AndroidX
 This plugin has been migrated to use [AndroidX (Jetpack)](https://developer.android.com/jetpack/androidx/migrate) which is the successor to the [Android Support Library](https://developer.android.com/topic/libraries/support-library/index).

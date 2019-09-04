@@ -34,7 +34,6 @@ import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.Trace;
 
 import io.fabric.sdk.android.Fabric;
-import me.leolin.shortcutbadger.ShortcutBadger;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
