@@ -117,7 +117,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 
   ## Installation
 Install the plugin by adding it to your project's config.xml:
-```
+```xml
 <plugin name="cordova-plugin-firebasex" spec="latest" />
 ```
 or by running:
@@ -895,7 +895,12 @@ See [Cloud messaging](#cloud-messaging) section for more.
 
 #### getToken
 Get the FCM device token (id):
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getToken(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
@@ -907,7 +912,12 @@ Note that token will be null if it has not been established yet.
 
 #### onTokenRefresh
 Register for token changes:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.onTokenRefresh(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
@@ -920,7 +930,12 @@ This is the best way to get a valid token for the device as soon as the token is
 #### getAPNSToken
 iOS only.
 Get the APNS token.
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} APNS token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getAPNSToken(function(apnsToken) {
     console.log(apnsToken);
 }, function(error) {
@@ -933,7 +948,12 @@ Note that token will be null if it has not been established yet.
 Registers a callback function to invoke when: 
 - a notification or data message is received by the app
 - a system notification is tapped by the user
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {object} message as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.onMessageReceived(function(message) {
     console.log("Message type: " + message.messageType);
     if(message.messageType === "notification"){
@@ -977,7 +997,11 @@ Data message flow:
 Grant permission to receive push notifications (will trigger prompt) and return `hasPermission: true`.
 iOS only (Android will always return true).
 
-```
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} permission result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.grantPermission(function(hasPermission){
     console.log("Permission was " + (hasPermission ? "granted" : "denied"));
 });
@@ -986,7 +1010,12 @@ window.FirebasePlugin.grantPermission(function(hasPermission){
 Check permission to receive push notifications and return the result to a callback function as boolean.
 On iOS, returns true is runtime permission for remote notifications is granted and enabled in Settings.
 On Android, returns true if remote notifications are enabled.
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} permission result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.hasPermission(function(hasPermission){
     console.log("Permission is " + (hasPermission ? "granted" : "denied"));
 });
@@ -995,7 +1024,10 @@ window.FirebasePlugin.hasPermission(function(hasPermission){
 #### unregister
 Unregister from firebase, used to stop receiving push notifications. 
 Call this when you logout user from your app.
-```
+
+**Parameters**: None
+
+```javascript
 window.FirebasePlugin.unregister();
 ```
 
@@ -1003,12 +1035,16 @@ window.FirebasePlugin.unregister();
 #### setBadgeNumber
 iOS only.
 Set a number on the icon badge:
-```
+
+**Parameters**:
+- {integer} badgeNumber - number to set for the app badge
+
+```javascript
 window.FirebasePlugin.setBadgeNumber(3);
 ```
 
 Set 0 to clear the badge
-```
+```javascript
 window.FirebasePlugin.setBadgeNumber(0);
 ```
 
@@ -1017,7 +1053,11 @@ Note: this function is no longer available on Android (see [#124](https://github
 #### getBadgeNumber
 iOS only.
 Get icon badge number:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {integer} current badge number as an argument
+
+```javascript
 window.FirebasePlugin.getBadgeNumber(function(n) {
     console.log(n);
 });
@@ -1027,7 +1067,10 @@ Note: this function is no longer available on Android (see [#124](https://github
 
 #### clearAllNotifications
 Clear all pending notifications from the drawer:
-```
+
+**Parameters**: None
+
+```javascript
 window.FirebasePlugin.clearAllNotifications();
 ```
 
@@ -1036,8 +1079,10 @@ Subscribe to a topic.
 
 Topic messaging allows you to send a message to multiple devices that have opted in to a particular topic.
 
+**Parameters**:
+- {string} topicName - name of topic to subscribe to
 
-```
+```javascript
 window.FirebasePlugin.subscribe("latest_news");
 ```
 
@@ -1045,7 +1090,11 @@ window.FirebasePlugin.subscribe("latest_news");
 Unsubscribe from a topic.
 
 This will stop you receiving messages for that topic
-```
+
+**Parameters**:
+- {string} topicName - name of topic to unsubscribe from
+
+```javascript
 window.FirebasePlugin.unsubscribe("latest_news");
 ```
 
@@ -1061,7 +1110,12 @@ A default channel is created by the plugin at app startup; the properties of thi
 
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {object} - channel configuration object (see below for object keys/values)
+- {function} success - callback function which will be call on successful channel creation
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 // Define custom  channel - all keys are except 'id' are optional.
 var channel  = {
     // channel ID - must be unique per app package
@@ -1121,13 +1175,13 @@ function(error){
 
 Example FCM v1 API notification message payload for invoking the above example channel:
 
-```
+```json
 
 {
  "notification":
  {
       "title":"Notification title",
-      "body":"Notification body",
+      "body":"Notification body"
  },
  "android": {
      "notification": {
@@ -1146,7 +1200,12 @@ Any options not specified will not be overridden.
 Should be called as soon as possible (on app start) so default notifications will work as expected. 
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {object} - channel configuration object
+- {function} success - callback function which will be call on successfully setting default channel
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 var options = {
   id: "my_default_channel",
   name: "My Default Name",
@@ -1161,10 +1220,10 @@ var options = {
 
 window.FirebasePlugin.setDefaultChannel(options,
 function(){
-    console.log('Channel created: ' + options.id);
+    console.log('Default channel set');
 },
 function(error){
-   console.log('Create channel error: ' + error);
+   console.log('Set default channel error: ' + error);
 });
 ```
 
@@ -1190,7 +1249,12 @@ Android 8+ only.
 Removes a previously defined channel.
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {string} - id of channel to delete
+- {function} success - callback function which will be call on successfully deleting channel
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.deleteChannel("my_channel_id",
 function(){
     console.log('Channel deleted');
@@ -1206,7 +1270,11 @@ Android 8+ only.
 Gets a list of all channels.
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {function} success - callback function which will be passed the {array} of channel objects as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.listChannels(
 function(channels){
      if(typeof channels == "undefined")
@@ -1236,7 +1304,10 @@ Note that until you set this up, all fine-grain event-level data is discarded by
 #### setAnalyticsCollectionEnabled
 Manually enable/disable analytics data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
 
-```
+**Parameters**:
+- {boolean} setEnabled - whether to enable or disable analytics data collection 
+
+```javascript
 window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics data collection
 
 window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics data collection
@@ -1244,25 +1315,43 @@ window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytic
 
 #### logEvent
 Log an event using Analytics:
-```
+
+**Parameters**:
+- {string} eventName - name of event to log to Firebase Analytics
+- {object} eventProperties - key/value object of event properties (must be serializable)
+
+```javascript
 window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
 ```
 
 #### setScreenName
 Set the name of the current screen in Analytics:
-```
+
+**Parameters**:
+- {string} screenName - name of screen to log to Firebase Analytics
+
+```javascript
 window.FirebasePlugin.setScreenName("Home");
 ```
 
 #### setUserId
 Set a user id for use in Analytics:
-```
+
+**Parameters**:
+- {string} userName - name of user to set in Firebase Analytics
+
+```javascript
 window.FirebasePlugin.setUserId("user_id");
 ```
 
 #### setUserProperty
 Set a user property for use in Analytics:
-```
+
+**Parameters**:
+- {string} userName - name of user property to set in Firebase Analytics
+- {string} userName - value of user property to set in Firebase Analytics
+
+```javascript
 window.FirebasePlugin.setUserProperty("name", "value");
 ```
 
@@ -1274,7 +1363,9 @@ Note that for iOS you may need to [upload the dSYM](https://firebase.google.com/
 #### setCrashlyticsCollectionEnabled
 Manually enable Crashlytics data collection if [disabled on app startup](#disable-data-collection-on-startup).
 
-```
+**Parameters**: None
+
+```javascript
 window.FirebasePlugin.setCrashlyticsCollectionEnabled();
 ```
 
@@ -1288,12 +1379,20 @@ To add user IDs to your reports, assign each user a unique identifier in the for
 
 See [the Firebase docs for more](https://firebase.google.com/docs/crashlytics/customize-crash-reports?authuser=0#set_user_ids).
 
+**Parameters**:
+- {string} userId - User ID to associate with Crashlytics reports
+
+```javascript
+window.FirebasePlugin.setCrashlyticsUserId("user_id");
+```
+
 
 #### sendCrash
 Simulates (causes) a fatal native crash which causes a crash event to be sent to Crashlytics (useful for testing).
 See [the Firebase documentation](https://firebase.google.com/docs/crashlytics/force-a-crash?authuser=0#force_a_crash_to_test_your_implementation) regarding crash testing.
 Crashes will appear under `Event type = "Crashes"` in the Crashlytics console.
 
+**Parameters**: None
 
 ```javascript
 window.FirebasePlugin.sendCrash();
@@ -1303,6 +1402,9 @@ window.FirebasePlugin.sendCrash();
 Sends a crash-related log message that will appear in the `Logs` section of the next native crash event.
 Note: if you don't then crash, the message won't be sent!
 Also logs the message to the native device console.
+
+**Parameters**:
+- {string} message - message to associate with next native crash event
 
 ```javascript
 window.FirebasePlugin.logMessage("about to send a crash for testing!");
@@ -1316,6 +1418,9 @@ In a Cordova app, you may use this to log unhandled Javascript exceptions, for e
 The event will appear under `Event type = "Non-fatals"` in the Crashlytics console.
 The error message will appear in the `Logs` section of the non-fatal error event.
 Also logs the error message to the native device console.
+
+**Parameters**:
+- {string} errorMessage - non-fatal error message to log to Crashlytics
 
 ```javascript
 window.FirebasePlugin.logError("something bad happened, but at least we didn't crash!");
@@ -1346,11 +1451,11 @@ When using node.js Firebase Admin-SDK, follow this tutorial:
 - https://firebase.google.com/docs/auth/admin/create-custom-tokens
 
 Pass back your custom generated token and call
-```js
+```javascript
 firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 ```
 instead of
-```
+```javascript
 firebase.auth().signInWithCredential(credential)
 ```
 **YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
@@ -1359,17 +1464,24 @@ If this process is too complex for you, use this awesome plugin
 
 It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
 
-```
+**Parameters**:
+- {string} phoneNumber - phone number to verify
+- {integer} timeOutDuration - time to wait in seconds before timing out
+- {function} success - callback function pass {string/object} credentials to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
     console.log(credential);
 
-    // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
-    var code = credential.instantVerification ? credential.code : inputField.value.toString();
-
-    var verificationId = credential.verificationId;
-
-    var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-
+    if(typeof credential === 'object'){
+        // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
+        var code = credential.instantVerification ? credential.code : inputField.value.toString();
+    
+        var verificationId = credential.verificationId;
+    
+        credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    }
     // sign in with the credential
     firebase.auth().signInWithCredential(credential);
 
@@ -1392,7 +1504,13 @@ Setup your push notifications first, and verify that they are arriving on your p
 
 #### fetch
 Fetch Remote Config parameter values for your app:
-```
+
+**Parameters**:
+- {integer} cacheExpirationSeconds (optional) - cache expiration in seconds
+- {function} success - callback function on successfully fetching remote config
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.fetch(function () {
     // success callback
 }, function () {
@@ -1408,7 +1526,12 @@ window.FirebasePlugin.fetch(600, function () {
 
 #### activateFetched
 Activate the Remote Config fetched config:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed a {boolean} argument indicating whether fetched config was successfully activated
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.activateFetched(function(activated) {
     // activated will be true if there was a fetched config activated,
     // or false if no fetched config was found, or the fetched config was already activated.
@@ -1420,7 +1543,13 @@ window.FirebasePlugin.activateFetched(function(activated) {
 
 #### getValue
 Retrieve a Remote Config value:
-```
+
+**Parameters**:
+- {string} key - key for which to fetch associated value
+- {function} success - callback function which will be passed a {any} argument containing the value stored against the specified key.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getValue("key", function(value) {
     console.log(value);
 }, function(error) {
@@ -1431,7 +1560,13 @@ window.FirebasePlugin.getValue("key", function(value) {
 #### getByteArray
 Android only.
 Retrieve a Remote Config byte array:
-```
+
+**Parameters**:
+- {string} key - key for which to fetch associated value
+- {function} success - callback function which will be passed a {string} argument containing the Base64 encoded string that represents the value stored against the specified key.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getByteArray("key", function(bytes) {
     // a Base64 encoded string that represents the value for "key"
     console.log(bytes.base64);
@@ -1445,7 +1580,12 @@ window.FirebasePlugin.getByteArray("key", function(bytes) {
 #### getInfo
 Android only.
 Get the current state of the FirebaseRemoteConfig singleton object:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed an {object} argument containing the state info
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getInfo(function(info) {
     // the status of the developer mode setting (true/false)
     console.log(info.configSettings.developerModeEnabled);
@@ -1465,6 +1605,12 @@ window.FirebasePlugin.getInfo(function(info) {
 #### setConfigSettings
 Android only.
 Change the settings for the FirebaseRemoteConfig object's operations:
+
+**Parameters**:
+- {object} configSettings - object specifying the remote config settings
+- {function} success - callback function to be call on successfully setting the remote config settings
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 var settings = {
     developerModeEnabled: true
@@ -1475,6 +1621,12 @@ window.FirebasePlugin.setConfigSettings(settings);
 #### setDefaults
 Android only.
 Set defaults in the Remote Config:
+
+**Parameters**:
+- {object} defaultSettings - object specifying the default remote config settings
+- {function} success - callback function to be call on successfully setting the remote config setting defaults
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 // define defaults
 var defaults = {
@@ -1499,6 +1651,9 @@ window.FirebasePlugin.setDefaults(defaults);
 #### setPerformanceCollectionEnabled
 Manually enable/disable performance data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
 
+**Parameters**:
+- {boolean} setEnabled - whether to enable or disable performance data collection
+
 ```
 window.FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
 
@@ -1509,6 +1664,11 @@ window.FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables perfor
 
 Start a trace.
 
+**Parameters**:
+- {string} name - name of trace to start 
+- {function} success - callback function to call on successfully starting trace
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 window.FirebasePlugin.startTrace("test trace", success, error);
 ```
@@ -1517,6 +1677,12 @@ window.FirebasePlugin.startTrace("test trace", success, error);
 
 To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
 
+**Parameters**:
+- {string} name - name of trace
+- {string} counterName - name of counter to increment 
+- {function} success - callback function to call on successfully incrementing counter
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 ```
@@ -1524,6 +1690,11 @@ window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 #### stopTrace
 
 Stop the trace
+
+**Parameters**:
+- {string} name - name of trace to stop 
+- {function} success - callback function to call on successfully stopping trace
+- {function} error - callback function which will be passed a {string} error message as an argument
 
 ```
 window.FirebasePlugin.stopTrace("test trace");
