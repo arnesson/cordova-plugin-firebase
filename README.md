@@ -962,7 +962,7 @@ window.FirebasePlugin.onMessageReceived(function(message) {
             console.log("Tapped in " + message.tap);
         }
     }
-    console.dir(notification);
+    console.dir(message);
 }, function(error) {
     console.error(error);
 });
