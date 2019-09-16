@@ -65,7 +65,7 @@ $(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)
 ```
 ![Crashlytics script XCode](crashlytics_script_xcode_1.png)
 
-<br>
+
 Script's **Crashlytics Upload Symbols** (dSYM file):<br>
 Official documentation: https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports?authuser=0
 
