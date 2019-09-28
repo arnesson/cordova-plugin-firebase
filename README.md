@@ -469,7 +469,7 @@ On Android 7 and below, the sound setting of system notifications is specified i
         },
       "android": {
         "notification": {
-          "sound": "crystal",
+          "sound": "my_sound",
           "tag": "default"
       }
     }
@@ -626,7 +626,7 @@ In a notification message, you specify the sound file name in the `android.notif
       },
       "android": {
         "notification": {
-          "sound": "crystal"
+          "sound": "my_sound"
         }
       }
     }
@@ -639,7 +639,7 @@ And in a data message by specifying it in the `data` section:
         "notification_foreground": "true",
         "notification_body" : "Notification body",
         "notification_title": "Notification title",
-        "notification_android_sound": "crystal"
+        "notification_android_sound": "my_sound"
       }
     } 
     
@@ -835,7 +835,7 @@ Example data message with Android notification keys:
         "notification_android_visibility": "1",
         "notification_android_color": "#ff0000",
         "notification_android_icon": "coffee",
-        "notification_android_sound": "crystal",
+        "notification_android_sound": "my_sound",
         "notification_android_vibrate": "500, 200, 500",
         "notification_android_lights": "#ffff0000, 250, 250"
       }
