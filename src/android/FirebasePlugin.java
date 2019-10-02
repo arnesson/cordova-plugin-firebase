@@ -1030,6 +1030,11 @@ public class FirebasePlugin extends CordovaPlugin {
                     name,
                     importance);
 
+            // Description
+            String description = options.optString("description", "");
+            Log.d(TAG, "Channel "+id+" - description="+description);
+            channel.setDescription(description);
+
             // Light
             boolean light = options.optBoolean("light", true);
             Log.d(TAG, "Channel "+id+" - light="+light);
