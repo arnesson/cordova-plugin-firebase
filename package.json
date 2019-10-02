@@ -2,6 +2,7 @@
   "name": "cordova-plugin-firebasex",
   "version": "6.1.0",
   "description": "Cordova plugin for Google Firebase",
+  "types": "./types/index.d.ts",
   "author": {
     "name": "Dave Alden"
   },
