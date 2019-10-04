@@ -118,7 +118,7 @@
 
 		<podspec>
 			<config>
-				<source url="https://github.com/CocoaPods/Specs.git"/>
+				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
 				<pod name="Firebase/Core" spec="6.9.0"/>
