@@ -33,7 +33,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import com.google.firebase.perf.FirebasePerformance;
 import com.google.firebase.perf.metrics.Trace;
 
-import me.leolin.shortcutbadger.ShortcutBadger;
+import io.fabric.sdk.android.Fabric;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -91,7 +91,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     Log.d(TAG, "Starting Firebase plugin");
                     FirebaseApp.initializeApp(applicationContext);
                     mFirebaseAnalytics = FirebaseAnalytics.getInstance(applicationContext);
-                    mFirebaseAnalytics.setAnalyticsCollectionEnabled(true);
                     if (extras != null && extras.size() > 1) {
                         if (FirebasePlugin.notificationStack == null) {
                             FirebasePlugin.notificationStack = new ArrayList<Bundle>();
@@ -125,13 +124,7 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("hasPermission")) {
                 this.hasPermission(callbackContext);
                 return true;
-            } else if (action.equals("setBadgeNumber")) {
-                this.setBadgeNumber(callbackContext, args.getInt(0));
-                return true;
-            } else if (action.equals("getBadgeNumber")) {
-                this.getBadgeNumber(callbackContext);
-                return true;
-            } else if (action.equals("subscribe")) {
+            }else if (action.equals("subscribe")) {
                 this.subscribe(callbackContext, args.getString(0));
                 return true;
             } else if (action.equals("unsubscribe")) {
@@ -207,6 +200,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("setPerformanceCollectionEnabled")) {
                 this.setPerformanceCollectionEnabled(callbackContext, args.getBoolean(0));
                 return true;
+            } else if (action.equals("setCrashlyticsCollectionEnabled")) {
+                this.setCrashlyticsCollectionEnabled(callbackContext);
+                return true;
             } else if (action.equals("clearAllNotifications")) {
                 this.clearAllNotifications(callbackContext);
                 return true;
@@ -228,7 +224,11 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("setDefaultChannel")) {
                 this.setDefaultChannel(callbackContext, args.getJSONObject(0));
                 return true;
-            } else if (action.equals("grantPermission")) {
+            } else if (action.equals("grantPermission")
+                    || action.equals("setBadgeNumber")
+                    || action.equals("getBadgeNumber")
+            ) {
+                // Stubs for other platform methods
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 return true;
             }
@@ -404,36 +404,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(cordovaActivity);
                     boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
                     callbackContext.success(areNotificationsEnabled ? 1 : 0);
-                } catch (Exception e) {
-                    handleExceptionWithContext(e, callbackContext);
-                }
-            }
-        });
-    }
-
-    private void setBadgeNumber(final CallbackContext callbackContext, final int number) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    SharedPreferences.Editor editor = cordovaActivity.getSharedPreferences(KEY, Context.MODE_PRIVATE).edit();
-                    editor.putInt(KEY, number);
-                    editor.apply();
-                    ShortcutBadger.applyCount(cordovaActivity, number);
-                    callbackContext.success();
-                } catch (Exception e) {
-                    handleExceptionWithContext(e, callbackContext);
-                }
-            }
-        });
-    }
-
-    private void getBadgeNumber(final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    SharedPreferences settings = cordovaActivity.getSharedPreferences(KEY, Context.MODE_PRIVATE);
-                    int number = settings.getInt(KEY, 0);
-                    callbackContext.success(number);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -967,7 +937,6 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void setAnalyticsCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
-        final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -982,11 +951,25 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void setPerformanceCollectionEnabled(final CallbackContext callbackContext, final boolean enabled) {
-        final FirebasePlugin self = this;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
                     FirebasePerformance.getInstance().setPerformanceCollectionEnabled(enabled);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void setCrashlyticsCollectionEnabled(final CallbackContext callbackContext) {
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    Fabric.with(self.applicationContext, new Crashlytics());
                     callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);

@@ -16,6 +16,9 @@ var utilities = require("./lib/utilities");
 
 var config = fs.readFileSync('config.xml').toString();
 var name = utilities.getValue(config, 'name');
+if (name.includes('&amp;')) {
+    name = name.replace(/&amp;/g, '&');
+}
 var pluginVariables = {};
 
 var IOS_DIR = 'platforms/ios';
@@ -24,21 +27,16 @@ var PLUGIN_ID = 'cordova-plugin-firebase';
 
 var PLATFORM = {
   IOS: {
-    dest: [
-      IOS_DIR + '/' + name + '/Resources/GoogleService-Info.plist',
-      IOS_DIR + '/' + name + '/Resources/Resources/GoogleService-Info.plist'
-    ],
+    dest: IOS_DIR + '/' + name + '/Resources/GoogleService-Info.plist',
     src: [
       'GoogleService-Info.plist',
       IOS_DIR + '/www/GoogleService-Info.plist',
       'www/GoogleService-Info.plist'
-    ]
+    ],
+    appPlist: IOS_DIR + '/' + name + '/'+name+'-Info.plist',
   },
   ANDROID: {
-    dest: [
-      ANDROID_DIR + '/google-services.json',
-      ANDROID_DIR + '/app/google-services.json'
-    ],
+    dest: ANDROID_DIR + '/app/google-services.json',
     src: [
       'google-services.json',
       ANDROID_DIR + '/assets/www/google-services.json',
@@ -110,8 +108,12 @@ module.exports = function (context) {
     parsePluginVariables().then(function(){
       if(pluginVariables['IOS_STRIP_DEBUG'] && pluginVariables['IOS_STRIP_DEBUG'] === 'true'){
         helper.stripDebugSymbols();
-        deferred.resolve();
       }
+      helper.applyPluginVarsToPlists(PLATFORM.IOS.dest, PLATFORM.IOS.appPlist, pluginVariables);
+
+      deferred.resolve();
+    }).catch(error => {
+      deferred.reject(error);
     });
   }else{
     deferred.resolve();

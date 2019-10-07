@@ -1,3 +1,19 @@
+# Version 6.1.0
+* (iOS) Add `getAPNSToken()` plugin API method to get the APNS token on iOS. Derived from merging PR [#100](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/100).
+* Merge PR [#103](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/103) - fix for app name containing an ampersand.
+* Merge PR [#115](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/115) - fix for short attribute in app name.
+* Merge PR [#121](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/121) - fixes missing resolution of promise in after_prepare hook which caused other plugins to not run their after_prepare script (a bug introduced in v6.0.7)
+* (Android) Merge PR [#64](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/64) - replace Android hooks scripts to configure Gradle with actual Gradle configuration.
+* (iOS) Add missing `tap` property for notification messages received while app is running in background.
+	* Based on https://github.com/arnesson/cordova-plugin-firebase/pull/1104
+	* Resolves [#96](https://github.com/dpa99c/cordova-plugin-firebasex/issues/96)
+* (iOS) Fix issues causing foreground notifications not to display on first run. Fixes [#109](https://github.com/dpa99c/cordova-plugin-firebasex/issues/109).	
+* (iOS) Update string format when subscribing/unsubscribing topics. Resolves [#110](https://github.com/dpa99c/cordova-plugin-firebasex/issues/110]).
+* Support disabling of data collection (analytics/performance/crashlytics) at app startup and manual enabling of these at runtime.
+    * Resolves [#116](https://github.com/dpa99c/cordova-plugin-firebasex/issues/116]) and [#79](https://github.com/dpa99c/cordova-plugin-firebasex/issues/79]).
+* Remove Android implementation of `getBadgeNumber()`/`setBadgeNumber()` as it doesn't work on Android 8+.
+  * Resolves [#124](https://github.com/dpa99c/cordova-plugin-firebasex/issues/124]).    
+
 # Version 6.0.7
 * Merge PR [#93](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/93): Update Fabric dependencies
 * Port code to apply IOS_STRIP_DEBUG plugin variable to Podfile into this plugin's hook scripts (from cordova-plugin-cocoapod-supportx).

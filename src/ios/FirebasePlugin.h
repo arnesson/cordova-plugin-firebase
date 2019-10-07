@@ -8,6 +8,7 @@
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
 - (void)getId:(CDVInvokedUrlCommand*)command;
 - (void)getToken:(CDVInvokedUrlCommand*)command;
+- (void)getAPNSToken:(CDVInvokedUrlCommand*)command;
 - (void)grantPermission:(CDVInvokedUrlCommand*)command;
 - (void)hasPermission:(CDVInvokedUrlCommand*)command;
 - (void)setBadgeNumber:(CDVInvokedUrlCommand*)command;
@@ -33,6 +34,7 @@
 - (void)stopTrace:(CDVInvokedUrlCommand*)command;
 - (void)setAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)setPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;
+- (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command;
 - (void)logMessage:(CDVInvokedUrlCommand*)command;
 - (void)sendCrash:(CDVInvokedUrlCommand*)command;

@@ -1,4 +1,7 @@
 {
+  "name": "cordova-plugin-firebasex",
+  "version": "6.1.0",
+  "description": "Cordova plugin for Google Firebase",
   "author": {
     "name": "Dave Alden"
   },
@@ -7,9 +10,6 @@
     "type": "git",
     "url": "https://github.com/dpa99c/cordova-plugin-firebase"
   },
-  "name": "cordova-plugin-firebase",
-  "version": "6.0.7",
-  "description": "Cordova plugin for Google Firebase",
   "cordova": {
     "id": "cordova-plugin-firebase",
     "platforms": [
@@ -36,6 +36,7 @@
   "dependencies": {
     "xcode": "^2.0.0",
     "xml2js": "^0.4.16",
-    "q": "^1.5.1"
+    "q": "^1.5.1",
+    "plist": "^3.0.1"
   }
 }

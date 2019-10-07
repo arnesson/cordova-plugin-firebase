@@ -26,15 +26,18 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Ionic 4](#ionic-4)
       - [Ionic 3](#ionic-3)
   - [Build environment notes](#build-environment-notes)
-    - [Specifying dependent library versions](#specifying-dependent-library-versions)
     - [PhoneGap Build](#phonegap-build)
     - [Android-specific](#android-specific)
+      - [Specifying dependent library versions](#specifying-dependent-library-versions)
       - [AndroidX](#androidx)
     - [Google Play Services and Firebase libraries](#google-play-services-and-firebase-libraries)
     - [iOS-specific](#ios-specific)
+      - [Specifying dependent library versions](#specifying-dependent-library-versions-1)
       - [Cocoapods](#cocoapods)
+      - [Out-of-date pods](#out-of-date-pods)
       - [Strip debug symbols](#strip-debug-symbols)
   - [Firebase config setup](#firebase-config-setup)
+  - [Disable data collection on startup](#disable-data-collection-on-startup)
   - [Example project](#example-project)
   - [Reporting issues](#reporting-issues)
   - [Cloud messaging](#cloud-messaging)
@@ -64,6 +67,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Notifications and data messages](#notifications-and-data-messages)
       - [getToken](#gettoken)
       - [onTokenRefresh](#ontokenrefresh)
+      - [getAPNSToken](#getapnstoken)
       - [onMessageReceived](#onmessagereceived)
       - [grantPermission](#grantpermission)
       - [hasPermission](#haspermission)
@@ -85,6 +89,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [setUserId](#setuserid)
       - [setUserProperty](#setuserproperty)
     - [Crashlytics](#crashlytics)
+      - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
       - [setCrashlyticsUserId](#setcrashlyticsuserid)
       - [sendCrash](#sendcrash)
       - [logMessage](#logmessage)
@@ -102,6 +107,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [setConfigSettings](#setconfigsettings)
       - [setDefaults](#setdefaults)
     - [Performance](#performance)
+      - [setPerformanceCollectionEnabled](#setperformancecollectionenabled)
       - [startTrace](#starttrace)
       - [incrementCounter](#incrementcounter)
       - [stopTrace](#stoptrace)
@@ -111,7 +117,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 
   ## Installation
 Install the plugin by adding it to your project's config.xml:
-```
+```xml
 <plugin name="cordova-plugin-firebasex" spec="latest" />
 ```
 or by running:
@@ -194,13 +200,18 @@ If you want to make the `onMessageReceived()` JS API behave like the Ionic Nativ
 
 ## Build environment notes
 
-### Specifying dependent library versions
-This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android and Cocoapods on iOS.
-By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned Android & iOS versions as `<preference>`'s, for example:
+### PhoneGap Build
+This plugin will not work with Phonegap Build (and other remote cloud build envs) do not support Cordova hook scripts as they are used by this plugin to configure the native platform projects.
+        
+### Android-specific
+
+#### Specifying dependent library versions
+This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android.
+By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned versions as `<preference>`'s, for example:
 
     <preference name="ANDROID_FIREBASE_CORE_VERSION" default="17.0.0" />
 
-These defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
+The Android defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
 
     cordova plugin add cordova-plugin-firebasex --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0
     
@@ -220,17 +231,6 @@ The following plugin variables are use to specify the follow Gradle dependency v
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
-- `ANDROID_SHORTCUTBADGER_VERSION` => `me.leolin:ShortcutBadger`
-
-The following plugin variables are use to specify the follow Cocoapods dependency versions on iOS:
-
-- `IOS_FIREBASE_CORE_VERSION` => `Firebase/Core`
-- `IOS_FIREBASE_AUTH_VERSION` => `Firebase/Auth`
-- `IOS_FIREBASE_MESSAGING_VERSION` => `Firebase/Messaging`
-- `IOS_FIREBASE_PERFORMANCE_VERSION` => `Firebase/Performance`
-- `IOS_FIREBASE_REMOTECONFIG_VERSION` => `Firebase/RemoteConfig`
-- `IOS_FABRIC_VERSION` => `Fabric`
-- `IOS_CRASHLYTICS_VERSION` => `Crashlytics`
 
 For example, to explicitly specify all the component versions at plugin install time:
 
@@ -243,19 +243,7 @@ For example, to explicitly specify all the component versions at plugin install 
         --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0 \
         --variable ANDROID_CRASHLYTICS_VERSION=2.10.1 \
         --variable ANDROID_CRASHLYTICS_NDK_VERSION=2.1.0 \
-        --variable ANDROID_SHORTCUTBADGER_VERSION=1.1.22 \
-        --variable IOS_FIREBASE_CORE_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_AUTH_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_MESSAGING_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_PERFORMANCE_VERSION=5.20.2 \
-        --variable IOS_FIREBASE_REMOTECONFIG_VERSION=5.20.2 \
-        --variable IOS_FABRIC_VERSION=1.9.0 \
-        --variable IOS_CRASHLYTICS_VERSION=3.12.0
-
-### PhoneGap Build
-This plugin will not work with Phonegap Build (and other remote cloud build envs) do not support Cordova hook scripts as they are used by this plugin to configure the native platform projects.
         
-### Android-specific
 #### AndroidX
 This plugin has been migrated to use [AndroidX (Jetpack)](https://developer.android.com/jetpack/androidx/migrate) which is the successor to the [Android Support Library](https://developer.android.com/topic/libraries/support-library/index).
 This is implemented by adding a dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) which enables AndroidX in the Android platform of a Cordova project.
@@ -274,11 +262,19 @@ Similarly, if your build is failing because multiple plugins are installing diff
 you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release) to align these.  
 
 ### iOS-specific
+#### Specifying dependent library versions
+This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Cocoapods on iOS.
+This plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned iOS versions in the  `<pod>`'s, for example:
+
+    <pod name="Firebase/Core" spec="6.3.0"/>
+    
+**It is currently not possible to override these at plugin installation time** because `cordova@9`/`cordova-ios@5` does not support the use of plugin variables in the `<pod>`'s `spec` attribute.
+Therefore if you need to change the specified versions, you'll currently need to do this by forking the plugin and editing the `plugin.xml` to change the specified `spec` values.     
+
 #### Cocoapods
 This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
 Therefore please make sure you have Cocoapods installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
-Also make sure your local Cocoapods repo is up-to-date by running `pod repo update`.
 
 If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
 
@@ -287,6 +283,13 @@ You can list the pod dependencies in your Cordova iOS project by installing [coc
     sudo gem install cocoapods-dependencies
     cd platforms/ios/
     pod dependencies
+    
+#### Out-of-date pods
+If you receive a build error such as this:
+
+    None of your spec sources contain a spec satisfying the dependencies: `Firebase/Analytics (~> 6.1.0), Firebase/Analytics (= 6.1.0, ~> 6.1.0)`.
+
+Make sure your local Cocoapods repo is up-to-date by running `pod repo update` then run `pod install` in `/your_project/platforms/ios/`.    
 
 #### Strip debug symbols
 If your iOS app build contains too many debug symbols (i.e. because you include lots of libraries via a Cocoapods), you might get an error (e.g. [issue #28](https://github.com/dpa99c/cordova-plugin-firebase/issues/28)) when you upload your binary to App Store Connect, e.g.:
@@ -318,8 +321,29 @@ Check out this [firebase article](https://support.google.com/firebase/answer/701
     GoogleService-Info.plist   <--
     ...
 ```
-
 IMPORTANT: The Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
+
+## Disable data collection on startup
+By default, analytics, performance and Crashlytics data will begin being collected as soon as the app starts up.
+However, for data protection or privacy reasons, you may wish to disable data collection until such time as the user has granted their permission.
+
+To do this, set the following plugin variables to `false` at plugin install time:
+
+* `FIREBASE_ANALYTICS_COLLECTION_ENABLED`
+* `FIREBASE_PERFORMANCE_COLLECTION_ENABLED`
+* `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` 
+
+
+    cordova plugin add cordova-plugin-firebasex \
+        --variable FIREBASE_ANALYTICS_COLLECTION_ENABLED=false \ 
+        --variable FIREBASE_PERFORMANCE_COLLECTION_ENABLED=false \ 
+        --variable FIREBASE_CRASHLYTICS_COLLECTION_ENABLED=false
+
+This will disable data collection (on both Android & iOS) until you call [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled), [setPerformanceCollectionEnabled](#setperformancecollectionenabled) and [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled):
+
+       window.FirebasePlugin.setAnalyticsCollectionEnabled(true);
+       window.FirebasePlugin.setPerformanceCollectionEnabled(true);
+       window.FirebasePlugin.setCrashlyticsCollectionEnabled();
 
 ## Example project
 An example project repo exists to demonstrate and validate the functionality of this plugin:
@@ -445,7 +469,7 @@ On Android 7 and below, the sound setting of system notifications is specified i
         },
       "android": {
         "notification": {
-          "sound": "crystal",
+          "sound": "my_sound",
           "tag": "default"
       }
     }
@@ -602,7 +626,7 @@ In a notification message, you specify the sound file name in the `android.notif
       },
       "android": {
         "notification": {
-          "sound": "crystal"
+          "sound": "my_sound"
         }
       }
     }
@@ -615,7 +639,7 @@ And in a data message by specifying it in the `data` section:
         "notification_foreground": "true",
         "notification_body" : "Notification body",
         "notification_title": "Notification title",
-        "notification_android_sound": "crystal"
+        "notification_android_sound": "my_sound"
       }
     } 
     
@@ -811,7 +835,7 @@ Example data message with Android notification keys:
         "notification_android_visibility": "1",
         "notification_android_color": "#ff0000",
         "notification_android_icon": "coffee",
-        "notification_android_sound": "crystal",
+        "notification_android_sound": "my_sound",
         "notification_android_vibrate": "500, 200, 500",
         "notification_android_lights": "#ffff0000, 250, 250"
       }
@@ -870,8 +894,13 @@ The plugin is capable of receiving push notifications and FCM data messages.
 See [Cloud messaging](#cloud-messaging) section for more.
 
 #### getToken
-Get the device token (id):
-```
+Get the FCM device token (id):
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getToken(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
@@ -883,7 +912,12 @@ Note that token will be null if it has not been established yet.
 
 #### onTokenRefresh
 Register for token changes:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.onTokenRefresh(function(token) {
     // save this server-side and use it to push notifications to this device
     console.log(token);
@@ -893,11 +927,33 @@ window.FirebasePlugin.onTokenRefresh(function(token) {
 ```
 This is the best way to get a valid token for the device as soon as the token is established
 
+#### getAPNSToken
+iOS only.
+Get the APNS token.
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} APNS token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+window.FirebasePlugin.getAPNSToken(function(apnsToken) {
+    console.log(apnsToken);
+}, function(error) {
+    console.error(error);
+});
+```
+Note that token will be null if it has not been established yet.
+
 #### onMessageReceived
 Registers a callback function to invoke when: 
 - a notification or data message is received by the app
 - a system notification is tapped by the user
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {object} message as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.onMessageReceived(function(message) {
     console.log("Message type: " + message.messageType);
     if(message.messageType === "notification"){
@@ -906,7 +962,7 @@ window.FirebasePlugin.onMessageReceived(function(message) {
             console.log("Tapped in " + message.tap);
         }
     }
-    console.dir(notification);
+    console.dir(message);
 }, function(error) {
     console.error(error);
 });
@@ -941,7 +997,11 @@ Data message flow:
 Grant permission to receive push notifications (will trigger prompt) and return `hasPermission: true`.
 iOS only (Android will always return true).
 
-```
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} permission result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.grantPermission(function(hasPermission){
     console.log("Permission was " + (hasPermission ? "granted" : "denied"));
 });
@@ -950,7 +1010,12 @@ window.FirebasePlugin.grantPermission(function(hasPermission){
 Check permission to receive push notifications and return the result to a callback function as boolean.
 On iOS, returns true is runtime permission for remote notifications is granted and enabled in Settings.
 On Android, returns true if remote notifications are enabled.
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} permission result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.hasPermission(function(hasPermission){
     console.log("Permission is " + (hasPermission ? "granted" : "denied"));
 });
@@ -959,33 +1024,53 @@ window.FirebasePlugin.hasPermission(function(hasPermission){
 #### unregister
 Unregister from firebase, used to stop receiving push notifications. 
 Call this when you logout user from your app.
-```
+
+**Parameters**: None
+
+```javascript
 window.FirebasePlugin.unregister();
 ```
 
 
 #### setBadgeNumber
+iOS only.
 Set a number on the icon badge:
-```
+
+**Parameters**:
+- {integer} badgeNumber - number to set for the app badge
+
+```javascript
 window.FirebasePlugin.setBadgeNumber(3);
 ```
 
 Set 0 to clear the badge
-```
+```javascript
 window.FirebasePlugin.setBadgeNumber(0);
 ```
 
+Note: this function is no longer available on Android (see [#124](https://github.com/dpa99c/cordova-plugin-firebasex/issues/124))
+
 #### getBadgeNumber
+iOS only.
 Get icon badge number:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed the {integer} current badge number as an argument
+
+```javascript
 window.FirebasePlugin.getBadgeNumber(function(n) {
     console.log(n);
 });
 ```
 
+Note: this function is no longer available on Android (see [#124](https://github.com/dpa99c/cordova-plugin-firebasex/issues/124))
+
 #### clearAllNotifications
 Clear all pending notifications from the drawer:
-```
+
+**Parameters**: None
+
+```javascript
 window.FirebasePlugin.clearAllNotifications();
 ```
 
@@ -994,8 +1079,10 @@ Subscribe to a topic.
 
 Topic messaging allows you to send a message to multiple devices that have opted in to a particular topic.
 
+**Parameters**:
+- {string} topicName - name of topic to subscribe to
 
-```
+```javascript
 window.FirebasePlugin.subscribe("latest_news");
 ```
 
@@ -1003,7 +1090,11 @@ window.FirebasePlugin.subscribe("latest_news");
 Unsubscribe from a topic.
 
 This will stop you receiving messages for that topic
-```
+
+**Parameters**:
+- {string} topicName - name of topic to unsubscribe from
+
+```javascript
 window.FirebasePlugin.unsubscribe("latest_news");
 ```
 
@@ -1019,7 +1110,12 @@ A default channel is created by the plugin at app startup; the properties of thi
 
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {object} - channel configuration object (see below for object keys/values)
+- {function} success - callback function which will be call on successful channel creation
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 // Define custom  channel - all keys are except 'id' are optional.
 var channel  = {
     // channel ID - must be unique per app package
@@ -1079,13 +1175,13 @@ function(error){
 
 Example FCM v1 API notification message payload for invoking the above example channel:
 
-```
+```json
 
 {
  "notification":
  {
       "title":"Notification title",
-      "body":"Notification body",
+      "body":"Notification body"
  },
  "android": {
      "notification": {
@@ -1104,7 +1200,12 @@ Any options not specified will not be overridden.
 Should be called as soon as possible (on app start) so default notifications will work as expected. 
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {object} - channel configuration object
+- {function} success - callback function which will be call on successfully setting default channel
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 var options = {
   id: "my_default_channel",
   name: "My Default Name",
@@ -1119,10 +1220,10 @@ var options = {
 
 window.FirebasePlugin.setDefaultChannel(options,
 function(){
-    console.log('Channel created: ' + options.id);
+    console.log('Default channel set');
 },
 function(error){
-   console.log('Create channel error: ' + error);
+   console.log('Set default channel error: ' + error);
 });
 ```
 
@@ -1148,7 +1249,12 @@ Android 8+ only.
 Removes a previously defined channel.
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {string} - id of channel to delete
+- {function} success - callback function which will be call on successfully deleting channel
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.deleteChannel("my_channel_id",
 function(){
     console.log('Channel deleted');
@@ -1164,7 +1270,11 @@ Android 8+ only.
 Gets a list of all channels.
 Calling on Android 7 or below or another platform will have no effect.
 
-```
+**Parameters**:
+- {function} success - callback function which will be passed the {array} of channel objects as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.listChannels(
 function(channels){
      if(typeof channels == "undefined")
@@ -1192,35 +1302,56 @@ The easiest way to set this up is by [streaming Firebase Analytics data into Big
 Note that until you set this up, all fine-grain event-level data is discarded by Firebase.
 
 #### setAnalyticsCollectionEnabled
-Enable/disable analytics collection (useful for GDPR/privacy settings).
+Manually enable/disable analytics data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
 
-```
-window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics collection
+**Parameters**:
+- {boolean} setEnabled - whether to enable or disable analytics data collection 
 
-window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics collection
+```javascript
+window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics data collection
+
+window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics data collection
 ```
 
 #### logEvent
 Log an event using Analytics:
-```
+
+**Parameters**:
+- {string} eventName - name of event to log to Firebase Analytics
+- {object} eventProperties - key/value object of event properties (must be serializable)
+
+```javascript
 window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
 ```
 
 #### setScreenName
 Set the name of the current screen in Analytics:
-```
+
+**Parameters**:
+- {string} screenName - name of screen to log to Firebase Analytics
+
+```javascript
 window.FirebasePlugin.setScreenName("Home");
 ```
 
 #### setUserId
 Set a user id for use in Analytics:
-```
+
+**Parameters**:
+- {string} userName - name of user to set in Firebase Analytics
+
+```javascript
 window.FirebasePlugin.setUserId("user_id");
 ```
 
 #### setUserProperty
 Set a user property for use in Analytics:
-```
+
+**Parameters**:
+- {string} userName - name of user property to set in Firebase Analytics
+- {string} userName - value of user property to set in Firebase Analytics
+
+```javascript
 window.FirebasePlugin.setUserProperty("name", "value");
 ```
 
@@ -1228,6 +1359,17 @@ window.FirebasePlugin.setUserProperty("name", "value");
 By default this plugin will ensure fatal native crashes in your apps are reported via Firebase Crashlytics. 
 
 Note that for iOS you may need to [upload the dSYM](https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports?authuser=0) for you build before crashes are displayed in the Firebase console.
+
+#### setCrashlyticsCollectionEnabled
+Manually enable Crashlytics data collection if [disabled on app startup](#disable-data-collection-on-startup).
+
+**Parameters**: None
+
+```javascript
+window.FirebasePlugin.setCrashlyticsCollectionEnabled();
+```
+
+Note: once enabled, Crashlytics data collection cannot be disabled during the app session.
 
 #### setCrashlyticsUserId
 Set Crashlytics user identifier.
@@ -1237,12 +1379,20 @@ To add user IDs to your reports, assign each user a unique identifier in the for
 
 See [the Firebase docs for more](https://firebase.google.com/docs/crashlytics/customize-crash-reports?authuser=0#set_user_ids).
 
+**Parameters**:
+- {string} userId - User ID to associate with Crashlytics reports
+
+```javascript
+window.FirebasePlugin.setCrashlyticsUserId("user_id");
+```
+
 
 #### sendCrash
 Simulates (causes) a fatal native crash which causes a crash event to be sent to Crashlytics (useful for testing).
 See [the Firebase documentation](https://firebase.google.com/docs/crashlytics/force-a-crash?authuser=0#force_a_crash_to_test_your_implementation) regarding crash testing.
 Crashes will appear under `Event type = "Crashes"` in the Crashlytics console.
 
+**Parameters**: None
 
 ```javascript
 window.FirebasePlugin.sendCrash();
@@ -1252,6 +1402,9 @@ window.FirebasePlugin.sendCrash();
 Sends a crash-related log message that will appear in the `Logs` section of the next native crash event.
 Note: if you don't then crash, the message won't be sent!
 Also logs the message to the native device console.
+
+**Parameters**:
+- {string} message - message to associate with next native crash event
 
 ```javascript
 window.FirebasePlugin.logMessage("about to send a crash for testing!");
@@ -1265,6 +1418,9 @@ In a Cordova app, you may use this to log unhandled Javascript exceptions, for e
 The event will appear under `Event type = "Non-fatals"` in the Crashlytics console.
 The error message will appear in the `Logs` section of the non-fatal error event.
 Also logs the error message to the native device console.
+
+**Parameters**:
+- {string} errorMessage - non-fatal error message to log to Crashlytics
 
 ```javascript
 window.FirebasePlugin.logError("something bad happened, but at least we didn't crash!");
@@ -1295,11 +1451,11 @@ When using node.js Firebase Admin-SDK, follow this tutorial:
 - https://firebase.google.com/docs/auth/admin/create-custom-tokens
 
 Pass back your custom generated token and call
-```js
+```javascript
 firebase.auth().signInWithCustomToken(customTokenFromYourServer);
 ```
 instead of
-```
+```javascript
 firebase.auth().signInWithCredential(credential)
 ```
 **YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
@@ -1308,17 +1464,24 @@ If this process is too complex for you, use this awesome plugin
 
 It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
 
-```
+**Parameters**:
+- {string} phoneNumber - phone number to verify
+- {integer} timeOutDuration - time to wait in seconds before timing out
+- {function} success - callback function pass {string/object} credentials to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
     console.log(credential);
 
-    // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
-    var code = credential.instantVerification ? credential.code : inputField.value.toString();
-
-    var verificationId = credential.verificationId;
-
-    var credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-
+    if(typeof credential === 'object'){
+        // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
+        var code = credential.instantVerification ? credential.code : inputField.value.toString();
+    
+        var verificationId = credential.verificationId;
+    
+        credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    }
     // sign in with the credential
     firebase.auth().signInWithCredential(credential);
 
@@ -1341,7 +1504,13 @@ Setup your push notifications first, and verify that they are arriving on your p
 
 #### fetch
 Fetch Remote Config parameter values for your app:
-```
+
+**Parameters**:
+- {integer} cacheExpirationSeconds (optional) - cache expiration in seconds
+- {function} success - callback function on successfully fetching remote config
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.fetch(function () {
     // success callback
 }, function () {
@@ -1357,7 +1526,12 @@ window.FirebasePlugin.fetch(600, function () {
 
 #### activateFetched
 Activate the Remote Config fetched config:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed a {boolean} argument indicating whether fetched config was successfully activated
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.activateFetched(function(activated) {
     // activated will be true if there was a fetched config activated,
     // or false if no fetched config was found, or the fetched config was already activated.
@@ -1369,7 +1543,13 @@ window.FirebasePlugin.activateFetched(function(activated) {
 
 #### getValue
 Retrieve a Remote Config value:
-```
+
+**Parameters**:
+- {string} key - key for which to fetch associated value
+- {function} success - callback function which will be passed a {any} argument containing the value stored against the specified key.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getValue("key", function(value) {
     console.log(value);
 }, function(error) {
@@ -1380,7 +1560,13 @@ window.FirebasePlugin.getValue("key", function(value) {
 #### getByteArray
 Android only.
 Retrieve a Remote Config byte array:
-```
+
+**Parameters**:
+- {string} key - key for which to fetch associated value
+- {function} success - callback function which will be passed a {string} argument containing the Base64 encoded string that represents the value stored against the specified key.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getByteArray("key", function(bytes) {
     // a Base64 encoded string that represents the value for "key"
     console.log(bytes.base64);
@@ -1394,7 +1580,12 @@ window.FirebasePlugin.getByteArray("key", function(bytes) {
 #### getInfo
 Android only.
 Get the current state of the FirebaseRemoteConfig singleton object:
-```
+
+**Parameters**:
+- {function} success - callback function which will be passed an {object} argument containing the state info
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
 window.FirebasePlugin.getInfo(function(info) {
     // the status of the developer mode setting (true/false)
     console.log(info.configSettings.developerModeEnabled);
@@ -1414,6 +1605,12 @@ window.FirebasePlugin.getInfo(function(info) {
 #### setConfigSettings
 Android only.
 Change the settings for the FirebaseRemoteConfig object's operations:
+
+**Parameters**:
+- {object} configSettings - object specifying the remote config settings
+- {function} success - callback function to be call on successfully setting the remote config settings
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 var settings = {
     developerModeEnabled: true
@@ -1424,6 +1621,12 @@ window.FirebasePlugin.setConfigSettings(settings);
 #### setDefaults
 Android only.
 Set defaults in the Remote Config:
+
+**Parameters**:
+- {object} defaultSettings - object specifying the default remote config settings
+- {function} success - callback function to be call on successfully setting the remote config setting defaults
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 // define defaults
 var defaults = {
@@ -1445,9 +1648,26 @@ window.FirebasePlugin.setDefaults(defaults);
 
 ### Performance
 
+#### setPerformanceCollectionEnabled
+Manually enable/disable performance data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
+
+**Parameters**:
+- {boolean} setEnabled - whether to enable or disable performance data collection
+
+```
+window.FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
+
+window.FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables performance data collection
+```
+
 #### startTrace
 
 Start a trace.
+
+**Parameters**:
+- {string} name - name of trace to start 
+- {function} success - callback function to call on successfully starting trace
+- {function} error - callback function which will be passed a {string} error message as an argument
 
 ```
 window.FirebasePlugin.startTrace("test trace", success, error);
@@ -1457,6 +1677,12 @@ window.FirebasePlugin.startTrace("test trace", success, error);
 
 To count the performance-related events that occur in your app (such as cache hits or retries), add a line of code similar to the following whenever the event occurs, using a string other than retry to name that event if you are counting a different type of event:
 
+**Parameters**:
+- {string} name - name of trace
+- {string} counterName - name of counter to increment 
+- {function} success - callback function to call on successfully incrementing counter
+- {function} error - callback function which will be passed a {string} error message as an argument
+
 ```
 window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 ```
@@ -1464,6 +1690,11 @@ window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 #### stopTrace
 
 Stop the trace
+
+**Parameters**:
+- {string} name - name of trace to stop 
+- {function} success - callback function to call on successfully stopping trace
+- {function} error - callback function which will be passed a {string} error message as an argument
 
 ```
 window.FirebasePlugin.stopTrace("test trace");

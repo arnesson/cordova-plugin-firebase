@@ -77,6 +77,19 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)getAPNSToken:(CDVInvokedUrlCommand *)command {
+    NSData* apnsToken = [FIRMessaging messaging].APNSToken;
+    CDVPluginResult *pluginResult;
+    if (apnsToken) {
+        NSString* hexToken = [[apnsToken.description componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet]invertedSet]]componentsJoinedByString:@""];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:hexToken];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:nil];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)hasPermission:(CDVInvokedUrlCommand *)command {
     @try {
         [self _hasPermission:^(BOOL enabled) {
@@ -235,7 +248,7 @@ static BOOL registeredForRemoteNotifications = NO;
 
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
     @try {
-        NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
+        NSString* topic = [NSString stringWithFormat:@"%@", [command.arguments objectAtIndex:0]];
 
         [[FIRMessaging messaging] subscribeToTopic: topic];
 
@@ -248,7 +261,7 @@ static BOOL registeredForRemoteNotifications = NO;
 
 - (void)unsubscribe:(CDVInvokedUrlCommand *)command {
     @try {
-        NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
+        NSString* topic = [NSString stringWithFormat:@"%@", [command.arguments objectAtIndex:0]];
 
         [[FIRMessaging messaging] unsubscribeFromTopic: topic];
 
@@ -636,6 +649,19 @@ static BOOL registeredForRemoteNotifications = NO;
 
              [[FIRPerformance sharedInstance] setDataCollectionEnabled:enabled];
 
+             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+         }@catch (NSException *exception) {
+             [self handlePluginExceptionWithContext:exception :command];
+         }
+     }];
+}
+
+- (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand *)command {
+     [self.commandDelegate runInBackground:^{
+         @try {
+             [Fabric with:@[[Crashlytics class]]];
              CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
 
              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
