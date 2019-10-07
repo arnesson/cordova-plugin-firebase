@@ -506,7 +506,7 @@ The default notification icon images **must** be named `notification_icon.png`.
 You then need to add a `<config-file>` block to the `config.xml` which will instruct Firebase to use your icon as the default for notifications:
 
     <platform name="android">
-        <config-file target="AndroidManifest.xml" parent="application">
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/notification_icon" />
         </config-file>
     </platform>
