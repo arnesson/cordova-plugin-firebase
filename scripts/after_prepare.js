@@ -50,16 +50,14 @@ var parsePluginVariables = function(){
   const deferred = Q.defer();
   var parseConfigXml = function () {
     parser.parseString(config, function (err, data) {
-      if (data.widget.platform) {
-        (data.widget.plugin || []).forEach(function (plugin) {
-          (plugin.variable || []).forEach(function (variable) {
-            if((plugin.$.name === PLUGIN_ID || plugin.$.id === PLUGIN_ID) && variable.$.name && variable.$.value){
-              pluginVariables[variable.$.name] = variable.$.value;
-            }
-          });
+      (data.widget.plugin || []).forEach(function (plugin) {
+        (plugin.variable || []).forEach(function (variable) {
+          if((plugin.$.name === PLUGIN_ID || plugin.$.id === PLUGIN_ID) && variable.$.name && variable.$.value){
+            pluginVariables[variable.$.name] = variable.$.value;
+          }
         });
-        deferred.resolve();
-      }
+      });
+      deferred.resolve();
     });
     return deferred.promise;
   };
