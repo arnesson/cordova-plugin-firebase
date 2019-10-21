@@ -1120,6 +1120,9 @@ Calling on Android 7 or below or another platform will have no effect.
 var channel  = {
     // channel ID - must be unique per app package
     id: "my_channel_id",
+
+    // Channel description. Default: empty string
+    description: "Channel description",
     
     // Channel name. Default: empty string
     name: "Channel name",
@@ -1209,6 +1212,7 @@ Calling on Android 7 or below or another platform will have no effect.
 var channel = {
   id: "my_default_channel",
   name: "My Default Name",
+  description: "My Default Description",
   sound: "ringtone",
   vibration: [500, 200, 500],
   light: true,
@@ -1234,6 +1238,7 @@ The default channel is initialised at app startup with the following default set
 {
     id: "fcm_default_channel",
     name: "Default",
+    description: "",
     sound: "default",
     vibration: true,
     light: true,
