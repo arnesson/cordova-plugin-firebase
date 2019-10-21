@@ -37,6 +37,14 @@ exports.unregister = function (success, error) {
   exec(success, error, "FirebasePlugin", "unregister", []);
 };
 
+exports.isAutoInitEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "isAutoInitEnabled", []);
+};
+
+exports.setAutoInitEnabled = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "setAutoInitEnabled", [enabled]);
+};
+
 // Notifications - iOS-only
 exports.setBadgeNumber = function (number, success, error) {
     exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);

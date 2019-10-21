@@ -72,6 +72,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [grantPermission](#grantpermission)
       - [hasPermission](#haspermission)
       - [unregister](#unregister)
+      - [isAutoInitEnabled](#isautoinitenabled)
+      - [setAutoInitEnabled](#setautoinitenabled)
       - [setBadgeNumber](#setbadgenumber)
       - [getBadgeNumber](#getbadgenumber)
       - [clearAllNotifications](#clearallnotifications)
@@ -1022,8 +1024,11 @@ window.FirebasePlugin.hasPermission(function(hasPermission){
 ```
 
 #### unregister
-Unregister from firebase, used to stop receiving push notifications. 
-Call this when you logout user from your app.
+Unregisters from Firebase by deleting the current device token.
+Use this to stop receiving push notifications associated with the current token. 
+e.g. call this when you logout user from your app.
+By default, a new token will be generated as soon as the old one is removed.
+To prevent a new token being generated, by sure to disable autoinit using [`setAutoInitEnabled()`](#setautoinitenabled) before calling [`unregister()`](#unregister).
 
 **Parameters**: None
 
@@ -1031,6 +1036,40 @@ Call this when you logout user from your app.
 window.FirebasePlugin.unregister();
 ```
 
+#### isAutoInitEnabled
+Indicates whether autoinit is currently enabled.
+If so, new FCM tokens will be automatically generated.
+
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+
+```javascript
+window.FirebasePlugin.isAutoInitEnabled(function(enabled){
+    console.log("Auto init is " + (enabled ? "enabled" : "disabled"));    
+});
+
+```
+
+#### setAutoInitEnabled
+Sets whether to autoinit new FCM tokens.
+By default, a new token will be generated as soon as the old one is removed.
+To prevent a new token being generated, by sure to disable autoinit using [`setAutoInitEnabled()`](#setautoinitenabled) before calling [`unregister()`](#unregister).
+
+**Parameters**:
+- {boolean} enabled - set true to enable, false to disable
+- {function} success - callback function to call on successful execution of operation.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+
+```javascript
+window.FirebasePlugin.setAutoInitEnabled(false, function(){
+    console.log("Auto init has been disabled ");
+    window.FirebasePlugin.unregister();
+});
+
+```
 
 #### setBadgeNumber
 iOS only.

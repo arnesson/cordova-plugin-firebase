@@ -308,6 +308,42 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)setAutoInitEnabled:(CDVInvokedUrlCommand *)command {
+    @try {
+        bool enabled = [[command.arguments objectAtIndex:0] boolValue];
+        [self runOnMainThread:^{
+            @try {
+                [FIRMessaging messaging].autoInitEnabled = enabled;
+
+                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }@catch (NSException *exception) {
+                [self handlePluginExceptionWithContext:exception :command];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)isAutoInitEnabled:(CDVInvokedUrlCommand *)command {
+    @try {
+
+        [self runOnMainThread:^{
+            @try {
+                 bool enabled =[FIRMessaging messaging].isAutoInitEnabled;
+
+                 CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:enabled];
+                 [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+            }@catch (NSException *exception) {
+                [self handlePluginExceptionWithContext:exception :command];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)onMessageReceived:(CDVInvokedUrlCommand *)command {
     @try {
         self.notificationCallbackId = command.callbackId;

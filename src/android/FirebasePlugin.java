@@ -130,6 +130,12 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("unsubscribe")) {
                 this.unsubscribe(callbackContext, args.getString(0));
                 return true;
+            } else if (action.equals("isAutoInitEnabled")) {
+                isAutoInitEnabled(callbackContext);
+                return true;
+            } else if (action.equals("setAutoInitEnabled")) {
+                setAutoInitEnabled(callbackContext, args.getBoolean(0));
+                return true;
             } else if (action.equals("unregister")) {
                 this.unregister(callbackContext);
                 return true;
@@ -450,6 +456,36 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    private void isAutoInitEnabled(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    boolean isEnabled = FirebaseMessaging.getInstance().isAutoInitEnabled();
+                    callbackContext.success(isEnabled ? 1 : 0);
+                } catch (Exception e) {
+                    Crashlytics.logException(e);
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void setAutoInitEnabled(final CallbackContext callbackContext, final boolean enabled) {
+        final FirebasePlugin self = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseMessaging.getInstance().setAutoInitEnabled(enabled);
+                    callbackContext.success();
+                } catch (Exception e) {
+                    Crashlytics.log(e.getMessage());
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        });
+    }
+
     private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
             throws JSONException {
         final Bundle bundle = new Bundle();
@@ -517,7 +553,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void logMessage(final JSONArray data,
-                        final CallbackContext callbackContext) {
+                            final CallbackContext callbackContext) {
 
         String message = data.optString(0);
         Crashlytics.log(message);
@@ -525,15 +561,15 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void sendCrash(final JSONArray data,
-						   final CallbackContext callbackContext) {
+                           final CallbackContext callbackContext) {
 
         cordovaActivity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				throw new RuntimeException("This is a crash");
-			}
-		});
-	}
+            @Override
+            public void run() {
+                throw new RuntimeException("This is a crash");
+            }
+        });
+    }
 
 
     private void setCrashlyticsUserId(final CallbackContext callbackContext, final String userId) {
@@ -633,32 +669,32 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void getByteArray(final CallbackContext callbackContext, final String key) {
-      cordova.getThreadPool().execute(new Runnable() {
-        public void run() {
-            try {
-                byte[] bytes = FirebaseRemoteConfig.getInstance().getByteArray(key);
-                JSONObject object = new JSONObject();
-                object.put("base64", Base64.encodeToString(bytes, Base64.DEFAULT));
-                object.put("array", new JSONArray(bytes));
-                callbackContext.success(object);
-            } catch (Exception e) {
-                handleExceptionWithContext(e, callbackContext);
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    byte[] bytes = FirebaseRemoteConfig.getInstance().getByteArray(key);
+                    JSONObject object = new JSONObject();
+                    object.put("base64", Base64.encodeToString(bytes, Base64.DEFAULT));
+                    object.put("array", new JSONArray(bytes));
+                    callbackContext.success(object);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
             }
-        }
-      });
+        });
     }
 
     private void getValue(final CallbackContext callbackContext, final String key) {
-      cordova.getThreadPool().execute(new Runnable() {
-        public void run() {
-            try {
-                FirebaseRemoteConfigValue value = FirebaseRemoteConfig.getInstance().getValue(key);
-                callbackContext.success(value.asString());
-            } catch (Exception e) {
-                handleExceptionWithContext(e, callbackContext);
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseRemoteConfigValue value = FirebaseRemoteConfig.getInstance().getValue(key);
+                    callbackContext.success(value.asString());
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
             }
-        }
-      });
+        });
     }
 
     private void getInfo(final CallbackContext callbackContext) {

@@ -17,6 +17,8 @@
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)unregister:(CDVInvokedUrlCommand*)command;
+- (void)setAutoInitEnabled:(CDVInvokedUrlCommand*)command;
+- (void)isAutoInitEnabled:(CDVInvokedUrlCommand*)command;
 - (void)onMessageReceived:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
