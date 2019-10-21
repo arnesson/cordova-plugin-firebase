@@ -1164,9 +1164,9 @@ var channel  = {
 };
 
 // Create the channel
-window.FirebasePlugin.createChannel(options,
+window.FirebasePlugin.createChannel(channel,
 function(){
-    console.log('Channel created: ' + options.id);
+    console.log('Channel created: ' + channel.id);
 },
 function(error){
    console.log('Create channel error: ' + error);
@@ -1206,7 +1206,7 @@ Calling on Android 7 or below or another platform will have no effect.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-var options = {
+var channel = {
   id: "my_default_channel",
   name: "My Default Name",
   sound: "ringtone",
@@ -1218,7 +1218,7 @@ var options = {
   visibility: -1
 };
 
-window.FirebasePlugin.setDefaultChannel(options,
+window.FirebasePlugin.setDefaultChannel(channel,
 function(){
     console.log('Default channel set');
 },
