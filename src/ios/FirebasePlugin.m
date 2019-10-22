@@ -421,14 +421,7 @@ static BOOL registeredForRemoteNotifications = NO;
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* name = [command.arguments objectAtIndex:0];
-            NSDictionary *parameters;
-            @try {
-                NSString *description = NSLocalizedString([command argumentAtIndex:1 withDefault:@"No Message Provided"], nil);
-                parameters = @{ NSLocalizedDescriptionKey: description };
-            }
-            @catch (NSException *execption) {
-                parameters = [command argumentAtIndex:1];
-            }
+            NSDictionary *parameters = [command argumentAtIndex:1];
 
             [FIRAnalytics logEventWithName:name parameters:parameters];
 
