@@ -54,6 +54,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Android Notification Color](#android-notification-color)
       - [Android Notification Sound](#android-notification-sound)
     - [iOS notifications](#ios-notifications)
+      - [iOS background notifications](#ios-background-notifications)
       - [iOS notification sound](#ios-notification-sound)
       - [iOS badge number](#ios-badge-number)
     - [Data messages](#data-messages)
@@ -386,8 +387,11 @@ Note: only notification messages can be sent via the Firebase Console - data mes
 
 ### Background notifications
 If the notification message arrives while the app is in the background/not running, it will be displayed as a system notification.
-No callback can be made by the plugin to the app when the message arrives since the display of the notification is entirely handled by the operating system.
-However if the user taps the system notification, this launches/resumes the app and the notification title, body and optional data payload is passed to the [onMessageReceived](#onMessageReceived) callback.
+
+By default, no callback is made to the plugin when the message arrives while the app is not in the foreground, since the display of the notification is entirely handled by the operating system. 
+However, there are platform-specific circumstances where a callback can be made when the message arrives and the app is in the background that don't require user interaction to receive the message payload - see [Android background notifications](#android-background-notifications) and [iOS background notifications](#ios-background-notifications) for details.
+
+If the user taps the system notification, this launches/resumes the app and the notification title, body and optional data payload is passed to the [onMessageReceived](#onMessageReceived) callback.
 
 When the `onMessageReceived` is called in response to a user tapping a system notification while the app is in the background/not running, it will be passed the property `tap: "background"`.
 
@@ -419,6 +423,10 @@ Notifications on Android can be customised to specify the sound, icon, LED colou
 
 #### Android background notifications
 If the notification message arrives while the app is in the background/not running, it will be displayed as a system notification.
+
+If a notification message arrives while the app is in the background but is still running (i.e. has not been task-killed) and the device is not in power-saving mode, the `onMessageReceived` callback will be invoked without the `tap` property, indicating the message was received without user interaction.
+
+If the user then taps the system notification, the app will be brought to the foreground and `onMessageReceived` will be invoked **again**, this time with `tap: "background"` indicating that the user tapped the system notification while the app was in the background.
 
 In addition to the title and body of the notification message, Android system notifications support specification of the following notification settings:
 - [Icon](#android-notification-icons)
@@ -664,11 +672,18 @@ For example:
           "payload": {
             "aps": {
               "sound": "default",
-              "badge": 1
+              "badge": 1,
+              "content-available": 1
             }
           }
         }
     }
+
+#### iOS background notifications
+If the app is in the background but is still running (i.e. has not been task-killed) and the device is not in power-saving mode, the `onMessageReceived` callback can be invoked when the message arrives without requiring user interaction (i.e. tapping the system notification).
+To do this you must specify `"content-available": 1` in the `apns.payload.aps` section of the message payload - see the [Apple documentation](https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html#//apple_ref/doc/uid/TP40008194-CH10-SW8) for more information.
+When the message arrives, the `onMessageReceived` callback will be invoked without the `tap` property, indicating the message was received without user interaction.
+If the user then taps the system notification, the app will be brought to the foreground and `onMessageReceived` will be invoked **again**, this time with `tap: "background"` indicating that the user tapped the system notification while the app was in the background.
 
 #### iOS notification sound
 You can specify custom sounds for notifications or play the device default notification sound.
