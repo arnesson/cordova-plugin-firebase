@@ -9,21 +9,27 @@ import android.net.Uri;
 import android.media.AudioAttributes;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+
 import android.util.Base64;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import java.lang.reflect.Field;
+
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -190,6 +196,12 @@ public class FirebasePlugin extends CordovaPlugin {
                 return true;
             } else if (action.equals("verifyPhoneNumber")) {
                 this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
+                return true;
+            } else if (action.equals("signInWithCredential")) {
+                this.signInWithCredential(callbackContext, args);
+                return true;
+            } else if (action.equals("linkUserWithCredential")) {
+                this.linkUserWithCredential(callbackContext, args);
                 return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
@@ -888,6 +900,71 @@ public class FirebasePlugin extends CordovaPlugin {
             return null;
         }
     }
+
+    public void signInWithCredential(final CallbackContext callbackContext, JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String verificationId = args.getString(0);
+                    String code = args.getString(1);
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+
+                    FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    PluginResult pluginresult = new PluginResult(PluginResult.Status.OK);
+                                    if (!task.isSuccessful()) {
+                                        String errMessage;
+                                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                            errMessage = "Invalid verification code";
+                                        }else{
+                                            errMessage = task.getException().toString();
+                                        }
+                                        pluginresult = new PluginResult(PluginResult.Status.ERROR, errMessage);
+                                    }
+                                    callbackContext.sendPluginResult(pluginresult);
+                                }
+                            }
+                    );
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void linkUserWithCredential(final CallbackContext callbackContext, JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String verificationId = args.getString(0);
+                    String code = args.getString(1);
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+
+                    FirebaseAuth.getInstance().getCurrentUser().linkWithCredential(credential).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    PluginResult pluginresult = new PluginResult(PluginResult.Status.OK);
+                                    if (!task.isSuccessful()) {
+                                        String errMessage;
+                                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                            errMessage = "Invalid verification code";
+                                        }else{
+                                            errMessage = task.getException().toString();
+                                        }
+                                        pluginresult = new PluginResult(PluginResult.Status.ERROR, errMessage);
+                                    }
+                                    callbackContext.sendPluginResult(pluginresult);
+                                }
+                            }
+                    );
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
 
     //
     // Firebase Performace
