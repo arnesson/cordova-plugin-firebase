@@ -200,6 +200,8 @@ If you want to make the `onMessageReceived()` JS API behave like the Ionic Nativ
     }
     ...
     this.onNotificationOpen().subscribe(data => console.log(`FCM message: ${data}`));
+    
+See the [cordova-plugin-firebasex-ionic3-test](https://github.com/dpa99c/cordova-plugin-firebasex-ionic3-test) example project for a demonstration of how to use the plugin with Ionic 3.    
 
 ## Build environment notes
 
