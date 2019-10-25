@@ -198,10 +198,6 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand *)command {
-    [self getVerificationID:command];
-}
-
-- (void)getVerificationID:(CDVInvokedUrlCommand *)command {
     NSString* number = [command.arguments objectAtIndex:0];
 
     @try {
@@ -212,25 +208,107 @@ static BOOL registeredForRemoteNotifications = NO;
 
             @try {
                 NSDictionary *message;
+                CDVPluginResult* pluginResult;
                 if (error) {
                     // Verification code not sent.
                     message = @{
                         @"code": [NSNumber numberWithInteger:error.code],
                         @"description": error.description == nil ? [NSNull null] : error.description
                     };
-
-                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
-
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
                 } else {
                     // Successful.
-                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                    [result setValue:@"false" forKey:@"instantVerification"];
+                    [result setValue:@"false" forKey:@"verified"];
+                    [result setValue:verificationID forKey:@"verificationId"];
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
                 }
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithContext:exception :command];
             }
         }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)signInWithCredential:(CDVInvokedUrlCommand*)command {
+    NSString* verificationId = [command.arguments objectAtIndex:0];
+    NSString* code = [command.arguments objectAtIndex:1];
+
+    @try {
+        FIRAuthCredential* credential = [[FIRPhoneAuthProvider provider]
+        credentialWithVerificationID:verificationId
+                    verificationCode:code];
+        
+        [[FIRAuth auth] signInWithCredential:credential
+                                  completion:^(FIRAuthDataResult * _Nullable authResult,
+                                               NSError * _Nullable error) {
+            @try {
+                CDVPluginResult* pluginResult;
+              if (error) {
+                NSDictionary *message = @{
+                    @"code": [NSNumber numberWithInteger:error.code],
+                    @"description": error.description == nil ? [NSNull null] : error.description
+                };
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else if (authResult == nil) {
+                  NSDictionary *message = @{
+                      @"code": [NSNumber numberWithInteger:999],
+                      @"description": @"User not signed in"
+                  };
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else{
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+              }
+              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+        
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command {
+    NSString* verificationId = [command.arguments objectAtIndex:0];
+    NSString* code = [command.arguments objectAtIndex:1];
+
+    @try {
+        FIRAuthCredential* credential = [[FIRPhoneAuthProvider provider]
+        credentialWithVerificationID:verificationId
+                    verificationCode:code];
+        
+        [[FIRAuth auth].currentUser linkWithCredential:credential
+                                  completion:^(FIRAuthDataResult * _Nullable authResult,
+                                               NSError * _Nullable error) {
+            @try {
+                CDVPluginResult* pluginResult;
+              if (error) {
+                NSDictionary *message = @{
+                    @"code": [NSNumber numberWithInteger:error.code],
+                    @"description": error.description == nil ? [NSNull null] : error.description
+                };
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else if (authResult == nil) {
+                  NSDictionary *message = @{
+                      @"code": [NSNumber numberWithInteger:999],
+                      @"description": @"User not signed in"
+                  };
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else{
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+              }
+              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+        
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
