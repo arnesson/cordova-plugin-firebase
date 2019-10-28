@@ -1501,76 +1501,76 @@ window.FirebasePlugin.logError("an error message with a stack trace", StackTrace
 ### Authentication
 
 #### verifyPhoneNumber
-Request a verification ID and send a SMS with a verification code. Use them to construct a credential to sign in the user (in your app).
-- https://firebase.google.com/docs/auth/android/phone-auth
-- https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential
-- https://firebase.google.com/docs/reference/js/firebase.User#linkWithCredential
+Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 
-**NOTE: This will only work on physical devices.**
+**NOTE: This will only work on physical devices with a SIM card (not iOS Simulator or Android Emulator)**
 
-iOS will return: credential (string)
+In response to your request, you'll receive a verification ID which you can use in conjunction with the verification code to sign the user in.
 
-Android will return:
-credential.verificationId (object and with key verificationId)
-credential.instantVerification (boolean)
-credential.code (string) (note that this key only exists if instantVerification is true)
+On iOS and some Android devices, the user will receive and SMS containing the verification code which they must manually enter into your app.
 
-You need to use device plugin in order to access the right key.
-
-IMPORTANT NOTE: Android supports auto-verify and instant device verification. Therefore in that case it doesn't make sense to ask for an sms code as you won't receive one. In this case you'll get a credential.verificationId and a credential.code where code is the auto received verification code that would normally be sent via sms. To log in using this procedure you must pass this code to PhoneAuthProvider.credential(verificationId, code). You'll find an implementation example further below.
-
-When using node.js Firebase Admin-SDK, follow this tutorial:
-- https://firebase.google.com/docs/auth/admin/create-custom-tokens
-
-Pass back your custom generated token and call
-```javascript
-firebase.auth().signInWithCustomToken(customTokenFromYourServer);
-```
-instead of
-```javascript
-firebase.auth().signInWithCredential(credential)
-```
-**YOU HAVE TO COVER THIS PROCESS, OR YOU WILL HAVE ABOUT 5% OF USERS STICKING ON YOUR SCREEN, NOT RECEIVING ANYTHING**
-If this process is too complex for you, use this awesome plugin
-- https://github.com/chemerisuk/cordova-plugin-firebase-authentication
-
-It's not perfect but it fits for the most use cases and doesn't require calling your endpoint, as it has native phone auth support.
+Some Android devices support "instant verfication", in which case an SMS will not be send and you will be returned the verification code along with the verification ID.
+In this case, the user doesn't need to do anything in order for you to sign them in.  
 
 **Parameters**:
 - {string} phoneNumber - phone number to verify
 - {integer} timeOutDuration - time to wait in seconds before timing out
-- {function} success - callback function pass {string/object} credentials to as an argument
+- {function} success - callback function to pass {object} credentials to as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
 
+The success callback will be passed a credential object with the following properties:
+- instantVerification {boolean} - true if the Android device supports instant verification, in which case the verification code will be included in the credential object.
+If this is false, the device will be sent an SMS containing the verification code for the user to manually enter into your app.
+Always false on iOS.
+- verificationId {string} - the verification ID you'll need to pass along with the verification code to sign the user in.
+Always returned on both Android & iOS.
+- code {string} - verification code. Will only be present if `instantVerification` is true. Always undefined on iOS.
+
+Example usage:
+
 ```javascript
+var verificationId;
 window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
-    console.log(credential);
 
-    if(typeof credential === 'object'){
-        // if instant verification is true use the code that we received from the firebase endpoint, otherwise ask user to input verificationCode:
-        var code = credential.instantVerification ? credential.code : inputField.value.toString();
-    
-        var verificationId = credential.verificationId;
-    
-        credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+    verificationId = credential.verificationId;
+    if(credential.instantVerification){
+        signInWithCredential(credential.code);
+    }else{
+        promptUserToInputCode() // you need to implement this
+            .then(function(userEnteredCode){
+               signInWithCredential(userEnteredCode); 
+            });
     }
-    // sign in with the credential
-    firebase.auth().signInWithCredential(credential);
-
-    // OR link to an account
-    firebase.auth().currentUser.linkWithCredential(credential)
 }, function(error) {
-    console.error(error);
+    console.error("Failed to verify phone number: " + JSON.stringify(error));
 });
+
+function signInWithCredential(code){
+    FirebasePlugin.signInWithCredential(verificationId, code, function() {
+        console.log("Successfully signed in");
+    }, function(error) {
+        console.error("Failed to sign in", error);
+    });
+}
+
+
 ```
 
+##### Prerequisites
 
-##### Android
-To use this auth you need to configure your app SHA hash in the android app configuration in the firebase console.
-See https://developers.google.com/android/guides/client-auth to know how to get SHA app hash.
+###### Android
+To use phone auth with your Android app, you need to configure your app SHA-1 hash in the android app configuration in the Firebase console.
+See [this guide](https://developers.google.com/android/guides/client-auth) to find how to your SHA-1 app hash.
+See the [Firebase phone auth integration guide for native Android](https://firebase.google.com/docs/auth/android/phone-auth) for more information.
 
-##### iOS
-Setup your push notifications first, and verify that they are arriving on your physical device before you test this method. Use the APNs auth key to generate the .p8 file and upload it to firebase.  When you call this method, FCM sends a silent push to the device to verify it.
+###### iOS
+When you call this method on iOS, FCM sends a silent push notification to the iOS device to verify it.
+So to use phone auth with your Android app, you need to:
+- [setup your iOS app for push notifications](https://firebase.google.com/docs/cloud-messaging/ios/certs)
+- Verify that push notifications are arriving on your physical device
+- [Upload your APNs auth key o the Firebase console](https://firebase.google.com/docs/cloud-messaging/ios/client#upload_your_apns_authentication_key).
+
+With regard to the [set up of reCAPTCHA verification for iOS](https://firebase.google.com/docs/auth/ios/phone-auth#set-up-recaptcha-verification), this plugin automatically adds the `REVERSED_CLIENT_ID` to list of custom URL schemes in your Xcode project, so you don't need to do this manually.   
 
 ### Remote Config
 
