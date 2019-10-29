@@ -20,6 +20,10 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 **Table of Contents**
 
   - [Installation](#installation)
+    - [Plugin variables](#plugin-variables)
+      - [Android & iOS](#android--ios)
+      - [Android only](#android-only)
+      - [iOS only](#ios-only)
     - [Supported Cordova Versions](#supported-cordova-versions)
     - [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase)
       - [Breaking API changes](#breaking-api-changes)
@@ -28,11 +32,11 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [Build environment notes](#build-environment-notes)
     - [PhoneGap Build](#phonegap-build)
     - [Android-specific](#android-specific)
-      - [Specifying dependent library versions](#specifying-dependent-library-versions)
+      - [Specifying Android library versions](#specifying-android-library-versions)
       - [AndroidX](#androidx)
     - [Google Play Services and Firebase libraries](#google-play-services-and-firebase-libraries)
     - [iOS-specific](#ios-specific)
-      - [Specifying dependent library versions](#specifying-dependent-library-versions-1)
+      - [Specifying iOS library versions](#specifying-ios-library-versions)
       - [Cocoapods](#cocoapods)
       - [Out-of-date pods](#out-of-date-pods)
       - [Strip debug symbols](#strip-debug-symbols)
@@ -118,7 +122,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-  ## Installation
+## Installation
 Install the plugin by adding it to your project's config.xml:
 ```xml
 <plugin name="cordova-plugin-firebasex" spec="latest" />
@@ -127,6 +131,34 @@ or by running:
 ```
 cordova plugin add cordova-plugin-firebasex
 ```
+
+### Plugin variables
+The following Cordova plugin variables are supported by the plugin.
+Note that these must be set at plugin installation time. If you wish to change plugin variables, you'll need to uninstall the plugin and reinstall it with the new variable values.
+
+#### Android & iOS
+- `FIREBASE_ANALYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Analytics data collection on app startup
+- `FIREBASE_PERFORMANCE_COLLECTION_ENABLED` - whether to automatically enable Firebase Performance data collection on app startup
+- `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Crashlytics data collection on app startup
+See [Disable data collection on startup](#disable-data-collection-on-startup) for more info.
+
+#### Android only
+The following plugin variables are used to specify the Firebase SDK versions as Gradle dependencies on Android:
+- `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION`
+- `ANDROID_FIREBASE_CORE_VERSION`
+- `ANDROID_FIREBASE_MESSAGING_VERSION`
+- `ANDROID_FIREBASE_CONFIG_VERSION`
+- `ANDROID_FIREBASE_PERF_VERSION`
+- `ANDROID_FIREBASE_AUTH_VERSION`
+- `ANDROID_CRASHLYTICS_VERSION`
+- `ANDROID_CRASHLYTICS_NDK_VERSION`
+See [Specifying Android library versions](#specifying-android-library-versions) for more info.
+
+- `ANDROID_ICON_ACCENT` - sets the default accent color for system notifications. See [Android Notification Color](#android-notification-color) for more info.
+
+#### iOS only
+- `IOS_STRIP_DEBUG` - prevents symbolification of all libraries included via Cocoapods. See [Strip debug symbols](#strip-debug-symbols) for more info.
+- `SETUP_RECAPTCHA_VERIFICATION` - automatically sets up reCAPTCHA verification for phone authentication on iOS. See [verifyPhoneNumber](#verifyphonenumber) for more info. 
 
 ### Supported Cordova Versions
 - cordova: `>= 9`
@@ -210,7 +242,7 @@ This plugin will not work with Phonegap Build (and other remote cloud build envs
         
 ### Android-specific
 
-#### Specifying dependent library versions
+#### Specifying Android library versions
 This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android.
 By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned versions as `<preference>`'s, for example:
 
@@ -226,7 +258,7 @@ Or you can specify them as plugin variables in your `config.xml`, for example:
         <variable name="ANDROID_FIREBASE_CORE_VERSION" value="17.0.0" />
     </plugin>
     
-The following plugin variables are use to specify the follow Gradle dependency versions on Android:
+The following plugin variables are used to specify the following Gradle dependency versions on Android:
 
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION` => `com.google.android.gms:play-services-tagmanager`
 - `ANDROID_FIREBASE_CORE_VERSION` => `com.google.firebase:firebase-core`
@@ -267,7 +299,7 @@ Similarly, if your build is failing because multiple plugins are installing diff
 you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release) to align these.  
 
 ### iOS-specific
-#### Specifying dependent library versions
+#### Specifying iOS library versions
 This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Cocoapods on iOS.
 This plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned iOS versions in the  `<pod>`'s, for example:
 
@@ -587,6 +619,7 @@ You can also reference these icons in [data messages](#android-data-messages), f
 #### Android Notification Color
 On Android Lollipop (5.0/API 21) and above you can set the default accent color for the notification by adding a color setting.
 This is defined as an [ARGB colour](https://en.wikipedia.org/wiki/RGBA_color_space#ARGB_(word-order)) which the plugin sets by default to `#FF00FFFF` (cyan).
+Note: On Android 7 and above, the accent color can only be set for the notification displayed in the system tray area - the icon in the statusbar is always white.
 
 You can override this default by specifying a value using the `ANDROID_ICON_ACCENT` plugin variable during plugin installation, for example:
 
@@ -1556,21 +1589,23 @@ function signInWithCredential(code){
 
 ```
 
-##### Prerequisites
-
-###### Android
+##### Android
 To use phone auth with your Android app, you need to configure your app SHA-1 hash in the android app configuration in the Firebase console.
 See [this guide](https://developers.google.com/android/guides/client-auth) to find how to your SHA-1 app hash.
 See the [Firebase phone auth integration guide for native Android](https://firebase.google.com/docs/auth/android/phone-auth) for more information.
 
-###### iOS
+##### iOS
 When you call this method on iOS, FCM sends a silent push notification to the iOS device to verify it.
 So to use phone auth with your Android app, you need to:
 - [setup your iOS app for push notifications](https://firebase.google.com/docs/cloud-messaging/ios/certs)
 - Verify that push notifications are arriving on your physical device
-- [Upload your APNs auth key o the Firebase console](https://firebase.google.com/docs/cloud-messaging/ios/client#upload_your_apns_authentication_key).
+- [Upload your APNs auth key to the Firebase console](https://firebase.google.com/docs/cloud-messaging/ios/client#upload_your_apns_authentication_key).
 
-With regard to the [set up of reCAPTCHA verification for iOS](https://firebase.google.com/docs/auth/ios/phone-auth#set-up-recaptcha-verification), this plugin automatically adds the `REVERSED_CLIENT_ID` to list of custom URL schemes in your Xcode project, so you don't need to do this manually.   
+You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs/auth/ios/phone-auth#set-up-recaptcha-verification) automatically by specifying the `SETUP_RECAPTCHA_VERIFICATION` plugin variable at plugin install time:
+  
+    cordova plugin add cordova-plugin-firebasex --variable SETUP_RECAPTCHA_VERIFICATION=true
+
+This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
 
 ### Remote Config
 
