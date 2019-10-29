@@ -195,7 +195,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.setDefaults(callbackContext, args.getJSONObject(0));
                 return true;
             } else if (action.equals("verifyPhoneNumber")) {
-                this.verifyPhoneNumber(callbackContext, args.getString(0), args.getInt(1));
+                this.verifyPhoneNumber(callbackContext, args);
                 return true;
             } else if (action.equals("signInWithCredential")) {
                 this.signInWithCredential(callbackContext, args);
@@ -793,8 +793,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     public void verifyPhoneNumber(
             final CallbackContext callbackContext,
-            final String number,
-            final int timeOutDuration
+            final JSONArray args
     ) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -825,7 +824,6 @@ public class FirebasePlugin extends CordovaPlugin {
                                         else if(value.length() >= 4 && value.length() <= 6) code = value;
                                     }
                                 }
-                                returnResults.put("verified", verificationId != null && code != null);
                                 returnResults.put("verificationId", verificationId);
                                 returnResults.put("code", code);
                                 returnResults.put("instantVerification", true);
@@ -879,6 +877,14 @@ public class FirebasePlugin extends CordovaPlugin {
                             callbackContext.sendPluginResult(pluginresult);
                         }
                     };
+
+                    String number = args.getString(0);
+                    int timeOutDuration = args.getInt(1);
+                    String smsCode = args.getString(2);
+
+                    if(smsCode != null){
+                        FirebaseAuth.getInstance().getFirebaseAuthSettings().setAutoRetrievedSmsCodeForPhoneNumber(number, smsCode);
+                    }
 
                     PhoneAuthProvider.getInstance().verifyPhoneNumber(number, // Phone number to verify
                             timeOutDuration, // Timeout duration

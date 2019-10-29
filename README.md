@@ -1546,10 +1546,12 @@ Some Android devices support "instant verfication", in which case an SMS will no
 In this case, the user doesn't need to do anything in order for you to sign them in.  
 
 **Parameters**:
-- {string} phoneNumber - phone number to verify
-- {integer} timeOutDuration - time to wait in seconds before timing out
 - {function} success - callback function to pass {object} credentials to as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
+- {string} phoneNumber - phone number to verify
+- {integer} timeOutDuration - (optional) time to wait in seconds before timing out
+- {string} fakeVerificationCode - (optional) to test instant verification on Android ,specify a fake verification code to return for whitelisted phone numbers.
+    - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
 The success callback will be passed a credential object with the following properties:
 - instantVerification {boolean} - true if the Android device supports instant verification, in which case the verification code will be included in the credential object.
@@ -1562,8 +1564,11 @@ Always returned on both Android & iOS.
 Example usage:
 
 ```javascript
+var number = '+441234567890';
+var timeOutDuration = 60;
+var fakeVerificationCode = '123456';
 var verificationId;
-window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(credential) {
+window.FirebasePlugin.verifyPhoneNumber(function(credential) {
 
     verificationId = credential.verificationId;
     if(credential.instantVerification){
@@ -1576,7 +1581,7 @@ window.FirebasePlugin.verifyPhoneNumber(number, timeOutDuration, function(creden
     }
 }, function(error) {
     console.error("Failed to verify phone number: " + JSON.stringify(error));
-});
+}, number, timeOutDuration, fakeVerificationCode);
 
 function signInWithCredential(code){
     FirebasePlugin.signInWithCredential(verificationId, code, function() {
