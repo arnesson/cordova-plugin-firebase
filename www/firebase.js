@@ -25,6 +25,10 @@ exports.onTokenRefresh = function (success, error) {
   exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };
 
+exports.onApnsTokenReceived = function (success, error) {
+    exec(success, error, "FirebasePlugin", "onApnsTokenReceived", []);
+};
+
 exports.subscribe = function (topic, success, error) {
   exec(success, error, "FirebasePlugin", "subscribe", [topic]);
 };

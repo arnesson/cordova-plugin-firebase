@@ -133,6 +133,7 @@ static NSDictionary* mutableUserInfo;
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [FIRMessaging messaging].APNSToken = deviceToken;
     NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken);
+    [FirebasePlugin.firebasePlugin sendApnsToken:[FirebasePlugin.firebasePlugin hexadecimalStringFromData:deviceToken]];
     
     // Set UNUserNotificationCenter delegate
     [UNUserNotificationCenter currentNotificationCenter].delegate = self;

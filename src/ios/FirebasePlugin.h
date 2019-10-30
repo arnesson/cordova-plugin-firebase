@@ -22,8 +22,10 @@
 - (void)isAutoInitEnabled:(CDVInvokedUrlCommand*)command;
 - (void)onMessageReceived:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
+- (void)onApnsTokenReceived:(CDVInvokedUrlCommand *)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)sendToken:(NSString*)token;
+- (void)sendApnsToken:(NSString*)token;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand*)command;
@@ -53,6 +55,7 @@
 - (void)listChannels:(CDVInvokedUrlCommand *)command;
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
+@property (nonatomic, copy) NSString *apnsTokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
 

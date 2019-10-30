@@ -73,6 +73,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [getToken](#gettoken)
       - [onTokenRefresh](#ontokenrefresh)
       - [getAPNSToken](#getapnstoken)
+      - [onApnsTokenReceived](#onapnstokenreceived)
       - [onMessageReceived](#onmessagereceived)
       - [grantPermission](#grantpermission)
       - [hasPermission](#haspermission)
@@ -948,16 +949,16 @@ The plugin is capable of receiving push notifications and FCM data messages.
 See [Cloud messaging](#cloud-messaging) section for more.
 
 #### getToken
-Get the FCM device token (id):
+Get the current FCM token.
+Null if the token has not been allocated yet by the Firebase SDK.
 
 **Parameters**:
 - {function} success - callback function which will be passed the {string} token as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.getToken(function(token) {
-    // save this server-side and use it to push notifications to this device
-    console.log(token);
+window.FirebasePlugin.getToken(function(fcmToken) {
+    console.log(fcmToken);
 }, function(error) {
     console.error(error);
 });
@@ -965,25 +966,28 @@ window.FirebasePlugin.getToken(function(token) {
 Note that token will be null if it has not been established yet.
 
 #### onTokenRefresh
-Register for token changes:
+Registers a handler to call when the FCM token changes.
+This is the best way to get the token as soon as it has been allocated.
+This will be called on the first run after app install when a token is first allocated.
+It may also be called again under other circumstances, e.g. if `unregister()` is called or Firebase allocates a new token for other reasons.
+You can use this callback to return the token to you server to keep the FCM token associated with a given user up-to-date. 
 
 **Parameters**:
 - {function} success - callback function which will be passed the {string} token as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.onTokenRefresh(function(token) {
-    // save this server-side and use it to push notifications to this device
-    console.log(token);
+window.FirebasePlugin.onTokenRefresh(function(fcmToken) {
+    console.log(fcmToken);
 }, function(error) {
     console.error(error);
 });
 ```
-This is the best way to get a valid token for the device as soon as the token is established
 
 #### getAPNSToken
 iOS only.
-Get the APNS token.
+Get the APNS token allocated for this app install.
+Note that token will be null if it has not been allocated yet.
 
 **Parameters**:
 - {function} success - callback function which will be passed the {string} APNS token as an argument
@@ -996,7 +1000,23 @@ window.FirebasePlugin.getAPNSToken(function(apnsToken) {
     console.error(error);
 });
 ```
-Note that token will be null if it has not been established yet.
+
+#### onApnsTokenReceived
+iOS only.
+Registers a handler to call when the APNS token is allocated.
+This will be called once when remote notifications permission has been granted by the user at runtime. 
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} token as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+window.FirebasePlugin.onApnsTokenReceived(function(apnsToken) {
+    console.log(apnsToken);
+}, function(error) {
+    console.error(error);
+});
+```
 
 #### onMessageReceived
 Registers a callback function to invoke when: 

@@ -16,6 +16,7 @@
 
 @synthesize notificationCallbackId;
 @synthesize tokenRefreshCallbackId;
+@synthesize apnsTokenRefreshCallbackId;
 @synthesize notificationStack;
 @synthesize traces;
 
@@ -78,21 +79,22 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)getAPNSToken:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[self getAPNSToken]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (NSString *)getAPNSToken {
+    NSString* hexToken = nil;
     NSData* apnsToken = [FIRMessaging messaging].APNSToken;
-    CDVPluginResult *pluginResult;
     if (apnsToken) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
         // [deviceToken description] Starting with iOS 13 device token is like "{length = 32, bytes = 0xd3d997af 967d1f43 b405374a 13394d2f ... 28f10282 14af515f }"
-        NSString* hexToken = [self hexadecimalStringFromData:apnsToken];
+        hexToken = [self hexadecimalStringFromData:apnsToken];
 #else
-        NSString* hexToken = [[apnsToken.description componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet]invertedSet]]componentsJoinedByString:@""];
+        hexToken = [[apnsToken.description componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet]invertedSet]]componentsJoinedByString:@""];
 #endif
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:hexToken];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:nil];
     }
-    
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    return hexToken;
 }
 
 - (NSString *)hexadecimalStringFromData:(NSData *)data
@@ -460,6 +462,18 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)onApnsTokenReceived:(CDVInvokedUrlCommand *)command {
+    self.apnsTokenRefreshCallbackId = command.callbackId;
+    @try {
+        NSString* apnsToken = [self getAPNSToken];
+        if(apnsToken != nil){
+            [self sendApnsToken:apnsToken];
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)sendNotification:(NSDictionary *)userInfo {
     @try {
         if (self.notificationCallbackId != nil) {
@@ -489,6 +503,18 @@ static BOOL registeredForRemoteNotifications = NO;
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self.tokenRefreshCallbackId];
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :self.commandDelegate];
+    }
+}
+
+- (void)sendApnsToken:(NSString *)token {
+    @try {
+        if (self.apnsTokenRefreshCallbackId != nil) {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
+            [pluginResult setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.apnsTokenRefreshCallbackId];
         }
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :self.commandDelegate];
