@@ -1542,14 +1542,37 @@ Also logs the error message to the native device console.
 - {function} error - (optional) callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.logError("just a simple error message");
+    var appRootURL = window.location.href.replace("index.html",'');
 
-window.FirebasePlugin.logError("an error message with a stack trace", StackTrace.getSync(), function(){
-    console.log("Error was logged successfully");
-}, function(error){
-    console.error("Failed to leg error: " + error);
-});
+    window.onerror = function(errorMsg, url, line, col, error) {
+        var logMessage = errorMsg;
+        var stackTrace = null;
+
+        var sendError = function(){
+            FirebasePlugin.logError(logMessage, stackTrace, function(){
+                console.log("Sent non-fatal error");
+            },function(error){
+                console.error("Failed to send non-fatal error", error);
+            });
+        };
+
+        logMessage += ': url='+url.replace(appRootURL, '')+'; line='+line+'; col='+col;
+
+        if(typeof error === 'object'){
+            StackTrace.fromError(error).then(function(trace){
+                stackTrace = trace;
+                sendError()
+            });
+        }else{
+            sendError();
+        }
+    };
 ```
+
+An example of how the error entry will appear in the Crashlytics console:
+<br/>
+<img src="https://user-images.githubusercontent.com/2345062/68016874-5e0cdb80-fc8d-11e9-9a26-97b448039cf5.png"/>
+
 
 ### Authentication
 
