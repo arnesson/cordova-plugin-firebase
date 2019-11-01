@@ -1542,17 +1542,17 @@ Also logs the error message to the native device console.
 - {function} error - (optional) callback function which will be passed a {string} error message as an argument
 
 ```javascript
+    // Send an unhandled JS exception
     var appRootURL = window.location.href.replace("index.html",'');
-
     window.onerror = function(errorMsg, url, line, col, error) {
         var logMessage = errorMsg;
         var stackTrace = null;
 
         var sendError = function(){
             FirebasePlugin.logError(logMessage, stackTrace, function(){
-                console.log("Sent non-fatal error");
+                console.log("Sent JS exception");
             },function(error){
-                console.error("Failed to send non-fatal error", error);
+                console.error("Failed to send JS exception", error);
             });
         };
 
@@ -1567,11 +1567,27 @@ Also logs the error message to the native device console.
             sendError();
         }
     };
+    
+    // Send a non-fatal error
+    FirebasePlugin.logError("A non-fatal error", function(){
+        console.log("Sent non-fatal error");
+    },function(error){
+        console.error("Failed to send non-fatal error", error);
+    });
 ```
 
 An example of how the error entry will appear in the Crashlytics console:
+
+<br/>
+<b>Android</b>
 <br/>
 <img src="https://user-images.githubusercontent.com/2345062/68016874-5e0cdb80-fc8d-11e9-9a26-97b448039cf5.png"/>
+
+<br/><br/>
+<b>iOS</b>
+<br/>
+<img src="https://user-images.githubusercontent.com/2345062/68041597-d1800e80-fcc8-11e9-90e1-eeeedf9cc43f.png"/>
+
 
 
 ### Authentication
