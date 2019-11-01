@@ -538,9 +538,9 @@ public class FirebasePlugin extends CordovaPlugin {
                         for(int i = 0; i < stackTrace.length(); i++) {
                             JSONObject elem = stackTrace.getJSONObject(i);
                             trace[i] = new StackTraceElement(
-                                    "undefined",
-                                    elem.optString("functionName", "undefined"),
-                                    elem.optString("fileName", "undefined"),
+                                    "",
+                                    elem.optString("functionName", "(anonymous function)"),
+                                    elem.optString("fileName", "(unknown file)"),
                                     elem.optInt("lineNumber", -1)
                             );
                         }
@@ -1088,6 +1088,7 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
+
                     Fabric.with(self.applicationContext, new Crashlytics());
                     callbackContext.success();
                 } catch (Exception e) {
