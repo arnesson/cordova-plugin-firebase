@@ -1,5 +1,11 @@
 var exec = require('cordova/exec');
 
+var ensureBoolean = function (callback){
+    return function(result){
+        callback(!!result);
+    }
+};
+
 exports.getVerificationID = function (number, success, error) {
   exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
@@ -59,11 +65,11 @@ exports.getBadgeNumber = function (success, error) {
 };
 
 exports.grantPermission = function (success, error) {
-    exec(success, error, "FirebasePlugin", "grantPermission", []);
+    exec(ensureBoolean(success), error, "FirebasePlugin", "grantPermission", []);
 };
 
 exports.hasPermission = function (success, error) {
-    exec(success, error, "FirebasePlugin", "hasPermission", []);
+    exec(ensureBoolean(success), error, "FirebasePlugin", "hasPermission", []);
 };
 
 // Notifications - Android-only
@@ -105,7 +111,7 @@ exports.setUserProperty = function (name, value, success, error) {
 };
 
 exports.activateFetched = function (success, error) {
-  exec(success, error, "FirebasePlugin", "activateFetched", []);
+  exec(ensureBoolean(success), error, "FirebasePlugin", "activateFetched", []);
 };
 
 exports.fetch = function (cacheExpirationSeconds, success, error) {
