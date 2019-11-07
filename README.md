@@ -146,7 +146,7 @@ See [Disable data collection on startup](#disable-data-collection-on-startup) fo
 #### Android only
 The following plugin variables are used to specify the Firebase SDK versions as Gradle dependencies on Android:
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION`
-- `ANDROID_FIREBASE_CORE_VERSION`
+- `ANDROID_FIREBASE_ANALYTICS_VERSION`
 - `ANDROID_FIREBASE_MESSAGING_VERSION`
 - `ANDROID_FIREBASE_CONFIG_VERSION`
 - `ANDROID_FIREBASE_PERF_VERSION`
@@ -247,22 +247,22 @@ This plugin will not work with Phonegap Build (and other remote cloud build envs
 This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android.
 By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned versions as `<preference>`'s, for example:
 
-    <preference name="ANDROID_FIREBASE_CORE_VERSION" default="17.0.0" />
+    <preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.0.0" />
 
 The Android defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
 
-    cordova plugin add cordova-plugin-firebasex --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0
+    cordova plugin add cordova-plugin-firebasex --variable ANDROID_FIREBASE_ANALYTICS_VERSION=17.0.0
     
 Or you can specify them as plugin variables in your `config.xml`, for example:
 
     <plugin name="cordova-plugin-firebasex" spec="latest">
-        <variable name="ANDROID_FIREBASE_CORE_VERSION" value="17.0.0" />
+        <variable name="ANDROID_FIREBASE_ANALYTICS_VERSION" value="17.0.0" />
     </plugin>
     
 The following plugin variables are used to specify the following Gradle dependency versions on Android:
 
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION` => `com.google.android.gms:play-services-tagmanager`
-- `ANDROID_FIREBASE_CORE_VERSION` => `com.google.firebase:firebase-core`
+- `ANDROID_FIREBASE_ANALYTICS_VERSION` => `com.google.firebase:firebase-analytics`
 - `ANDROID_FIREBASE_MESSAGING_VERSION` => `com.google.firebase:firebase-messaging`
 - `ANDROID_FIREBASE_CONFIG_VERSION` => `com.google.firebase:firebase-config`
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
@@ -274,7 +274,7 @@ For example, to explicitly specify all the component versions at plugin install 
 
     cordova plugin add cordova-plugin-firebasex \
         --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \
-        --variable ANDROID_FIREBASE_CORE_VERSION=17.0.0 \
+        --variable ANDROID_FIREBASE_ANALYTICS_VERSION=17.0.0 \
         --variable ANDROID_FIREBASE_MESSAGING_VERSION=19.0.0 \
         --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0 \
         --variable ANDROID_FIREBASE_PERF_VERSION=18.0.0 \
