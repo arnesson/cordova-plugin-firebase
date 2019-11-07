@@ -60,15 +60,6 @@ module.exports = {
     }
   },
 
-  getValue: function (config, name) {
-    var value = config.match(new RegExp('<' + name + '(.*?)>(.*?)</' + name + '>', 'i'));
-    if (value && value[2]) {
-      return value[2]
-    } else {
-      return null
-    }
-  },
-
   fileExists: function (path) {
     try {
       return fs.statSync(path).isFile();
