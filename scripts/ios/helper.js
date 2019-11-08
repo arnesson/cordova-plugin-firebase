@@ -15,10 +15,9 @@ module.exports = {
     /**
      * Used to get the path to the XCode project's .pbxproj file.
      */
-    getXcodeProjectPath: function (cb) {
-        utilities.getAppName(function(appName){
-            cb(path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj"));
-        });
+    getXcodeProjectPath: function () {
+        var appName = utilities.getAppName();
+        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
     },
 
     /**
@@ -204,7 +203,7 @@ module.exports = {
         }
         if(pluginVariables['SETUP_RECAPTCHA_VERIFICATION'] === 'true'){
             var reversedClientId = googlePlist['REVERSED_CLIENT_ID'];
-            
+
             if(!appPlist['CFBundleURLTypes']) appPlist['CFBundleURLTypes'] = [];
             var entry, i;
             for(i=0; i<appPlist['CFBundleURLTypes'].length; i++){

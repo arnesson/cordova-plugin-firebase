@@ -20,6 +20,8 @@
 	<preference name="FIREBASE_CRASHLYTICS_COLLECTION_ENABLED" default="true" />
 
 	<platform name="android">
+		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
+
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
@@ -55,12 +57,6 @@
 		<source-file src="src/android/FirebasePluginMessageReceiver.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/JavaScriptException.java" target-dir="src/org/apache/cordova/firebase"/>
-
-		<source-file src="src/android/colors.xml" target-dir="res/values" />
-		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
-		<config-file target="res/values/colors.xml" parent="/resources">
-			<color name="accent">$ANDROID_ICON_ACCENT</color>
-		</config-file>
 
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 
