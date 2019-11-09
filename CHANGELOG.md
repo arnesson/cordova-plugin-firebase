@@ -1,3 +1,62 @@
+# Version 7.0.0
+* (iOS) Update Firebase SDK to [v6.11.0 released 22 Oct 2019](https://firebase.google.com/support/release-notes/ios#version_6110_-_october_22_2019)
+* (Android) Update pinned Firebase SDK versions to latest as of [25 Oct 2019](https://firebase.google.com/support/release-notes/android#2019-10-25)
+Resolves [#207](https://github.com/dpa99c/cordova-plugin-firebasex/issues/207)
+* (Doc) Document parameter types in API functions. 
+Resolves [#140](https://github.com/dpa99c/cordova-plugin-firebasex/issues/140)
+* (Doc) fix `onMessageReceived()` code sample. 
+Merged from PR [#142](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/142).
+* (Doc) Example sound name for custom Android notification sound.
+Resolves [#160](https://github.com/dpa99c/cordova-plugin-firebasex/issues/160)
+* (Feat): add Typescript declaration
+Merged from PR [#166](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/166).
+* (Doc) Fix `createChannel()` examples.
+Merged from PR [#167](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/167).
+* (Android) Expose `description` notification channel field.
+Merged from PR [#168](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/168).
+* (iOS) Update CocoaPods spec url to new CDN.
+Merged from PR [#173](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/173).
+* (Doc) Fix code example for default android icon.
+Merged from PR [#174](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/174).
+* (iOS) Support iOS 13 APNS format token change.
+Merged from PR [#177](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/177).
+* (Hook) Remove check for presence of platform in `config.xml`
+Merged from PR [#185](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/185).
+* (Feat) Expose Firebase Messaging autoinit API functions to allow enabling/disabling/checking of autoinit.
+    * If disabled and `unregister()` is called, a new token will not be automatically allocated.
+    * Resolves [#147](https://github.com/dpa99c/cordova-plugin-firebasex/issues/147).
+* (iOS) Fix `logEvent()` so it doesn't generated warning message in console. Fixes [#154](https://github.com/dpa99c/cordova-plugin-firebasex/issues/154).
+* (iOS) Handle notification messages that contain `"content-available":1` which wakes up the app while in the background to deliver the message payload immediately when the message arrives (without requiring user interaction by tapping the system notification).
+Fixes [#158](https://github.com/dpa99c/cordova-plugin-firebasex/issues/158).
+* (Android)(Do) Clarify Android custom notification icons example. Resolves [#183](https://github.com/dpa99c/cordova-plugin-firebasex/issues/183).
+* (Doc) Add example of using stacktrace.js with `logError()`.
+Clarifies [#118](https://github.com/dpa99c/cordova-plugin-firebasex/issues/118).
+* (Doc) Add link to [cordova-plugin-firebasex-ionic3-test](https://github.com/dpa99c/cordova-plugin-firebasex-ionic3-test) Ionic 3 example project
+*  Add `signInWithCredential()` to sign user into Firebase account and `linkUserWithCredential()` to link user account with credentials obtained via `verifyPhoneNumber()`.
+* (Android) *BREAKING CHANGE* Rework `verifyPhoneNumber()`
+    * Remove redundant `verified` in returned credentials object.
+    * Support mocking of instant verification for `verifyPhoneNumber()` on Android for integration testing.
+* (iOS) *BREAKING CHANGE* Rework `verifyPhoneNumber()` 
+    * Return the same credential object structure as Android.
+* (iOS) Add `SETUP_RECAPTCHA_VERIFICATION` plugin variable to automatically set up reCAPTURE verification for phone auth.
+* (Doc) Add section to explicitly document all supported plugin variables.
+* (iOS) Add `onApnsTokenReceived()` to register a callback function to be invoked when the APNS token is allocated. 
+Resolves [#201](https://github.com/dpa99c/cordova-plugin-firebasex/issues/201).
+* (Android) Tweak default empty values when sending stacktrace using `logError()`
+* (Doc) Better example of using `logError()` to track unhandled JS exceptions vs logging a non-fatal logical error.
+* (iOS) Modify `logError()` to send stacktrace.js output as an actual stacktrace instead of custom keys. 
+Resolves [#118](https://github.com/dpa99c/cordova-plugin-firebasex/issues/118).
+* (Hook) Fix parsing of `config.xml` to extract app name. 
+Fixes [#139](https://github.com/dpa99c/cordova-plugin-firebasex/issues/139).
+* (Android) Ensure functions which return a boolean result return an actual boolean type rather than a binary integer.
+Fixes [#153](https://github.com/dpa99c/cordova-plugin-firebasex/issues/153).
+* (Hook) Rework hook scripts to:
+    * be fully synchronous to eliminate race conditions (remove q dependency)
+    * use [xml-js](https://github.com/nashwaan/xml-js) (instead of [xml2js](https://github.com/Leonidas-from-XIV/node-xml2js)) to convert XML>JSON and JSON>XML
+    * (Android) handle existing `colors.xml`. 
+    Resolves [#132](https://github.com/dpa99c/cordova-plugin-firebasex/issues/132).
+
+
 # Version 6.1.0
 * (iOS) Add `getAPNSToken()` plugin API method to get the APNS token on iOS. Derived from merging PR [#100](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/100).
 * Merge PR [#103](See https://github.com/dpa99c/cordova-plugin-firebasex/pull/103) - fix for app name containing an ampersand.
