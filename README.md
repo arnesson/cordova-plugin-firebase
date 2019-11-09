@@ -106,6 +106,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [verifyPhoneNumber](#verifyphonenumber)
         - [Android](#android-1)
         - [iOS](#ios-1)
+      - [signInWithCredential](#signinwithcredential)
+      - [linkUserWithCredential](#linkuserwithcredential)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
@@ -1649,8 +1651,6 @@ function signInWithCredential(code){
         console.error("Failed to sign in", error);
     });
 }
-
-
 ```
 
 ##### Android
@@ -1670,6 +1670,89 @@ You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs
     cordova plugin add cordova-plugin-firebasex --variable SETUP_RECAPTCHA_VERIFICATION=true
 
 This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
+
+#### signInWithCredential
+Signs the user into Firebase with credentials obtained using `verifyPhoneNumber()`.
+See the [Android-](https://firebase.google.com/docs/auth/android/phone-auth#sign-in-the-user) and [iOS](https://firebase.google.com/docs/auth/ios/phone-auth#sign-in-the-user-with-the-verification-code)-specific Firebase documentation for more info.
+
+**Parameters**:
+- {string} verificationId - the verification ID returned in the credentials object to the `verifyPhoneNumber()` success callback.
+- {string} code - the activation code, either returned in the credentials object to the `verifyPhoneNumber()` success callback if using Instant Verification on Android, or the activation code as entered by the user from the received SMS message. 
+- {function} success - callback function to call on successful sign-in using credentials
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+var number = '+441234567890';
+var timeOutDuration = 60;
+var fakeVerificationCode = '123456';
+var verificationId;
+window.FirebasePlugin.verifyPhoneNumber(function(credential) {
+
+    verificationId = credential.verificationId;
+    if(credential.instantVerification){
+        signInWithCredential(credential.code);
+    }else{
+        promptUserToInputCode() // you need to implement this
+            .then(function(userEnteredCode){
+               signInWithCredential(userEnteredCode); 
+            });
+    }
+}, function(error) {
+    console.error("Failed to verify phone number: " + JSON.stringify(error));
+}, number, timeOutDuration, fakeVerificationCode);
+
+function signInWithCredential(code){
+    FirebasePlugin.signInWithCredential(verificationId, code, function() {
+        console.log("Successfully signed in");
+    }, function(error) {
+        console.error("Failed to sign in", error);
+    });
+}
+```
+
+#### linkUserWithCredential
+Links the user account to an existing Firebase user account with credentials obtained using `verifyPhoneNumber()`.
+See the [Android-](https://firebase.google.com/docs/auth/android/account-linking) and [iOS](https://firebase.google.com/docs/auth/ios/account-linking)-specific Firebase documentation for more info.
+
+**Parameters**:
+- {string} verificationId - the verification ID returned in the credentials object to the `verifyPhoneNumber()` success callback.
+- {string} code - the activation code, either returned in the credentials object to the `verifyPhoneNumber()` success callback if using Instant Verification on Android, or the activation code as entered by the user from the received SMS message. 
+- {function} success - callback function to call on successful linking using credentials
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+var number = '+441234567890';
+var timeOutDuration = 60;
+var fakeVerificationCode = '123456';
+var verificationId;
+window.FirebasePlugin.verifyPhoneNumber(function(credential) {
+
+    verificationId = credential.verificationId;
+    if(credential.instantVerification){
+        linkUserWithCredential(credential.code);
+    }else{
+        promptUserToInputCode() // you need to implement this
+            .then(function(userEnteredCode){
+               linkUserWithCredential(userEnteredCode); 
+            });
+    }
+}, function(error) {
+    console.error("Failed to verify phone number: " + JSON.stringify(error));
+}, number, timeOutDuration, fakeVerificationCode);
+
+function linkUserWithCredential(code){
+    FirebasePlugin.linkUserWithCredential(verificationId, code, function() {
+        console.log("Successfully linked");
+    }, function(error) {
+        console.error("Failed to link", error);
+    });
+}
+```
+
 
 ### Remote Config
 
