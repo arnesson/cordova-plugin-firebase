@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebasex" version="6.1.0"
+<plugin id="cordova-plugin-firebasex" version="7.0.0"
 		xmlns="http://apache.org/cordova/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -20,6 +20,8 @@
 	<preference name="FIREBASE_CRASHLYTICS_COLLECTION_ENABLED" default="true" />
 
 	<platform name="android">
+		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
+
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
@@ -56,26 +58,20 @@
 		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/JavaScriptException.java" target-dir="src/org/apache/cordova/firebase"/>
 
-		<source-file src="src/android/colors.xml" target-dir="res/values" />
-		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
-		<config-file target="res/values/colors.xml" parent="/resources">
-			<color name="accent">$ANDROID_ICON_ACCENT</color>
-		</config-file>
-
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 
 		<!-- Default versions for Gradle dependencies -->
 		<preference name="ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" default="17.0.0" />
-		<preference name="ANDROID_FIREBASE_CORE_VERSION" default="17.0.0" />
-		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="19.0.0" />
-		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="18.0.0" />
-		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="18.0.0" />
-		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="18.0.0" />
+		<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.2.1" />
+		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="20.0.0" />
+		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="19.0.3" />
+		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="19.0.1" />
+		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="19.1.0" />
 		<preference name="ANDROID_CRASHLYTICS_VERSION" default="2.10.1" />
-		<preference name="ANDROID_CRASHLYTICS_NDK_VERSION" default="2.1.0" />
+		<preference name="ANDROID_CRASHLYTICS_NDK_VERSION" default="2.1.1" />
 
 		<framework src="com.google.android.gms:play-services-tagmanager:$ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" />
-		<framework src="com.google.firebase:firebase-core:$ANDROID_FIREBASE_CORE_VERSION" />
+		<framework src="com.google.firebase:firebase-analytics:$ANDROID_FIREBASE_ANALYTICS_VERSION" />
 		<framework src="com.google.firebase:firebase-messaging:$ANDROID_FIREBASE_MESSAGING_VERSION" />
 		<framework src="com.google.firebase:firebase-config:$ANDROID_FIREBASE_CONFIG_VERSION" />
 		<framework src="com.google.firebase:firebase-perf:$ANDROID_FIREBASE_PERF_VERSION" />
@@ -121,11 +117,11 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="Firebase/Core" spec="6.9.0"/>
-				<pod name="Firebase/Auth" spec="6.9.0"/>
-				<pod name="Firebase/Messaging" spec="6.9.0"/>
-				<pod name="Firebase/Performance" spec="6.9.0"/>
-				<pod name="Firebase/RemoteConfig" spec="6.9.0"/>
+				<pod name="Firebase/Core" spec="6.11.0"/>
+				<pod name="Firebase/Auth" spec="6.11.0"/>
+				<pod name="Firebase/Messaging" spec="6.11.0"/>
+				<pod name="Firebase/Performance" spec="6.11.0"/>
+				<pod name="Firebase/RemoteConfig" spec="6.11.0"/>
 				<pod name="Fabric" spec="1.10.2"/>
 				<pod name="Crashlytics" spec="3.14.0"/>
 			</pods>

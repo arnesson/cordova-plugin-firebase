@@ -4,8 +4,9 @@
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
 
-- (void)getVerificationID:(CDVInvokedUrlCommand*)command;
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
+- (void)signInWithCredential:(CDVInvokedUrlCommand*)command;
+- (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)getId:(CDVInvokedUrlCommand*)command;
 - (void)getToken:(CDVInvokedUrlCommand*)command;
 - (void)getAPNSToken:(CDVInvokedUrlCommand*)command;
@@ -17,10 +18,14 @@
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)unregister:(CDVInvokedUrlCommand*)command;
+- (void)setAutoInitEnabled:(CDVInvokedUrlCommand*)command;
+- (void)isAutoInitEnabled:(CDVInvokedUrlCommand*)command;
 - (void)onMessageReceived:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
+- (void)onApnsTokenReceived:(CDVInvokedUrlCommand *)command;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)sendToken:(NSString*)token;
+- (void)sendApnsToken:(NSString*)token;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand*)command;
@@ -50,6 +55,7 @@
 - (void)listChannels:(CDVInvokedUrlCommand *)command;
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
+@property (nonatomic, copy) NSString *apnsTokenRefreshCallbackId;
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
 

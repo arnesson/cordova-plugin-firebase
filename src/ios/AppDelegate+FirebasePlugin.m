@@ -16,6 +16,8 @@
 
 @implementation AppDelegate (FirebasePlugin)
 
+static NSDictionary* mutableUserInfo;
+
 - (void)setDelegate:(id)delegate {
     objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -131,6 +133,7 @@
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [FIRMessaging messaging].APNSToken = deviceToken;
     NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken);
+    [FirebasePlugin.firebasePlugin sendApnsToken:[FirebasePlugin.firebasePlugin hexadecimalStringFromData:deviceToken]];
     
     // Set UNUserNotificationCenter delegate
     [UNUserNotificationCenter currentNotificationCenter].delegate = self;
@@ -142,12 +145,14 @@
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
     @try{
-        NSDictionary *mutableUserInfo = [userInfo mutableCopy];
+        mutableUserInfo = [userInfo mutableCopy];
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
+        bool isContentAvailable = false;
         if([aps objectForKey:@"alert"] != nil){
+            isContentAvailable = [[aps objectForKey:@"content-available"] isEqualToNumber:[NSNumber numberWithInt:1]];
             [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
             NSString* tap;
-            if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){
+            if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]] && !isContentAvailable){
                 tap = @"background";
             }
             [mutableUserInfo setValue:tap forKey:@"tap"];
@@ -158,8 +163,14 @@
         NSLog(@"didReceiveRemoteNotification: %@", mutableUserInfo);
         
         completionHandler(UIBackgroundFetchResultNewData);
-        [self processMessageForForegroundNotification:mutableUserInfo];
-        [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+        if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]] && isContentAvailable){
+            [FirebasePlugin.firebasePlugin _logError:@"didReceiveRemoteNotification: omitting foreground notification as content-available:1 so system notification will be shown"];
+        }else{
+            [self processMessageForForegroundNotification:mutableUserInfo];
+        }
+        if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]] || !isContentAvailable){
+            [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
+        }
     }@catch (NSException *exception) {
         [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
     }
@@ -259,10 +270,14 @@
                     [aps setValue:badge forKey:@"badge"];
                 }
                 
+                NSString* messageType = @"data";
+                if([mutableUserInfo objectForKey:@"messageType"] != nil){
+                    messageType = [mutableUserInfo objectForKey:@"messageType"];
+                }
                 
                 NSDictionary* userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
                                           @"true", @"notification_foreground",
-                                          @"data", @"messageType",
+                                          messageType, @"messageType",
                                           aps, @"aps"
                                           , nil];
                 
@@ -307,7 +322,8 @@
         }
         
 
-        NSDictionary* mutableUserInfo = [notification.request.content.userInfo mutableCopy];
+        mutableUserInfo = [notification.request.content.userInfo mutableCopy];
+        
         NSString* messageType = [mutableUserInfo objectForKey:@"messageType"];
         if(![messageType isEqualToString:@"data"]){
             [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
@@ -317,6 +333,12 @@
         NSLog(@"willPresentNotification: %@", mutableUserInfo);
         
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
+        bool isContentAvailable = [[aps objectForKey:@"content-available"] isEqualToNumber:[NSNumber numberWithInt:1]];
+        if(isContentAvailable){
+            [FirebasePlugin.firebasePlugin _logError:@"willPresentNotification: aborting as content-available:1 so system notification will be shown"];
+            return;
+        }
+        
         bool showForegroundNotification = [mutableUserInfo objectForKey:@"notification_foreground"];
         bool hasAlert = [aps objectForKey:@"alert"] != nil;
         bool hasBadge = [aps objectForKey:@"badge"] != nil;
@@ -368,7 +390,7 @@
             return;
         }
 
-        NSDictionary *mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
+        mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
         
         NSString* tap;
         if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]]){

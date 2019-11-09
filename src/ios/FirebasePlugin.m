@@ -16,6 +16,7 @@
 
 @synthesize notificationCallbackId;
 @synthesize tokenRefreshCallbackId;
+@synthesize apnsTokenRefreshCallbackId;
 @synthesize notificationStack;
 @synthesize traces;
 
@@ -78,21 +79,22 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)getAPNSToken:(CDVInvokedUrlCommand *)command {
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[self getAPNSToken]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (NSString *)getAPNSToken {
+    NSString* hexToken = nil;
     NSData* apnsToken = [FIRMessaging messaging].APNSToken;
-    CDVPluginResult *pluginResult;
     if (apnsToken) {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 130000
         // [deviceToken description] Starting with iOS 13 device token is like "{length = 32, bytes = 0xd3d997af 967d1f43 b405374a 13394d2f ... 28f10282 14af515f }"
-        NSString* hexToken = [self hexadecimalStringFromData:apnsToken];
+        hexToken = [self hexadecimalStringFromData:apnsToken];
 #else
-        NSString* hexToken = [[apnsToken.description componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet]invertedSet]]componentsJoinedByString:@""];
+        hexToken = [[apnsToken.description componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet]invertedSet]]componentsJoinedByString:@""];
 #endif
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:hexToken];
-    } else {
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:nil];
     }
-    
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    return hexToken;
 }
 
 - (NSString *)hexadecimalStringFromData:(NSData *)data
@@ -198,10 +200,6 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand *)command {
-    [self getVerificationID:command];
-}
-
-- (void)getVerificationID:(CDVInvokedUrlCommand *)command {
     NSString* number = [command.arguments objectAtIndex:0];
 
     @try {
@@ -212,25 +210,107 @@ static BOOL registeredForRemoteNotifications = NO;
 
             @try {
                 NSDictionary *message;
+                CDVPluginResult* pluginResult;
                 if (error) {
                     // Verification code not sent.
                     message = @{
                         @"code": [NSNumber numberWithInteger:error.code],
                         @"description": error.description == nil ? [NSNull null] : error.description
                     };
-
-                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
-
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
                 } else {
                     // Successful.
-                    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:verificationID];
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                    [result setValue:@"false" forKey:@"instantVerification"];
+                    [result setValue:@"false" forKey:@"verified"];
+                    [result setValue:verificationID forKey:@"verificationId"];
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
                 }
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithContext:exception :command];
             }
         }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)signInWithCredential:(CDVInvokedUrlCommand*)command {
+    NSString* verificationId = [command.arguments objectAtIndex:0];
+    NSString* code = [command.arguments objectAtIndex:1];
+
+    @try {
+        FIRAuthCredential* credential = [[FIRPhoneAuthProvider provider]
+        credentialWithVerificationID:verificationId
+                    verificationCode:code];
+        
+        [[FIRAuth auth] signInWithCredential:credential
+                                  completion:^(FIRAuthDataResult * _Nullable authResult,
+                                               NSError * _Nullable error) {
+            @try {
+                CDVPluginResult* pluginResult;
+              if (error) {
+                NSDictionary *message = @{
+                    @"code": [NSNumber numberWithInteger:error.code],
+                    @"description": error.description == nil ? [NSNull null] : error.description
+                };
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else if (authResult == nil) {
+                  NSDictionary *message = @{
+                      @"code": [NSNumber numberWithInteger:999],
+                      @"description": @"User not signed in"
+                  };
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else{
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+              }
+              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+        
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command {
+    NSString* verificationId = [command.arguments objectAtIndex:0];
+    NSString* code = [command.arguments objectAtIndex:1];
+
+    @try {
+        FIRAuthCredential* credential = [[FIRPhoneAuthProvider provider]
+        credentialWithVerificationID:verificationId
+                    verificationCode:code];
+        
+        [[FIRAuth auth].currentUser linkWithCredential:credential
+                                  completion:^(FIRAuthDataResult * _Nullable authResult,
+                                               NSError * _Nullable error) {
+            @try {
+                CDVPluginResult* pluginResult;
+              if (error) {
+                NSDictionary *message = @{
+                    @"code": [NSNumber numberWithInteger:error.code],
+                    @"description": error.description == nil ? [NSNull null] : error.description
+                };
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else if (authResult == nil) {
+                  NSDictionary *message = @{
+                      @"code": [NSNumber numberWithInteger:999],
+                      @"description": @"User not signed in"
+                  };
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:message];
+              }else{
+                  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+              }
+              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+        
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
@@ -308,6 +388,42 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)setAutoInitEnabled:(CDVInvokedUrlCommand *)command {
+    @try {
+        bool enabled = [[command.arguments objectAtIndex:0] boolValue];
+        [self runOnMainThread:^{
+            @try {
+                [FIRMessaging messaging].autoInitEnabled = enabled;
+
+                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }@catch (NSException *exception) {
+                [self handlePluginExceptionWithContext:exception :command];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)isAutoInitEnabled:(CDVInvokedUrlCommand *)command {
+    @try {
+
+        [self runOnMainThread:^{
+            @try {
+                 bool enabled =[FIRMessaging messaging].isAutoInitEnabled;
+
+                 CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:enabled];
+                 [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+            }@catch (NSException *exception) {
+                [self handlePluginExceptionWithContext:exception :command];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)onMessageReceived:(CDVInvokedUrlCommand *)command {
     @try {
         self.notificationCallbackId = command.callbackId;
@@ -341,6 +457,18 @@ static BOOL registeredForRemoteNotifications = NO;
                 [self handlePluginExceptionWithContext:exception :command];
             }
         }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)onApnsTokenReceived:(CDVInvokedUrlCommand *)command {
+    self.apnsTokenRefreshCallbackId = command.callbackId;
+    @try {
+        NSString* apnsToken = [self getAPNSToken];
+        if(apnsToken != nil){
+            [self sendApnsToken:apnsToken];
+        }
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
@@ -381,18 +509,23 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)sendApnsToken:(NSString *)token {
+    @try {
+        if (self.apnsTokenRefreshCallbackId != nil) {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
+            [pluginResult setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.apnsTokenRefreshCallbackId];
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :self.commandDelegate];
+    }
+}
+
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* name = [command.arguments objectAtIndex:0];
-            NSDictionary *parameters;
-            @try {
-                NSString *description = NSLocalizedString([command argumentAtIndex:1 withDefault:@"No Message Provided"], nil);
-                parameters = @{ NSLocalizedDescriptionKey: description };
-            }
-            @catch (NSException *execption) {
-                parameters = [command argumentAtIndex:1];
-            }
+            NSDictionary *parameters = [command argumentAtIndex:1];
 
             [FIRAnalytics logEventWithName:name parameters:parameters];
 
@@ -407,26 +540,38 @@ static BOOL registeredForRemoteNotifications = NO;
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
-        NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] init];
+        
         CDVCommandStatus status = CDVCommandStatus_OK;
-
         @try {
             // We can optionally be passed a stack trace from stackTrace.js which we'll put in userInfo.
             if ([command.arguments count] > 1) {
-                NSArray *stack = [command.arguments objectAtIndex:1];
-                int lineNum = 1;
-                for (NSDictionary *entry in stack) {
-                    NSString *key = [NSString stringWithFormat:@"Stack_line_%02d", lineNum++];
-                    userInfo[key] = entry[@"source"];
+                NSArray* stackFrames = [command.arguments objectAtIndex:1];
+                
+                NSString* message = errorMessage;
+                NSString* name = @"Uncaught Javascript exception";
+                NSMutableArray *customFrames = [[NSMutableArray alloc] init];
+                
+                for (NSDictionary* stackFrame in stackFrames) {
+                    CLSStackFrame *customFrame = [CLSStackFrame stackFrame];
+                    [customFrame setSymbol:stackFrame[@"functionName"]];
+                    [customFrame setFileName:stackFrame[@"fileName"]];
+                    [customFrame setLibrary:stackFrame[@"source"]];
+                    [customFrame setOffset:(uint64_t) [stackFrame[@"columnNumber"] intValue]];
+                    [customFrame setLineNumber:(uint32_t) [stackFrame[@"lineNumber"] intValue]];
+                    [customFrames addObject:customFrame];
                 }
+                [[Crashlytics sharedInstance] recordCustomExceptionName:name reason:message frameArray:customFrames];
+            }else{
+                //TODO detect and handle non-stack userInfo and pass to recordError
+                NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] init];
+                NSError *error = [NSError errorWithDomain:errorMessage code:0 userInfo:userInfo];
+                [CrashlyticsKit recordError:error];
             }
         } @catch (NSException *exception) {
             CLSNSLog(@"Exception in logError: %@, original error: %@", exception.description, errorMessage);
             status = CDVCommandStatus_ERROR;
         }
-
-        NSError *error = [NSError errorWithDomain:errorMessage code:0 userInfo:userInfo];
-        [CrashlyticsKit recordError:error];
+        
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:status];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];

@@ -15,10 +15,9 @@ module.exports = {
     /**
      * Used to get the path to the XCode project's .pbxproj file.
      */
-    getXcodeProjectPath: function (cb) {
-        utilities.getAppName(function(appName){
-            cb(path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj"));
-        });
+    getXcodeProjectPath: function () {
+        var appName = utilities.getAppName();
+        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
     },
 
     /**
@@ -201,6 +200,26 @@ module.exports = {
         if(typeof pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== 'undefined'){
             googlePlist["FIREBASE_CRASHLYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
             googlePlistModified = true;
+        }
+        if(pluginVariables['SETUP_RECAPTCHA_VERIFICATION'] === 'true'){
+            var reversedClientId = googlePlist['REVERSED_CLIENT_ID'];
+
+            if(!appPlist['CFBundleURLTypes']) appPlist['CFBundleURLTypes'] = [];
+            var entry, i;
+            for(i=0; i<appPlist['CFBundleURLTypes'].length; i++){
+                if(typeof appPlist['CFBundleURLTypes'][i] === 'object' && appPlist['CFBundleURLTypes'][i]['CFBundleURLSchemes']){
+                    entry = appPlist['CFBundleURLTypes'][i];
+                    break;
+                }
+            }
+            if(!entry) entry = {};
+            if(!entry['CFBundleTypeRole']) entry['CFBundleTypeRole'] = 'Editor';
+            if(!entry['CFBundleURLSchemes']) entry['CFBundleURLSchemes'] = [];
+            if(entry['CFBundleURLSchemes'].indexOf(reversedClientId) === -1){
+                entry['CFBundleURLSchemes'].push(reversedClientId)
+            }
+            appPlist['CFBundleURLTypes'][i] = entry;
+            appPlistModified = true;
         }
 
         if(googlePlistModified) fs.writeFileSync(googlePlistPath, plist.build(googlePlist));

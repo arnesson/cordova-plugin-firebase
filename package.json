@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-firebasex",
-  "version": "6.1.0",
+  "version": "7.0.0",
   "description": "Cordova plugin for Google Firebase",
   "types": "./types/index.d.ts",
   "author": {
@@ -35,9 +35,8 @@
     "test:android": "bash ./test/test-default.sh 9.0.0 android 8.1.0 && bash ./test/test-with-3-plugins.sh 9.0.0 android 8.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release"
   },
   "dependencies": {
+    "plist": "^3.0.1",
     "xcode": "^2.0.0",
-    "xml2js": "^0.4.16",
-    "q": "^1.5.1",
-    "plist": "^3.0.1"
+    "xml-js": "^1.6.11"
   }
 }
