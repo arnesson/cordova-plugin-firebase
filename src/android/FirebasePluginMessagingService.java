@@ -80,6 +80,10 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 return;
             }
 
+            if(FirebasePlugin.applicationContext == null){
+                FirebasePlugin.applicationContext = this.getApplicationContext();
+            }
+
             // TODO(developer): Handle FCM messages here.
             // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
             String messageType;

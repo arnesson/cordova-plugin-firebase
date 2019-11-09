@@ -70,7 +70,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static FirebasePlugin instance = null;
     private FirebaseAnalytics mFirebaseAnalytics;
     private static CordovaInterface cordovaInterface = null;
-    private static Context applicationContext = null;
+    protected static Context applicationContext = null;
     private static Activity cordovaActivity = null;
     protected static final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
@@ -299,7 +299,7 @@ public class FirebasePlugin extends CordovaPlugin {
         FirebasePlugin.notificationCallbackContext = callbackContext;
         if (FirebasePlugin.notificationStack != null) {
             for (Bundle bundle : FirebasePlugin.notificationStack) {
-                FirebasePlugin.sendMessage(bundle, cordovaActivity.getApplicationContext());
+                FirebasePlugin.sendMessage(bundle, applicationContext);
             }
             FirebasePlugin.notificationStack.clear();
         }
@@ -416,6 +416,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void hasPermission(final CallbackContext callbackContext) {
+        if(cordovaActivity == null) return;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -1103,7 +1104,7 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    NotificationManager nm = (NotificationManager) cordovaActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationManager nm = (NotificationManager) applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
                     nm.cancelAll();
                     callbackContext.success();
                 } catch (Exception e) {
@@ -1137,7 +1138,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 deleteChannel(id);
             }
 
-            NotificationManager nm = (NotificationManager) cordovaActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager nm = (NotificationManager) applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
             String packageName = cordovaActivity.getPackageName();
 
             String name = options.optString("name", "");
@@ -1269,7 +1270,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static void deleteChannel(final String channelID){
         // only call on Android O and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = (NotificationManager) cordovaActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager nm = (NotificationManager) applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.deleteNotificationChannel(channelID);
         }
     }
@@ -1300,7 +1301,7 @@ public class FirebasePlugin extends CordovaPlugin {
         List<NotificationChannel> notificationChannels = null;
         // only call on Android O and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = (NotificationManager) cordovaActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager nm = (NotificationManager) applicationContext.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationChannels = nm.getNotificationChannels();
         }
         return notificationChannels;
@@ -1312,7 +1313,7 @@ public class FirebasePlugin extends CordovaPlugin {
             List<NotificationChannel> notificationChannels = FirebasePlugin.listChannels();
             if(notificationChannels != null){
                 for (NotificationChannel notificationChannel : notificationChannels) {
-                    if(notificationChannel.getId() == channelId){
+                    if(notificationChannel.getId().equals(channelId)){
                         exists = true;
                     }
                 }
