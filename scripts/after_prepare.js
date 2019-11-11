@@ -45,8 +45,8 @@ var PLATFORM = {
 
 var parsePluginVariables = function(){
     var config = Utilities.parseConfigXml();
-    (config.widget.plugin || []).forEach(function(plugin){
-        (plugin.variable || []).forEach(function(variable){
+    (config.widget.plugin ? [].concat(config.widget.plugin) : []).forEach(function(plugin){
+        (plugin.variable ? [].concat(plugin.variable) : []).forEach(function(variable){
             if((plugin._attributes.name === PLUGIN_ID || plugin._attributes.id === PLUGIN_ID) && variable._attributes.name && variable._attributes.value){
                 pluginVariables[variable._attributes.name] = variable._attributes.value;
             }
