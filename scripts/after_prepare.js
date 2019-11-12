@@ -44,6 +44,22 @@ var PLATFORM = {
 
 
 var parsePluginVariables = function(){
+    // Parse plugin.xml
+    var plugin = Utilities.parsePluginXml();
+    var prefs = [];
+    if(plugin.plugin.preference){
+        prefs = prefs.concat(plugin.plugin.preference);
+    }
+    plugin.plugin.platform.forEach(function(platform){
+        if(platform.preference){
+            prefs = prefs.concat(platform.preference);
+        }
+    });
+    prefs.forEach(function(pref){
+        pluginVariables[pref._attributes.name] = pref._attributes.default;
+    });
+
+    // Parse config.xml
     var config = Utilities.parseConfigXml();
     (config.widget.plugin ? [].concat(config.widget.plugin) : []).forEach(function(plugin){
         (plugin.variable ? [].concat(plugin.variable) : []).forEach(function(variable){
@@ -53,6 +69,7 @@ var parsePluginVariables = function(){
         });
     });
 
+    // Parse package.json
     var packageJSON = Utilities.parsePackageJson();
     if(packageJSON.cordova && packageJSON.cordova.plugins){
         for(const pluginId in packageJSON.cordova.plugins){

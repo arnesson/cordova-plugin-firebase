@@ -5,7 +5,7 @@ var fs = require('fs');
 var path = require("path");
 var parser = require('xml-js');
 
-var _configXml;
+var _configXml, _pluginXml;
 
 var Utilities = {};
 
@@ -29,6 +29,12 @@ Utilities.parseConfigXml = function(){
     if(_configXml) return _configXml;
     _configXml = Utilities.parseXmlFileToJson("config.xml");
     return _configXml;
+};
+
+Utilities.parsePluginXml = function(){
+    if(_pluginXml) return _pluginXml;
+    _pluginXml = Utilities.parseXmlFileToJson("plugins/"+Utilities.getPluginId()+"/plugin.xml");
+    return _pluginXml;
 };
 
 Utilities.parseXmlFileToJson = function(filepath, parseOpts){
