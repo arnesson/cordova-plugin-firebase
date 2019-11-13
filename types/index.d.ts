@@ -23,6 +23,15 @@ interface FirebasePlugin {
     clearAllNotifications(): void
     subscribe(topic: string): void
     unsubscribe(topic: string): void
+    isAutoInitEnabled(
+        success: (enabled: boolean) => void,
+        error?: (err: string) => void
+    ): void
+    setAutoInitEnabled(
+        enabled: boolean,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
     createChannel(channel: IChannelOptions, success: () => void, error: (err: string) => void): void
     setDefaultChannel(channel: IChannelOptions, success: () => void, error: (err: string) => void): void
     deleteChannel(channel: string, success: () => void, error: (err: string) => void): void
@@ -36,12 +45,30 @@ interface FirebasePlugin {
     setCrashlyticsUserId(userId: string): void
     sendCrash(): void
     logMessage(message: string): void
-    logError(errorMessage: string): void
+    logError(
+        errorMessage: string,
+        stackTrace?: object,
+        success?: () => void,
+        error?: (err: string) => void
+    )
     verifyPhoneNumber(
+        success: (value: object) => void,
+        error: (err: string) => void,
         phoneNumber: string,
         timeOutDuration: number,
-        success: (value: string | object) => void,
-        error: (err: string) => void
+        fakeVerificationCode?: string
+    ): void
+    signInWithCredential(
+        verificationId: string,
+        code: string,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
+    linkUserWithCredential(
+        verificationId: string,
+        code: string,
+        success?: () => void,
+        error?: (err: string) => void
     ): void
     fetch(cacheExpirationSeconds: number, success: () => void, error: (err: string) => void): void
     fetch(success: () => void, error: (err: string) => void): void
@@ -56,4 +83,4 @@ interface FirebasePlugin {
     incrementCounter(name: string, counterName: string, success: () => void, error: (err: string) => void): void
     stopTrace(name: string): void
 }
-declare var FirebasePlugin: FirebasePlugin; 
+declare var FirebasePlugin: FirebasePlugin;
