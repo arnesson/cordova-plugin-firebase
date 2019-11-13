@@ -138,7 +138,9 @@ module.exports = function (context) {
             Utilities.writeJsonToXmlFile($colorsXml, PLATFORM.ANDROID.colorsXml.target);
             Utilities.log('Updated colors.xml with accent color');
         }
-    }else if (platforms.indexOf('ios') !== -1 && Utilities.directoryExists(IOS_DIR)){
+    }
+
+    if (platforms.indexOf('ios') !== -1 && Utilities.directoryExists(IOS_DIR)){
         Utilities.log('Preparing Firebase on iOS');
         Utilities.copyKey(PLATFORM.IOS);
 
