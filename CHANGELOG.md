@@ -1,3 +1,15 @@
+# Version 7.0.1
+* (Android) Replace references to cordovaActivity with applicationContext when app is not running and therefore cordovaActivity doesn't exist. 
+Resolves [#165](https://github.com/dpa99c/cordova-plugin-firebasex/issues/165).
+* Fix .forEach is not a function.
+Merged from PR [#219](https://github.com/dpa99c/cordova-plugin-firebasex/pull/219).
+Resolves [#213](https://github.com/dpa99c/cordova-plugin-firebasex/issues/213).
+* (Android) Parse this plugin's `plugin.xml` to extract default values for plugin variables not explicitly set at plugin install time.
+Fixes [#218](https://github.com/dpa99c/cordova-plugin-firebasex/issues/218).
+* (iOS) Fix after_prepare hook to run on multiple platforms so if they are added in one operation using `cordova prepare`, both platforms are processed.
+Fixes [#221](https://github.com/dpa99c/cordova-plugin-firebasex/issues/221).
+* (Typedef) Update the typedef for recent plugin API changes.
+
 # Version 7.0.0
 * (iOS) Update Firebase SDK to [v6.11.0 released 22 Oct 2019](https://firebase.google.com/support/release-notes/ios#version_6110_-_october_22_2019)
 * (Android) Update pinned Firebase SDK versions to latest as of [25 Oct 2019](https://firebase.google.com/support/release-notes/android#2019-10-25)
