@@ -1258,7 +1258,7 @@ var channel  = {
     light: true,
     
     //LED color in ARGB format - this example BLUE color. If set to -1, light color will be default. Default value: -1.
-    lightColor: "0xFF0000FF",
+    lightColor: parseInt("FF0000FF", 16).toString(),
     
     //Importance - integer from 0 to 4. Default value: 4
     //0 - none - no sound, does not show in the shade
@@ -1329,7 +1329,7 @@ var channel = {
   sound: "ringtone",
   vibration: [500, 200, 500],
   light: true,
-  lightColor: "0xFF0000FF",
+  lightColor: parseInt("FF0000FF", 16).toString(),
   importance: 4,
   badge: false,
   visibility: -1
