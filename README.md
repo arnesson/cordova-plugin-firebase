@@ -1,9 +1,7 @@
 cordova-plugin-firebasex [![Latest Stable Version](https://img.shields.io/npm/v/cordova-plugin-firebasex.svg)](https://www.npmjs.com/package/cordova-plugin-firebasex) [![Total Downloads](https://img.shields.io/npm/dt/cordova-plugin-firebasex.svg)](https://npm-stat.com/charts.html?package=cordova-plugin-firebasex)
 ========================
 
-This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been rework to fix issues and add new functionality.
-
-It brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project.
+Brings push notifications, analytics, event tracking, crash reporting and more from Google Firebase to your Cordova project.
 
 Supported platforms: Android and iOS
 
@@ -169,6 +167,7 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - cordova-ios: `>= 5`
 
 ### Migrating from cordova-plugin-firebase
+This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been reworked to fix issues and add new functionality.
 If you already have [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) installed in your Cordova project, you need to completely remove it before installing this plugin otherwise they will conflict and cause build errors in your project. The safest way of doing this is as follows:
 
     rm -Rf platforms/android
