@@ -8,6 +8,7 @@
  * Credits: https://github.com/arnesson.
  */
 var fs = require('fs');
+var path = require("path");
 var Utilities = require("./lib/utilities");
 
 var appName = Utilities.getAppName();
@@ -94,8 +95,8 @@ module.exports = function (context) {
         Utilities.log('Preparing Firebase on Android');
         Utilities.copyKey(PLATFORM.ANDROID);
 
-        if(!fs.existsSync(PLATFORM.ANDROID.colorsXml.target)){
-            fs.copyFileSync(PLATFORM.ANDROID.colorsXml.src, PLATFORM.ANDROID.colorsXml.target);
+        if(!fs.existsSync(path.resolve(PLATFORM.ANDROID.colorsXml.target))){
+            fs.copyFileSync(path.resolve(PLATFORM.ANDROID.colorsXml.src), path.resolve(PLATFORM.ANDROID.colorsXml.target));
         }
 
         const $colorsXml = Utilities.parseXmlFileToJson(PLATFORM.ANDROID.colorsXml.target, {compact: true});

@@ -72,7 +72,7 @@ module.exports = {
         }
 
         // Finally, write the .pbxproj back out to disk.
-        fs.writeFileSync(xcodeProjectPath, xcodeProject.writeSync());
+        fs.writeFileSync(path.resolve(xcodeProjectPath), xcodeProject.writeSync());
     },
 
     /**
@@ -133,7 +133,7 @@ module.exports = {
         }
 
         // Finally, write the .pbxproj back out to disk.
-        fs.writeFileSync(xcodeProjectPath, xcodeProject.writeSync());
+        fs.writeFileSync(path.resolve(xcodeProjectPath), xcodeProject.writeSync());
     },
 
     ensureRunpathSearchPath: function(context, xcodeProjectPath){
@@ -165,11 +165,11 @@ module.exports = {
         addRunpathSearchBuildProperty(xcodeProject, "Release");
 
         // Finally, write the .pbxproj back out to disk.
-        fs.writeFileSync(xcodeProjectPath, xcodeProject.writeSync());
+        fs.writeFileSync(path.resolve(xcodeProjectPath), xcodeProject.writeSync());
     },
     stripDebugSymbols: function(){
         var podFilePath = 'platforms/ios/Podfile',
-            podFile = fs.readFileSync(podFilePath).toString();
+            podFile = fs.readFileSync(path.resolve(podFilePath)).toString();
         if(!podFile.match('DEBUG_INFORMATION_FORMAT')){
             podFile += "\npost_install do |installer|\n" +
                 "    installer.pods_project.targets.each do |target|\n" +
@@ -178,13 +178,13 @@ module.exports = {
                 "        end\n" +
                 "    end\n" +
                 "end";
-            fs.writeFileSync(podFilePath, podFile);
+            fs.writeFileSync(path.resolve(podFilePath), podFile);
             console.log('cordova-plugin-firebasex: Applied IOS_STRIP_DEBUG to Podfile');
         }
     },
     applyPluginVarsToPlists: function(googlePlistPath, appPlistPath, pluginVariables){
-        var googlePlist = plist.parse(fs.readFileSync(googlePlistPath, 'utf8')),
-            appPlist = plist.parse(fs.readFileSync(appPlistPath, 'utf8')),
+        var googlePlist = plist.parse(fs.readFileSync(path.resolve(googlePlistPath), 'utf8')),
+            appPlist = plist.parse(fs.readFileSync(path.resolve(appPlistPath), 'utf8')),
             googlePlistModified = false,
             appPlistModified = false;
 
@@ -222,7 +222,7 @@ module.exports = {
             appPlistModified = true;
         }
 
-        if(googlePlistModified) fs.writeFileSync(googlePlistPath, plist.build(googlePlist));
-        if(appPlistModified) fs.writeFileSync(appPlistPath, plist.build(appPlist));
+        if(googlePlistModified) fs.writeFileSync(path.resolve(googlePlistPath), plist.build(googlePlist));
+        if(appPlistModified) fs.writeFileSync(path.resolve(appPlistPath), plist.build(appPlist));
     }
 };
