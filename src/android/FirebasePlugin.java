@@ -527,7 +527,7 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void logError(final CallbackContext callbackContext, final JSONArray args) throws JSONException {
-        String message = args.getString(0);
+        final String message = args.getString(0);
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -908,7 +908,7 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
-    public void signInWithCredential(final CallbackContext callbackContext, JSONArray args){
+    public void signInWithCredential(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
@@ -940,7 +940,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    public void linkUserWithCredential(final CallbackContext callbackContext, JSONArray args){
+    public void linkUserWithCredential(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
