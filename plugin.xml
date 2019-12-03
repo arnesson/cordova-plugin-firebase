@@ -117,11 +117,11 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="Firebase/Core" spec="6.11.0"/>
-				<pod name="Firebase/Auth" spec="6.11.0"/>
-				<pod name="Firebase/Messaging" spec="6.11.0"/>
-				<pod name="Firebase/Performance" spec="6.11.0"/>
-				<pod name="Firebase/RemoteConfig" spec="6.11.0"/>
+				<pod name="Firebase/Core" spec="6.13.0"/>
+				<pod name="Firebase/Auth" spec="6.13.0"/>
+				<pod name="Firebase/Messaging" spec="6.13.0"/>
+				<pod name="Firebase/Performance" spec="6.13.0"/>
+				<pod name="Firebase/RemoteConfig" spec="6.13.0"/>
 				<pod name="Fabric" spec="1.10.2"/>
 				<pod name="Crashlytics" spec="3.14.0"/>
 			</pods>
