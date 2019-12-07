@@ -1598,12 +1598,14 @@ Requests verification of a phone number in order to authenticate a user and sign
 
 **NOTE: This will only work on physical devices with a SIM card (not iOS Simulator or Android Emulator)**
 
+
 In response to your request, you'll receive a verification ID which you can use in conjunction with the verification code to sign the user in.
 
-On iOS and some Android devices, the user will receive and SMS containing the verification code which they must manually enter into your app.
+On iOS and most Android devices, the user will receive an SMS containing a verification code which they must manually enter into your app.
+This can be used, along with the accompanying verification ID, to sign the user in or link the user account to an existing Firebase user account. 
 
-Some Android devices support "instant verfication", in which case an SMS will not be send and you will be returned the verification code along with the verification ID.
-In this case, the user doesn't need to do anything in order for you to sign them in.  
+Some Android devices support "instant verification", in which case an SMS will not be sent.
+In this case, the user doesn't need to do anything in order for you to sign them in and you don't need to provide any additional credentials in order to sign the user in or link the user account to an existing Firebase user account.
 
 **Parameters**:
 - {function} success - callback function to pass {object} credentials to as an argument
@@ -1614,12 +1616,13 @@ In this case, the user doesn't need to do anything in order for you to sign them
     - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
 The success callback will be passed a credential object with the following properties:
-- instantVerification {boolean} - true if the Android device supports instant verification, in which case the verification code will be included in the credential object.
+- {boolean} instantVerification - true if the Android device used instant verification to verify the user.
 If this is false, the device will be sent an SMS containing the verification code for the user to manually enter into your app.
 Always false on iOS.
-- verificationId {string} - the verification ID you'll need to pass along with the verification code to sign the user in.
-Always returned on both Android & iOS.
-- code {string} - verification code. Will only be present if `instantVerification` is true. Always undefined on iOS.
+- {string} id - the identifier of a native credential object which can be used for signing in the user.
+Will only be present if `instantVerification` is `true`.
+- {string} verificationId - the verification ID to be passed along with the verification code sent via SMS to sign the user in.
+Will only be present if `instantVerification` is `false`.
 
 Example usage:
 
@@ -1627,24 +1630,24 @@ Example usage:
 var number = '+441234567890';
 var timeOutDuration = 60;
 var fakeVerificationCode = '123456';
-var verificationId;
+
 window.FirebasePlugin.verifyPhoneNumber(function(credential) {
 
-    verificationId = credential.verificationId;
     if(credential.instantVerification){
-        signInWithCredential(credential.code);
+        signInWithCredential(credential);
     }else{
         promptUserToInputCode() // you need to implement this
             .then(function(userEnteredCode){
-               signInWithCredential(userEnteredCode); 
+                credential.code = userEnteredCode; // set the user-entered verification code on the credential object
+                signInWithCredential(credential); 
             });
     }
 }, function(error) {
     console.error("Failed to verify phone number: " + JSON.stringify(error));
 }, number, timeOutDuration, fakeVerificationCode);
 
-function signInWithCredential(code){
-    FirebasePlugin.signInWithCredential(verificationId, code, function() {
+function signInWithCredential(credential){
+    FirebasePlugin.signInWithCredential(credential, function() {
         console.log("Successfully signed in");
     }, function(error) {
         console.error("Failed to sign in", error);
@@ -1675,8 +1678,14 @@ Signs the user into Firebase with credentials obtained using `verifyPhoneNumber(
 See the [Android-](https://firebase.google.com/docs/auth/android/phone-auth#sign-in-the-user) and [iOS](https://firebase.google.com/docs/auth/ios/phone-auth#sign-in-the-user-with-the-verification-code)-specific Firebase documentation for more info.
 
 **Parameters**:
-- {string} verificationId - the verification ID returned in the credentials object to the `verifyPhoneNumber()` success callback.
-- {string} code - the activation code, either returned in the credentials object to the `verifyPhoneNumber()` success callback if using Instant Verification on Android, or the activation code as entered by the user from the received SMS message. 
+- {object} credential - a credential object returned to the `verifyPhoneNumber()` success callback; has the following keys:
+    - {boolean} instantVerification - true if the Android device used instant verification to verify the user. 
+    If true, you do not need to provide a user-entered verification code as no SMS will be sent.
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+    Will only be present if `instantVerification` is `true`.
+    - {string} verificationId - the verification ID to accompany the user-entered verification code from the SMS.
+    Only present if `instantVerification` is `false`.
+    - {string} code - if `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message. 
 - {function} success - callback function to call on successful sign-in using credentials
 - {function} error - callback function which will be passed a {string} error message as an argument
 
@@ -1686,24 +1695,24 @@ Example usage:
 var number = '+441234567890';
 var timeOutDuration = 60;
 var fakeVerificationCode = '123456';
-var verificationId;
+
 window.FirebasePlugin.verifyPhoneNumber(function(credential) {
 
-    verificationId = credential.verificationId;
     if(credential.instantVerification){
-        signInWithCredential(credential.code);
+        signInWithCredential(credential);
     }else{
         promptUserToInputCode() // you need to implement this
             .then(function(userEnteredCode){
-               signInWithCredential(userEnteredCode); 
+                credential.code = userEnteredCode; // set the user-entered verification code on the credential object
+                signInWithCredential(credential); 
             });
     }
 }, function(error) {
     console.error("Failed to verify phone number: " + JSON.stringify(error));
 }, number, timeOutDuration, fakeVerificationCode);
 
-function signInWithCredential(code){
-    FirebasePlugin.signInWithCredential(verificationId, code, function() {
+function signInWithCredential(credential){
+    FirebasePlugin.signInWithCredential(credential, function() {
         console.log("Successfully signed in");
     }, function(error) {
         console.error("Failed to sign in", error);
@@ -1716,8 +1725,14 @@ Links the user account to an existing Firebase user account with credentials obt
 See the [Android-](https://firebase.google.com/docs/auth/android/account-linking) and [iOS](https://firebase.google.com/docs/auth/ios/account-linking)-specific Firebase documentation for more info.
 
 **Parameters**:
-- {string} verificationId - the verification ID returned in the credentials object to the `verifyPhoneNumber()` success callback.
-- {string} code - the activation code, either returned in the credentials object to the `verifyPhoneNumber()` success callback if using Instant Verification on Android, or the activation code as entered by the user from the received SMS message. 
+- {object} credential - a credential object returned to the `verifyPhoneNumber()` success callback; has the following keys:
+    - {boolean} instantVerification - true if the Android device used instant verification to verify the user. 
+    If true, you do not need to provide a user-entered verification code as no SMS will be sent.
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+    Will only be present if `instantVerification` is `true`.
+    - {string} verificationId - the verification ID to accompany the user-entered verification code from the SMS.
+    Only present if `instantVerification` is `false`.
+    - {string} code - if `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message. 
 - {function} success - callback function to call on successful linking using credentials
 - {function} error - callback function which will be passed a {string} error message as an argument
 
@@ -1727,24 +1742,24 @@ Example usage:
 var number = '+441234567890';
 var timeOutDuration = 60;
 var fakeVerificationCode = '123456';
-var verificationId;
+
 window.FirebasePlugin.verifyPhoneNumber(function(credential) {
 
-    verificationId = credential.verificationId;
     if(credential.instantVerification){
-        linkUserWithCredential(credential.code);
+        linkUserWithCredential(credential);
     }else{
         promptUserToInputCode() // you need to implement this
             .then(function(userEnteredCode){
-               linkUserWithCredential(userEnteredCode); 
+                credential.code = userEnteredCode; // set the user-entered verification code on the credential object
+                linkUserWithCredential(credential); 
             });
     }
 }, function(error) {
     console.error("Failed to verify phone number: " + JSON.stringify(error));
 }, number, timeOutDuration, fakeVerificationCode);
 
-function linkUserWithCredential(code){
-    FirebasePlugin.linkUserWithCredential(verificationId, code, function() {
+function linkUserWithCredential(credential){
+    FirebasePlugin.linkUserWithCredential(credential, function() {
         console.log("Successfully linked");
     }, function(error) {
         console.error("Failed to link", error);

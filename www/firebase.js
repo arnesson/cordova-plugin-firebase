@@ -204,10 +204,10 @@ exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, f
     exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
 };
 
-exports.signInWithCredential = function (verificationId, code, success, error) {
-    exec(success, error, "FirebasePlugin", "signInWithCredential", [verificationId, code]);
+exports.signInWithCredential = function (credential, success, error) {
+    exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);
 };
 
-exports.linkUserWithCredential = function (verificationId, code, success, error) {
-    exec(success, error, "FirebasePlugin", "linkUserWithCredential", [verificationId, code]);
+exports.linkUserWithCredential = function (credential, success, error) {
+    exec(success, error, "FirebasePlugin", "linkUserWithCredential", [credential]);
 };

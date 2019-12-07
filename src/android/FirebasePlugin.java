@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.List;
 
@@ -83,6 +85,8 @@ public class FirebasePlugin extends CordovaPlugin {
     private static NotificationChannel defaultNotificationChannel = null;
     public static String defaultChannelId = null;
     public static String defaultChannelName = null;
+
+    private Map<String, AuthCredential> authCredentials = new HashMap<String, AuthCredential>();
 
     @Override
     protected void pluginInitialize() {
@@ -810,24 +814,12 @@ public class FirebasePlugin extends CordovaPlugin {
                             //     user action.
                             Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted");
 
+                            String id = FirebasePlugin.instance.saveAuthCredential((AuthCredential) credential);
+
                             JSONObject returnResults = new JSONObject();
                             try {
-                                String verificationId = null;
-                                String code = null;
-
-                                Field[] fields = credential.getClass().getDeclaredFields();
-                                for (Field field : fields) {
-                                    Class type = field.getType();
-                                    if(type == String.class){
-                                        String value = getPrivateField(credential, field);
-                                        if(value == null) continue;
-                                        if(value.length() > 100) verificationId = value;
-                                        else if(value.length() >= 4 && value.length() <= 6) code = value;
-                                    }
-                                }
-                                returnResults.put("verificationId", verificationId);
-                                returnResults.put("code", code);
                                 returnResults.put("instantVerification", true);
+                                returnResults.put("id", id);
                             } catch(JSONException e){
                                 handleExceptionWithContext(e, callbackContext);
                                 return;
@@ -843,18 +835,16 @@ public class FirebasePlugin extends CordovaPlugin {
                             // for instance if the the phone number format is not valid.
                             Log.w(TAG, "failed: verifyPhoneNumber.onVerificationFailed ", e);
 
-                            String errorMsg = "unknown error verifying number";
-                            errorMsg += " Error instance: " + e.getClass().getName();
-
+                            String errorMsg;
                             if (e instanceof FirebaseAuthInvalidCredentialsException) {
                                 // Invalid request
                                 errorMsg = "Invalid phone number";
                             } else if (e instanceof FirebaseTooManyRequestsException) {
                                 // The SMS quota for the project has been exceeded
                                 errorMsg = "The SMS quota for the project has been exceeded";
+                            }else{
+                                errorMsg = e.getMessage();
                             }
-
-                            Crashlytics.logException(e);
                             callbackContext.error(errorMsg);
                         }
 
@@ -899,24 +889,29 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private static String getPrivateField(PhoneAuthCredential credential, Field field) {
-        try {
-            field.setAccessible(true);
-            return (String) field.get(credential);
-        } catch (IllegalAccessException e) {
-            return null;
-        }
-    }
-
     public void signInWithCredential(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    String verificationId = args.getString(0);
-                    String code = args.getString(1);
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+                    JSONObject credential = args.getJSONObject(0);
+                    AuthCredential authCredential = null;
+                    if(credential.has("verificationId") && credential.has("code")){
+                        Log.d(TAG, "signInWithCredential using specified verificationId and code");
+                        authCredential = (AuthCredential) PhoneAuthProvider.getCredential(credential.getString("verificationId"), credential.getString("code"));
+                    }else if(credential.has("id")){
+                        if(FirebasePlugin.instance.authCredentials.containsKey(credential.getString("id"))){
+                            Log.d(TAG, "signInWithCredential using existing native auth credential");
+                            authCredential = FirebasePlugin.instance.authCredentials.get(credential.getString("id"));
+                        }else{
+                            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Specified native auth credential id does not exist"));
+                            return;
+                        }
+                    }else{
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No auth credentials specified"));
+                        return;
+                    }
 
-                    FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
+                    FirebaseAuth.getInstance().signInWithCredential(authCredential).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     PluginResult pluginresult = new PluginResult(PluginResult.Status.OK);
@@ -924,7 +919,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                         String errMessage;
                                         if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                             errMessage = "Invalid verification code";
-                                        }else{
+                                        } else {
                                             errMessage = task.getException().toString();
                                         }
                                         pluginresult = new PluginResult(PluginResult.Status.ERROR, errMessage);
@@ -944,11 +939,25 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    String verificationId = args.getString(0);
-                    String code = args.getString(1);
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+                    JSONObject credential = args.getJSONObject(0);
+                    AuthCredential authCredential = null;
+                    if(credential.has("verificationId") && credential.has("code")){
+                        Log.d(TAG, "signInWithCredential using specified verificationId and code");
+                        authCredential = (AuthCredential) PhoneAuthProvider.getCredential(credential.getString("verificationId"), credential.getString("code"));
+                    }else if(credential.has("id")){
+                        if(FirebasePlugin.instance.authCredentials.containsKey(credential.getString("id"))){
+                            Log.d(TAG, "signInWithCredential using existing native auth credential");
+                            authCredential = FirebasePlugin.instance.authCredentials.get(credential.getString("id"));
+                        }else{
+                            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Specified native auth credential id does not exist"));
+                            return;
+                        }
+                    }else{
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No auth credentials specified"));
+                        return;
+                    }
 
-                    FirebaseAuth.getInstance().getCurrentUser().linkWithCredential(credential).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
+                    FirebaseAuth.getInstance().getCurrentUser().linkWithCredential(authCredential).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     PluginResult pluginresult = new PluginResult(PluginResult.Status.OK);
@@ -1357,5 +1366,12 @@ public class FirebasePlugin extends CordovaPlugin {
                 webView.loadUrl("javascript:" + jsString);
             }
         });
+    }
+
+    private String saveAuthCredential(AuthCredential authCredential){
+        Random r = new Random();
+        String id = Integer.toString(r.nextInt(1000+1));
+        this.authCredentials.put(id, authCredential);
+        return id;
     }
 }
