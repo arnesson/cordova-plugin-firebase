@@ -1,9 +1,18 @@
 var exec = require('cordova/exec');
 
-var ensureBoolean = function (callback){
+var ensureBooleanFn = function (callback){
     return function(result){
-        callback(!!result);
+        callback(ensureBoolean(result));
     }
+};
+
+var ensureBoolean = function(value){
+    if(value === "true"){
+        value = true;
+    }else if(value === "false"){
+        value = false;
+    }
+    return !!value;
 };
 
 exports.getVerificationID = function (number, success, error) {
@@ -65,11 +74,11 @@ exports.getBadgeNumber = function (success, error) {
 };
 
 exports.grantPermission = function (success, error) {
-    exec(ensureBoolean(success), error, "FirebasePlugin", "grantPermission", []);
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "grantPermission", []);
 };
 
 exports.hasPermission = function (success, error) {
-    exec(ensureBoolean(success), error, "FirebasePlugin", "hasPermission", []);
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "hasPermission", []);
 };
 
 // Notifications - Android-only
@@ -111,7 +120,7 @@ exports.setUserProperty = function (name, value, success, error) {
 };
 
 exports.activateFetched = function (success, error) {
-  exec(ensureBoolean(success), error, "FirebasePlugin", "activateFetched", []);
+  exec(ensureBooleanFn(success), error, "FirebasePlugin", "activateFetched", []);
 };
 
 exports.fetch = function (cacheExpirationSeconds, success, error) {
@@ -201,7 +210,12 @@ exports.setCrashlyticsUserId = function (userId, success, error) {
 
 // Authentication
 exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, fakeVerificationCode) {
-    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
+    exec(function(credential){
+        if(typeof credential === 'object'){
+            credential.instantVerification = ensureBoolean(credential.instantVerification);
+        }
+        success(credential);
+    }, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
 };
 
 exports.signInWithCredential = function (credential, success, error) {

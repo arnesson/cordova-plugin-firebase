@@ -25,13 +25,13 @@ static NSInteger const kNotificationStackSize = 10;
 static FirebasePlugin *firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
 
+
 + (FirebasePlugin *) firebasePlugin {
     return firebasePlugin;
 }
 
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
-    firebasePlugin = self;
     
     // Check for permission and register for remote notifications if granted
     [self _hasPermission:^(BOOL result) {}];
@@ -222,7 +222,6 @@ static BOOL registeredForRemoteNotifications = NO;
                     // Successful.
                     NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
                     [result setValue:@"false" forKey:@"instantVerification"];
-                    [result setValue:@"false" forKey:@"verified"];
                     [result setValue:verificationID forKey:@"verificationId"];
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
                 }
@@ -237,8 +236,26 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command {
-    NSString* verificationId = [command.arguments objectAtIndex:0];
-    NSString* code = [command.arguments objectAtIndex:1];
+    NSDictionary* credential = [command.arguments objectAtIndex:0];
+    if(credential == nil){
+        NSString* errMsg = @"credential object must be passed as first and only argument";
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        return;
+    }
+    
+    NSString* verificationId = [credential objectForKey:@"verificationId"];
+    if(verificationId == nil){
+        NSString* errMsg = @"verificationId key must be specified as a string value in the credential object";
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        return;
+    }
+    
+    NSString* code = [credential objectForKey:@"code"];
+    if(code == nil){
+        NSString* errMsg = @"code key must be specified as a string value in the credential object";
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        return;
+    }
 
     @try {
         FIRAuthCredential* credential = [[FIRPhoneAuthProvider provider]
@@ -277,8 +294,26 @@ static BOOL registeredForRemoteNotifications = NO;
 }
 
 - (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command {
-    NSString* verificationId = [command.arguments objectAtIndex:0];
-    NSString* code = [command.arguments objectAtIndex:1];
+    NSDictionary* credential = [command.arguments objectAtIndex:0];
+    if(credential == nil){
+        NSString* errMsg = @"credential object must be passed as first and only argument";
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        return;
+    }
+    
+    NSString* verificationId = [credential objectForKey:@"verificationId"];
+    if(verificationId == nil){
+        NSString* errMsg = @"verificationId key must be specified as a string value in the credential object";
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        return;
+    }
+    
+    NSString* code = [credential objectForKey:@"code"];
+    if(code == nil){
+        NSString* errMsg = @"code key must be specified as a string value in the credential object";
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        return;
+    }
 
     @try {
         FIRAuthCredential* credential = [[FIRPhoneAuthProvider provider]
