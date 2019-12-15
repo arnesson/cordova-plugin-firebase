@@ -1593,6 +1593,21 @@ An example of how the error entry will appear in the Crashlytics console:
 
 ### Authentication
 
+#### isUserSignedIn
+Checks if there is a current Firebase user signed into the app.
+
+**Parameters**:
+- {function} success - callback function to pass {boolean} result to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.isUserSignedIn(function(isSignedIn) {
+        console.log("User "+(isSignedIn ? "is" : "is not") + " signed in");
+    }, function(error) {
+        console.error("Failed to check if user is signed in: " + error);
+    });
+```
+
 #### verifyPhoneNumber
 Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 

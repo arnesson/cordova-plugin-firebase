@@ -225,3 +225,7 @@ exports.signInWithCredential = function (credential, success, error) {
 exports.linkUserWithCredential = function (credential, success, error) {
     exec(success, error, "FirebasePlugin", "linkUserWithCredential", [credential]);
 };
+
+exports.isUserSignedIn = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "isUserSignedIn", []);
+};

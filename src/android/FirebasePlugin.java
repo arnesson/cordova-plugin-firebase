@@ -207,6 +207,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("linkUserWithCredential")) {
                 this.linkUserWithCredential(callbackContext, args);
                 return true;
+            } else if (action.equals("isUserSignedIn")) {
+                this.isUserSignedIn(callbackContext, args);
+                return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
                 return true;
@@ -919,7 +922,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                         String errMessage;
                                         if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                             errMessage = "Invalid verification code";
-                                        } else {
+                                        }else{
                                             errMessage = task.getException().toString();
                                         }
                                         pluginresult = new PluginResult(PluginResult.Status.ERROR, errMessage);
@@ -974,6 +977,19 @@ public class FirebasePlugin extends CordovaPlugin {
                                 }
                             }
                     );
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void isUserSignedIn(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    boolean isSignedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isSignedIn));
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
