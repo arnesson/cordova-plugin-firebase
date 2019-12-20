@@ -355,8 +355,33 @@ static BOOL registeredForRemoteNotifications = NO;
     
     @try {
         bool isSignedIn = [FIRAuth auth].currentUser ? true : false;
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsBool:isSignedIn] callbackId:command.callbackId];
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isSignedIn] callbackId:command.callbackId];
         
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)getCurrentUser:(CDVInvokedUrlCommand *)command {
+    
+    @try {
+        FIRUser* user = [FIRAuth auth].currentUser;
+        if(user){
+            NSMutableDictionary* userInfo = [NSMutableDictionary new];
+            [userInfo setValue:user.displayName forKey:@"name"];
+            [userInfo setValue:user.email forKey:@"email"];
+            [userInfo setValue:user.isEmailVerified ? @"1" : @"0" forKey:@"emailIsVerified"];
+            [userInfo setValue:user.phoneNumber forKey:@"phoneNumber"];
+            [userInfo setValue:user.photoURL forKey:@"photoUrl"];
+            [userInfo setValue:user.uid forKey:@"uid"];
+            [userInfo setValue:user.providerID forKey:@"providerId"];
+            [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
+                [userInfo setValue:token forKey:@"idToken"];
+                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+            }];
+        }else{
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
+        }
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
