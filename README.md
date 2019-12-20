@@ -1608,6 +1608,29 @@ Checks if there is a current Firebase user signed into the app.
     });
 ```
 
+#### getCurrentUser
+Returns details of the currently logged in user.
+Note that some user properties will be empty is they are not defined in Firebase for the current user.
+
+**Parameters**:
+- {function} success - callback function to pass user {object} to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.getCurrentUser(function(user) {
+        console.log("Name: "+user.name);
+        console.log("Email: "+user.email);
+        console.log("Is email verified?: "+user.emailIsVerified);
+        console.log("Phone number: "+user.phoneNumber);
+        console.log("Photo URL: "+user.photoUrl);
+        console.log("UID: "+user.uid);
+        console.log("Provider ID: "+user.providerId);
+        console.log("ID token: "+user.idToken);
+    }, function(error) {
+        console.error("Failed to check if user is signed in: " + error);
+    });
+```
+
 #### verifyPhoneNumber
 Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 

@@ -31,6 +31,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -209,6 +211,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 return true;
             } else if (action.equals("isUserSignedIn")) {
                 this.isUserSignedIn(callbackContext, args);
+                return true;
+            }  else if (action.equals("getCurrentUser")) {
+                this.getCurrentUser(callbackContext, args);
                 return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
@@ -990,6 +995,43 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     boolean isSignedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isSignedIn));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void getCurrentUser(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+                    JSONObject returnResults = new JSONObject();
+                    returnResults.put("name", user.getDisplayName());
+                    returnResults.put("email", user.getEmail());
+                    returnResults.put("emailIsVerified", user.isEmailVerified());
+                    returnResults.put("phoneNumber", user.getPhoneNumber());
+                    returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
+                    returnResults.put("uid", user.getUid());
+                    returnResults.put("providerId", user.getProviderId());
+
+                    user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
+                        @Override
+                        public void onSuccess(GetTokenResult result) {
+                            try {
+                                String idToken = result.getToken();
+                                returnResults.put("idToken", idToken);
+                                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                            } catch (Exception e) {
+                                handleExceptionWithContext(e, callbackContext);
+                            }
+                        }
+                    });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
