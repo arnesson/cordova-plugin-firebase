@@ -351,6 +351,17 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)isUserSignedIn:(CDVInvokedUrlCommand*)command {
+    
+    @try {
+        bool isSignedIn = [FIRAuth auth].currentUser ? true : false;
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsBool:isSignedIn] callbackId:command.callbackId];
+        
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)setBadgeNumber:(CDVInvokedUrlCommand *)command {
     @try {
         int number = [[command.arguments objectAtIndex:0] intValue];

@@ -7,6 +7,8 @@
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command;
+- (void)isUserSignedIn:(CDVInvokedUrlCommand*)command;
+
 - (void)getId:(CDVInvokedUrlCommand*)command;
 - (void)getToken:(CDVInvokedUrlCommand*)command;
 - (void)getAPNSToken:(CDVInvokedUrlCommand*)command;
