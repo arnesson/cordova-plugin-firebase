@@ -219,6 +219,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("updateUserProfile")) {
                 this.updateUserProfile(callbackContext, args);
                 return true;
+            } else if (action.equals("updateUserEmail")) {
+                this.updateUserEmail(callbackContext, args);
+                return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
                 return true;
@@ -265,6 +268,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 // Stubs for other platform methods
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 return true;
+            }else{
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Invalid action: " + action));
+                return false;
             }
         }catch(Exception e){
             handleExceptionWithContext(e, callbackContext);
@@ -1077,15 +1083,32 @@ public class FirebasePlugin extends CordovaPlugin {
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                try {
-                                    if (task.isSuccessful()) {
-                                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-                                    }else{
-                                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Failed to update user profile"));
-                                    }
-                                } catch (Exception e) {
-                                    handleExceptionWithContext(e, callbackContext);
-                                }
+                                FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to update user profile");
+                            }
+                        });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void updateUserEmail(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+
+                    String email = args.getString(0);
+                    user.updateEmail(email)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to update user email");
                             }
                         });
                 } catch (Exception e) {
@@ -1487,5 +1510,21 @@ public class FirebasePlugin extends CordovaPlugin {
         String id = Integer.toString(r.nextInt(1000+1));
         this.authCredentials.put(id, authCredential);
         return id;
+    }
+
+    private void handleTaskOutcome(@NonNull Task<Void> task, CallbackContext callbackContext, String defaultErrorMsg) {
+        try {
+            if (task.isSuccessful()) {
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+            }else{
+                String errorMsg = defaultErrorMsg;
+                if(task.getException() != null){
+                    errorMsg = task.getException().getMessage();
+                }
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, errorMsg));
+            }
+        } catch (Exception e) {
+            handleExceptionWithContext(e, callbackContext);
+        }
     }
 }
