@@ -1717,6 +1717,21 @@ Note: doesn't require the Firebase user to be signed in to the app.
     });
 ```
 
+#### deleteUser
+Deletes the account of the current Firebase user signed into the app.
+
+**Parameters**:
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.deleteUser(function() {
+        console.log("User account deleted");
+    }, function(error) {
+        console.error("Failed to delete current user account: " + error);
+    });
+```
+
 #### verifyPhoneNumber
 Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 

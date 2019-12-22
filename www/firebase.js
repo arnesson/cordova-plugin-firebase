@@ -257,3 +257,7 @@ exports.sendUserPasswordResetEmail = function (email, success, error) {
     if(typeof email !== 'string' || !email) return error("'email' must be a valid email address");
     exec(success, error, "FirebasePlugin", "sendUserPasswordResetEmail", [email]);
 };
+
+exports.deleteUser = function (success, error) {
+    exec(success, error, "FirebasePlugin", "deleteUser", []);
+};

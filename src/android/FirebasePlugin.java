@@ -231,6 +231,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("sendUserPasswordResetEmail")) {
                 this.sendUserPasswordResetEmail(callbackContext, args);
                 return true;
+            } else if (action.equals("deleteUser")) {
+                this.deleteUser(callbackContext, args);
+                return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
                 return true;
@@ -1196,6 +1199,29 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    public void deleteUser(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+
+                    user.delete()
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to delete current user account");
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
 
     //
     // Firebase Performace
