@@ -101,11 +101,20 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [logMessage](#logmessage)
       - [logError](#logerror)
     - [Authentication](#authentication)
+      - [isUserSignedIn](#isusersignedin)
+      - [getCurrentUser](#getcurrentuser)
+      - [updateUserProfile](#updateuserprofile)
+      - [updateUserEmail](#updateuseremail)
+      - [sendUserEmailVerification](#senduseremailverification)
+      - [updateUserPassword](#updateuserpassword)
+      - [sendUserPasswordResetEmail](#senduserpasswordresetemail)
+      - [deleteUser](#deleteuser)
       - [verifyPhoneNumber](#verifyphonenumber)
         - [Android](#android-1)
         - [iOS](#ios-1)
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
+      - [reauthenticateWithCredential](#reauthenticatewithcredential)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
@@ -1906,6 +1915,30 @@ function linkUserWithCredential(credential){
 }
 ```
 
+#### reauthenticateWithCredential
+Reauthenticates the currently signed in user with credentials obtained using `verifyPhoneNumber()`.
+
+**Parameters**:
+- {object} credential - a credential object returned to the `verifyPhoneNumber()` success callback; has the following keys:
+    - {boolean} instantVerification - true if the Android device used instant verification to verify the user. 
+    If true, you do not need to provide a user-entered verification code as no SMS will be sent.
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+    Will only be present if `instantVerification` is `true`.
+    - {string} verificationId - the verification ID to accompany the user-entered verification code from the SMS.
+    Only present if `instantVerification` is `false`.
+    - {string} code - if `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message. 
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.reauthenticateWithCredential(credential, function() {
+        console.log("Successfully reauthenticated");
+    }, function(error) {
+        console.error("Failed to reauthenticate", error);
+    });
+```
 
 ### Remote Config
 

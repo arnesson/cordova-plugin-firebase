@@ -219,11 +219,18 @@ exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, f
 };
 
 exports.signInWithCredential = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
     exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);
 };
 
 exports.linkUserWithCredential = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
     exec(success, error, "FirebasePlugin", "linkUserWithCredential", [credential]);
+};
+
+exports.reauthenticateWithCredential = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
+    exec(success, error, "FirebasePlugin", "reauthenticateWithCredential", [credential]);
 };
 
 exports.isUserSignedIn = function (success, error) {
