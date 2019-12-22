@@ -33,6 +33,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -212,8 +213,11 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("isUserSignedIn")) {
                 this.isUserSignedIn(callbackContext, args);
                 return true;
-            }  else if (action.equals("getCurrentUser")) {
+            } else if (action.equals("getCurrentUser")) {
                 this.getCurrentUser(callbackContext, args);
+                return true;
+            } else if (action.equals("updateUserProfile")) {
+                this.updateUserProfile(callbackContext, args);
                 return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
@@ -1032,6 +1036,58 @@ public class FirebasePlugin extends CordovaPlugin {
                             }
                         }
                     });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void updateUserProfile(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+
+                    JSONObject profile = args.getJSONObject(0);
+                    UserProfileChangeRequest profileUpdates;
+                    if(profile.has("name") && profile.has("photoUri")){
+                        profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(profile.getString("name"))
+                            .setPhotoUri(Uri.parse(profile.getString("photoUri")))
+                            .build();
+                    }else if(profile.has("name")){
+                        profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(profile.getString("name"))
+                            .build();
+                    }else if(profile.has("photoUri")){
+                        profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setPhotoUri(Uri.parse(profile.getString("photoUri")))
+                            .build();
+                    }else{
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "'name' and/or 'photoUri' keys must be specified in the profile object"));
+                        return;
+                    }
+
+                    user.updateProfile(profileUpdates)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                try {
+                                    if (task.isSuccessful()) {
+                                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+                                    }else{
+                                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Failed to update user profile"));
+                                    }
+                                } catch (Exception e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            }
+                        });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }

@@ -233,3 +233,8 @@ exports.isUserSignedIn = function (success, error) {
 exports.getCurrentUser = function (success, error) {
     exec(success, error, "FirebasePlugin", "getCurrentUser", []);
 };
+
+exports.updateUserProfile = function (profile, success, error) {
+    if(typeof profile !== 'object') return error("'profile' must be an object with keys 'name' and/or 'photoUri'");
+    exec(success, error, "FirebasePlugin", "updateUserProfile", [profile]);
+};

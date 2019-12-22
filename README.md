@@ -1631,6 +1631,27 @@ Note that some user properties will be empty is they are not defined in Firebase
     });
 ```
 
+#### updateUserProfile
+Updates the display name and/or photo URL of the current Firebase user signed into the app.
+
+**Parameters**:
+- {object} profile - new profile details:
+    - {string} name - display name of user
+    - {string} photoUri - URL of user profile photo
+- {function} success - callback function to pass {boolean} result to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.updateUserProfile({
+        name: "Homer Simpson",
+        photoUri: "http://homer.simpson.com/photo.png"
+    },function() {
+        console.log("User profile successfully updated");
+    }, function(error) {
+        console.error("Failed to update user profile: " + error);
+    });
+```
+
 #### verifyPhoneNumber
 Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 
