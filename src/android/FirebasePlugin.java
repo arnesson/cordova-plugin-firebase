@@ -228,6 +228,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("updateUserPassword")) {
                 this.updateUserPassword(callbackContext, args);
                 return true;
+            } else if (action.equals("sendUserPasswordResetEmail")) {
+                this.sendUserPasswordResetEmail(callbackContext, args);
+                return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
                 return true;
@@ -1164,6 +1167,26 @@ public class FirebasePlugin extends CordovaPlugin {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to update user password");
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void sendUserPasswordResetEmail(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    String email = args.getString(0);
+                    auth.sendPasswordResetEmail(email)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to send user password reset email");
                                 }
                             });
                 } catch (Exception e) {

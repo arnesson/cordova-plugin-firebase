@@ -252,3 +252,8 @@ exports.updateUserPassword = function (password, success, error) {
     if(typeof password !== 'string' || !password) return error("'password' must be a valid string");
     exec(success, error, "FirebasePlugin", "updateUserPassword", [password]);
 };
+
+exports.sendUserPasswordResetEmail = function (email, success, error) {
+    if(typeof email !== 'string' || !email) return error("'email' must be a valid email address");
+    exec(success, error, "FirebasePlugin", "sendUserPasswordResetEmail", [email]);
+};

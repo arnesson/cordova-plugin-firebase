@@ -1700,6 +1700,23 @@ Updates/sets the account password for the current Firebase user signed into the 
     });
 ```
 
+#### sendUserPasswordResetEmail
+Sends a password reset email to the specified user email address.
+Note: doesn't require the Firebase user to be signed in to the app.
+
+**Parameters**:
+- {string} email - email address of user
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.sendUserPasswordResetEmail("user@somewhere.com",function() {
+        console.log("User password reset email sent successfully");
+    }, function(error) {
+        console.error("Failed to send user password reset email: " + error);
+    });
+```
+
 #### verifyPhoneNumber
 Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 
