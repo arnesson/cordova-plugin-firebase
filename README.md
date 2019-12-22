@@ -1638,7 +1638,7 @@ Updates the display name and/or photo URL of the current Firebase user signed in
 - {object} profile - new profile details:
     - {string} name - display name of user
     - {string} photoUri - URL of user profile photo
-- {function} success - callback function to pass {boolean} result to as an argument
+- {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
@@ -1657,7 +1657,7 @@ Updates/sets the email address of the current Firebase user signed into the app.
 
 **Parameters**:
 - {string} email - email address of user
-- {function} success - callback function to pass {boolean} result to as an argument
+- {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
@@ -1665,6 +1665,22 @@ Updates/sets the email address of the current Firebase user signed into the app.
         console.log("User email successfully updated");
     }, function(error) {
         console.error("Failed to update user email: " + error);
+    });
+```
+
+#### sendUserEmailVerification
+Sends a verification email to the currently configured email address of the current Firebase user signed into the app.
+When the user opens the contained link, their email address will have been verified.
+
+**Parameters**:
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.sendUserEmailVerification(function() {
+        console.log("User verification email successfully sent");
+    }, function(error) {
+        console.error("Failed to send user verification email: " + error);
     });
 ```
 

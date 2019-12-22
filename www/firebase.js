@@ -243,3 +243,7 @@ exports.updateUserEmail = function (email, success, error) {
     if(typeof email !== 'string' || !email) return error("'email' must be a valid email address");
     exec(success, error, "FirebasePlugin", "updateUserEmail", [email]);
 };
+
+exports.sendUserEmailVerification = function (success, error) {
+    exec(success, error, "FirebasePlugin", "sendUserEmailVerification", []);
+};
