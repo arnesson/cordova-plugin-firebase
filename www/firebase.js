@@ -247,3 +247,8 @@ exports.updateUserEmail = function (email, success, error) {
 exports.sendUserEmailVerification = function (success, error) {
     exec(success, error, "FirebasePlugin", "sendUserEmailVerification", []);
 };
+
+exports.updateUserPassword = function (password, success, error) {
+    if(typeof password !== 'string' || !password) return error("'password' must be a valid string");
+    exec(success, error, "FirebasePlugin", "updateUserPassword", [password]);
+};

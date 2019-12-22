@@ -1684,6 +1684,22 @@ When the user opens the contained link, their email address will have been verif
     });
 ```
 
+#### updateUserPassword
+Updates/sets the account password for the current Firebase user signed into the app.
+
+**Parameters**:
+- {string} password - user-defined password
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.updateUserPassword("mypassword",function() {
+        console.log("User password successfully updated");
+    }, function(error) {
+        console.error("Failed to update user password: " + error);
+    });
+```
+
 #### verifyPhoneNumber
 Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
 

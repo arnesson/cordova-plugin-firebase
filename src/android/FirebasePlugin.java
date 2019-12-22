@@ -225,6 +225,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("sendUserEmailVerification")) {
                 this.sendUserEmailVerification(callbackContext, args);
                 return true;
+            } else if (action.equals("updateUserPassword")) {
+                this.updateUserPassword(callbackContext, args);
+                return true;
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
                 return true;
@@ -1138,6 +1141,31 @@ public class FirebasePlugin extends CordovaPlugin {
                                 FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to send user email verification");
                             }
                         });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void updateUserPassword(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+
+                    String password = args.getString(0);
+                    user.updatePassword(password)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    FirebasePlugin.instance.handleTaskOutcome(task, callbackContext, "Failed to update user password");
+                                }
+                            });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
