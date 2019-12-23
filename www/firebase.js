@@ -237,6 +237,11 @@ exports.isUserSignedIn = function (success, error) {
     exec(ensureBooleanFn(success), error, "FirebasePlugin", "isUserSignedIn", []);
 };
 
+exports.signOutUser = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "signOutUser", []);
+};
+
+
 exports.getCurrentUser = function (success, error) {
     exec(function(user){
         user.emailIsVerified = ensureBoolean(user.emailIsVerified);

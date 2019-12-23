@@ -102,6 +102,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [logError](#logerror)
     - [Authentication](#authentication)
       - [isUserSignedIn](#isusersignedin)
+      - [signOutUser](#signoutuser)
       - [getCurrentUser](#getcurrentuser)
       - [updateUserProfile](#updateuserprofile)
       - [updateUserEmail](#updateuseremail)
@@ -1614,6 +1615,21 @@ Checks if there is a current Firebase user signed into the app.
         console.log("User "+(isSignedIn ? "is" : "is not") + " signed in");
     }, function(error) {
         console.error("Failed to check if user is signed in: " + error);
+    });
+```
+
+#### signOutUser
+Signs current Firebase user out of the app.
+
+**Parameters**:
+- {function} success - callback function to pass {boolean} result to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.signOutUser(function() {
+        console.log("User signed out");
+    }, function(error) {
+        console.error("Failed to sign out user: " + error);
     });
 ```
 

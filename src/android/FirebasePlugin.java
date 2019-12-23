@@ -216,6 +216,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("isUserSignedIn")) {
                 this.isUserSignedIn(callbackContext, args);
                 return true;
+            } else if (action.equals("signOutUser")) {
+                this.signOutUser(callbackContext, args);
+                return true;
             } else if (action.equals("getCurrentUser")) {
                 this.getCurrentUser(callbackContext, args);
                 return true;
@@ -834,6 +837,24 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     boolean isSignedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isSignedIn));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void signOutUser(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+                    FirebaseAuth.getInstance().signOut();
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
