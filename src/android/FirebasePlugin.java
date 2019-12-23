@@ -1188,7 +1188,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     int timeOutDuration = args.getInt(1);
                     String smsCode = args.getString(2);
 
-                    if(smsCode != null){
+                    if(smsCode != null && smsCode != "null"){
                         FirebaseAuth.getInstance().getFirebaseAuthSettings().setAutoRetrievedSmsCodeForPhoneNumber(number, smsCode);
                     }
 
