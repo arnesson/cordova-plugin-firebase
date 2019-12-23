@@ -238,7 +238,10 @@ exports.isUserSignedIn = function (success, error) {
 };
 
 exports.getCurrentUser = function (success, error) {
-    exec(success, error, "FirebasePlugin", "getCurrentUser", []);
+    exec(function(user){
+        user.emailIsVerified = ensureBoolean(user.emailIsVerified);
+        success(user);
+    }, error, "FirebasePlugin", "getCurrentUser", []);
 };
 
 exports.updateUserProfile = function (profile, success, error) {
