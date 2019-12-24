@@ -218,6 +218,11 @@ exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, f
     }, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
 };
 
+exports.createUserWithEmailAndPassword = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
+    exec(success, error, "FirebasePlugin", "createUserWithEmailAndPassword", [credential]);
+};
+
 exports.signInWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
     exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);

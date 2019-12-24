@@ -116,6 +116,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
+      - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
@@ -1928,6 +1929,28 @@ Example usage:
         console.log("Successfully reauthenticated");
     }, function(error) {
         console.error("Failed to reauthenticate", error);
+    });
+```
+
+#### createUserWithEmailAndPassword
+Creates a new email/password-based user account.
+If account creation is successful, user will be automatically signed in.
+
+**Parameters**:
+- {object} credential - a credential object containing email/password for new account:
+    - {string} email - user email address. It is the responsibility of the app to ensure this is a valid email address.
+    - {string} password - user password. It is the responsibility of the app to ensure the password is suitable. 
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.createUserWithEmailAndPassword(credential, function() {
+        console.log("Successfully created email/password-based user account");
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to create email/password-based user account", error);
     });
 ```
 

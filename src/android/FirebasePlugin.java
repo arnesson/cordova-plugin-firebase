@@ -204,6 +204,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("verifyPhoneNumber")) {
                 this.verifyPhoneNumber(callbackContext, args);
                 return true;
+            } else if (action.equals("createUserWithEmailAndPassword")) {
+                this.createUserWithEmailAndPassword(callbackContext, args);
+                return true;
             } else if (action.equals("signInWithCredential")) {
                 this.signInWithCredential(callbackContext, args);
                 return true;
@@ -1218,6 +1221,38 @@ public class FirebasePlugin extends CordovaPlugin {
                             TimeUnit.SECONDS, // Unit of timeout
                             cordovaActivity, // Activity (for callback binding)
                             mCallbacks); // OnVerificationStateChangedCallbacks
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void createUserWithEmailAndPassword(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    JSONObject credential = args.getJSONObject(0);
+
+                    if(!credential.has("email")){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User email address must be specified as 'email' key in the credential object"));
+                        return;
+                    }
+                    String email = credential.getString("email");
+
+                    if(!credential.has("password")){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "User password must be specified as 'password' key in the credential object"));
+                        return;
+                    }
+                    String password = credential.getString("password");
+
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).addOnCompleteListener(cordova.getActivity(), new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    FirebasePlugin.instance.handleAuthTaskOutcome(task, callbackContext);
+                                }
+                            }
+                    );
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
