@@ -1759,7 +1759,8 @@ Deletes the account of the current Firebase user signed into the app.
 ```
 
 #### verifyPhoneNumber
-Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
+Requests verification of a phone number.
+The result can be used to create/sign in to a phone number-based user account in your app or to link the phone number to an existing user account
 
 **NOTE: This will only work on physical devices with a SIM card (not iOS Simulator or Android Emulator)**
 
@@ -1769,8 +1770,9 @@ There are 3 verification scenarios:
 - Some Android devices support "instant verification" where the phone number can be instantly verified without sending or receiving an SMS.
     - In this case, the user doesn't need to do anything in order for you to sign them in and you don't need to provide any additional credentials in order to sign the user in or link the user account to an existing Firebase user account.
 - Some Android devices support "auto-retrieval" where Google Play services is able to detect the incoming verification SMS and perform verification with no user action required.
-- All iOS devices and other Android devices will receive an SMS containing a verification code which the user must manually enter into your app.
-    - This can be used, along with the accompanying verification ID, to sign the user in or link the user account to an existing Firebase user account. 
+    - As above, the user doesn't need to do anything in order for you to sign them in.
+- For other Android devices and all iOS devices, the user must manually enter the verification code received in the SMS into your app.
+    - This code be used, along with the accompanying verification ID, to sign the user in or link phone number to an existing Firebase user account. 
 
 **Parameters**:
 - {function} success - callback function to pass {object} credentials to as an argument
@@ -1879,7 +1881,7 @@ function signInWithCredential(credential){
 ```
 
 #### linkUserWithCredential
-Links the user account to an existing Firebase user account with credentials obtained using `verifyPhoneNumber()`.
+Links an existing Firebase user account with credentials obtained using `verifyPhoneNumber()`.
 See the [Android-](https://firebase.google.com/docs/auth/android/account-linking) and [iOS](https://firebase.google.com/docs/auth/ios/account-linking)-specific Firebase documentation for more info.
 
 **Parameters**:
@@ -1937,20 +1939,39 @@ Creates a new email/password-based user account.
 If account creation is successful, user will be automatically signed in.
 
 **Parameters**:
-- {object} credential - a credential object containing email/password for new account:
-    - {string} email - user email address. It is the responsibility of the app to ensure this is a valid email address.
-    - {string} password - user password. It is the responsibility of the app to ensure the password is suitable. 
+- {string} email - user email address. It is the responsibility of the app to ensure this is a valid email address.
+- {string} password - user password. It is the responsibility of the app to ensure the password is suitable. 
 - {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 Example usage:
 
 ```javascript
-    FirebasePlugin.createUserWithEmailAndPassword(credential, function() {
+    FirebasePlugin.createUserWithEmailAndPassword(email, password, function() {
         console.log("Successfully created email/password-based user account");
         // User is now signed in
     }, function(error) {
         console.error("Failed to create email/password-based user account", error);
+    });
+```
+
+#### signInUserWithEmailAndPassword
+Signs in to an email/password-based user account.
+
+**Parameters**:
+- {string} email - user email address
+- {string} password - user password 
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.signInUserWithEmailAndPassword(email, password, function() {
+        console.log("Successfully signed in");
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to sign in", error);
     });
 ```
 

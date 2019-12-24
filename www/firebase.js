@@ -218,9 +218,12 @@ exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, f
     }, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
 };
 
-exports.createUserWithEmailAndPassword = function (credential, success, error) {
-    if(typeof credential !== 'object') return error("'credential' must be an object");
-    exec(success, error, "FirebasePlugin", "createUserWithEmailAndPassword", [credential]);
+exports.createUserWithEmailAndPassword = function (email, password, success, error) {
+    exec(success, error, "FirebasePlugin", "createUserWithEmailAndPassword", [email, password]);
+};
+
+exports.signInUserWithEmailAndPassword = function (email, password, success, error) {
+    exec(success, error, "FirebasePlugin", "signInUserWithEmailAndPassword", [email, password]);
 };
 
 exports.signInWithCredential = function (credential, success, error) {
