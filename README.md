@@ -117,6 +117,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
       - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
+      - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
