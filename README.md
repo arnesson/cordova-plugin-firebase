@@ -117,7 +117,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
       - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
-      - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
@@ -158,6 +157,7 @@ See [Disable data collection on startup](#disable-data-collection-on-startup) fo
 #### Android only
 The following plugin variables are used to specify the Firebase SDK versions as Gradle dependencies on Android:
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION`
+- `ANDROID_PLAY_SERVICES_AUTH_VERSION``
 - `ANDROID_FIREBASE_ANALYTICS_VERSION`
 - `ANDROID_FIREBASE_MESSAGING_VERSION`
 - `ANDROID_FIREBASE_CONFIG_VERSION`
@@ -275,6 +275,7 @@ Or you can specify them as plugin variables in your `config.xml`, for example:
 The following plugin variables are used to specify the following Gradle dependency versions on Android:
 
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION` => `com.google.android.gms:play-services-tagmanager`
+- `ANDROID_PLAY_SERVICES_AUTH_VERSION` => `com.google.android.gms:play-services-auth`
 - `ANDROID_FIREBASE_ANALYTICS_VERSION` => `com.google.firebase:firebase-analytics`
 - `ANDROID_FIREBASE_MESSAGING_VERSION` => `com.google.firebase:firebase-messaging`
 - `ANDROID_FIREBASE_CONFIG_VERSION` => `com.google.firebase:firebase-config`
@@ -287,6 +288,7 @@ For example, to explicitly specify all the component versions at plugin install 
 
     cordova plugin add cordova-plugin-firebasex \
         --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \
+        --variable ANDROID_PLAY_SERVICES_AUTH_VERSION=17.0.0 \
         --variable ANDROID_FIREBASE_ANALYTICS_VERSION=17.0.0 \
         --variable ANDROID_FIREBASE_MESSAGING_VERSION=19.0.0 \
         --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0 \

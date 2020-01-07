@@ -226,6 +226,10 @@ exports.signInUserWithEmailAndPassword = function (email, password, success, err
     exec(success, error, "FirebasePlugin", "signInUserWithEmailAndPassword", [email, password]);
 };
 
+exports.authenticateUserWithGoogle = function (clientId, success, error) {
+    exec(success, error, "FirebasePlugin", "authenticateUserWithGoogle", [clientId]);
+};
+
 exports.signInWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
     exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);

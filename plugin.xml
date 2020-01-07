@@ -62,6 +62,7 @@
 
 		<!-- Default versions for Gradle dependencies -->
 		<preference name="ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" default="17.0.0" />
+		<preference name="ANDROID_PLAY_SERVICES_AUTH_VERSION" default="17.0.0" />
 		<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.2.1" />
 		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="20.0.0" />
 		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="19.0.3" />
@@ -71,6 +72,7 @@
 		<preference name="ANDROID_CRASHLYTICS_NDK_VERSION" default="2.1.1" />
 
 		<framework src="com.google.android.gms:play-services-tagmanager:$ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" />
+		<framework src="com.google.android.gms:play-services-auth:$ANDROID_PLAY_SERVICES_AUTH_VERSION" />
 		<framework src="com.google.firebase:firebase-analytics:$ANDROID_FIREBASE_ANALYTICS_VERSION" />
 		<framework src="com.google.firebase:firebase-messaging:$ANDROID_FIREBASE_MESSAGING_VERSION" />
 		<framework src="com.google.firebase:firebase-config:$ANDROID_FIREBASE_CONFIG_VERSION" />

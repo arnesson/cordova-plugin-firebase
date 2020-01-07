@@ -22,6 +22,12 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import java.lang.reflect.Field;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,6 +39,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -79,11 +86,13 @@ public class FirebasePlugin extends CordovaPlugin {
     private static Activity cordovaActivity = null;
     protected static final String TAG = "FirebasePlugin";
     protected static final String KEY = "badge";
+    protected static final int GOOGLE_SIGN_IN = 0x1;
 
     private static boolean inBackground = true;
     private static ArrayList<Bundle> notificationStack = null;
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
+    private static CallbackContext activityResultCallbackContext;
 
     private static NotificationChannel defaultNotificationChannel = null;
     public static String defaultChannelId = null;
@@ -204,6 +213,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("verifyPhoneNumber")) {
                 this.verifyPhoneNumber(callbackContext, args);
                 return true;
+            } else if (action.equals("authenticateUserWithGoogle")) {
+                this.authenticateUserWithGoogle(callbackContext, args);
+                return true;
             } else if (action.equals("createUserWithEmailAndPassword")) {
                 this.createUserWithEmailAndPassword(callbackContext, args);
                 return true;
@@ -316,6 +328,7 @@ public class FirebasePlugin extends CordovaPlugin {
     public void onReset() {
         FirebasePlugin.notificationCallbackContext = null;
         FirebasePlugin.tokenRefreshCallbackContext = null;
+        FirebasePlugin.activityResultCallbackContext = null;
     }
 
     @Override
@@ -325,6 +338,37 @@ public class FirebasePlugin extends CordovaPlugin {
         cordovaInterface = null;
         applicationContext = null;
         super.onDestroy();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            switch (requestCode) {
+                case GOOGLE_SIGN_IN:
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    GoogleSignInAccount acct;
+                    try{
+                        acct = task.getResult(ApiException.class);
+                    }catch (ApiException ae){
+                        if(ae.getStatusCode() == 10){
+                            throw new Exception("Unknown server client ID");
+                        }else{
+                            throw new Exception(CommonStatusCodes.getStatusCodeString(ae.getStatusCode()));
+                        }
+                    }
+                    AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+                    String id = FirebasePlugin.instance.saveAuthCredential(credential);
+
+                    JSONObject returnResults = new JSONObject();
+                    returnResults.put("instantVerification", true);
+                    returnResults.put("id", id);
+                    FirebasePlugin.activityResultCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                    break;
+            }
+        } catch (Exception e) {
+            handleExceptionWithContext(e, FirebasePlugin.activityResultCallbackContext);
+        }
     }
 
     /**
@@ -1286,6 +1330,29 @@ public class FirebasePlugin extends CordovaPlugin {
                                 }
                             }
                     );
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+
+    public void authenticateUserWithGoogle(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String clientId = args.getString(0);
+
+                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(clientId)
+                            .requestEmail()
+                            .build();
+
+                    GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(FirebasePlugin.instance.cordovaActivity, gso);
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    FirebasePlugin.activityResultCallbackContext = callbackContext;
+                    FirebasePlugin.instance.cordovaInterface.startActivityForResult(FirebasePlugin.instance, signInIntent, GOOGLE_SIGN_IN);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
