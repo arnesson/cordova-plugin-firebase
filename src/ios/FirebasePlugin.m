@@ -518,6 +518,25 @@ static BOOL registeredForRemoteNotifications = NO;
     }
 }
 
+- (void)signOutUser:(CDVInvokedUrlCommand*)command {
+    @try {
+        bool isSignedIn = [FIRAuth auth].currentUser ? true : false;
+        if(!isSignedIn){
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
+            return;
+        }
+        NSError *signOutError;
+        BOOL status = [[FIRAuth auth] signOut:&signOutError];
+        if (!status) {
+          [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"Error signing out: %@", signOutError]] callbackId:command.callbackId];
+        }else{
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)getCurrentUser:(CDVInvokedUrlCommand *)command {
     
     @try {
