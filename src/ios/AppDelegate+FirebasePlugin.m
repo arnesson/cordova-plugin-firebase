@@ -14,7 +14,7 @@
 #define kApplicationInBackgroundKey @"applicationInBackground"
 #define kDelegateKey @"delegate"
 
-@implementation AppDelegate (FirebasePlugin)
+@implementation AppDelegate (FirebasePlugin) 
 
 static NSDictionary* mutableUserInfo;
 
@@ -67,6 +67,10 @@ static NSDictionary* mutableUserInfo;
         [FIRMessaging messaging].delegate = self;
         [FIRMessaging messaging].shouldEstablishDirectChannel = true;
         
+        // Setup Google SignIn
+        [GIDSignIn sharedInstance].clientID = [FIRApp defaultApp].options.clientID;
+        [GIDSignIn sharedInstance].delegate = self;
+        
         // Set UNUserNotificationCenter delegate
         self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
         [UNUserNotificationCenter currentNotificationCenter].delegate = self;
@@ -94,6 +98,48 @@ static NSDictionary* mutableUserInfo;
     [FIRMessaging messaging].shouldEstablishDirectChannel = false;
     self.applicationInBackground = @(YES);
     NSLog(@"FCM direct channel = false");
+}
+
+- (BOOL)application:(nonnull UIApplication *)application
+            openURL:(nonnull NSURL *)url
+            options:(nonnull NSDictionary<NSString *, id> *)options {
+    return [[GIDSignIn sharedInstance] handleURL:url];
+}
+
+# pragma mark - Google SignIn
+- (void)signIn:(GIDSignIn *)signIn
+didSignInForUser:(GIDGoogleUser *)user
+     withError:(NSError *)error {
+  
+    NSLog(@"Google SignIn delegate: signIn");
+    @try{
+        CDVPluginResult* pluginResult;
+        if (error == nil) {
+            GIDAuthentication *authentication = user.authentication;
+            FIRAuthCredential *credential =
+            [FIRGoogleAuthProvider credentialWithIDToken:authentication.idToken
+                                           accessToken:authentication.accessToken];
+            
+            int key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+            NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+            [result setValue:@"true" forKey:@"instantVerification"];
+            [result setValue:[NSNumber numberWithInt:key] forKey:@"id"];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+        } else {
+          pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        }
+        if ([FirebasePlugin firebasePlugin].googleSignInCallbackId != nil) {
+            [[FirebasePlugin firebasePlugin].commandDelegate sendPluginResult:pluginResult callbackId:[FirebasePlugin firebasePlugin].googleSignInCallbackId];
+        }
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
+}
+
+- (void)signIn:(GIDSignIn *)signIn
+didDisconnectWithUser:(GIDGoogleUser *)user
+     withError:(NSError *)error {
+  NSLog(@"Google SignIn delegate: didDisconnectWithUser");
 }
 
 # pragma mark - FIRMessagingDelegate

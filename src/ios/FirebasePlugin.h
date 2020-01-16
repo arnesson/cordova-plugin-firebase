@@ -1,5 +1,6 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
+#import "Firebase.h"
 
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
@@ -9,6 +10,8 @@
 
 // Authentication
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
+- (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
+- (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command;
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)reauthenticateWithCredential:(CDVInvokedUrlCommand*)command;
@@ -69,17 +72,22 @@
 
 
 // Internals
++ (FirebasePlugin *) firebasePlugin;
 - (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
 - (void) handlePluginExceptionWithoutContext: (NSException*) exception;
-- (void)_logError: (NSString*)msg;
+- (void) _logError: (NSString*)msg;
+- (int) saveAuthCredential: (FIRAuthCredential *) authCredential;
 
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
 - (void)setDefaultChannel:(CDVInvokedUrlCommand *)command;
 - (void)deleteChannel:(CDVInvokedUrlCommand *)command;
 - (void)listChannels:(CDVInvokedUrlCommand *)command;
+
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, copy) NSString *apnsTokenRefreshCallbackId;
+@property (nonatomic, copy) NSString *googleSignInCallbackId;
+
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
 

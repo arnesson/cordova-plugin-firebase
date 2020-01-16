@@ -1,9 +1,9 @@
 #import "FirebasePlugin.h"
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
-#import "Firebase.h"
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
+#import <GoogleSignIn/GoogleSignIn.h>
 @import FirebaseInstanceID;
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
@@ -17,24 +17,36 @@
 @synthesize notificationCallbackId;
 @synthesize tokenRefreshCallbackId;
 @synthesize apnsTokenRefreshCallbackId;
+@synthesize googleSignInCallbackId;
 @synthesize notificationStack;
 @synthesize traces;
 
 static NSString*const LOG_TAG = @"FirebasePlugin[native]";
 static NSInteger const kNotificationStackSize = 10;
-static FirebasePlugin *firebasePlugin;
+static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
+static NSMutableDictionary* authCredentials;
 
 
-+ (FirebasePlugin *) firebasePlugin {
++ (FirebasePlugin*) firebasePlugin {
     return firebasePlugin;
 }
 
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     
-    // Check for permission and register for remote notifications if granted
-    [self _hasPermission:^(BOOL result) {}];
+    firebasePlugin = self;
+    
+    @try {
+        // Check for permission and register for remote notifications if granted
+        [self _hasPermission:^(BOOL result) {}];
+        
+        [GIDSignIn sharedInstance].presentingViewController = self.viewController;
+        
+        authCredentials = [[NSMutableDictionary alloc] init];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithoutContext:exception];
+    }
 }
 
 - (void)setAutoInitEnabled:(CDVInvokedUrlCommand *)command {
@@ -456,6 +468,19 @@ static BOOL registeredForRemoteNotifications = NO;
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
+}
+
+- (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command {
+    
+}
+
+- (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command{
+    [[GIDSignIn sharedInstance] signIn];
+    
+    self.googleSignInCallbackId = command.callbackId;
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command {
@@ -1083,23 +1108,25 @@ static BOOL registeredForRemoteNotifications = NO;
         return authCredential;
     }
     
+    NSString* key = [credential objectForKey:@"id"];
     NSString* verificationId = [credential objectForKey:@"verificationId"];
-    if(verificationId == nil){
-        NSString* errMsg = @"verificationId key must be specified as a string value in the credential object";
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
-        return authCredential;
-    }
-    
     NSString* code = [credential objectForKey:@"code"];
-    if(code == nil){
-        NSString* errMsg = @"code key must be specified as a string value in the credential object";
+    
+    if(key != nil){
+        authCredential = [authCredentials objectForKey:key];
+        if(authCredential == nil){
+            NSString* errMsg = [NSString stringWithFormat:@"no native auth credential exists for specified id '%@'", key];
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
+        }
+    }else if(verificationId != nil && code != nil){
+        authCredential = [[FIRPhoneAuthProvider provider]
+        credentialWithVerificationID:verificationId
+                    verificationCode:code];
+    }else{
+        NSString* errMsg = @"credential object must either specify the id key of an existing native auth credential or the verificationId/code keys must be specified for a phone number authentication";
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
-        return authCredential;
     }
-        
-    authCredential = [[FIRPhoneAuthProvider provider]
-    credentialWithVerificationID:verificationId
-                verificationCode:code];
+
     return authCredential;
 }
 
@@ -1117,6 +1144,17 @@ static BOOL registeredForRemoteNotifications = NO;
      }@catch (NSException *exception) {
          [self handlePluginExceptionWithContext:exception :command];
      }
+}
+
+- (int) saveAuthCredential: (FIRAuthCredential*) authCredential {
+    int key = -1;
+    while (key < 0 || [authCredentials objectForKey:[NSNumber numberWithInt:key]] != nil) {
+        key = arc4random_uniform(100000);
+    }
+    
+    [authCredentials setObject:authCredential forKey:[NSNumber numberWithInt:key]];
+
+    return key;
 }
 
 - (void) handleResultWithPotentialError:(NSError*) error command:(CDVInvokedUrlCommand*)command {

@@ -126,6 +126,7 @@
 				<pod name="Firebase/RemoteConfig" spec="6.13.0"/>
 				<pod name="Fabric" spec="1.10.2"/>
 				<pod name="Crashlytics" spec="3.14.0"/>
+				<pod name="GoogleSignIn" spec="5.0.2"/>
 			</pods>
 		</podspec>
 
