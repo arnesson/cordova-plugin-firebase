@@ -471,16 +471,54 @@ static NSMutableDictionary* authCredentials;
 }
 
 - (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command {
-    
+    @try {
+        NSString* email = [command.arguments objectAtIndex:0];
+        NSString* password = [command.arguments objectAtIndex:1];
+        [[FIRAuth auth] createUserWithEmail:email
+                                   password:password
+                                 completion:^(FIRAuthDataResult * _Nullable authResult,
+                                              NSError * _Nullable error) {
+          @try {
+              [self handleAuthResult:authResult error:error command:command];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)signInUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command {
+    @try {
+        NSString* email = [command.arguments objectAtIndex:0];
+        NSString* password = [command.arguments objectAtIndex:1];
+        [[FIRAuth auth] signInWithEmail:email
+                                   password:password
+                                 completion:^(FIRAuthDataResult * _Nullable authResult,
+                                              NSError * _Nullable error) {
+          @try {
+              [self handleAuthResult:authResult error:error command:command];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
 }
 
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command{
-    [[GIDSignIn sharedInstance] signIn];
-    
-    self.googleSignInCallbackId = command.callbackId;
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    @try {
+        [[GIDSignIn sharedInstance] signIn];
+        
+        self.googleSignInCallbackId = command.callbackId;
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
 }
 
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command {
