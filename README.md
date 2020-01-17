@@ -23,6 +23,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Android only](#android-only)
       - [iOS only](#ios-only)
     - [Supported Cordova Versions](#supported-cordova-versions)
+    - [Supported Mobile Platform Versions](#supported-mobile-platform-versions)
     - [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase)
       - [Breaking API changes](#breaking-api-changes)
       - [Ionic 4](#ionic-4)
@@ -165,6 +166,10 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - cordova: `>= 9`
 - cordova-android: `>= 8`
 - cordova-ios: `>= 5`
+
+### Supported Mobile Platform Versions
+- Android `>= 4.1`
+- iOS `>= 10.0`
 
 ### Migrating from cordova-plugin-firebase
 This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been reworked to fix issues and add new functionality.
