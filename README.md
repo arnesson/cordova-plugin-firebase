@@ -26,7 +26,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Supported Mobile Platform Versions](#supported-mobile-platform-versions)
     - [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase)
       - [Breaking API changes](#breaking-api-changes)
-      - [Ionic 4](#ionic-4)
+      - [Ionic 4+](#ionic-4)
       - [Ionic 3](#ionic-3)
   - [Build environment notes](#build-environment-notes)
     - [PhoneGap Build](#phonegap-build)
@@ -203,18 +203,16 @@ You should be aware of the following breaking changes compared with `cordova-plu
            });`
 * Adds support for foreground notifications and data notification messages
 
-#### Ionic 4
-[This PR](https://github.com/ionic-team/ionic-native/pull/3106) adds an [Ionic Native firebase-x Typescript wrapper](https://github.com/ionic-team/ionic-native/blob/master/src/%40ionic-native/plugins/firebase-x/index.ts) for using `cordova-plugin-firebasex` with Ionic 4. 
-The API is similar to the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) wrapper.
+#### Ionic 4+
+Ionic Native provides a [FirebaseX Typescript wrapper](https://ionicframework.com/docs/native/firebase-x) for using `cordova-plugin-firebasex` with Ionic v4, v5 and above.
+Please see their documentation for usage.
 
-    ionic cordova plugin add cordova-plugin-firebasex
-    npm install @ionic-native/firebase-x
+**NOTE:** 
+- This plugin provides only the Javascript API as documented below.
+- The Typescript wrapper is owned and maintain by Ionic. 
+- Please [report any issues](https://github.com/ionic-team/ionic-native/issues) against the [Ionic Native repo](https://github.com/ionic-team/ionic-native/), not this one.
+- Any issues opened against this repo which relate to the Typescript wrapper **will be closed immediately**.
 
-    import { FirebaseX } from "@ionic-native/firebase-x/ngx";
-    constructor(private firebase: FirebaseX)
-     
-    this.firebase.getToken().then(token => console.log(`The token is ${token}`))
-    this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
      
 #### Ionic 3
 The above PR does not work for Ionic 3 so you (currently) can't use the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) Typescript wrapper with Ionic 3. 
