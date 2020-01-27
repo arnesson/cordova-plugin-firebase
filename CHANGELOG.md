@@ -1,3 +1,11 @@
+# Version 7.0.2
+* (Android) Fix error caused by local variable
+    * Merged from PR [#229](https://github.com/dpa99c/cordova-plugin-firebasex/pull/229).
+* (iOS Hook) Fix retrieving Xcode project path
+    * Merged from PR [#234](https://github.com/dpa99c/cordova-plugin-firebasex/pull/234).
+* (Android) Check google-services plugin doesn't already exist in Gradle script   
+    * Merged from PR [#281](https://github.com/dpa99c/cordova-plugin-firebasex/pull/281).
+
 # Version 7.0.1
 * (Android) Replace references to cordovaActivity with applicationContext when app is not running and therefore cordovaActivity doesn't exist. 
 Resolves [#165](https://github.com/dpa99c/cordova-plugin-firebasex/issues/165).
