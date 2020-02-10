@@ -15,6 +15,7 @@ interface FirebasePlugin {
     getToken(success: (value: string) => void, error: (err: string) => void): void
     onTokenRefresh(success: (value: string) => void, error: (err: string) => void): void
     getAPNSToken(success: (value: string) => void, error: (err: string) => void): void
+    onApnsTokenReceived(success: (value: string) => void, error: (err: string) => void): void
     onMessageReceived(success: (value: object) => void, error: (err: string) => void): void
     grantPermission(success: (value: boolean) => void, error: (err: string) => void): void
     hasPermission(success: (value: boolean) => void, error: (err: string) => void): void
