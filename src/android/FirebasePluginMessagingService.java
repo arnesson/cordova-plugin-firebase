@@ -85,6 +85,10 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 return;
             }
 
+            if(FirebasePlugin.applicationContext == null){
+                FirebasePlugin.applicationContext = this.getApplicationContext();
+            }
+
             // TODO(developer): Handle FCM messages here.
             // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
             String messageType;
@@ -271,7 +275,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Channel
-            if(channelId == null || FirebasePlugin.channelExists(channelId)){
+            if(channelId == null || !FirebasePlugin.channelExists(channelId)){
                 channelId = FirebasePlugin.defaultChannelId;
             }
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){

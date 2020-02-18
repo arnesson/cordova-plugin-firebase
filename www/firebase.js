@@ -1,5 +1,11 @@
 var exec = require('cordova/exec');
 
+var ensureBoolean = function (callback){
+    return function(result){
+        callback(!!result);
+    }
+};
+
 exports.getVerificationID = function (number, success, error) {
   exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
@@ -25,6 +31,10 @@ exports.onTokenRefresh = function (success, error) {
   exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };
 
+exports.onApnsTokenReceived = function (success, error) {
+    exec(success, error, "FirebasePlugin", "onApnsTokenReceived", []);
+};
+
 exports.subscribe = function (topic, success, error) {
   exec(success, error, "FirebasePlugin", "subscribe", [topic]);
 };
@@ -37,6 +47,14 @@ exports.unregister = function (success, error) {
   exec(success, error, "FirebasePlugin", "unregister", []);
 };
 
+exports.isAutoInitEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "isAutoInitEnabled", []);
+};
+
+exports.setAutoInitEnabled = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "setAutoInitEnabled", [enabled]);
+};
+
 // Notifications - iOS-only
 exports.setBadgeNumber = function (number, success, error) {
     exec(success, error, "FirebasePlugin", "setBadgeNumber", [number]);
@@ -47,11 +65,11 @@ exports.getBadgeNumber = function (success, error) {
 };
 
 exports.grantPermission = function (success, error) {
-    exec(success, error, "FirebasePlugin", "grantPermission", []);
+    exec(ensureBoolean(success), error, "FirebasePlugin", "grantPermission", []);
 };
 
 exports.hasPermission = function (success, error) {
-    exec(success, error, "FirebasePlugin", "hasPermission", []);
+    exec(ensureBoolean(success), error, "FirebasePlugin", "hasPermission", []);
 };
 
 // Notifications - Android-only
@@ -93,7 +111,7 @@ exports.setUserProperty = function (name, value, success, error) {
 };
 
 exports.activateFetched = function (success, error) {
-  exec(success, error, "FirebasePlugin", "activateFetched", []);
+  exec(ensureBoolean(success), error, "FirebasePlugin", "activateFetched", []);
 };
 
 exports.fetch = function (cacheExpirationSeconds, success, error) {
@@ -144,19 +162,6 @@ exports.setPerformanceCollectionEnabled = function (enabled, success, error) {
 };
 
 
-
-exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
-  if (typeof timeOutDuration === 'function') {
-    // method being called with old signature: function(number, success, error)
-    // timeOutDuration is the success callback, success is the error callback
-    exec(timeOutDuration, success, "FirebasePlugin", "verifyPhoneNumber", [number]);
-  } else {
-    // method being called with new signature: function(number, timeOutDuration, success, error)
-    // callbacks are correctly named
-    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration]);
-  }
-};
-
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
 };
@@ -194,3 +199,15 @@ exports.setCrashlyticsUserId = function (userId, success, error) {
 };
 
 
+// Authentication
+exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, fakeVerificationCode) {
+    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
+};
+
+exports.signInWithCredential = function (verificationId, code, success, error) {
+    exec(success, error, "FirebasePlugin", "signInWithCredential", [verificationId, code]);
+};
+
+exports.linkUserWithCredential = function (verificationId, code, success, error) {
+    exec(success, error, "FirebasePlugin", "linkUserWithCredential", [verificationId, code]);
+};

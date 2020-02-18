@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a problem
 title: ''
 labels: ''
 assignees: ''
@@ -24,8 +24,6 @@ Before opening an issue, please do the following:
 	- Ionic Native Typescript wrappers are maintained by the Ionic Team
 	- To verify an if an issue is caused by this plugin or its Typescript wrapper, please re-test using the vanilla Javascript plugin interface (without the Ionic Native wrapper).
 	- Any issue opened here which is obviously an Ionic Typescript wrapper issue will be closed immediately.
-- if you are having build problems, ensure you have thoroughly read the "Build environment notes" section of the `README.md` and searched existing open/closed issues for a similar problem.
-- if you are migrating from `cordova-plugin-firebase` to `cordova-plugin-firebasex` please make sure you have read the "Migrating from cordova-plugin-firebase" section of the `README.md`	
 -->
 
 <!-- Fill out the relevant sections below and delete irrelevant sections. -->
