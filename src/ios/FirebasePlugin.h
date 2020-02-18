@@ -4,6 +4,7 @@
 
 @interface FirebasePlugin : CDVPlugin
 + (FirebasePlugin *) firebasePlugin;
++ (NSString*) appleSignInNonce;
 
 - (void)setAutoInitEnabled:(CDVInvokedUrlCommand*)command;
 - (void)isAutoInitEnabled:(CDVInvokedUrlCommand*)command;
@@ -13,6 +14,7 @@
 - (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)signInUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command;
+- (void)authenticateUserWithApple:(CDVInvokedUrlCommand*)command;
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)reauthenticateWithCredential:(CDVInvokedUrlCommand*)command;
@@ -77,6 +79,8 @@
 - (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
 - (void) handlePluginExceptionWithoutContext: (NSException*) exception;
 - (void) _logError: (NSString*)msg;
+- (void) _logInfo: (NSString*)msg;
+- (void) _logMessage: (NSString*)msg;
 - (int) saveAuthCredential: (FIRAuthCredential *) authCredential;
 
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
@@ -88,6 +92,7 @@
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, copy) NSString *apnsTokenRefreshCallbackId;
 @property (nonatomic, copy) NSString *googleSignInCallbackId;
+@property (nonatomic, copy) NSString *appleSignInCallbackId;
 
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;

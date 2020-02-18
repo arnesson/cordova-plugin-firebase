@@ -114,6 +114,8 @@
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
 
+		<framework src="AuthenticationServices.framework" />
+
 		<podspec>
 			<config>
 				<source url="https://cdn.cocoapods.org/"/>
