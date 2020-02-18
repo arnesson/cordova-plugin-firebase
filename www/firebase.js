@@ -230,8 +230,8 @@ exports.authenticateUserWithGoogle = function (clientId, success, error) {
     exec(success, error, "FirebasePlugin", "authenticateUserWithGoogle", [clientId]);
 };
 
-exports.authenticateUserWithApple = function (success, error) {
-    exec(success, error, "FirebasePlugin", "authenticateUserWithApple", []);
+exports.authenticateUserWithApple = function (success, error, locale) {
+    exec(success, error, "FirebasePlugin", "authenticateUserWithApple", [locale]);
 };
 
 exports.signInWithCredential = function (credential, success, error) {

@@ -118,6 +118,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
         - [iOS](#ios-1)
       - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
         - [Android](#android-2)
+      - [authenticateUserWithApple](#authenticateuserwithapple)
+        - [iOS](#ios-2)
+        - [Android](#android-3)
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -1930,6 +1933,42 @@ To use Google Sign-in in your Android app you need to do the following:
 - Enable Google Sign-in in the Firebase console
 
 For details how to do the above, see the [Google Sign-In on Android page](https://firebase.google.com/docs/auth/android/google-signin) in the Firebase documentation.
+
+#### authenticateUserWithApple
+Authenticates the user with an Apple account using Sign In with Apple to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+
+**Parameters**:
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+ - {string} locale - (Android only) the language to display Apple's Sign-in screen in.
+    - Defaults to "en" (English) if not specified.
+    - See [the Apple documentation](https://developer.apple.com/documentation/signinwithapplejs/incorporating_sign_in_with_apple_into_other_platforms#3332112) for a list of supported locales.
+    - The value is ignored on iOS which uses the locale of the device to determine the display language.
+
+Example usage:
+
+```javascript
+
+FirebasePlugin.authenticateUserWithApple(function(credential) {
+    FirebasePlugin.signInWithCredential(credential, function() {
+            console.log("Successfully signed in");
+        }, function(error) {
+            console.error("Failed to sign in", error);
+        });
+}, function(error) {
+    console.error("Failed to authenticate with Apple: " + error);
+}, 'en_GB');
+```
+##### iOS
+To use Sign In with Apple in your iOS app you need to do the following:
+- Configure your app for Sign In with Apple as outlined in the [Firebase documentation's "Before you begin" section](https://firebase.google.com/docs/auth/ios/apple#before-you-begin)
+- After adding the `cordova-ios` platform, open the project workspace in Xcode (`platforms/ios/YourApp.xcworkspace`) and add the "Sign In with Apple" capability in the "Signing & Capabilities section"
+    - Note: AFAIK there is currently no way to automate the addition of this capability 
+
+##### Android
+To use Sign In with Apple in your Android app you need to do the following:
+- Configure your app for Sign In with Apple as outlined in the [Firebase documentation's "Before you begin" section](https://firebase.google.com/docs/auth/android/apple#before-you-begin)
 
 #### signInWithCredential
 Signs the user into Firebase with credentials obtained via an authentication method such as `verifyPhoneNumber()` or `authenticateUserWithGoogle()`.
