@@ -225,6 +225,39 @@ You should be aware of the following breaking changes compared with `cordova-plu
 Ionic Native provides a [FirebaseX Typescript wrapper](https://ionicframework.com/docs/native/firebase-x) for using `cordova-plugin-firebasex` with Ionic v4, v5 and above.
 Please see their documentation for usage.
 
+First install the package.
+
+```
+ionic cordova plugin add cordova-plugin-firebasex
+npm install @ionic-native/firebase-x
+```
+    
+If you're using Angular, register it in your component/service's `NgModule` (for example, app.module.ts) as a provider.
+
+```typescript
+import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+
+@NgModule({
+    //declarations, imports...
+    providers: [
+        FirebaseX,
+        //other providers...
+    ]
+})
+```
+
+Then you're good to go.
+```typescript
+import { FirebaseX } from "@ionic-native/firebase-x/ngx";
+
+//...
+
+constructor(private firebase: FirebaseX)
+
+this.firebase.getToken().then(token => console.log(`The token is ${token}`))
+this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
+```
+
 **NOTE:** 
 - This plugin provides only the Javascript API as documented below.
 - The Typescript wrapper is owned and maintain by Ionic. 
@@ -238,23 +271,27 @@ The above PR does not work for Ionic 3 so you (currently) can't use the [Ionic N
 
 To use `cordova-plugin-firebasex` with Ionic 3, you'll need to call its Javascript API directly from your Typescript app code, for example:
 
-    (<any>window).FirebasePlugin.getToken(token => console.log(`token: ${token}`))
-    
-    (<any>window).FirebasePlugin.onMessageReceived((message) => {
-        if (message.tap) { console.log(`Notification was tapped in the ${message.tap}`); }
-    })
+```typescript
+(<any>window).FirebasePlugin.getToken(token => console.log(`token: ${token}`))
+
+(<any>window).FirebasePlugin.onMessageReceived((message) => {
+    if (message.tap) { console.log(`Notification was tapped in the ${message.tap}`); }
+})
+```
     
 If you want to make the `onMessageReceived()` JS API behave like the Ionic Native wrapper:
 
-    onNotificationOpen() {
-          return new Observable(observer => {
-                (window as any).FirebasePlugin.onMessageReceived((response) => {
-                    observer.next(response);
-                });
-           });
-    }
-    ...
-    this.onNotificationOpen().subscribe(data => console.log(`FCM message: ${data}`));
+```javascript
+onNotificationOpen() {
+      return new Observable(observer => {
+            (window as any).FirebasePlugin.onMessageReceived((response) => {
+                observer.next(response);
+            });
+       });
+}
+...
+this.onNotificationOpen().subscribe(data => console.log(`FCM message: ${data}`));
+```
     
 See the [cordova-plugin-firebasex-ionic3-test](https://github.com/dpa99c/cordova-plugin-firebasex-ionic3-test) example project for a demonstration of how to use the plugin with Ionic 3.    
 
@@ -269,7 +306,9 @@ This plugin will not work with Phonegap Build (and other remote cloud build envs
 This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Gradle on Android.
 By default this plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned versions as `<preference>`'s, for example:
 
-    <preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.0.0" />
+```xml
+<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.0.0" />
+```
 
 The Android defaults can be overridden at plugin installation time by specifying plugin variables as command-line arguments, for example:
 
@@ -277,9 +316,11 @@ The Android defaults can be overridden at plugin installation time by specifying
     
 Or you can specify them as plugin variables in your `config.xml`, for example:
 
-    <plugin name="cordova-plugin-firebasex" spec="latest">
-        <variable name="ANDROID_FIREBASE_ANALYTICS_VERSION" value="17.0.0" />
-    </plugin>
+```xml
+<plugin name="cordova-plugin-firebasex" spec="latest">
+    <variable name="ANDROID_FIREBASE_ANALYTICS_VERSION" value="17.0.0" />
+</plugin>
+```
     
 The following plugin variables are used to specify the following Gradle dependency versions on Android:
 
@@ -426,6 +467,7 @@ Before reporting an issue with this plugin, please do the following:
 - if you are migrating from `cordova-plugin-firebase` to `cordova-plugin-firebasex` please make sure you have read the [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase) section.
 
 ## Cloud messaging
+
 <p align="center">
   <a href="https://youtu.be/qLPhan9YUhQ"><img src="https://media.giphy.com/media/U70vu02o9yCFEffidf/200w_d.gif" /></a>
   <span>&nbsp;</span>
@@ -462,16 +504,18 @@ Instead the notification message payload will be passed to the [onMessageReceive
 If you include the `notification_foreground` key in the `data` payload, the plugin will also display a system notification upon receiving the notification messages while the app is running in the foreground.
 For example:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "data": {
-        "notification_foreground": "true",
-      }
-    }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "data": {
+    "notification_foreground": "true",
+  }
+}
+```
 
 When the `onMessageReceived` is called in response to a user tapping a system notification while the app is in the foreground, it will be passed the property `tap: "foreground"`.
 
@@ -504,17 +548,19 @@ In addition to the title and body of the notification message, Android system no
 Note: on tapping a background notification, if your app is not running, only the `data` section of the notification message payload will be delivered to [onMessageReceived](#onMessageReceived).
 i.e. the notification title, body, etc. will not. Therefore if you need the properties of the notification message itself (e.g. title & body) to be delivered to [onMessageReceived](#onMessageReceived), you must duplicate these in the `data` section, e.g.:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "data": {
-        "notification_body": "Notification body",
-        "notification_title": "Notification title"
-      }
-    }  
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "data": {
+    "notification_body": "Notification body",
+    "notification_title": "Notification title"
+  }
+}
+```
 
 #### Android foreground notifications
 If the notification message arrives while the app is in the foreground, by default a system notification won't be displayed and the data will be passed to [onMessageReceived](#onMessageReceived).
@@ -530,18 +576,20 @@ However, if you set the `notification_foreground` key in the `data` section of t
 
 On Android 7 and below, the sound setting of system notifications is specified in the notification message itself, for example:
 
-    {
-      "name": "my_notification",
-        "notification": {
-          "body": "Notification body",
-          "title": "Notification title"
-        },
-      "android": {
-        "notification": {
-          "sound": "my_sound",
-          "tag": "default"
-      }
-    }
+```json
+{
+  "name": "my_notification",
+    "notification": {
+      "body": "Notification body",
+      "title": "Notification title"
+    },
+  "android": {
+    "notification": {
+      "sound": "my_sound",
+      "tag": "default"
+  }
+}
+```
 
 
 #### Android Notification Icons
@@ -564,23 +612,27 @@ To do this, copy the `drawable-DPI` image directories into your Cordova project 
 
 For example, copy the`drawable-DPI` image directories to `<projectroot>/res/android/` and add the following to your `config.xml`:
 
-    <platform name="android">
-        <resource-file src="res/android/drawable-mdpi/notification_icon.png" target="app/src/main/res/drawable-mdpi/notification_icon.png" />
-        <resource-file src="res/android/drawable-hdpi/notification_icon.png" target="app/src/main/res/drawable-hdpi/notification_icon.png" />
-        <resource-file src="res/android/drawable-xhdpi/notification_icon.png" target="app/src/main/res/drawable-xhdpi/notification_icon.png" />
-        <resource-file src="res/android/drawable-xxhdpi/notification_icon.png" target="app/src/main/res/drawable-xxhdpi/notification_icon.png" />
-        <resource-file src="res/android/drawable-xxxhdpi/notification_icon.png" target="app/src/main/res/drawable-xxxhdpi/notification_icon.png" />
-    </platform>
+```xml
+<platform name="android">
+    <resource-file src="res/android/drawable-mdpi/notification_icon.png" target="app/src/main/res/drawable-mdpi/notification_icon.png" />
+    <resource-file src="res/android/drawable-hdpi/notification_icon.png" target="app/src/main/res/drawable-hdpi/notification_icon.png" />
+    <resource-file src="res/android/drawable-xhdpi/notification_icon.png" target="app/src/main/res/drawable-xhdpi/notification_icon.png" />
+    <resource-file src="res/android/drawable-xxhdpi/notification_icon.png" target="app/src/main/res/drawable-xxhdpi/notification_icon.png" />
+    <resource-file src="res/android/drawable-xxxhdpi/notification_icon.png" target="app/src/main/res/drawable-xxxhdpi/notification_icon.png" />
+</platform>
+```
     
 The default notification icon images **must** be named `notification_icon.png`. 
 
 You then need to add a `<config-file>` block to the `config.xml` which will instruct Firebase to use your icon as the default for notifications:
 
-    <platform name="android">
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/notification_icon" />
-        </config-file>
-    </platform>
+```xml
+<platform name="android">
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/notification_icon" />
+    </config-file>
+</platform>
+```
 
 
 ##### Android Large Notification Icon
@@ -592,9 +644,11 @@ So the large icon will currently only be used if specified in [data messages](#a
 The large icon image should be a PNG-24 that's 256x256 pixels and must be named `notification_icon_large.png` and should be placed in the `drawable-xxxhdpi` resource directory.
 As with the small icons, you'll need to add a `<resource-file>` entry to the `<platform name="android">` section of your `config.xml`:
 
-    <platform name="android">
-        <resource-file src="res/android/drawable-xxxhdpi/notification_icon_large.png" target="app/src/main/res/drawable-xxxhdpi/notification_icon_large.png" />
-    </platform>
+```xml
+<platform name="android">
+    <resource-file src="res/android/drawable-xxxhdpi/notification_icon_large.png" target="app/src/main/res/drawable-xxxhdpi/notification_icon_large.png" />
+</platform>
+```
 
 
 ##### Android Custom Notification Icons
@@ -603,42 +657,48 @@ These can be specified in notification or data messages.
 
 For example:
 
+```xml
         <resource-file src="res/android/drawable-mdpi/my_icon.png" target="app/src/main/res/drawable-mdpi/my_icon.png" />
         <resource-file src="res/android/drawable-hdpi/my_icon.png" target="app/src/main/res/drawable-hdpi/my_icon.png" />
         <resource-file src="res/android/drawable-xhdpi/my_icon.png" target="app/src/main/res/drawable-xhdpi/my_icon.png" />
         <resource-file src="res/android/drawable-xxhdpi/my_icon.png" target="app/src/main/res/drawable-xxhdpi/my_icon.png" />
         <resource-file src="res/android/drawable-xxxhdpi/my_icon.png" target="app/src/main/res/drawable-xxxhdpi/my_icon.png" />
         <resource-file src="res/android/drawable-xxxhdpi/my_icon_large.png" target="app/src/main/res/drawable-xxxhdpi/my_icon_large.png" />
+```
         
 When sending an FCM notification message, you will then specify the icon name in the `android.notification` section, for example:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "android": {
-        "notification": {
-          "icon": "my_icon",
-        }
-      },
-      "data": {
-        "notification_foreground": "true",
-      }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "android": {
+    "notification": {
+      "icon": "my_icon",
     }
+  },
+  "data": {
+    "notification_foreground": "true",
+  }
+}
+```
 
 You can also reference these icons in [data messages](#android-data-messages), for example:
 
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_android_icon": "my_icon",
-      }
-    }         
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_android_icon": "my_icon",
+  }
+}
+```
 
 
 #### Android Notification Color
@@ -652,31 +712,34 @@ You can override this default by specifying a value using the `ANDROID_ICON_ACCE
     
 You can override the default color accent by specifying the `colour` key as an RGB value in a notification message, e.g.:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "android": {
-        "notification": {
-          "color": "#00ff00"
-        }
-      }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "android": {
+    "notification": {
+      "color": "#00ff00"
     }
+  }
+}
+```
     
 And in a data message:
 
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_android_color": "#00ff00"
-      }
-    }         
-
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_android_color": "#00ff00"
+  }
+}         
+```
 
 #### Android Notification Sound
 You can specify custom sounds for notifications or play the device default notification sound.
@@ -684,36 +747,42 @@ You can specify custom sounds for notifications or play the device default notif
 Custom sound files must be in `.mp3` format and deployed to the `/res/raw` directory in the Android project.
 To do this, you can add `<resource-file>` tags to your `config.xml` to deploy the files, for example:
 
-    <platform name="android">
-        <resource-file src="res/android/raw/my_sound.mp3" target="app/src/main/res/raw/my_sound.mp3" />
-    </platform>
+```xml
+<platform name="android">
+    <resource-file src="res/android/raw/my_sound.mp3" target="app/src/main/res/raw/my_sound.mp3" />
+</platform>
+```
 
 In a notification message, you specify the sound file name in the `android.notification` section, for example:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "android": {
-        "notification": {
-          "sound": "my_sound"
-        }
-      }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "android": {
+    "notification": {
+      "sound": "my_sound"
     }
+  }
+}
+```
     
 And in a data message by specifying it in the `data` section:
 
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_android_sound": "my_sound"
-      }
-    } 
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_android_sound": "my_sound"
+  }
+} 
+```
     
 - To play the default notification sound, set `"sound": "default"`.
 - To display a silent notification (no sound), omit the `sound` key from the message.
@@ -724,22 +793,24 @@ Notifications on iOS can be customised to specify the sound and badge number tha
 Notification settings are specified in the `apns.payload.aps` key of the notification message payload.
 For example:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "apns": {
-          "payload": {
-            "aps": {
-              "sound": "default",
-              "badge": 1,
-              "content-available": 1
-            }
-          }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "apns": {
+      "payload": {
+        "aps": {
+          "sound": "default",
+          "badge": 1,
+          "content-available": 1
         }
+      }
     }
+}
+```
 
 #### iOS background notifications
 If the app is in the background but is still running (i.e. has not been task-killed) and the device is not in power-saving mode, the `onMessageReceived` callback can be invoked when the message arrives without requiring user interaction (i.e. tapping the system notification).
@@ -758,72 +829,81 @@ For example to convert an `.mp3` file to the supported `.caf` format run:
 Sound files must be deployed with the iOS application bundle. 
 To do this, you can add `<resource-file>` tags to your `config.xml` to deploy the files, for example:
 
-    <platform name="ios">
-        <resource-file src="res/ios/sound/my_sound.caf" />
-    </platform>
+```xml
+<platform name="ios">
+    <resource-file src="res/ios/sound/my_sound.caf" />
+</platform>
+```
 
 In a notification message, specify the `sound` key in the `apns.payload.aps` section, for example:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "apns": {
-          "payload": {
-            "aps": {
-              "sound": "my_sound.caf"
-            }
-          }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "apns": {
+      "payload": {
+        "aps": {
+          "sound": "my_sound.caf"
         }
+      }
     }
+}
+```
     
 - To play the default notification sound, set `"sound": "default"`.
 - To display a silent notification (no sound), omit the `sound` key from the message.
     
 In a data message, specify the `notification_ios_sound` key in the `data` section:
 
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_ios_sound": "my_sound.caf"
-      }
-    } 
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_ios_sound": "my_sound.caf"
+  }
+}
+```
     
 #### iOS badge number
 In a notification message, specify the `badge` key in the `apns.payload.aps` section, for example:
 
-    {
-      "name": "my_notification",
-      "notification": {
-        "body": "Notification body",
-        "title": "Notification title"
-      },
-      "apns": {
-          "payload": {
-            "aps": {
-              "badge": 1
-            }
-          }
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "apns": {
+      "payload": {
+        "aps": {
+          "badge": 1
         }
+      }
     }
+}
+```
     
 In a data message, specify the `notification_ios_badge` key in the `data` section:
 
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_ios_badge": 1
-      }
-    } 
-
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_ios_badge": 1
+  }
+} 
+```
 
 ### Data messages
 FCM data messages are sent as an arbitrary k/v structure and by default are passed to the app for it to handle them.
@@ -835,16 +915,18 @@ This plugin enables a data message to be displayed as a system notification.
 To have the app display a notification when the data message arrives, you need to set the `notification_foreground` key in the `data` section.
 You can then set a `notification_title` and `notification_body`, for example:
 
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "foo" : "bar"
-      }
-    }
-    
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "foo" : "bar"
+  }
+}
+```
+   
 Additional platform-specific notification options can be set using the additional keys below (which are only relevant if the `notification_foreground` key is set).
 
 Note: [foreground notification messages](#foreground-notifications) can also make use of these keys.
@@ -903,22 +985,24 @@ On Android 8 and above they will be ignored - the `notification_android_channel_
 
 Example data message with Android notification keys:
 
-    {
-      "name": "my_data_message",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_android_channel_id": "my_channel",
-        "notification_android_priority": "2",
-        "notification_android_visibility": "1",
-        "notification_android_color": "#ff0000",
-        "notification_android_icon": "coffee",
-        "notification_android_sound": "my_sound",
-        "notification_android_vibrate": "500, 200, 500",
-        "notification_android_lights": "#ffff0000, 250, 250"
-      }
-    }
+```json
+{
+  "name": "my_data_message",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_android_channel_id": "my_channel",
+    "notification_android_priority": "2",
+    "notification_android_visibility": "1",
+    "notification_android_color": "#ff0000",
+    "notification_android_icon": "coffee",
+    "notification_android_sound": "my_sound",
+    "notification_android_vibrate": "500, 200, 500",
+    "notification_android_lights": "#ffff0000, 250, 250"
+  }
+}
+```
 
 ##### iOS data message notifications
 On iOS:
@@ -934,31 +1018,31 @@ The following iOS-specific keys are supported and should be placed inside the `d
 - `notification_ios_badge` - Badge number to display on app icon on home screen.
 
 For example:
-
-    {
-      "name": "my_data",
-      "data" : {
-        "notification_foreground": "true",
-        "notification_body" : "Notification body",
-        "notification_title": "Notification title",
-        "notification_ios_sound": "my_sound.caf",
-        "notification_ios_badge": 1
-      }
-    } 
-
+```json
+{
+  "name": "my_data",
+  "data" : {
+    "notification_foreground": "true",
+    "notification_body" : "Notification body",
+    "notification_title": "Notification title",
+    "notification_ios_sound": "my_sound.caf",
+    "notification_ios_badge": 1
+  }
+} 
+```
 
 ## Google Tag Manager
 Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
 
 ### Android
-```
+```xml
 <platform name="android">
     <resource-file src="GTM-XXXXXXX.json" target="assets/containers/GTM-XXXXXXX.json" />
     ...
 ```
 
 ### iOS
-```
+```xml
 <platform name="ios">
     <resource-file src="GTM-YYYYYYY.json" />
     ...
@@ -1369,7 +1453,7 @@ function(error){
 #### Default Android Channel Properties
 The default channel is initialised at app startup with the following default settings:
 
-```
+```json
 {
     id: "fcm_default_channel",
     name: "Default",
@@ -1601,7 +1685,6 @@ Also logs the error message to the native device console.
 ```
 
 An example of how the error entry will appear in the Crashlytics console:
-
 <br/>
 <b>Android</b>
 <br/>
@@ -2169,7 +2252,7 @@ Change the settings for the FirebaseRemoteConfig object's operations:
 - {function} success - callback function to be call on successfully setting the remote config settings
 - {function} error - callback function which will be passed a {string} error message as an argument
 
-```
+```javascript
 var settings = {
     developerModeEnabled: true
 }
@@ -2185,7 +2268,7 @@ Set defaults in the Remote Config:
 - {function} success - callback function to be call on successfully setting the remote config setting defaults
 - {function} error - callback function which will be passed a {string} error message as an argument
 
-```
+```javascript
 // define defaults
 var defaults = {
     // map property name to value in Remote Config defaults
@@ -2212,7 +2295,7 @@ Manually enable/disable performance data collection, e.g. if [disabled on app st
 **Parameters**:
 - {boolean} setEnabled - whether to enable or disable performance data collection
 
-```
+```javascript
 FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
 
 FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables performance data collection
@@ -2227,7 +2310,7 @@ Start a trace.
 - {function} success - callback function to call on successfully starting trace
 - {function} error - callback function which will be passed a {string} error message as an argument
 
-```
+```javascript
 FirebasePlugin.startTrace("test trace", success, error);
 ```
 
@@ -2241,7 +2324,8 @@ To count the performance-related events that occur in your app (such as cache hi
 - {function} success - callback function to call on successfully incrementing counter
 - {function} error - callback function which will be passed a {string} error message as an argument
 
-```
+
+```javascript
 FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 ```
 
@@ -2254,7 +2338,7 @@ Stop the trace
 - {function} success - callback function to call on successfully stopping trace
 - {function} error - callback function which will be passed a {string} error message as an argument
 
-```
+```javascript
 FirebasePlugin.stopTrace("test trace");
 ```
 
