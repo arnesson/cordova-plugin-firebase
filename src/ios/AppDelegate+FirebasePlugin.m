@@ -202,6 +202,7 @@ didDisconnectWithUser:(GIDGoogleUser *)user
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
     @try{
+        [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
         mutableUserInfo = [userInfo mutableCopy];
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
         bool isContentAvailable = false;
@@ -378,7 +379,8 @@ didDisconnectWithUser:(GIDGoogleUser *)user
             return;
         }
         
-
+        [[FIRMessaging messaging] appDidReceiveMessage:notification.request.content.userInfo];
+        
         mutableUserInfo = [notification.request.content.userInfo mutableCopy];
         
         NSString* messageType = [mutableUserInfo objectForKey:@"messageType"];
@@ -448,6 +450,8 @@ didDisconnectWithUser:(GIDGoogleUser *)user
             return;
         }
 
+        [[FIRMessaging messaging] appDidReceiveMessage:response.notification.request.content.userInfo];
+        
         mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
         
         NSString* tap;
