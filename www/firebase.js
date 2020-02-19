@@ -1,9 +1,18 @@
 var exec = require('cordova/exec');
 
-var ensureBoolean = function (callback){
+var ensureBooleanFn = function (callback){
     return function(result){
-        callback(!!result);
+        callback(ensureBoolean(result));
     }
+};
+
+var ensureBoolean = function(value){
+    if(value === "true"){
+        value = true;
+    }else if(value === "false"){
+        value = false;
+    }
+    return !!value;
 };
 
 exports.getVerificationID = function (number, success, error) {
@@ -65,11 +74,11 @@ exports.getBadgeNumber = function (success, error) {
 };
 
 exports.grantPermission = function (success, error) {
-    exec(ensureBoolean(success), error, "FirebasePlugin", "grantPermission", []);
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "grantPermission", []);
 };
 
 exports.hasPermission = function (success, error) {
-    exec(ensureBoolean(success), error, "FirebasePlugin", "hasPermission", []);
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "hasPermission", []);
 };
 
 // Notifications - Android-only
@@ -111,7 +120,7 @@ exports.setUserProperty = function (name, value, success, error) {
 };
 
 exports.activateFetched = function (success, error) {
-  exec(ensureBoolean(success), error, "FirebasePlugin", "activateFetched", []);
+  exec(ensureBooleanFn(success), error, "FirebasePlugin", "activateFetched", []);
 };
 
 exports.fetch = function (cacheExpirationSeconds, success, error) {
@@ -201,13 +210,85 @@ exports.setCrashlyticsUserId = function (userId, success, error) {
 
 // Authentication
 exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, fakeVerificationCode) {
-    exec(success, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
+    exec(function(credential){
+        if(typeof credential === 'object'){
+            credential.instantVerification = ensureBoolean(credential.instantVerification);
+        }
+        success(credential);
+    }, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
 };
 
-exports.signInWithCredential = function (verificationId, code, success, error) {
-    exec(success, error, "FirebasePlugin", "signInWithCredential", [verificationId, code]);
+exports.createUserWithEmailAndPassword = function (email, password, success, error) {
+    exec(success, error, "FirebasePlugin", "createUserWithEmailAndPassword", [email, password]);
 };
 
-exports.linkUserWithCredential = function (verificationId, code, success, error) {
-    exec(success, error, "FirebasePlugin", "linkUserWithCredential", [verificationId, code]);
+exports.signInUserWithEmailAndPassword = function (email, password, success, error) {
+    exec(success, error, "FirebasePlugin", "signInUserWithEmailAndPassword", [email, password]);
+};
+
+exports.authenticateUserWithGoogle = function (clientId, success, error) {
+    exec(success, error, "FirebasePlugin", "authenticateUserWithGoogle", [clientId]);
+};
+
+exports.authenticateUserWithApple = function (success, error, locale) {
+    exec(success, error, "FirebasePlugin", "authenticateUserWithApple", [locale]);
+};
+
+exports.signInWithCredential = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
+    exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);
+};
+
+exports.linkUserWithCredential = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
+    exec(success, error, "FirebasePlugin", "linkUserWithCredential", [credential]);
+};
+
+exports.reauthenticateWithCredential = function (credential, success, error) {
+    if(typeof credential !== 'object') return error("'credential' must be an object");
+    exec(success, error, "FirebasePlugin", "reauthenticateWithCredential", [credential]);
+};
+
+exports.isUserSignedIn = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "isUserSignedIn", []);
+};
+
+exports.signOutUser = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "signOutUser", []);
+};
+
+
+exports.getCurrentUser = function (success, error) {
+    exec(function(user){
+        user.emailIsVerified = ensureBoolean(user.emailIsVerified);
+        success(user);
+    }, error, "FirebasePlugin", "getCurrentUser", []);
+};
+
+exports.updateUserProfile = function (profile, success, error) {
+    if(typeof profile !== 'object') return error("'profile' must be an object with keys 'name' and/or 'photoUri'");
+    exec(success, error, "FirebasePlugin", "updateUserProfile", [profile]);
+};
+
+exports.updateUserEmail = function (email, success, error) {
+    if(typeof email !== 'string' || !email) return error("'email' must be a valid email address");
+    exec(success, error, "FirebasePlugin", "updateUserEmail", [email]);
+};
+
+exports.sendUserEmailVerification = function (success, error) {
+    exec(success, error, "FirebasePlugin", "sendUserEmailVerification", []);
+};
+
+exports.updateUserPassword = function (password, success, error) {
+    if(typeof password !== 'string' || !password) return error("'password' must be a valid string");
+    exec(success, error, "FirebasePlugin", "updateUserPassword", [password]);
+};
+
+exports.sendUserPasswordResetEmail = function (email, success, error) {
+    if(typeof email !== 'string' || !email) return error("'email' must be a valid email address");
+    exec(success, error, "FirebasePlugin", "sendUserPasswordResetEmail", [email]);
+};
+
+exports.deleteUser = function (success, error) {
+    exec(success, error, "FirebasePlugin", "deleteUser", []);
 };

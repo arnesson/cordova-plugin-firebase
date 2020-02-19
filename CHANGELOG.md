@@ -1,3 +1,17 @@
+# Version 8.0.0
+* *BREAKING CHANGE*:  Rework `verifyPhoneNumber()` to preserve and reference the native credentials object (rather than attempting to extract and parse its properties to JS). Fixes [#176](https://github.com/dpa99c/cordova-plugin-firebasex/issues/176).
+* Add other Firebase Authentication methods: Google Sign In, Sign In with Apple, email/password sign in, and authentication utility methods. Partially resolves [#208](https://github.com/dpa99c/cordova-plugin-firebasex/issues/208).
+* (Android) Add check `google-services` plugin does not already exist. Fixes [#282](https://github.com/dpa99c/cordova-plugin-firebasex/issues/282).
+* (iOS) Update pinned Firebase SDK versions to latest v6.13.0. Resolves [#232](https://github.com/dpa99c/cordova-plugin-firebasex/issues/232).
+
+# Version 7.0.2
+* (Android) Fix error caused by local variable
+    * Merged from PR [#229](https://github.com/dpa99c/cordova-plugin-firebasex/pull/229).
+* (iOS Hook) Fix retrieving Xcode project path
+    * Merged from PR [#234](https://github.com/dpa99c/cordova-plugin-firebasex/pull/234).
+* (Android) Check google-services plugin doesn't already exist in Gradle script   
+    * Merged from PR [#281](https://github.com/dpa99c/cordova-plugin-firebasex/pull/281).
+
 # Version 7.0.1
 * (Android) Replace references to cordovaActivity with applicationContext when app is not running and therefore cordovaActivity doesn't exist. 
 Resolves [#165](https://github.com/dpa99c/cordova-plugin-firebasex/issues/165).

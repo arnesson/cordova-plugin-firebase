@@ -23,9 +23,10 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Android only](#android-only)
       - [iOS only](#ios-only)
     - [Supported Cordova Versions](#supported-cordova-versions)
+    - [Supported Mobile Platform Versions](#supported-mobile-platform-versions)
     - [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase)
       - [Breaking API changes](#breaking-api-changes)
-      - [Ionic 4](#ionic-4)
+      - [Ionic 4+](#ionic-4)
       - [Ionic 3](#ionic-3)
   - [Build environment notes](#build-environment-notes)
     - [PhoneGap Build](#phonegap-build)
@@ -101,11 +102,28 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [logMessage](#logmessage)
       - [logError](#logerror)
     - [Authentication](#authentication)
+      - [isUserSignedIn](#isusersignedin)
+      - [signOutUser](#signoutuser)
+      - [getCurrentUser](#getcurrentuser)
+      - [updateUserProfile](#updateuserprofile)
+      - [updateUserEmail](#updateuseremail)
+      - [sendUserEmailVerification](#senduseremailverification)
+      - [updateUserPassword](#updateuserpassword)
+      - [sendUserPasswordResetEmail](#senduserpasswordresetemail)
+      - [deleteUser](#deleteuser)
+      - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
+      - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
       - [verifyPhoneNumber](#verifyphonenumber)
         - [Android](#android-1)
         - [iOS](#ios-1)
+      - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
+        - [Android](#android-2)
+      - [authenticateUserWithApple](#authenticateuserwithapple)
+        - [iOS](#ios-2)
+        - [Android](#android-3)
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
+      - [reauthenticateWithCredential](#reauthenticatewithcredential)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
@@ -146,6 +164,7 @@ See [Disable data collection on startup](#disable-data-collection-on-startup) fo
 #### Android only
 The following plugin variables are used to specify the Firebase SDK versions as Gradle dependencies on Android:
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION`
+- `ANDROID_PLAY_SERVICES_AUTH_VERSION``
 - `ANDROID_FIREBASE_ANALYTICS_VERSION`
 - `ANDROID_FIREBASE_MESSAGING_VERSION`
 - `ANDROID_FIREBASE_CONFIG_VERSION`
@@ -165,6 +184,10 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - cordova: `>= 9`
 - cordova-android: `>= 8`
 - cordova-ios: `>= 5`
+
+### Supported Mobile Platform Versions
+- Android `>= 4.1`
+- iOS `>= 10.0`
 
 ### Migrating from cordova-plugin-firebase
 This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been reworked to fix issues and add new functionality.
@@ -193,14 +216,14 @@ You should be aware of the following breaking changes compared with `cordova-plu
     * `tap` parameter is only set when user taps on a notification (not when a message is received from FCM)
     * `tap=foreground|background` instead of `tap=true|false`
 * `hasPermission()` receives argument as a boolean (rather than an object with `isEnabled` key)
-    * e.g. `window.FirebasePlugin.hasPermission(function(hasPermission){
+    * e.g. `FirebasePlugin.hasPermission(function(hasPermission){
                console.log("Permission is " + (hasPermission ? "granted" : "denied"));
            });`
 * Adds support for foreground notifications and data notification messages
 
-#### Ionic 4
-[This PR](https://github.com/ionic-team/ionic-native/pull/3106) adds an [Ionic Native firebase-x Typescript wrapper](https://github.com/ionic-team/ionic-native/blob/master/src/%40ionic-native/plugins/firebase-x/index.ts) for using `cordova-plugin-firebasex` with Ionic 4. 
-The API is similar to the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) wrapper.
+#### Ionic 4+
+Ionic Native provides a [FirebaseX Typescript wrapper](https://ionicframework.com/docs/native/firebase-x) for using `cordova-plugin-firebasex` with Ionic v4, v5 and above.
+Please see their documentation for usage.
 
 First install the package.
 
@@ -234,6 +257,13 @@ constructor(private firebase: FirebaseX)
 this.firebase.getToken().then(token => console.log(`The token is ${token}`))
 this.firebase.onMessageReceived().subscribe(data => console.log(`FCM message: ${data}`));
 ```
+
+**NOTE:** 
+- This plugin provides only the Javascript API as documented below.
+- The Typescript wrapper is owned and maintain by Ionic. 
+- Please [report any issues](https://github.com/ionic-team/ionic-native/issues) against the [Ionic Native repo](https://github.com/ionic-team/ionic-native/), not this one.
+- Any issues opened against this repo which relate to the Typescript wrapper **will be closed immediately**.
+
      
 #### Ionic 3
 The above PR does not work for Ionic 3 so you (currently) can't use the [Ionic Native Firebase](https://ionicframework.com/docs/native/firebase) Typescript wrapper with Ionic 3. 
@@ -295,6 +325,7 @@ Or you can specify them as plugin variables in your `config.xml`, for example:
 The following plugin variables are used to specify the following Gradle dependency versions on Android:
 
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION` => `com.google.android.gms:play-services-tagmanager`
+- `ANDROID_PLAY_SERVICES_AUTH_VERSION` => `com.google.android.gms:play-services-auth`
 - `ANDROID_FIREBASE_ANALYTICS_VERSION` => `com.google.firebase:firebase-analytics`
 - `ANDROID_FIREBASE_MESSAGING_VERSION` => `com.google.firebase:firebase-messaging`
 - `ANDROID_FIREBASE_CONFIG_VERSION` => `com.google.firebase:firebase-config`
@@ -307,6 +338,7 @@ For example, to explicitly specify all the component versions at plugin install 
 
     cordova plugin add cordova-plugin-firebasex \
         --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \
+        --variable ANDROID_PLAY_SERVICES_AUTH_VERSION=17.0.0 \
         --variable ANDROID_FIREBASE_ANALYTICS_VERSION=17.0.0 \
         --variable ANDROID_FIREBASE_MESSAGING_VERSION=19.0.0 \
         --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0 \
@@ -412,9 +444,9 @@ To do this, set the following plugin variables to `false` at plugin install time
 
 This will disable data collection (on both Android & iOS) until you call [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled), [setPerformanceCollectionEnabled](#setperformancecollectionenabled) and [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled):
 
-       window.FirebasePlugin.setAnalyticsCollectionEnabled(true);
-       window.FirebasePlugin.setPerformanceCollectionEnabled(true);
-       window.FirebasePlugin.setCrashlyticsCollectionEnabled();
+       FirebasePlugin.setAnalyticsCollectionEnabled(true);
+       FirebasePlugin.setPerformanceCollectionEnabled(true);
+       FirebasePlugin.setCrashlyticsCollectionEnabled();
 
 ## Example project
 An example project repo exists to demonstrate and validate the functionality of this plugin:
@@ -1033,7 +1065,7 @@ Null if the token has not been allocated yet by the Firebase SDK.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.getToken(function(fcmToken) {
+FirebasePlugin.getToken(function(fcmToken) {
     console.log(fcmToken);
 }, function(error) {
     console.error(error);
@@ -1053,7 +1085,7 @@ You can use this callback to return the token to you server to keep the FCM toke
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.onTokenRefresh(function(fcmToken) {
+FirebasePlugin.onTokenRefresh(function(fcmToken) {
     console.log(fcmToken);
 }, function(error) {
     console.error(error);
@@ -1070,7 +1102,7 @@ Note that token will be null if it has not been allocated yet.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.getAPNSToken(function(apnsToken) {
+FirebasePlugin.getAPNSToken(function(apnsToken) {
     console.log(apnsToken);
 }, function(error) {
     console.error(error);
@@ -1087,7 +1119,7 @@ This will be called once when remote notifications permission has been granted b
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.onApnsTokenReceived(function(apnsToken) {
+FirebasePlugin.onApnsTokenReceived(function(apnsToken) {
     console.log(apnsToken);
 }, function(error) {
     console.error(error);
@@ -1104,7 +1136,7 @@ Registers a callback function to invoke when:
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.onMessageReceived(function(message) {
+FirebasePlugin.onMessageReceived(function(message) {
     console.log("Message type: " + message.messageType);
     if(message.messageType === "notification"){
         console.log("Notification message received");
@@ -1152,7 +1184,7 @@ iOS only (Android will always return true).
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.grantPermission(function(hasPermission){
+FirebasePlugin.grantPermission(function(hasPermission){
     console.log("Permission was " + (hasPermission ? "granted" : "denied"));
 });
 ```
@@ -1166,7 +1198,7 @@ On Android, returns true if remote notifications are enabled.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.hasPermission(function(hasPermission){
+FirebasePlugin.hasPermission(function(hasPermission){
     console.log("Permission is " + (hasPermission ? "granted" : "denied"));
 });
 ```
@@ -1181,7 +1213,7 @@ To prevent a new token being generated, by sure to disable autoinit using [`setA
 **Parameters**: None
 
 ```javascript
-window.FirebasePlugin.unregister();
+FirebasePlugin.unregister();
 ```
 
 #### isAutoInitEnabled
@@ -1194,7 +1226,7 @@ If so, new FCM tokens will be automatically generated.
 
 
 ```javascript
-window.FirebasePlugin.isAutoInitEnabled(function(enabled){
+FirebasePlugin.isAutoInitEnabled(function(enabled){
     console.log("Auto init is " + (enabled ? "enabled" : "disabled"));    
 });
 
@@ -1212,9 +1244,9 @@ To prevent a new token being generated, by sure to disable autoinit using [`setA
 
 
 ```javascript
-window.FirebasePlugin.setAutoInitEnabled(false, function(){
+FirebasePlugin.setAutoInitEnabled(false, function(){
     console.log("Auto init has been disabled ");
-    window.FirebasePlugin.unregister();
+    FirebasePlugin.unregister();
 });
 
 ```
@@ -1227,12 +1259,12 @@ Set a number on the icon badge:
 - {integer} badgeNumber - number to set for the app badge
 
 ```javascript
-window.FirebasePlugin.setBadgeNumber(3);
+FirebasePlugin.setBadgeNumber(3);
 ```
 
 Set 0 to clear the badge
 ```javascript
-window.FirebasePlugin.setBadgeNumber(0);
+FirebasePlugin.setBadgeNumber(0);
 ```
 
 Note: this function is no longer available on Android (see [#124](https://github.com/dpa99c/cordova-plugin-firebasex/issues/124))
@@ -1245,7 +1277,7 @@ Get icon badge number:
 - {function} success - callback function which will be passed the {integer} current badge number as an argument
 
 ```javascript
-window.FirebasePlugin.getBadgeNumber(function(n) {
+FirebasePlugin.getBadgeNumber(function(n) {
     console.log(n);
 });
 ```
@@ -1258,7 +1290,7 @@ Clear all pending notifications from the drawer:
 **Parameters**: None
 
 ```javascript
-window.FirebasePlugin.clearAllNotifications();
+FirebasePlugin.clearAllNotifications();
 ```
 
 #### subscribe
@@ -1270,7 +1302,7 @@ Topic messaging allows you to send a message to multiple devices that have opted
 - {string} topicName - name of topic to subscribe to
 
 ```javascript
-window.FirebasePlugin.subscribe("latest_news");
+FirebasePlugin.subscribe("latest_news");
 ```
 
 #### unsubscribe
@@ -1282,7 +1314,7 @@ This will stop you receiving messages for that topic
 - {string} topicName - name of topic to unsubscribe from
 
 ```javascript
-window.FirebasePlugin.unsubscribe("latest_news");
+FirebasePlugin.unsubscribe("latest_news");
 ```
 
 #### createChannel
@@ -1354,7 +1386,7 @@ var channel  = {
 };
 
 // Create the channel
-window.FirebasePlugin.createChannel(channel,
+FirebasePlugin.createChannel(channel,
 function(){
     console.log('Channel created: ' + channel.id);
 },
@@ -1409,7 +1441,7 @@ var channel = {
   visibility: -1
 };
 
-window.FirebasePlugin.setDefaultChannel(channel,
+FirebasePlugin.setDefaultChannel(channel,
 function(){
     console.log('Default channel set');
 },
@@ -1447,7 +1479,7 @@ Calling on Android 7 or below or another platform will have no effect.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.deleteChannel("my_channel_id",
+FirebasePlugin.deleteChannel("my_channel_id",
 function(){
     console.log('Channel deleted');
 },
@@ -1467,7 +1499,7 @@ Calling on Android 7 or below or another platform will have no effect.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.listChannels(
+FirebasePlugin.listChannels(
 function(channels){
      if(typeof channels == "undefined")
           return;
@@ -1500,9 +1532,9 @@ Manually enable/disable analytics data collection, e.g. if [disabled on app star
 - {boolean} setEnabled - whether to enable or disable analytics data collection 
 
 ```javascript
-window.FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics data collection
+FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics data collection
 
-window.FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics data collection
+FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics data collection
 ```
 
 #### logEvent
@@ -1513,7 +1545,7 @@ Log an event using Analytics:
 - {object} eventProperties - key/value object of event properties (must be serializable)
 
 ```javascript
-window.FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
+FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
 ```
 
 #### setScreenName
@@ -1523,7 +1555,7 @@ Set the name of the current screen in Analytics:
 - {string} screenName - name of screen to log to Firebase Analytics
 
 ```javascript
-window.FirebasePlugin.setScreenName("Home");
+FirebasePlugin.setScreenName("Home");
 ```
 
 #### setUserId
@@ -1533,7 +1565,7 @@ Set a user id for use in Analytics:
 - {string} userName - name of user to set in Firebase Analytics
 
 ```javascript
-window.FirebasePlugin.setUserId("user_id");
+FirebasePlugin.setUserId("user_id");
 ```
 
 #### setUserProperty
@@ -1544,7 +1576,7 @@ Set a user property for use in Analytics:
 - {string} userName - value of user property to set in Firebase Analytics
 
 ```javascript
-window.FirebasePlugin.setUserProperty("name", "value");
+FirebasePlugin.setUserProperty("name", "value");
 ```
 
 ### Crashlytics
@@ -1558,7 +1590,7 @@ Manually enable Crashlytics data collection if [disabled on app startup](#disabl
 **Parameters**: None
 
 ```javascript
-window.FirebasePlugin.setCrashlyticsCollectionEnabled();
+FirebasePlugin.setCrashlyticsCollectionEnabled();
 ```
 
 Note: once enabled, Crashlytics data collection cannot be disabled during the app session.
@@ -1575,7 +1607,7 @@ See [the Firebase docs for more](https://firebase.google.com/docs/crashlytics/cu
 - {string} userId - User ID to associate with Crashlytics reports
 
 ```javascript
-window.FirebasePlugin.setCrashlyticsUserId("user_id");
+FirebasePlugin.setCrashlyticsUserId("user_id");
 ```
 
 
@@ -1587,7 +1619,7 @@ Crashes will appear under `Event type = "Crashes"` in the Crashlytics console.
 **Parameters**: None
 
 ```javascript
-window.FirebasePlugin.sendCrash();
+FirebasePlugin.sendCrash();
 ```
 
 #### logMessage
@@ -1599,8 +1631,8 @@ Also logs the message to the native device console.
 - {string} message - message to associate with next native crash event
 
 ```javascript
-window.FirebasePlugin.logMessage("about to send a crash for testing!");
-window.FirebasePlugin.sendCrash();
+FirebasePlugin.logMessage("about to send a crash for testing!");
+FirebasePlugin.sendCrash();
 ```
 
 #### logError
@@ -1667,17 +1699,216 @@ An example of how the error entry will appear in the Crashlytics console:
 
 ### Authentication
 
+#### isUserSignedIn
+Checks if there is a current Firebase user signed into the app.
+
+**Parameters**:
+- {function} success - callback function to pass {boolean} result to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.isUserSignedIn(function(isSignedIn) {
+        console.log("User "+(isSignedIn ? "is" : "is not") + " signed in");
+    }, function(error) {
+        console.error("Failed to check if user is signed in: " + error);
+    });
+```
+
+#### signOutUser
+Signs current Firebase user out of the app.
+
+**Parameters**:
+- {function} success - callback function to pass {boolean} result to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.signOutUser(function() {
+        console.log("User signed out");
+    }, function(error) {
+        console.error("Failed to sign out user: " + error);
+    });
+```
+
+#### getCurrentUser
+Returns details of the currently logged in user.
+Note that some user properties will be empty is they are not defined in Firebase for the current user.
+
+**Parameters**:
+- {function} success - callback function to pass user {object} to as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.getCurrentUser(function(user) {
+        console.log("Name: "+user.name);
+        console.log("Email: "+user.email);
+        console.log("Is email verified?: "+user.emailIsVerified);
+        console.log("Phone number: "+user.phoneNumber);
+        console.log("Photo URL: "+user.photoUrl);
+        console.log("UID: "+user.uid);
+        console.log("Provider ID: "+user.providerId);
+        console.log("ID token: "+user.idToken);
+    }, function(error) {
+        console.error("Failed to check if user is signed in: " + error);
+    });
+```
+
+#### updateUserProfile
+Updates the display name and/or photo URL of the current Firebase user signed into the app.
+
+**Parameters**:
+- {object} profile - new profile details:
+    - {string} name - display name of user
+    - {string} photoUri - URL of user profile photo
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.updateUserProfile({
+        name: "Homer Simpson",
+        photoUri: "http://homer.simpson.com/photo.png"
+    },function() {
+        console.log("User profile successfully updated");
+    }, function(error) {
+        console.error("Failed to update user profile: " + error);
+    });
+```
+
+#### updateUserEmail
+Updates/sets the email address of the current Firebase user signed into the app.
+
+**Parameters**:
+- {string} email - email address of user
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.updateUserEmail("user@somewhere.com",function() {
+        console.log("User email successfully updated");
+    }, function(error) {
+        console.error("Failed to update user email: " + error);
+    });
+```
+
+#### sendUserEmailVerification
+Sends a verification email to the currently configured email address of the current Firebase user signed into the app.
+When the user opens the contained link, their email address will have been verified.
+
+**Parameters**:
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.sendUserEmailVerification(function() {
+        console.log("User verification email successfully sent");
+    }, function(error) {
+        console.error("Failed to send user verification email: " + error);
+    });
+```
+
+#### updateUserPassword
+Updates/sets the account password for the current Firebase user signed into the app.
+
+**Parameters**:
+- {string} password - user-defined password
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.updateUserPassword("mypassword",function() {
+        console.log("User password successfully updated");
+    }, function(error) {
+        console.error("Failed to update user password: " + error);
+    });
+```
+
+#### sendUserPasswordResetEmail
+Sends a password reset email to the specified user email address.
+Note: doesn't require the Firebase user to be signed in to the app.
+
+**Parameters**:
+- {string} email - email address of user
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.sendUserPasswordResetEmail("user@somewhere.com",function() {
+        console.log("User password reset email sent successfully");
+    }, function(error) {
+        console.error("Failed to send user password reset email: " + error);
+    });
+```
+
+#### deleteUser
+Deletes the account of the current Firebase user signed into the app.
+
+**Parameters**:
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.deleteUser(function() {
+        console.log("User account deleted");
+    }, function(error) {
+        console.error("Failed to delete current user account: " + error);
+    });
+```
+
+#### createUserWithEmailAndPassword
+Creates a new email/password-based user account.
+If account creation is successful, user will be automatically signed in.
+
+**Parameters**:
+- {string} email - user email address. It is the responsibility of the app to ensure this is a valid email address.
+- {string} password - user password. It is the responsibility of the app to ensure the password is suitable. 
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.createUserWithEmailAndPassword(email, password, function() {
+        console.log("Successfully created email/password-based user account");
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to create email/password-based user account", error);
+    });
+```
+
+#### signInUserWithEmailAndPassword
+Signs in to an email/password-based user account.
+
+**Parameters**:
+- {string} email - user email address
+- {string} password - user password 
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.signInUserWithEmailAndPassword(email, password, function() {
+        console.log("Successfully signed in");
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to sign in", error);
+    });
+```
+
 #### verifyPhoneNumber
-Requests verification of a phone number in order to authenticate a user and sign then into Firebase in your app.
+Requests verification of a phone number.
+The resulting credential can be used to create/sign in to a phone number-based user account in your app or to link the phone number to an existing user account
 
 **NOTE: This will only work on physical devices with a SIM card (not iOS Simulator or Android Emulator)**
 
 In response to your request, you'll receive a verification ID which you can use in conjunction with the verification code to sign the user in.
 
-On iOS and some Android devices, the user will receive and SMS containing the verification code which they must manually enter into your app.
-
-Some Android devices support "instant verfication", in which case an SMS will not be send and you will be returned the verification code along with the verification ID.
-In this case, the user doesn't need to do anything in order for you to sign them in.  
+There are 3 verification scenarios:
+- Some Android devices support "instant verification" where the phone number can be instantly verified without sending or receiving an SMS.
+    - In this case, the user doesn't need to do anything in order for you to sign them in and you don't need to provide any additional credentials in order to sign the user in or link the user account to an existing Firebase user account.
+- Some Android devices support "auto-retrieval" where Google Play services is able to detect the incoming verification SMS and perform verification with no user action required.
+    - As above, the user doesn't need to do anything in order for you to sign them in.
+- For other Android devices and all iOS devices, the user must manually enter the verification code received in the SMS into your app.
+    - This code be used, along with the accompanying verification ID, to sign the user in or link phone number to an existing Firebase user account. 
 
 **Parameters**:
 - {function} success - callback function to pass {object} credentials to as an argument
@@ -1687,13 +1918,17 @@ In this case, the user doesn't need to do anything in order for you to sign them
 - {string} fakeVerificationCode - (optional) to test instant verification on Android ,specify a fake verification code to return for whitelisted phone numbers.
     - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
-The success callback will be passed a credential object with the following properties:
-- instantVerification {boolean} - true if the Android device supports instant verification, in which case the verification code will be included in the credential object.
-If this is false, the device will be sent an SMS containing the verification code for the user to manually enter into your app.
-Always false on iOS.
-- verificationId {string} - the verification ID you'll need to pass along with the verification code to sign the user in.
-Always returned on both Android & iOS.
-- code {string} - verification code. Will only be present if `instantVerification` is true. Always undefined on iOS.
+The success callback will be passed a credential object with the following possible properties:
+- {boolean} instantVerification - `true` if the Android device used instant verification to instantly verify the user without sending an SMS 
+or used auto-retrieval to automatically read an incoming SMS.
+If this is `false`, the device will be sent an SMS containing the verification code.
+If the Android device supports auto-retrieval, on the device receiving the SMS, this success callback will be immediately invoked again with `instantVerification: true` and no user action will be required for verification since Google Play services will extract and submit the verification code. 
+Otherwise the user must manually enter the verification code from the SMS into your app.
+Always `false` on iOS.
+- {string} id - the identifier of a native credential object which can be used for signing in the user.
+Will only be present if `instantVerification` is `true`.
+- {string} verificationId - the verification ID to be passed along with the verification code sent via SMS to sign the user in.
+Will only be present if `instantVerification` is `false`.
 
 Example usage:
 
@@ -1701,24 +1936,32 @@ Example usage:
 var number = '+441234567890';
 var timeOutDuration = 60;
 var fakeVerificationCode = '123456';
-var verificationId;
-window.FirebasePlugin.verifyPhoneNumber(function(credential) {
+var awaitingSms = false;
 
-    verificationId = credential.verificationId;
+FirebasePlugin.verifyPhoneNumber(function(credential) {
+
     if(credential.instantVerification){
-        signInWithCredential(credential.code);
+        if(awaitingSms){
+            awaitingSms = false;
+            // the Android device used auto-retrieval to extract and submit the verification code in the SMS so dismiss user input UI
+            dismissUserPromptToInputCode();
+        }   
+        signInWithCredential(credential);
     }else{
+        awaitingSms = true;
         promptUserToInputCode() // you need to implement this
             .then(function(userEnteredCode){
-               signInWithCredential(userEnteredCode); 
+                awaitingSms = false;                
+                credential.code = userEnteredCode; // set the user-entered verification code on the credential object
+                signInWithCredential(credential); 
             });
     }
 }, function(error) {
     console.error("Failed to verify phone number: " + JSON.stringify(error));
 }, number, timeOutDuration, fakeVerificationCode);
 
-function signInWithCredential(code){
-    FirebasePlugin.signInWithCredential(verificationId, code, function() {
+function signInWithCredential(credential){
+    FirebasePlugin.signInWithCredential(credential, function() {
         console.log("Successfully signed in");
     }, function(error) {
         console.error("Failed to sign in", error);
@@ -1733,7 +1976,7 @@ See the [Firebase phone auth integration guide for native Android](https://fireb
 
 ##### iOS
 When you call this method on iOS, FCM sends a silent push notification to the iOS device to verify it.
-So to use phone auth with your Android app, you need to:
+So to use phone auth with your iOS app, you need to:
 - [setup your iOS app for push notifications](https://firebase.google.com/docs/cloud-messaging/ios/certs)
 - Verify that push notifications are arriving on your physical device
 - [Upload your APNs auth key to the Firebase console](https://firebase.google.com/docs/cloud-messaging/ios/client#upload_your_apns_authentication_key).
@@ -1744,87 +1987,158 @@ You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs
 
 This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
 
+#### authenticateUserWithGoogle
+Authenticates the user with a Google account to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+
+**Parameters**:
+- {string} clientId - your OAuth 2.0 client ID - [see here](https://developers.google.com/identity/sign-in/android/start-integrating#get_your_backend_servers_oauth_20_client_id) how to obtain it. 
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+FirebasePlugin.authenticateUserWithGoogle(clientId, function(credential) {
+    FirebasePlugin.signInWithCredential(credential, function() {
+            console.log("Successfully signed in");
+        }, function(error) {
+            console.error("Failed to sign in", error);
+        });
+}, function(error) {
+    console.error("Failed to authenticate with Google: " + error);
+});
+```
+
+##### Android
+To use Google Sign-in in your Android app you need to do the following:
+- Add the SHA-1 fingerprint of your app's signing key to your Firebase project
+- Enable Google Sign-in in the Firebase console
+
+For details how to do the above, see the [Google Sign-In on Android page](https://firebase.google.com/docs/auth/android/google-signin) in the Firebase documentation.
+
+#### authenticateUserWithApple
+Authenticates the user with an Apple account using Sign In with Apple to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+
+**Parameters**:
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+ - {string} locale - (Android only) the language to display Apple's Sign-in screen in.
+    - Defaults to "en" (English) if not specified.
+    - See [the Apple documentation](https://developer.apple.com/documentation/signinwithapplejs/incorporating_sign_in_with_apple_into_other_platforms#3332112) for a list of supported locales.
+    - The value is ignored on iOS which uses the locale of the device to determine the display language.
+
+Example usage:
+
+```javascript
+
+FirebasePlugin.authenticateUserWithApple(function(credential) {
+    FirebasePlugin.signInWithCredential(credential, function() {
+            console.log("Successfully signed in");
+        }, function(error) {
+            console.error("Failed to sign in", error);
+        });
+}, function(error) {
+    console.error("Failed to authenticate with Apple: " + error);
+}, 'en_GB');
+```
+##### iOS
+To use Sign In with Apple in your iOS app you need to do the following:
+- Configure your app for Sign In with Apple as outlined in the [Firebase documentation's "Before you begin" section](https://firebase.google.com/docs/auth/ios/apple#before-you-begin)
+- After adding the `cordova-ios` platform, open the project workspace in Xcode (`platforms/ios/YourApp.xcworkspace`) and add the "Sign In with Apple" capability in the "Signing & Capabilities section"
+    - Note: AFAIK there is currently no way to automate the addition of this capability 
+
+##### Android
+To use Sign In with Apple in your Android app you need to do the following:
+- Configure your app for Sign In with Apple as outlined in the [Firebase documentation's "Before you begin" section](https://firebase.google.com/docs/auth/android/apple#before-you-begin)
+
 #### signInWithCredential
-Signs the user into Firebase with credentials obtained using `verifyPhoneNumber()`.
+Signs the user into Firebase with credentials obtained via an authentication method such as `verifyPhoneNumber()` or `authenticateUserWithGoogle()`.
 See the [Android-](https://firebase.google.com/docs/auth/android/phone-auth#sign-in-the-user) and [iOS](https://firebase.google.com/docs/auth/ios/phone-auth#sign-in-the-user-with-the-verification-code)-specific Firebase documentation for more info.
 
 **Parameters**:
-- {string} verificationId - the verification ID returned in the credentials object to the `verifyPhoneNumber()` success callback.
-- {string} code - the activation code, either returned in the credentials object to the `verifyPhoneNumber()` success callback if using Instant Verification on Android, or the activation code as entered by the user from the received SMS message. 
+- {object} credential - a credential object returned by the success callback of an authentication method; may have the following keys:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+        Present if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `true`, or if another authentication method was used such as `authenticateUserWithGoogle()`.
+    - {boolean} instantVerification - true if an Android device and instant verification or auto-retrieval was used to verify the user. 
+    If true, you do not need to provide a user-entered verification.
+        - Only present if the credential was obtained via `verifyPhoneNumber()`
+    - {string} verificationId - the verification ID to accompany the user-entered verification code from the SMS.
+        - Only present if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`.
+    - {string} code - if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message. 
 - {function} success - callback function to call on successful sign-in using credentials
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 Example usage:
 
 ```javascript
-var number = '+441234567890';
-var timeOutDuration = 60;
-var fakeVerificationCode = '123456';
-var verificationId;
-window.FirebasePlugin.verifyPhoneNumber(function(credential) {
-
-    verificationId = credential.verificationId;
-    if(credential.instantVerification){
-        signInWithCredential(credential.code);
-    }else{
-        promptUserToInputCode() // you need to implement this
-            .then(function(userEnteredCode){
-               signInWithCredential(userEnteredCode); 
-            });
-    }
-}, function(error) {
-    console.error("Failed to verify phone number: " + JSON.stringify(error));
-}, number, timeOutDuration, fakeVerificationCode);
-
-function signInWithCredential(code){
-    FirebasePlugin.signInWithCredential(verificationId, code, function() {
+function signInWithCredential(credential){
+    FirebasePlugin.signInWithCredential(credential, function() {
         console.log("Successfully signed in");
     }, function(error) {
         console.error("Failed to sign in", error);
     });
 }
+
 ```
 
 #### linkUserWithCredential
-Links the user account to an existing Firebase user account with credentials obtained using `verifyPhoneNumber()`.
+Links an existing Firebase user account with credentials obtained via an authentication method such as `verifyPhoneNumber()` or `authenticateUserWithGoogle()`.
 See the [Android-](https://firebase.google.com/docs/auth/android/account-linking) and [iOS](https://firebase.google.com/docs/auth/ios/account-linking)-specific Firebase documentation for more info.
 
 **Parameters**:
-- {string} verificationId - the verification ID returned in the credentials object to the `verifyPhoneNumber()` success callback.
-- {string} code - the activation code, either returned in the credentials object to the `verifyPhoneNumber()` success callback if using Instant Verification on Android, or the activation code as entered by the user from the received SMS message. 
+- {object} credential - a credential object returned by the success callback of an authentication method; may have the following keys:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+        Present if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `true`, or if another authentication method was used such as `authenticateUserWithGoogle()`.
+    - {boolean} instantVerification - true if an Android device and instant verification or auto-retrieval was used to verify the user. 
+    If true, you do not need to provide a user-entered verification.
+        - Only present if the credential was obtained via `verifyPhoneNumber()`
+    - {string} verificationId - the verification ID to accompany the user-entered verification code from the SMS.
+        - Only present if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`.
+    - {string} code - if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message.
 - {function} success - callback function to call on successful linking using credentials
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 Example usage:
 
 ```javascript
-var number = '+441234567890';
-var timeOutDuration = 60;
-var fakeVerificationCode = '123456';
-var verificationId;
-window.FirebasePlugin.verifyPhoneNumber(function(credential) {
-
-    verificationId = credential.verificationId;
-    if(credential.instantVerification){
-        linkUserWithCredential(credential.code);
-    }else{
-        promptUserToInputCode() // you need to implement this
-            .then(function(userEnteredCode){
-               linkUserWithCredential(userEnteredCode); 
-            });
-    }
-}, function(error) {
-    console.error("Failed to verify phone number: " + JSON.stringify(error));
-}, number, timeOutDuration, fakeVerificationCode);
-
-function linkUserWithCredential(code){
-    FirebasePlugin.linkUserWithCredential(verificationId, code, function() {
+function linkUserWithCredential(credential){
+    FirebasePlugin.linkUserWithCredential(credential, function() {
         console.log("Successfully linked");
     }, function(error) {
         console.error("Failed to link", error);
     });
 }
+
 ```
+
+#### reauthenticateWithCredential
+Reauthenticates the currently signed in user with credentials obtained via an authentication method such as `verifyPhoneNumber()` or `authenticateUserWithGoogle()`.
+
+**Parameters**:
+- {object} credential - a credential object returned by the success callback of an authentication method; may have the following keys:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+        Present if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `true`, or if another authentication method was used such as `authenticateUserWithGoogle()`.
+    - {boolean} instantVerification - true if an Android device and instant verification or auto-retrieval was used to verify the user. 
+    If true, you do not need to provide a user-entered verification.
+        - Only present if the credential was obtained via `verifyPhoneNumber()`
+    - {string} verificationId - the verification ID to accompany the user-entered verification code from the SMS.
+        - Only present if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`.
+    - {string} code - if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message.
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.reauthenticateWithCredential(credential, function() {
+        console.log("Successfully reauthenticated");
+    }, function(error) {
+        console.error("Failed to reauthenticate", error);
+    });
+```
+
 
 
 ### Remote Config
@@ -1838,13 +2152,13 @@ Fetch Remote Config parameter values for your app:
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.fetch(function () {
+FirebasePlugin.fetch(function () {
     // success callback
 }, function () {
     // error callback
 });
 // or, specify the cacheExpirationSeconds
-window.FirebasePlugin.fetch(600, function () {
+FirebasePlugin.fetch(600, function () {
     // success callback
 }, function () {
     // error callback
@@ -1859,7 +2173,7 @@ Activate the Remote Config fetched config:
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.activateFetched(function(activated) {
+FirebasePlugin.activateFetched(function(activated) {
     // activated will be true if there was a fetched config activated,
     // or false if no fetched config was found, or the fetched config was already activated.
     console.log(activated);
@@ -1877,7 +2191,7 @@ Retrieve a Remote Config value:
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.getValue("key", function(value) {
+FirebasePlugin.getValue("key", function(value) {
     console.log(value);
 }, function(error) {
     console.error(error);
@@ -1894,7 +2208,7 @@ Retrieve a Remote Config byte array:
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.getByteArray("key", function(bytes) {
+FirebasePlugin.getByteArray("key", function(bytes) {
     // a Base64 encoded string that represents the value for "key"
     console.log(bytes.base64);
     // a numeric array containing the values of the byte array (i.e. [0xFF, 0x00])
@@ -1913,7 +2227,7 @@ Get the current state of the FirebaseRemoteConfig singleton object:
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.getInfo(function(info) {
+FirebasePlugin.getInfo(function(info) {
     // the status of the developer mode setting (true/false)
     console.log(info.configSettings.developerModeEnabled);
     // the timestamp (milliseconds since epoch) of the last successful fetch
@@ -1942,7 +2256,7 @@ Change the settings for the FirebaseRemoteConfig object's operations:
 var settings = {
     developerModeEnabled: true
 }
-window.FirebasePlugin.setConfigSettings(settings);
+FirebasePlugin.setConfigSettings(settings);
 ```
 
 #### setDefaults
@@ -1969,7 +2283,7 @@ var defaults = {
     mBytes: [0xFF, 0x00]
 }
 // set defaults
-window.FirebasePlugin.setDefaults(defaults);
+FirebasePlugin.setDefaults(defaults);
 
 ```
 
@@ -1982,9 +2296,9 @@ Manually enable/disable performance data collection, e.g. if [disabled on app st
 - {boolean} setEnabled - whether to enable or disable performance data collection
 
 ```javascript
-window.FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
+FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
 
-window.FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables performance data collection
+FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables performance data collection
 ```
 
 #### startTrace
@@ -1997,7 +2311,7 @@ Start a trace.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.startTrace("test trace", success, error);
+FirebasePlugin.startTrace("test trace", success, error);
 ```
 
 #### incrementCounter
@@ -2010,8 +2324,9 @@ To count the performance-related events that occur in your app (such as cache hi
 - {function} success - callback function to call on successfully incrementing counter
 - {function} error - callback function which will be passed a {string} error message as an argument
 
+
 ```javascript
-window.FirebasePlugin.incrementCounter("test trace", "retry", success, error);
+FirebasePlugin.incrementCounter("test trace", "retry", success, error);
 ```
 
 #### stopTrace
@@ -2024,7 +2339,7 @@ Stop the trace
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-window.FirebasePlugin.stopTrace("test trace");
+FirebasePlugin.stopTrace("test trace");
 ```
 
 
