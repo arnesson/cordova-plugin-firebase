@@ -164,14 +164,16 @@ See [Disable data collection on startup](#disable-data-collection-on-startup) fo
 #### Android only
 The following plugin variables are used to specify the Firebase SDK versions as Gradle dependencies on Android:
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION`
-- `ANDROID_PLAY_SERVICES_AUTH_VERSION``
+- `ANDROID_PLAY_SERVICES_AUTH_VERSION`
 - `ANDROID_FIREBASE_ANALYTICS_VERSION`
 - `ANDROID_FIREBASE_MESSAGING_VERSION`
 - `ANDROID_FIREBASE_CONFIG_VERSION`
 - `ANDROID_FIREBASE_PERF_VERSION`
 - `ANDROID_FIREBASE_AUTH_VERSION`
+- `ANDROID_FIREBASE_FIRESTORE_VERSION`
 - `ANDROID_CRASHLYTICS_VERSION`
 - `ANDROID_CRASHLYTICS_NDK_VERSION`
+- `ANDROID_GSON_VERSION`
 See [Specifying Android library versions](#specifying-android-library-versions) for more info.
 
 - `ANDROID_ICON_ACCENT` - sets the default accent color for system notifications. See [Android Notification Color](#android-notification-color) for more info.
@@ -331,10 +333,12 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_CONFIG_VERSION` => `com.google.firebase:firebase-config`
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
+- `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
+- `ANDROID_GSON_VERSION` => `com.google.code.gson:gson`
 
-For example, to explicitly specify all the component versions at plugin install time:
+For example:
 
     cordova plugin add cordova-plugin-firebasex \
         --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \

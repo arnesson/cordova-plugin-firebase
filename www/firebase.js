@@ -292,3 +292,17 @@ exports.sendUserPasswordResetEmail = function (email, success, error) {
 exports.deleteUser = function (success, error) {
     exec(success, error, "FirebasePlugin", "deleteUser", []);
 };
+
+// Firestore
+exports.addDocumentToFirestoreCollection = function (document, collection, success, error) {
+    if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+    if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be and object specifying record data to add to the Firestore collection");
+
+    exec(success, error, "FirebasePlugin", "addDocumentToFirestoreCollection", [document, collection]);
+};
+
+exports.fetchFirestoreCollection = function (collection, success, error) {
+    if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+
+    exec(success, error, "FirebasePlugin", "fetchFirestoreCollection", [collection]);
+};
