@@ -82,10 +82,13 @@ public class FirebasePlugin extends CordovaPlugin {
 
     protected static FirebasePlugin instance = null;
     private FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseAuth.AuthStateListener authStateListener;
     private static CordovaInterface cordovaInterface = null;
     protected static Context applicationContext = null;
     private static Activity cordovaActivity = null;
+
     protected static final String TAG = "FirebasePlugin";
+    protected static final String JS_GLOBAL_NAMESPACE = "FirebasePlugin.";
     protected static final String KEY = "badge";
     protected static final int GOOGLE_SIGN_IN = 0x1;
 
@@ -116,6 +119,9 @@ public class FirebasePlugin extends CordovaPlugin {
                     Log.d(TAG, "Starting Firebase plugin");
                     FirebaseApp.initializeApp(applicationContext);
                     mFirebaseAnalytics = FirebaseAnalytics.getInstance(applicationContext);
+                    authStateListener = new AuthStateListener();
+                    FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+
                     if (extras != null && extras.size() > 1) {
                         if (FirebasePlugin.notificationStack == null) {
                             FirebasePlugin.notificationStack = new ArrayList<Bundle>();
@@ -340,6 +346,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     public void onDestroy() {
+        FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
         instance = null;
         cordovaActivity = null;
         cordovaInterface = null;
@@ -1911,6 +1918,18 @@ public class FirebasePlugin extends CordovaPlugin {
         @Override
         public void onComplete(@NonNull Task<AuthResult> task) {
             FirebasePlugin.instance.handleAuthTaskOutcome(task, callbackContext);
+        }
+    }
+
+    private static class AuthStateListener implements FirebaseAuth.AuthStateListener {
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            try {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthStateChange("+(user != null ? "true" : "false")+")");
+            } catch (Exception e) {
+                handleExceptionWithoutContext(e);
+            }
         }
     }
 }
