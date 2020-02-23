@@ -23,6 +23,8 @@ static AppDelegate* instance;
 }
 
 static NSDictionary* mutableUserInfo;
+static FIRAuthStateDidChangeListenerHandle authStateChangeListener;
+static bool authStateChangeListenerInitialized = false;
 
 - (void)setDelegate:(id)delegate {
     objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -78,6 +80,18 @@ static NSDictionary* mutableUserInfo;
         // Setup Google SignIn
         [GIDSignIn sharedInstance].clientID = [FIRApp defaultApp].options.clientID;
         [GIDSignIn sharedInstance].delegate = self;
+        
+        authStateChangeListener = [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth * _Nonnull auth, FIRUser * _Nullable user) {
+            @try {
+                if(!authStateChangeListenerInitialized){
+                    authStateChangeListenerInitialized = true;
+                }else{
+                    [FirebasePlugin.firebasePlugin executeGlobalJavascript:[NSString stringWithFormat:@"FirebasePlugin._onAuthStateChange(%@)", (user != nil ? @"true": @"false")]];
+                }
+            }@catch (NSException *exception) {
+                [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+            }
+        }];
         
         // Set UNUserNotificationCenter delegate
         self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
