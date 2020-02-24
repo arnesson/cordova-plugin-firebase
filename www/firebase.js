@@ -15,6 +15,19 @@ var ensureBoolean = function(value){
     return !!value;
 };
 
+var onAuthStateChangeCallback = function(){};
+
+/***********************
+ * Protected internals
+ ***********************/
+exports._onAuthStateChange = function(userSignedIn){
+    onAuthStateChangeCallback(userSignedIn);
+};
+
+/**************
+ * Public API
+ **************/
+
 exports.getVerificationID = function (number, success, error) {
   exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
 };
@@ -291,6 +304,11 @@ exports.sendUserPasswordResetEmail = function (email, success, error) {
 
 exports.deleteUser = function (success, error) {
     exec(success, error, "FirebasePlugin", "deleteUser", []);
+};
+
+exports.registerAuthStateChangeListener = function(fn){
+    if(typeof fn !== "function") throw "The specified argument must be a function";
+    onAuthStateChangeCallback = fn;
 };
 
 // Firestore

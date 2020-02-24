@@ -91,13 +91,13 @@ public class FirebasePlugin extends CordovaPlugin {
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseFirestore firestore;
     private Gson gson;
-
+    private FirebaseAuth.AuthStateListener authStateListener;
     private static CordovaInterface cordovaInterface = null;
     protected static Context applicationContext = null;
     private static Activity cordovaActivity = null;
 
-
     protected static final String TAG = "FirebasePlugin";
+    protected static final String JS_GLOBAL_NAMESPACE = "FirebasePlugin.";
     protected static final String KEY = "badge";
     protected static final int GOOGLE_SIGN_IN = 0x1;
 
@@ -126,10 +126,13 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     Log.d(TAG, "Starting Firebase plugin");
-
                     FirebaseApp.initializeApp(applicationContext);
                     mFirebaseAnalytics = FirebaseAnalytics.getInstance(applicationContext);
-                    firestore = FirebaseFirestore.getInstance();
+					
+                    authStateListener = new AuthStateListener();
+                    FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+					
+					firestore = FirebaseFirestore.getInstance();
                     gson = new Gson();
 
                     if (extras != null && extras.size() > 1) {
@@ -362,6 +365,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     @Override
     public void onDestroy() {
+        FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
         instance = null;
         cordovaActivity = null;
         cordovaInterface = null;
@@ -1863,11 +1867,6 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-
-    //
-    // Helpers
-    //
-
     protected static void handleExceptionWithContext(Exception e, CallbackContext context){
         String msg = e.toString();
         Log.e(TAG, msg);
@@ -2005,7 +2004,19 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
-    private Map<String, Object> jsonObjectToMap(JSONObject jsonObj)  throws JSONException {
+    private static class AuthStateListener implements FirebaseAuth.AuthStateListener {
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            try {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthStateChange("+(user != null ? "true" : "false")+")");
+            } catch (Exception e) {
+                handleExceptionWithoutContext(e);
+            }
+        }
+    }
+	
+	private Map<String, Object> jsonObjectToMap(JSONObject jsonObj)  throws JSONException {
         String jsonString = gson.toJson(jsonObj);
 
         Type type = new TypeToken<Map<String, Object>>(){}.getType();

@@ -1,3 +1,9 @@
+# Version 8.0.1
+* Add `registerAuthStateChangeListener()` to support invocation of a callback function on the Firebase Authentication state changing. 
+Resolves [#311](https://github.com/dpa99c/cordova-plugin-firebasex/issues/311). 
+* (Android) Bump Firebase SDK dependency versions to latest releases. Resolves [#279](https://github.com/dpa99c/cordova-plugin-firebasex/issues/279).
+* (iOS) Bump podspec versions for Firebase SDK components to [latest release (v6.17.0)](https://firebase.google.com/support/release-notes/ios#version_6170_-_february_11_2020)
+
 # Version 8.0.0
 * *BREAKING CHANGE*:  Rework `verifyPhoneNumber()` to preserve and reference the native credentials object (rather than attempting to extract and parse its properties to JS). Fixes [#176](https://github.com/dpa99c/cordova-plugin-firebasex/issues/176).
 * Add other Firebase Authentication methods: Google Sign In, Sign In with Apple, email/password sign in, and authentication utility methods. Partially resolves [#208](https://github.com/dpa99c/cordova-plugin-firebasex/issues/208).

@@ -82,6 +82,7 @@
 - (void) _logInfo: (NSString*)msg;
 - (void) _logMessage: (NSString*)msg;
 - (int) saveAuthCredential: (FIRAuthCredential *) authCredential;
+- (void)executeGlobalJavascript: (NSString*)jsString;
 
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
 - (void)setDefaultChannel:(CDVInvokedUrlCommand *)command;

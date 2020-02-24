@@ -124,6 +124,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
+      - [registerAuthStateChangeListener](#registerauthstatechangelistener)
     - [Remote Config](#remote-config)
       - [fetch](#fetch)
       - [activateFetched](#activatefetched)
@@ -2143,7 +2144,20 @@ Example usage:
     });
 ```
 
+#### registerAuthStateChangeListener
+Registers a Javascript function to invoke when Firebase Authentication state changes between user signed in/signed out.
 
+**Parameters**:
+- {function} fn - callback function to invoke when authentication state changes
+    - Will be a passed a single boolean argument which is `true` if user just signed in and `false` if user just signed out.
+
+Example usage:
+
+```javascript
+    FirebasePlugin.registerAuthStateChangeListener(function(userSignedIn){
+        console.log("Auth state changed: User signed " + (userSignedIn ? "in" : "out"));
+    });
+```
 
 ### Remote Config
 
