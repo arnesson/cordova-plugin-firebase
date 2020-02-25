@@ -325,6 +325,15 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("addDocumentToFirestoreCollection")) {
                 this.addDocumentToFirestoreCollection(args, callbackContext);
                 return true;
+            } else if (action.equals("setDocumentInFirestoreCollection")) {
+                this.setDocumentInFirestoreCollection(args, callbackContext);
+                return true;
+            } else if (action.equals("updateDocumentInFirestoreCollection")) {
+                this.updateDocumentInFirestoreCollection(args, callbackContext);
+                return true;
+            } else if (action.equals("deleteDocumentFromFirestoreCollection")) {
+                this.deleteDocumentFromFirestoreCollection(args, callbackContext);
+                return true;
             } else if (action.equals("fetchFirestoreCollection")) {
                 this.fetchFirestoreCollection(args, callbackContext);
                 return true;
@@ -1810,16 +1819,101 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    JSONObject jsonDoc = args.getJSONObject(0);
+                    String jsonDoc = args.getString(0);
                     String collection = args.getString(1);
 
-                    Map<String, Object> doc = jsonObjectToMap(jsonDoc);
                     firestore.collection(collection)
-                            .add(doc)
+                            .add(jsonStringToMap(jsonDoc))
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     callbackContext.success(documentReference.getId());
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void setDocumentInFirestoreCollection(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String documentId = args.getString(0);
+                    String jsonDoc = args.getString(1);
+                    String collection = args.getString(2);
+
+                    firestore.collection(collection).document(documentId)
+                            .set(jsonStringToMap(jsonDoc))
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    callbackContext.success();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void updateDocumentInFirestoreCollection(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String documentId = args.getString(0);
+                    String jsonDoc = args.getString(1);
+                    String collection = args.getString(2);
+
+                    firestore.collection(collection).document(documentId)
+                            .update(jsonStringToMap(jsonDoc))
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    callbackContext.success();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void deleteDocumentFromFirestoreCollection(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String documentId = args.getString(0);
+                    String collection = args.getString(1);
+
+                    firestore.collection(collection).document(documentId)
+                            .delete()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    callbackContext.success();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -1866,6 +1960,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
 
     protected static void handleExceptionWithContext(Exception e, CallbackContext context){
         String msg = e.toString();
@@ -2016,9 +2111,7 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 	
-	private Map<String, Object> jsonObjectToMap(JSONObject jsonObj)  throws JSONException {
-        String jsonString = gson.toJson(jsonObj);
-
+	private Map<String, Object> jsonStringToMap(String jsonString)  throws JSONException {
         Type type = new TypeToken<Map<String, Object>>(){}.getType();
         return gson.fromJson(jsonString, type);
     }

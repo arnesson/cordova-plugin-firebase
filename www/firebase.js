@@ -314,9 +314,32 @@ exports.registerAuthStateChangeListener = function(fn){
 // Firestore
 exports.addDocumentToFirestoreCollection = function (document, collection, success, error) {
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
-    if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be and object specifying record data to add to the Firestore collection");
+    if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
 
     exec(success, error, "FirebasePlugin", "addDocumentToFirestoreCollection", [document, collection]);
+};
+
+exports.setDocumentInFirestoreCollection = function (documentId, document, collection, success, error) {
+    if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
+    if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+    if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
+
+    exec(success, error, "FirebasePlugin", "setDocumentInFirestoreCollection", [documentId, document, collection]);
+};
+
+exports.updateDocumentInFirestoreCollection = function (documentId, document, collection, success, error) {
+    if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
+    if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+    if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
+
+    exec(success, error, "FirebasePlugin", "updateDocumentInFirestoreCollection", [documentId, document, collection]);
+};
+
+exports.deleteDocumentFromFirestoreCollection = function (documentId, collection, success, error) {
+    if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
+    if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+
+    exec(success, error, "FirebasePlugin", "deleteDocumentFromFirestoreCollection", [documentId, collection]);
 };
 
 exports.fetchFirestoreCollection = function (collection, success, error) {
