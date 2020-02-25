@@ -138,6 +138,12 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [startTrace](#starttrace)
       - [incrementCounter](#incrementcounter)
       - [stopTrace](#stoptrace)
+    - [Firestore](#firestore)
+      - [addDocumentToFirestoreCollection](#adddocumenttofirestorecollection)
+      - [setDocumentInFirestoreCollection](#setdocumentinfirestorecollection)
+      - [updateDocumentInFirestoreCollection](#updatedocumentinfirestorecollection)
+      - [deleteDocumentFromFirestoreCollection](#deletedocumentfromfirestorecollection)
+      - [fetchFirestoreCollection](#fetchfirestorecollection)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -2358,6 +2364,134 @@ Stop the trace
 
 ```javascript
 FirebasePlugin.stopTrace("test trace");
+```
+
+### Firestore
+These plugin API functions provide CRUD operations for working with documents in Firestore collections.
+
+Notes: 
+- Only top-level Firestore collections are currently supported - [subcollections](https://firebase.google.com/docs/firestore/manage-data/structure-data#subcollections) (nested collections within documents) are currently not supported due to the complexity of mapping the native objects into the plugin's JS API layer.
+- A document object may contain values of primitive Javascript types `string`, `number`, `boolean`, `array` or `object`.
+Arrays and objects may contain nested structures of these types.
+- If a collection name referenced in a document write operation does not already exist, it will be created by the first write operation referencing it. 
+
+#### addDocumentToFirestoreCollection
+Adds a new document to a Firestore collection, which will be allocated an auto-generated document ID.
+
+**Parameters**:
+- {object} document - document object to add to collection
+- {string} collection - name of top-level collection to add document to.
+- {function} success - callback function to call on successfully adding the document.
+Will be passed a {string} argument containing the auto-generated document ID that the document was stored against.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var document = {
+    "a_string": "foo",
+    "a_list": [1, 2, 3],
+    "an_object": {
+        "an_integer": 1,            
+    }
+};
+var collection = "my_collection";
+FirebasePlugin.addDocumentToFirestoreCollection(document, collection, function(documentId){
+    console.log("Successfully added document with id="+documentId);
+}, function(error){
+    console.error("Error adding document: "+error);
+});
+```
+
+#### setDocumentInFirestoreCollection
+Sets (adds/replaces) a document with the given ID in a Firestore collection.
+
+**Parameters**:
+- {string} documentId - document ID to use when setting document in the collection.
+- {object} document - document object to set in collection.
+- {string} collection - name of top-level collection to set document in.
+- {function} success - callback function to call on successfully setting the document.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var document = {
+    "a_string": "foo",
+    "a_list": [1, 2, 3],
+    "an_object": {
+        "an_integer": 1,            
+    }
+};
+var collection = "my_collection";
+FirebasePlugin.setDocumentInFirestoreCollection(documentId, document, collection, function(){
+    console.log("Successfully set document with id="+documentId);
+}, function(error){
+    console.error("Error setting document: "+error);
+});
+```
+
+#### updateDocumentInFirestoreCollection
+Updates an existing document with the given ID in a Firestore collection.
+This is a non-destructive update that will only overwrite existing keys in the existing document or add new ones if they don't already exist.
+If the no document with the specified ID exists in the collection, an error will be raised. 
+
+**Parameters**:
+- {string} documentId - document ID of the document to update.
+- {object} document - entire document or document fragment to update existing document with.
+- {string} collection - name of top-level collection to update document in.
+- {function} success - callback function to call on successfully updating the document.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var documentFragment = {
+    "a_string": "new value",    
+    "a_new_string": "bar"
+};
+var collection = "my_collection";
+FirebasePlugin.updateDocumentInFirestoreCollection(documentId, documentFragment, collection, function(){
+    console.log("Successfully updated document with id="+documentId);
+}, function(error){
+    console.error("Error updating document: "+error);
+});
+```
+
+#### deleteDocumentFromFirestoreCollection
+Deletes an existing document with the given ID in a Firestore collection.
+
+Note: If the no document with the specified ID exists in the collection, the Firebase SDK will still return a successful outcome.   
+
+**Parameters**:
+- {string} documentId - document ID of the document to delete.
+- {string} collection - name of top-level collection to delete document in.
+- {function} success - callback function to call on successfully deleting the document.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var collection = "my_collection";
+FirebasePlugin.deleteDocumentFromFirestoreCollection(documentId, collection, function(){
+    console.log("Successfully deleted document with id="+documentId);
+}, function(error){
+    console.error("Error deleting document: "+error);
+});
+```
+
+#### fetchFirestoreCollection
+Fetches all the documents in the specific collection.
+
+**Parameters**:
+- {string} collection - name of top-level collection to fetch.
+- {function} success - callback function to call on successfully deleting the document.
+Will be passed an {object} containing all the documents in the collection, indexed by document ID.
+If a Firebase collection with that name does not exist or it contains no documents, the object will be empty.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var collection = "my_collection";
+FirebasePlugin.fetchFirestoreCollection(collection, function(documents){
+    console.log("Successfully fetched collection: "+JSON.stringify(documents));
+}, function(error){
+    console.error("Error fetching collection: "+error);
+});
 ```
 
 
