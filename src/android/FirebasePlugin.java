@@ -43,6 +43,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.OAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -333,6 +334,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 return true;
             } else if (action.equals("deleteDocumentFromFirestoreCollection")) {
                 this.deleteDocumentFromFirestoreCollection(args, callbackContext);
+                return true;
+            } else if (action.equals("fetchDocumentInFirestoreCollection")) {
+                this.fetchDocumentInFirestoreCollection(args, callbackContext);
                 return true;
             } else if (action.equals("fetchFirestoreCollection")) {
                 this.fetchFirestoreCollection(args, callbackContext);
@@ -1914,6 +1918,51 @@ public class FirebasePlugin extends CordovaPlugin {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     callbackContext.success();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void fetchDocumentInFirestoreCollection(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String documentId = args.getString(0);
+                    String collection = args.getString(1);
+
+                    firestore.collection(collection).document(documentId)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    try {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document != null) {
+                                                JSONObject jsonDoc = mapToJsonObject(document.getData());
+                                                callbackContext.success(jsonDoc);
+                                            } else {
+                                                callbackContext.error("No document found in collection");
+                                            }
+                                        } else {
+                                            Exception e = task.getException();
+                                            if(e != null){
+                                                handleExceptionWithContext(e, callbackContext);
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        handleExceptionWithContext(e, callbackContext);
+                                    }
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {

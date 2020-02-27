@@ -143,6 +143,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [setDocumentInFirestoreCollection](#setdocumentinfirestorecollection)
       - [updateDocumentInFirestoreCollection](#updatedocumentinfirestorecollection)
       - [deleteDocumentFromFirestoreCollection](#deletedocumentfromfirestorecollection)
+      - [fetchDocumentInFirestoreCollection](#fetchdocumentinfirestorecollection)
       - [fetchFirestoreCollection](#fetchfirestorecollection)
 - [Credits](#credits)
 
@@ -2472,6 +2473,28 @@ FirebasePlugin.deleteDocumentFromFirestoreCollection(documentId, collection, fun
     console.log("Successfully deleted document with id="+documentId);
 }, function(error){
     console.error("Error deleting document: "+error);
+});
+```
+
+#### fetchDocumentInFirestoreCollection
+Fetches an existing document with the given ID from a Firestore collection.
+
+Note: If the no document with the specified ID exists in the collection, the error callback will be invoked.   
+
+**Parameters**:
+- {string} documentId - document ID of the document to fetch.
+- {string} collection - name of top-level collection to fetch document from.
+- {function} success - callback function to call on successfully fetching the document.
+Will be passed an {object} contain the document contents.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var collection = "my_collection";
+FirebasePlugin.fetchDocumentInFirestoreCollection(documentId, collection, function(document){
+    console.log("Successfully fetched document: "+JSON.stringify(document));
+}, function(error){
+    console.error("Error fetching document: "+error);
 });
 ```
 
