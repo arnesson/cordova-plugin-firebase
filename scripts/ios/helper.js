@@ -190,8 +190,7 @@ module.exports = {
 
         if(typeof pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== 'undefined'){
             googlePlist["FIREBASE_ANALYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
-            appPlist["FirebaseScreenReportingEnabled"] = (pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== "false");
-            appPlistModified = googlePlistModified = true;
+            googlePlistModified = true;
         }
         if(typeof pluginVariables['FIREBASE_PERFORMANCE_COLLECTION_ENABLED'] !== 'undefined'){
             googlePlist["FIREBASE_PERFORMANCE_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_PERFORMANCE_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
