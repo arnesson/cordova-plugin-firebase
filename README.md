@@ -64,9 +64,12 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Data message notifications](#data-message-notifications)
         - [Android data message notifications](#android-data-message-notifications)
         - [iOS data message notifications](#ios-data-message-notifications)
-  - [Google Tag Manager](#google-tag-manager)
-    - [Android](#android)
+  - [InApp Messaging](#inapp-messaging)
     - [iOS](#ios)
+    - [Android](#android)
+  - [Google Tag Manager](#google-tag-manager)
+    - [Android](#android-1)
+    - [iOS](#ios-1)
   - [API](#api)
     - [Notifications and data messages](#notifications-and-data-messages)
       - [getToken](#gettoken)
@@ -115,13 +118,13 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
       - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
       - [verifyPhoneNumber](#verifyphonenumber)
-        - [Android](#android-1)
-        - [iOS](#ios-1)
-      - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
         - [Android](#android-2)
-      - [authenticateUserWithApple](#authenticateuserwithapple)
         - [iOS](#ios-2)
+      - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
         - [Android](#android-3)
+      - [authenticateUserWithApple](#authenticateuserwithapple)
+        - [iOS](#ios-3)
+        - [Android](#android-4)
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -139,9 +142,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [startTrace](#starttrace)
       - [incrementCounter](#incrementcounter)
       - [stopTrace](#stoptrace)
-    - [In-App Messaging](#inappmessaging)
-      - [iOS](#ios-3)
-      - [Android](#android-4)
     - [Firestore](#firestore)
       - [addDocumentToFirestoreCollection](#adddocumenttofirestorecollection)
       - [setDocumentInFirestoreCollection](#setdocumentinfirestorecollection)
@@ -182,6 +182,7 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_CONFIG_VERSION`
 - `ANDROID_FIREBASE_PERF_VERSION`
 - `ANDROID_FIREBASE_AUTH_VERSION`
+- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION`
 - `ANDROID_CRASHLYTICS_VERSION`
 - `ANDROID_CRASHLYTICS_NDK_VERSION`
@@ -346,6 +347,7 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
+- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION` => `com.google.firebase:firebase-inappmessaging-display`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
 - `ANDROID_GSON_VERSION` => `com.google.code.gson:gson`
@@ -1050,6 +1052,17 @@ For example:
   }
 } 
 ```
+
+## InApp Messaging
+Engage active app users with contextual messages.
+The SDK component is included in the plugin but no explicit plugin API calls are required to use inapp messaging.
+
+### iOS
+Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=ios#send_a_test_message
+
+### Android
+
+Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=android#send_a_test_message
 
 ## Google Tag Manager
 Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
@@ -2391,18 +2404,6 @@ Stop the trace
 ```javascript
 FirebasePlugin.stopTrace("test trace");
 ```
-
-### InAppMessaging
-
-Engage active app users with contextual messages.
-
-##### iOS
-
-Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=ios#send_a_test_message
-
-##### Android
-
-Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=android#send_a_test_message
 
 ### Firestore
 These plugin API functions provide CRUD operations for working with documents in Firestore collections.
