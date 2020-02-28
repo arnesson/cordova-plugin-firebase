@@ -139,6 +139,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [startTrace](#starttrace)
       - [incrementCounter](#incrementcounter)
       - [stopTrace](#stoptrace)
+    - [In-App Messaging](#inappmessaging)
+      - [iOS](#ios-3)
+      - [Android](#android-4)
     - [Firestore](#firestore)
       - [addDocumentToFirestoreCollection](#adddocumenttofirestorecollection)
       - [setDocumentInFirestoreCollection](#setdocumentinfirestorecollection)
@@ -2389,6 +2392,18 @@ Stop the trace
 FirebasePlugin.stopTrace("test trace");
 ```
 
+### InAppMessaging
+
+Engage active app users with contextual messages.
+
+##### iOS
+
+Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=ios#send_a_test_message
+
+##### Android
+
+Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=android#send_a_test_message
+
 ### Firestore
 These plugin API functions provide CRUD operations for working with documents in Firestore collections.
 
@@ -2538,7 +2553,6 @@ FirebasePlugin.fetchFirestoreCollection(collection, function(documents){
     console.error("Error fetching collection: "+error);
 });
 ```
-
 
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.
