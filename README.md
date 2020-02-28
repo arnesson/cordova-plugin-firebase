@@ -460,6 +460,10 @@ This will disable data collection (on both Android & iOS) until you call [setAna
        FirebasePlugin.setAnalyticsCollectionEnabled(true);
        FirebasePlugin.setPerformanceCollectionEnabled(true);
        FirebasePlugin.setCrashlyticsCollectionEnabled();
+       
+Note on persistence of these settings:
+- Calling `setAnalyticsCollectionEnabled(true|false)` or `setPerformanceCollectionEnabled(true|false)` will enable or dislable data collection during the current app session and across subsequent app sessions until such time as the same method is called again with a different value.
+- If you set `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED=false`, then you will need to call `setCrashlyticsCollectionEnabled()` at the start of each app session to enable crash data collection since the setting does not persist between app sessions.
 
 ## Example project
 An example project repo exists to demonstrate and validate the functionality of this plugin:

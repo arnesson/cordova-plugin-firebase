@@ -133,6 +133,7 @@
 				<pod name="Fabric" spec="1.10.2"/>
 				<pod name="Crashlytics" spec="3.14.0"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
+				<pod name="GoogleTagManager" spec="7.1.2"/>
 			</pods>
 		</podspec>
 
