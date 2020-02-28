@@ -70,6 +70,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [API](#api)
     - [Notifications and data messages](#notifications-and-data-messages)
       - [getToken](#gettoken)
+      - [getId](#getid)
       - [onTokenRefresh](#ontokenrefresh)
       - [getAPNSToken](#getapnstoken)
       - [onApnsTokenReceived](#onapnstokenreceived)
@@ -1079,6 +1080,23 @@ Null if the token has not been allocated yet by the Firebase SDK.
 ```javascript
 FirebasePlugin.getToken(function(fcmToken) {
     console.log(fcmToken);
+}, function(error) {
+    console.error(error);
+});
+```
+Note that token will be null if it has not been established yet.
+
+#### getId
+Get the app instance ID (an constant ID which persists as long as the app is not uninstalled/reinstalled).
+Null if the ID has not been allocated yet by the Firebase SDK.
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} ID as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.getId(function(appInstanceId) {
+    console.log(appInstanceId);
 }, function(error) {
     console.error(error);
 });

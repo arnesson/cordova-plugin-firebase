@@ -28,10 +28,6 @@ exports._onAuthStateChange = function(userSignedIn){
  * Public API
  **************/
 
-exports.getVerificationID = function (number, success, error) {
-  exec(success, error, "FirebasePlugin", "getVerificationID", [number]);
-};
-
 // Notifications
 exports.getId = function (success, error) {
   exec(success, error, "FirebasePlugin", "getId", []);
