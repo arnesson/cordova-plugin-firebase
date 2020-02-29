@@ -31,6 +31,7 @@ static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
 static NSMutableDictionary* authCredentials;
 static NSString* currentNonce; // used for Apple Sign In
+static FIRFirestore* firestore;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -39,6 +40,10 @@ static NSString* currentNonce; // used for Apple Sign In
 
 + (NSString*) appleSignInNonce {
     return currentNonce;
+}
+
++ (void) setFirestore:(FIRFirestore*) firestoreInstance{
+    firestore = firestoreInstance;
 }
 
 - (void)pluginInitialize {
@@ -1161,6 +1166,141 @@ static NSString* currentNonce; // used for Apple Sign In
             }
 
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+/*
+* Firestore
+*/
+
+- (void)addDocumentToFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSDictionary* document = [command.arguments objectAtIndex:0];
+            NSString* collection = [command.arguments objectAtIndex:1];
+            __block FIRDocumentReference *ref =
+            [[firestore collectionWithPath:collection] addDocumentWithData:document completion:^(NSError * _Nullable error) {
+              if (error != nil) {
+                  [self sendPluginError:error.localizedDescription:command];
+              } else {
+                  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:ref.documentID];
+                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+              }
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)setDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* documentId = [command.arguments objectAtIndex:0];
+            NSDictionary* document = [command.arguments objectAtIndex:1];
+            NSString* collection = [command.arguments objectAtIndex:2];
+            
+            [[[firestore collectionWithPath:collection] documentWithPath:documentId] setData:document completion:^(NSError * _Nullable error) {
+              if (error != nil) {
+                [self sendPluginError:error.localizedDescription:command];
+              } else {
+                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+              }
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)updateDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* documentId = [command.arguments objectAtIndex:0];
+            NSDictionary* document = [command.arguments objectAtIndex:1];
+            NSString* collection = [command.arguments objectAtIndex:2];
+            
+            FIRDocumentReference* docRef = [[firestore collectionWithPath:collection] documentWithPath:documentId];
+            if(docRef != nil){
+                [docRef updateData:document completion:^(NSError * _Nullable error) {
+                    if (error != nil) {
+                        [self sendPluginError:error.localizedDescription:command];
+                    } else {
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+                    }
+                }];
+            }else{
+                [self sendPluginError:@"Document not found in collection":command];
+            }
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)deleteDocumentFromFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* documentId = [command.arguments objectAtIndex:0];
+            NSString* collection = [command.arguments objectAtIndex:1];
+
+            [[[firestore collectionWithPath:collection] documentWithPath:documentId]
+                deleteDocumentWithCompletion:^(NSError * _Nullable error) {
+                  if (error != nil) {
+                    [self sendPluginError:error.localizedDescription:command];
+                  } else {
+                    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+                  }
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)fetchDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* documentId = [command.arguments objectAtIndex:0];
+            NSString* collection = [command.arguments objectAtIndex:1];
+            
+            FIRDocumentReference* docRef = [[firestore collectionWithPath:collection] documentWithPath:documentId];
+            if(docRef != nil){
+                [docRef getDocumentWithCompletion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+                    if (error != nil) {
+                        [self sendPluginError:error.localizedDescription:command];
+                    } else {
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:snapshot.data] callbackId:command.callbackId];
+                    }
+                }];
+            }else{
+                [self sendPluginError:@"Document not found in collection":command];
+            }
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)fetchFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* collection = [command.arguments objectAtIndex:0];
+
+            [[firestore collectionWithPath:collection] getDocumentsWithCompletion:^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
+                if (error != nil) {
+                    [self sendPluginError:error.localizedDescription:command];
+                } else {
+                    NSMutableDictionary* documents = [[NSMutableDictionary alloc] init];;
+                    for (FIRDocumentSnapshot *document in snapshot.documents) {
+                        [documents setObject:document.data forKey:document.documentID];
+                    }
+                    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:documents] callbackId:command.callbackId];
+                }
+            }];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
         }
