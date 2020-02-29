@@ -1,10 +1,9 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
 #import "Firebase.h"
+@import FirebaseFirestore;
 
 @interface FirebasePlugin : CDVPlugin
-+ (FirebasePlugin *) firebasePlugin;
-+ (NSString*) appleSignInNonce;
 
 - (void)setAutoInitEnabled:(CDVInvokedUrlCommand*)command;
 - (void)isAutoInitEnabled:(CDVInvokedUrlCommand*)command;
@@ -73,9 +72,19 @@
 - (void)incrementCounter:(CDVInvokedUrlCommand*)command;
 - (void)stopTrace:(CDVInvokedUrlCommand*)command;
 
+// Firestore
+- (void)addDocumentToFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)setDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)updateDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)deleteDocumentFromFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)fetchDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)fetchFirestoreCollection:(CDVInvokedUrlCommand*)command;
+
 
 // Internals
 + (FirebasePlugin *) firebasePlugin;
++ (NSString*) appleSignInNonce;
++ (void) setFirestore:(FIRFirestore*) firestoreInstance;
 - (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
 - (void) handlePluginExceptionWithoutContext: (NSException*) exception;
 - (void) _logError: (NSString*)msg;

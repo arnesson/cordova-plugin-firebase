@@ -64,12 +64,16 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [Data message notifications](#data-message-notifications)
         - [Android data message notifications](#android-data-message-notifications)
         - [iOS data message notifications](#ios-data-message-notifications)
-  - [Google Tag Manager](#google-tag-manager)
-    - [Android](#android)
+  - [InApp Messaging](#inapp-messaging)
     - [iOS](#ios)
+    - [Android](#android)
+  - [Google Tag Manager](#google-tag-manager)
+    - [Android](#android-1)
+    - [iOS](#ios-1)
   - [API](#api)
     - [Notifications and data messages](#notifications-and-data-messages)
       - [getToken](#gettoken)
+      - [getId](#getid)
       - [onTokenRefresh](#ontokenrefresh)
       - [getAPNSToken](#getapnstoken)
       - [onApnsTokenReceived](#onapnstokenreceived)
@@ -114,13 +118,13 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
       - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
       - [verifyPhoneNumber](#verifyphonenumber)
-        - [Android](#android-1)
-        - [iOS](#ios-1)
-      - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
         - [Android](#android-2)
-      - [authenticateUserWithApple](#authenticateuserwithapple)
         - [iOS](#ios-2)
+      - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
         - [Android](#android-3)
+      - [authenticateUserWithApple](#authenticateuserwithapple)
+        - [iOS](#ios-3)
+        - [Android](#android-4)
       - [signInWithCredential](#signinwithcredential)
       - [linkUserWithCredential](#linkuserwithcredential)
       - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -138,6 +142,13 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
       - [startTrace](#starttrace)
       - [incrementCounter](#incrementcounter)
       - [stopTrace](#stoptrace)
+    - [Firestore](#firestore)
+      - [addDocumentToFirestoreCollection](#adddocumenttofirestorecollection)
+      - [setDocumentInFirestoreCollection](#setdocumentinfirestorecollection)
+      - [updateDocumentInFirestoreCollection](#updatedocumentinfirestorecollection)
+      - [deleteDocumentFromFirestoreCollection](#deletedocumentfromfirestorecollection)
+      - [fetchDocumentInFirestoreCollection](#fetchdocumentinfirestorecollection)
+      - [fetchFirestoreCollection](#fetchfirestorecollection)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -165,14 +176,17 @@ See [Disable data collection on startup](#disable-data-collection-on-startup) fo
 #### Android only
 The following plugin variables are used to specify the Firebase SDK versions as Gradle dependencies on Android:
 - `ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION`
-- `ANDROID_PLAY_SERVICES_AUTH_VERSION``
+- `ANDROID_PLAY_SERVICES_AUTH_VERSION`
 - `ANDROID_FIREBASE_ANALYTICS_VERSION`
 - `ANDROID_FIREBASE_MESSAGING_VERSION`
 - `ANDROID_FIREBASE_CONFIG_VERSION`
 - `ANDROID_FIREBASE_PERF_VERSION`
 - `ANDROID_FIREBASE_AUTH_VERSION`
+- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION`
+- `ANDROID_FIREBASE_FIRESTORE_VERSION`
 - `ANDROID_CRASHLYTICS_VERSION`
 - `ANDROID_CRASHLYTICS_NDK_VERSION`
+- `ANDROID_GSON_VERSION`
 See [Specifying Android library versions](#specifying-android-library-versions) for more info.
 
 - `ANDROID_ICON_ACCENT` - sets the default accent color for system notifications. See [Android Notification Color](#android-notification-color) for more info.
@@ -332,10 +346,13 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_CONFIG_VERSION` => `com.google.firebase:firebase-config`
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
+- `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
+- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION` => `com.google.firebase:firebase-inappmessaging-display`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
+- `ANDROID_GSON_VERSION` => `com.google.code.gson:gson`
 
-For example, to explicitly specify all the component versions at plugin install time:
+For example:
 
     cordova plugin add cordova-plugin-firebasex \
         --variable ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION=17.0.0 \
@@ -1036,6 +1053,17 @@ For example:
 } 
 ```
 
+## InApp Messaging
+Engage active app users with contextual messages.
+The SDK component is included in the plugin but no explicit plugin API calls are required to use inapp messaging.
+
+### iOS
+Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=ios#send_a_test_message
+
+### Android
+
+Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=android#send_a_test_message
+
 ## Google Tag Manager
 Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
 
@@ -1072,6 +1100,23 @@ Null if the token has not been allocated yet by the Firebase SDK.
 ```javascript
 FirebasePlugin.getToken(function(fcmToken) {
     console.log(fcmToken);
+}, function(error) {
+    console.error(error);
+});
+```
+Note that token will be null if it has not been established yet.
+
+#### getId
+Get the app instance ID (an constant ID which persists as long as the app is not uninstalled/reinstalled).
+Null if the ID has not been allocated yet by the Firebase SDK.
+
+**Parameters**:
+- {function} success - callback function which will be passed the {string} ID as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.getId(function(appInstanceId) {
+    console.log(appInstanceId);
 }, function(error) {
     console.error(error);
 });
@@ -2360,6 +2405,155 @@ Stop the trace
 FirebasePlugin.stopTrace("test trace");
 ```
 
+### Firestore
+These plugin API functions provide CRUD operations for working with documents in Firestore collections.
+
+Notes: 
+- Only top-level Firestore collections are currently supported - [subcollections](https://firebase.google.com/docs/firestore/manage-data/structure-data#subcollections) (nested collections within documents) are currently not supported due to the complexity of mapping the native objects into the plugin's JS API layer.
+- A document object may contain values of primitive Javascript types `string`, `number`, `boolean`, `array` or `object`.
+Arrays and objects may contain nested structures of these types.
+- If a collection name referenced in a document write operation does not already exist, it will be created by the first write operation referencing it. 
+
+#### addDocumentToFirestoreCollection
+Adds a new document to a Firestore collection, which will be allocated an auto-generated document ID.
+
+**Parameters**:
+- {object} document - document object to add to collection
+- {string} collection - name of top-level collection to add document to.
+- {function} success - callback function to call on successfully adding the document.
+Will be passed a {string} argument containing the auto-generated document ID that the document was stored against.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var document = {
+    "a_string": "foo",
+    "a_list": [1, 2, 3],
+    "an_object": {
+        "an_integer": 1,            
+    }
+};
+var collection = "my_collection";
+FirebasePlugin.addDocumentToFirestoreCollection(document, collection, function(documentId){
+    console.log("Successfully added document with id="+documentId);
+}, function(error){
+    console.error("Error adding document: "+error);
+});
+```
+
+#### setDocumentInFirestoreCollection
+Sets (adds/replaces) a document with the given ID in a Firestore collection.
+
+**Parameters**:
+- {string} documentId - document ID to use when setting document in the collection.
+- {object} document - document object to set in collection.
+- {string} collection - name of top-level collection to set document in.
+- {function} success - callback function to call on successfully setting the document.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var document = {
+    "a_string": "foo",
+    "a_list": [1, 2, 3],
+    "an_object": {
+        "an_integer": 1,            
+    }
+};
+var collection = "my_collection";
+FirebasePlugin.setDocumentInFirestoreCollection(documentId, document, collection, function(){
+    console.log("Successfully set document with id="+documentId);
+}, function(error){
+    console.error("Error setting document: "+error);
+});
+```
+
+#### updateDocumentInFirestoreCollection
+Updates an existing document with the given ID in a Firestore collection.
+This is a non-destructive update that will only overwrite existing keys in the existing document or add new ones if they don't already exist.
+If the no document with the specified ID exists in the collection, an error will be raised. 
+
+**Parameters**:
+- {string} documentId - document ID of the document to update.
+- {object} document - entire document or document fragment to update existing document with.
+- {string} collection - name of top-level collection to update document in.
+- {function} success - callback function to call on successfully updating the document.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var documentFragment = {
+    "a_string": "new value",    
+    "a_new_string": "bar"
+};
+var collection = "my_collection";
+FirebasePlugin.updateDocumentInFirestoreCollection(documentId, documentFragment, collection, function(){
+    console.log("Successfully updated document with id="+documentId);
+}, function(error){
+    console.error("Error updating document: "+error);
+});
+```
+
+#### deleteDocumentFromFirestoreCollection
+Deletes an existing document with the given ID in a Firestore collection.
+
+Note: If the no document with the specified ID exists in the collection, the Firebase SDK will still return a successful outcome.   
+
+**Parameters**:
+- {string} documentId - document ID of the document to delete.
+- {string} collection - name of top-level collection to delete document in.
+- {function} success - callback function to call on successfully deleting the document.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var collection = "my_collection";
+FirebasePlugin.deleteDocumentFromFirestoreCollection(documentId, collection, function(){
+    console.log("Successfully deleted document with id="+documentId);
+}, function(error){
+    console.error("Error deleting document: "+error);
+});
+```
+
+#### fetchDocumentInFirestoreCollection
+Fetches an existing document with the given ID from a Firestore collection.
+
+Note: If the no document with the specified ID exists in the collection, the error callback will be invoked.   
+
+**Parameters**:
+- {string} documentId - document ID of the document to fetch.
+- {string} collection - name of top-level collection to fetch document from.
+- {function} success - callback function to call on successfully fetching the document.
+Will be passed an {object} contain the document contents.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var documentId = "my_doc";
+var collection = "my_collection";
+FirebasePlugin.fetchDocumentInFirestoreCollection(documentId, collection, function(document){
+    console.log("Successfully fetched document: "+JSON.stringify(document));
+}, function(error){
+    console.error("Error fetching document: "+error);
+});
+```
+
+#### fetchFirestoreCollection
+Fetches all the documents in the specific collection.
+
+**Parameters**:
+- {string} collection - name of top-level collection to fetch.
+- {function} success - callback function to call on successfully deleting the document.
+Will be passed an {object} containing all the documents in the collection, indexed by document ID.
+If a Firebase collection with that name does not exist or it contains no documents, the object will be empty.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+
+```javascript
+var collection = "my_collection";
+FirebasePlugin.fetchFirestoreCollection(collection, function(documents){
+    console.log("Successfully fetched collection: "+JSON.stringify(documents));
+}, function(error){
+    console.error("Error fetching collection: "+error);
+});
+```
 
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.

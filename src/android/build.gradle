@@ -27,6 +27,9 @@ cdvPluginPostBuildExtras.add({
                 apply {
                     plugin com.google.gms.googleservices.GoogleServicesPlugin
                 }
+
+                // Disable strict version check as it causes problems
+                com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
             }
         }
     }
@@ -39,3 +42,5 @@ cdvPluginPostBuildExtras.add({
         enableNdk true
     }
 })
+
+
