@@ -1,3 +1,13 @@
+# Version 8.1.0
+* Add support for Firebase inapp messaging
+    * Merged from PR [#312](https://github.com/dpa99c/cordova-plugin-firebasex/pull/312).
+* Add support for Firestore realtime database. Resolves [#190](https://github.com/dpa99c/cordova-plugin-firebasex/issues/190).
+* (Doc) Add note regarding persistence of data collection settings. Resolves [#315](https://github.com/dpa99c/cordova-plugin-firebasex/issues/315).
+* (iOS) Added missing Google Tag Manager Pod for iOS.
+    * Merged from PR [#318](https://github.com/dpa99c/cordova-plugin-firebasex/pull/318).
+* (iOS) Don't set `FirebaseScreenReportEnabled=false` in app list when `FIREBASE_ANALYTICS_COLLECTION_ENABLE=false`. Resolves [#317](https://github.com/dpa99c/cordova-plugin-firebasex/issues/317).
+* (Android) Disable strict version check in Google Services plugin for Gradle as it causes erroneous build failures.
+
 # Version 8.0.1
 * Add `registerAuthStateChangeListener()` to support invocation of a callback function on the Firebase Authentication state changing. 
 Resolves [#311](https://github.com/dpa99c/cordova-plugin-firebasex/issues/311). 
