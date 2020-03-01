@@ -93,6 +93,7 @@ public class FirebasePlugin extends CordovaPlugin {
     private FirebaseFirestore firestore;
     private Gson gson;
     private FirebaseAuth.AuthStateListener authStateListener;
+    private boolean authStateChangeListenerInitialized = false;
     private static CordovaInterface cordovaInterface = null;
     protected static Context applicationContext = null;
     private static Activity cordovaActivity = null;
@@ -129,10 +130,10 @@ public class FirebasePlugin extends CordovaPlugin {
                     Log.d(TAG, "Starting Firebase plugin");
                     FirebaseApp.initializeApp(applicationContext);
                     mFirebaseAnalytics = FirebaseAnalytics.getInstance(applicationContext);
-					
+
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
-					
+
 					firestore = FirebaseFirestore.getInstance();
                     gson = new Gson();
 
@@ -2149,17 +2150,21 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private static class AuthStateListener implements FirebaseAuth.AuthStateListener {
-        @Override
-        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-            try {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthStateChange("+(user != null ? "true" : "false")+")");
-            } catch (Exception e) {
-                handleExceptionWithoutContext(e);
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                try {
+                    if(!FirebasePlugin.instance.authStateChangeListenerInitialized){
+                        FirebasePlugin.instance.authStateChangeListenerInitialized = true;
+                    }else{
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                        FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthStateChange("+(user != null ? "true" : "false")+")");
+                    }
+                } catch (Exception e) {
+                    handleExceptionWithoutContext(e);
+                }
             }
         }
-    }
-	
+
 	private Map<String, Object> jsonStringToMap(String jsonString)  throws JSONException {
         Type type = new TypeToken<Map<String, Object>>(){}.getType();
         return gson.fromJson(jsonString, type);
