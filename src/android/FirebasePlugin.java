@@ -469,22 +469,29 @@ public class FirebasePlugin extends CordovaPlugin {
 
             return;
         }
-        final CallbackContext callbackContext = FirebasePlugin.notificationCallbackContext;
-        if (callbackContext != null && bundle != null) {
-            JSONObject json = new JSONObject();
-            Set<String> keys = bundle.keySet();
-            for (String key : keys) {
-                try {
-                    json.put(key, bundle.get(key));
-                } catch (JSONException e) {
-                    handleExceptionWithContext(e, callbackContext);
-                    return;
-                }
-            }
 
-            PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, json);
-            pluginresult.setKeepCallback(true);
-            callbackContext.sendPluginResult(pluginresult);
+        final CallbackContext callbackContext = FirebasePlugin.notificationCallbackContext;
+        if(bundle != null){
+            // Pass the message bundle to the receiver manager so any registered receivers can decide to handle it
+            boolean wasHandled = FirebasePluginMessageReceiverManager.sendMessage(bundle);
+            if (wasHandled) {
+                Log.d(TAG, "Message bundle was handled by a registered receiver");
+            }else if (callbackContext != null) {
+                JSONObject json = new JSONObject();
+                Set<String> keys = bundle.keySet();
+                for (String key : keys) {
+                  try {
+                      json.put(key, bundle.get(key));
+                  } catch (JSONException e) {
+                      handleExceptionWithContext(e, callbackContext);
+                      return;
+                  }
+                }
+
+                PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, json);
+                pluginresult.setKeepCallback(true);
+                callbackContext.sendPluginResult(pluginresult);
+            }
         }
     }
 
@@ -2150,20 +2157,20 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private static class AuthStateListener implements FirebaseAuth.AuthStateListener {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                try {
-                    if(!FirebasePlugin.instance.authStateChangeListenerInitialized){
-                        FirebasePlugin.instance.authStateChangeListenerInitialized = true;
-                    }else{
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                        FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthStateChange("+(user != null ? "true" : "false")+")");
-                    }
-                } catch (Exception e) {
-                    handleExceptionWithoutContext(e);
+        @Override
+        public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            try {
+                if(!FirebasePlugin.instance.authStateChangeListenerInitialized){
+                    FirebasePlugin.instance.authStateChangeListenerInitialized = true;
+                }else{
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthStateChange("+(user != null ? "true" : "false")+")");
                 }
+            } catch (Exception e) {
+                handleExceptionWithoutContext(e);
             }
         }
+    }
 
 	private Map<String, Object> jsonStringToMap(String jsonString)  throws JSONException {
         Type type = new TypeToken<Map<String, Object>>(){}.getType();
