@@ -64,12 +64,16 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Data message notifications](#data-message-notifications)
       - [Android data message notifications](#android-data-message-notifications)
       - [iOS data message notifications](#ios-data-message-notifications)
+  - [Custom FCM message handling](#custom-fcm-message-handling)
+    - [Android](#android)
+    - [iOS](#ios)
+    - [Example](#example)
 - [InApp Messaging](#inapp-messaging)
-  - [iOS](#ios)
-  - [Android](#android)
-- [Google Tag Manager](#google-tag-manager)
-  - [Android](#android-1)
   - [iOS](#ios-1)
+  - [Android](#android-1)
+- [Google Tag Manager](#google-tag-manager)
+  - [Android](#android-2)
+  - [iOS](#ios-2)
 - [API](#api)
   - [Notifications and data messages](#notifications-and-data-messages)
     - [getToken](#gettoken)
@@ -118,13 +122,13 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
     - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
     - [verifyPhoneNumber](#verifyphonenumber)
-      - [Android](#android-2)
-      - [iOS](#ios-2)
-    - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
       - [Android](#android-3)
-    - [authenticateUserWithApple](#authenticateuserwithapple)
       - [iOS](#ios-3)
+    - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
       - [Android](#android-4)
+    - [authenticateUserWithApple](#authenticateuserwithapple)
+      - [iOS](#ios-4)
+      - [Android](#android-5)
     - [signInWithCredential](#signinwithcredential)
     - [linkUserWithCredential](#linkuserwithcredential)
     - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -1052,6 +1056,21 @@ For example:
   }
 } 
 ```
+
+## Custom FCM message handling
+In some cases you may want to handle certain incoming FCM messages differently rather than with the default behaviour of this plugin.
+Therefore this plugin provides a mechanism by which you can implement your own custom FCM message handling for specific FCM messages which bypasses handling of those messages by this plugin.
+To do this requires you to write native handlers for Android & iOS which hook into the native code of this plugin.
+
+### Android
+You'll need to add a native class which extends the [`FirebasePluginMessageReceiver` abstract class](src/android/FirebasePluginMessageReceiver.java) and implements the `onMessageReceived()` and `sendMessage()` abstract methods.
+
+### iOS
+You'll need to add a native class which extends the [`FirebasePluginMessageReceiver` abstract class](src/ios/FirebasePluginMessageReceiver.h) and implements the `sendNotification()` abstract method.
+
+### Example
+The [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) contains an [example plugin](https://github.com/dpa99c/cordova-plugin-firebasex-test/tree/master/plugins/cordova-plugin-customfcmreceiver) which implements a custom receiver class for both platforms.
+You can test this by building and running the example project app, and sending the [notification_custom_receiver](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/notification_custom_receiver.json) and [data_custom_receiver](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/data_custom_receiver.json) test messages using the [built-in FCM client](https://github.com/dpa99c/cordova-plugin-firebasex-test#messaging-client).
 
 # InApp Messaging
 Engage active app users with contextual messages.
