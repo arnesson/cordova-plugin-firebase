@@ -1,3 +1,11 @@
+# Version 8.1.1
+* (Doc) Document custom FCM message handling.
+* (Doc) Rationalise heading levels.
+* (iOS) Implement message receiver mechanism (equivalent to existing Android mechanism) to enable custom handling of specific message types.
+* (Android) Extend custom receiver to handle payload obtained from system notification message bundle received while in background/not running.
+* (Android) Ignore invocation of auth state change listener at app start (same as on iOS) to prevent error due to race condition with plugin initialisation.
+
+
 # Version 8.1.0
 * Add support for Firebase inapp messaging
     * Merged from PR [#312](https://github.com/dpa99c/cordova-plugin-firebasex/pull/312).
