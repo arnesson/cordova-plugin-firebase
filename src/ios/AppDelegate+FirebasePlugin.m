@@ -1,6 +1,7 @@
 #import "AppDelegate+FirebasePlugin.h"
 #import "FirebasePlugin.h"
 #import "Firebase.h"
+#import <Fabric/Fabric.h>
 #import <objc/runtime.h>
 
 
@@ -66,6 +67,9 @@ static bool authStateChangeListenerInitialized = false;
             
             // configure FIRApp with options
             [FIRApp configureWithOptions:options];
+            if([FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
+                [Fabric with:@[[Crashlytics class]]];
+            }
         }
         
         // no .plist found, try default App

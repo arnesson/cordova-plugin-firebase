@@ -56,6 +56,8 @@
 
 // Crashlytics
 - (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
+- (void)isCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
+- (void)isCrashlyticsCollectionCurrentlyEnabled:(CDVInvokedUrlCommand*)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
 - (void)logMessage:(CDVInvokedUrlCommand*)command;
 - (void)sendCrash:(CDVInvokedUrlCommand*)command;
@@ -90,6 +92,7 @@
 - (void) _logError: (NSString*)msg;
 - (void) _logInfo: (NSString*)msg;
 - (void) _logMessage: (NSString*)msg;
+- (BOOL) _shouldEnableCrashlytics;
 - (int) saveAuthCredential: (FIRAuthCredential *) authCredential;
 - (void)executeGlobalJavascript: (NSString*)jsString;
 

@@ -105,6 +105,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [setUserProperty](#setuserproperty)
   - [Crashlytics](#crashlytics)
     - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
+    - [isCrashlyticsCollectionEnabled](#iscrashlyticscollectionenabled)
+    - [isCrashlyticsCollectionCurrentlyEnabled](#iscrashlyticscollectioncurrentlyenabled)
     - [setCrashlyticsUserId](#setcrashlyticsuserid)
     - [sendCrash](#sendcrash)
     - [logMessage](#logmessage)
@@ -468,17 +470,20 @@ This will disable data collection (on both Android & iOS) until you call [setAna
 
        FirebasePlugin.setAnalyticsCollectionEnabled(true);
        FirebasePlugin.setPerformanceCollectionEnabled(true);
-       FirebasePlugin.setCrashlyticsCollectionEnabled();
+       FirebasePlugin.setCrashlyticsCollectionEnabled(true);
        
-Note on persistence of these settings:
-- Calling `setAnalyticsCollectionEnabled(true|false)` or `setPerformanceCollectionEnabled(true|false)` will enable or dislable data collection during the current app session and across subsequent app sessions until such time as the same method is called again with a different value.
-- If you set `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED=false`, then you will need to call `setCrashlyticsCollectionEnabled()` at the start of each app session to enable crash data collection since the setting does not persist between app sessions.
+Notes:
+- Calling `setXCollectionEnabled()` will have no effect if the corresponding `FIREBASE_X_COLLECTION_ENABLED` variable is set to `true`.
+- Calling `setAnalyticsCollectionEnabled(true|false)` or `setPerformanceCollectionEnabled(true|false)` will enable/disable data collection during the current app session and across subsequent app sessions until such time as the same method is called again with a different value.
+- Calling `setCrashlyticsCollectionEnabled(true|false)` will enable/disable data collection during subsequent app sessions until such time as the same method is called again with a different value. It **does not** affect the current app session. 
 
 # Example project
 An example project repo exists to demonstrate and validate the functionality of this plugin:
 https://github.com/dpa99c/cordova-plugin-firebasex-test
 
 Please use this as a working reference.
+
+Before reporting any issues, please (if possible) test against the example project to rule out causes external to this plugin.
 
 # Reporting issues
 Before reporting an issue with this plugin, please do the following:
@@ -1649,20 +1654,72 @@ FirebasePlugin.setUserProperty("name", "value");
 ```
 
 ## Crashlytics
-By default this plugin will ensure fatal native crashes in your apps are reported via Firebase Crashlytics. 
-
-Note that for iOS you may need to [upload the dSYM](https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports?authuser=0) for you build before crashes are displayed in the Firebase console.
+By default this plugin will ensure fatal native crashes in your apps are reported to Firebase via Crashlytics. 
 
 ### setCrashlyticsCollectionEnabled
-Manually enable Crashlytics data collection if [disabled on app startup](#disable-data-collection-on-startup).
+Manually enable/disable Crashlytics data collection setting.
 
-**Parameters**: None
+Notes: 
+- This setting **will not be applied** in the *current app session* and will only be applied **when the app is next fully restarted**.
+- The setting value then persists between app sessions until such time as it is changed.
+- The setting has no effect if automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup)
+- So if automatic data collection is enabled, calling this will invoke the error callback.
+
+**Parameters**:
+- {boolean} setEnabled - whether to enable or disable Crashlytics data collection in the next app session.
+- {function} success - (optional) callback function which will be invoked on success
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
 
 ```javascript
-FirebasePlugin.setCrashlyticsCollectionEnabled();
+var shouldSetEnabled = true;
+FirebasePlugin.setCrashlyticsCollectionEnabled(shouldSetEnabled, function(){
+    console.log("Crashlytics data collection was enabled for the next app session");
+}, function(error){
+    console.error("Crashlytics data collection couldn't be enabled: "+error);
+});
 ```
 
-Note: once enabled, Crashlytics data collection cannot be disabled during the app session.
+### isCrashlyticsCollectionEnabled
+Indicates whether the persistent (inter-app session) Crashlytics collection setting is enabled.
+
+Notes: 
+- This value does not apply to the current app session - it applies to the value set by [setCrashlyticsCollectionEnabled()](#setcrashlyticscollectionenabled) which will be applied at the start of the next app session (after the app has fully restarted).
+- The setting value persists between app sessions until such time as it is changed.
+- If automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup), this will always return `true`.
+
+**Parameters**:
+- {function} success - callback function which will be invoked on success.
+Will be passed a {boolean} indicating if the setting is enabled.
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.isCrashlyticsCollectionEnabled(function(enabled){
+    console.log("Crashlytics data collection will be "+(enabled ? "enabled" : "disabled")+" in the next app session");
+}, function(error){
+    console.error("Error getting Crashlytics data collection setting: "+error);
+});
+```
+
+### isCrashlyticsCollectionCurrentlyEnabled
+Indicates whether Crashlytics collection is enabled for the current app session.
+
+Notes: 
+- This value only applies to the current app session - it **does not** apply to the value set by [setCrashlyticsCollectionEnabled()](#setcrashlyticscollectionenabled) which will be applied at the start of the next app session (after the app has fully restarted).
+- This value **does not** persist between app sessions - it's value is for the current session only.
+- If automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup), this will always return `true`.
+
+**Parameters**:
+- {function} success - callback function which will be invoked on success.
+Will be passed a {boolean} indicating if collection is enabled.
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.isCrashlyticsCollectionCurrentlyEnabled(function(enabled){
+    console.log("Crashlytics data collection is "+(enabled ? "enabled" : "disabled")+" for the current app session");
+}, function(error){
+    console.error("Error getting current Crashlytics data collection state: "+error);
+});
+```
 
 ### setCrashlyticsUserId
 Set Crashlytics user identifier.

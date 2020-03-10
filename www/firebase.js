@@ -70,7 +70,7 @@ exports.isAutoInitEnabled = function (success, error) {
 };
 
 exports.setAutoInitEnabled = function (enabled, success, error) {
-    exec(success, error, "FirebasePlugin", "setAutoInitEnabled", [enabled]);
+    exec(success, error, "FirebasePlugin", "setAutoInitEnabled", [!!enabled]);
 };
 
 // Notifications - iOS-only
@@ -109,7 +109,7 @@ exports.listChannels = function (success, error) {
 
 // Analytics
 exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
-    exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [enabled]);
+    exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [!!enabled]);
 };
 
 exports.logEvent = function (name, params, success, error) {
@@ -176,7 +176,7 @@ exports.stopTrace = function (name, success, error) {
 };
 
 exports.setPerformanceCollectionEnabled = function (enabled, success, error) {
-  exec(success, error, "FirebasePlugin", "setPerformanceCollectionEnabled", [enabled]);
+  exec(success, error, "FirebasePlugin", "setPerformanceCollectionEnabled", [!!enabled]);
 };
 
 
@@ -186,8 +186,16 @@ exports.clearAllNotifications = function (success, error) {
 
 
 // Crashlytics
-exports.setCrashlyticsCollectionEnabled = function (success, error) {
-    exec(success, error, "FirebasePlugin", "setCrashlyticsCollectionEnabled", []);
+exports.setCrashlyticsCollectionEnabled = function (enabled, success, error) {
+    exec(success, error, "FirebasePlugin", "setCrashlyticsCollectionEnabled", [!!enabled]);
+};
+
+exports.isCrashlyticsCollectionEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "isCrashlyticsCollectionEnabled", []);
+};
+
+exports.isCrashlyticsCollectionCurrentlyEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "isCrashlyticsCollectionCurrentlyEnabled", []);
 };
 
 exports.logMessage = function (message, success, error) {

@@ -3,7 +3,6 @@
 #import "AppDelegate+FirebasePlugin.h"
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
-#import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import <GoogleSignIn/GoogleSignIn.h>
 @import FirebaseInstanceID;
@@ -28,11 +27,16 @@
 
 static NSString*const LOG_TAG = @"FirebasePlugin[native]";
 static NSInteger const kNotificationStackSize = 10;
+static NSString*const FIREBASE_CRASHLYTICS_COLLECTION_ENABLED = @"FIREBASE_CRASHLYTICS_COLLECTION_ENABLED";
+
 static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
+static BOOL isCrashlyticsEnabled = NO;
 static NSMutableDictionary* authCredentials;
 static NSString* currentNonce; // used for Apple Sign In
 static FIRFirestore* firestore;
+static NSUserDefaults* preferences;
+static NSDictionary* googlePlist;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -49,10 +53,19 @@ static FIRFirestore* firestore;
 
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
-    
     firebasePlugin = self;
     
     @try {
+        preferences = [NSUserDefaults standardUserDefaults];
+        googlePlist = [NSMutableDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"]];
+        
+        if(![self getGooglePlistFlagWithDefaultValue:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED defaultValue:YES]){
+            isCrashlyticsEnabled = [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED];
+        }else{
+            isCrashlyticsEnabled = YES;
+            [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:YES];
+        }
+        
         // Check for permission and register for remote notifications if granted
         [self _hasPermission:^(BOOL result) {}];
         
@@ -930,12 +943,26 @@ static FIRFirestore* firestore;
 /*
  * Crashlytics
  */
+- (BOOL) _shouldEnableCrashlytics {
+    return ![self getGooglePlistFlagWithDefaultValue:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED defaultValue:YES] && [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED];
+}
+
 - (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand *)command {
      [self.commandDelegate runInBackground:^{
          @try {
-             [Fabric with:@[[Crashlytics class]]];
-             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-
+             BOOL enabled = [[command argumentAtIndex:0] boolValue];
+             CDVPluginResult* pluginResult;
+             if([self getGooglePlistFlagWithDefaultValue:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED defaultValue:YES]){
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set Crashlytics data collection at runtime as it's hard-coded to ENABLED at build-time in the plist"];
+             }else if(enabled && [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED]){
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Crashlytics data collection is already set to enabled"];
+             }else if(!enabled && ![self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED]){
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Crashlytics data collection is already set to disabled"];
+             }else{
+                 [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:enabled];
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+             }
+             
              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
@@ -943,14 +970,39 @@ static FIRFirestore* firestore;
      }];
 }
 
+- (void)isCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)isCrashlyticsCollectionCurrentlyEnabled:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isCrashlyticsEnabled];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
         
-        CDVCommandStatus status = CDVCommandStatus_OK;
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         @try {
+            if(!isCrashlyticsEnabled){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log error - Crashlytics collection is disabled"];
+            }
             // We can optionally be passed a stack trace from stackTrace.js which we'll put in userInfo.
-            if ([command.arguments count] > 1) {
+            else if ([command.arguments count] > 1) {
                 NSArray* stackFrames = [command.arguments objectAtIndex:1];
                 
                 NSString* message = errorMessage;
@@ -973,13 +1025,11 @@ static FIRFirestore* firestore;
                 NSError *error = [NSError errorWithDomain:errorMessage code:0 userInfo:userInfo];
                 [CrashlyticsKit recordError:error];
             }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         } @catch (NSException *exception) {
-            CLSNSLog(@"Exception in logError: %@, original error: %@", exception.description, errorMessage);
-            status = CDVCommandStatus_ERROR;
+            [self handlePluginExceptionWithContext:exception :command];
         }
-        
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:status];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    
     }];
 }
 
@@ -987,12 +1037,13 @@ static FIRFirestore* firestore;
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* message = [command argumentAtIndex:0 withDefault:@""];
-            if(message)
-            {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            if(!isCrashlyticsEnabled){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log message - Crashlytics collection is disabled"];
+            }else if(message){
                 CLSNSLog(@"%@",message);
-                CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
         }
@@ -1006,9 +1057,12 @@ static FIRFirestore* firestore;
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand *)command {
     @try {
         NSString* userId = [command.arguments objectAtIndex:0];
-
-        [CrashlyticsKit setUserIdentifier:userId];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        if(!isCrashlyticsEnabled){
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set user ID - Crashlytics collection is disabled"];
+        }else{
+            [CrashlyticsKit setUserIdentifier:userId];
+        }
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
@@ -1451,6 +1505,26 @@ static FIRFirestore* firestore;
      }
      [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
+
+- (void) setPreferenceFlag:(NSString*) name flag:(BOOL)flag {
+    [preferences setBool:flag forKey:name];
+    [preferences synchronize];
+}
+
+- (BOOL) getPreferenceFlag:(NSString*) name {
+    if([preferences objectForKey:name] == nil){
+        return false;
+    }
+    return [preferences boolForKey:name];
+}
+
+- (BOOL) getGooglePlistFlagWithDefaultValue:(NSString*) name defaultValue:(BOOL)defaultValue {
+    if([googlePlist objectForKey:name] == nil){
+        return defaultValue;
+    }
+    return [[googlePlist objectForKey:name] isEqualToString:@"true"];
+}
+
 
 # pragma mark - Stubs
 - (void)createChannel:(CDVInvokedUrlCommand *)command {
