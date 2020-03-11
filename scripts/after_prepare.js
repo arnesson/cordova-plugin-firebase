@@ -127,7 +127,10 @@ module.exports = function (context) {
                 },
                 _text: accentColor
             };
-            if($resources.color.length){
+            if($resources.color && $resources.color._text){
+                if(typeof $resources.color.length === 'undefined'){
+                    $resources.color = [$resources.color];
+                }
                 $resources.color.push($accentColor)
             }else{
                 $resources.color = $accentColor;

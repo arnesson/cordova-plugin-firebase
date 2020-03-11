@@ -6,6 +6,8 @@
     * Resolves [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326).
 * (iOS) Override CDVPlugin class abstract method `handleOpenURL` instead of implementing app delegate method `application:openURL:options` to prevent conflicts with other plugins. 
     * Resolves [#328](https://github.com/dpa99c/cordova-plugin-firebasex/issues/328).
+* (Android) Fix parsing of existing `colors.xml` when it only contains a single `<color>` to prevent overwriting the existing value.
+    * Fixes [#284](https://github.com/dpa99c/cordova-plugin-firebasex/issues/284).
 
 # Version 8.1.1
 * (Doc) Document custom FCM message handling.
