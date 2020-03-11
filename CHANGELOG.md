@@ -2,6 +2,7 @@
 * *BREAKING CHANGE*: Change method signature of `setCrashlyticsCollectionEnabled()` to `(enabled, success, error)` (from `()`) to allow enabling/disabling of Crashlytics at runtime and align it with `setPerformanceCollectionEnabled()` and `setAnalyticsCollectionEnabled()`
 * Add `isCrashlyticsCollectionEnabled()` and `isCrashlyticsCollectionCurrentlyEnabled()` to respectively check if persistent Crashlytics setting is enabled and if Crashlytics is enabling during the current app session.
 * Add `isAnalyticsCollectionEnabled()` and `isPerformanceCollectionEnabled()` to check if persistent settings are enabled.
+* *BREAKING CHANGE*: Remove Firebase Inapp Messaging SDK component due to causing Cordova CLI build issues. Resolves [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326).
 
 # Version 8.1.1
 * (Doc) Document custom FCM message handling.

@@ -69,8 +69,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [iOS](#ios)
     - [Example](#example)
 - [InApp Messaging](#inapp-messaging)
-  - [iOS](#ios-1)
-  - [Android](#android-1)
 - [Google Tag Manager](#google-tag-manager)
   - [Android](#android-2)
   - [iOS](#ios-2)
@@ -190,7 +188,6 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_CONFIG_VERSION`
 - `ANDROID_FIREBASE_PERF_VERSION`
 - `ANDROID_FIREBASE_AUTH_VERSION`
-- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION`
 - `ANDROID_CRASHLYTICS_VERSION`
 - `ANDROID_CRASHLYTICS_NDK_VERSION`
@@ -355,7 +352,6 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
-- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION` => `com.google.firebase:firebase-inappmessaging-display`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
 - `ANDROID_GSON_VERSION` => `com.google.code.gson:gson`
@@ -1080,15 +1076,13 @@ The [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) c
 You can test this by building and running the example project app, and sending the [notification_custom_receiver](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/notification_custom_receiver.json) and [data_custom_receiver](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/data_custom_receiver.json) test messages using the [built-in FCM client](https://github.com/dpa99c/cordova-plugin-firebasex-test#messaging-client).
 
 # InApp Messaging
-Engage active app users with contextual messages.
-The SDK component is included in the plugin but no explicit plugin API calls are required to use inapp messaging.
+Due to causing Cordova CLI build issues (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)) the Inapp Messaging Firebase SDK component has been removed from this plugin.
 
-## iOS
-Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=ios#send_a_test_message
+If/when the underlying [Cordova issue](https://github.com/apache/cordova-ios/issues/659) is resolved in a subsequent [cordova-ios](https://github.com/apache/cordova-ios) platform release, the component can be re-added to this plugin.
 
-## Android
+In the meantime, if you wish to use Firebase Inapp Messaging functionality, please add it via another plugin such as [cordova-plugin-firebase-inappmessaging](https://github.com/chemerisuk/cordova-plugin-firebase-inappmessaging).
 
-Send a test message as described in the link: https://firebase.google.com/docs/in-app-messaging/get-started?platform=android#send_a_test_message
+Note: no explicit plugin API calls are required to use inapp messaging.
 
 # Google Tag Manager
 Download your container-config json file from Tag Manager and add a resource-file node in your `config.xml`.
