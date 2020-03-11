@@ -49,6 +49,7 @@
 
 // Analytics
 - (void)setAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
+- (void)isAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)logEvent:(CDVInvokedUrlCommand*)command;
 - (void)setScreenName:(CDVInvokedUrlCommand*)command;
 - (void)setUserId:(CDVInvokedUrlCommand*)command;
@@ -70,6 +71,7 @@
 
 // Performance
 - (void)setPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;
+- (void)isPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)startTrace:(CDVInvokedUrlCommand*)command;
 - (void)incrementCounter:(CDVInvokedUrlCommand*)command;
 - (void)stopTrace:(CDVInvokedUrlCommand*)command;

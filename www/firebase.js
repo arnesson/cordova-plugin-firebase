@@ -112,6 +112,10 @@ exports.setAnalyticsCollectionEnabled = function (enabled, success, error) {
     exec(success, error, "FirebasePlugin", "setAnalyticsCollectionEnabled", [!!enabled]);
 };
 
+exports.isAnalyticsCollectionEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "isAnalyticsCollectionEnabled", []);
+};
+
 exports.logEvent = function (name, params, success, error) {
   exec(success, error, "FirebasePlugin", "logEvent", [name, params]);
 };
@@ -179,6 +183,9 @@ exports.setPerformanceCollectionEnabled = function (enabled, success, error) {
   exec(success, error, "FirebasePlugin", "setPerformanceCollectionEnabled", [!!enabled]);
 };
 
+exports.isPerformanceCollectionEnabled = function (success, error) {
+    exec(success, error, "FirebasePlugin", "isPerformanceCollectionEnabled", []);
+};
 
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);

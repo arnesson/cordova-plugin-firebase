@@ -99,6 +99,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [listChannels](#listchannels)
   - [Analytics](#analytics)
     - [setAnalyticsCollectionEnabled](#setanalyticscollectionenabled)
+    - [isAnalyticsCollectionEnabled](#isanalyticscollectionenabled)
     - [logEvent](#logevent)
     - [setScreenName](#setscreenname)
     - [setUserId](#setuserid)
@@ -145,6 +146,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [setDefaults](#setdefaults)
   - [Performance](#performance)
     - [setPerformanceCollectionEnabled](#setperformancecollectionenabled)
+    - [isPerformanceCollectionEnabled](#isperformancecollectionenabled)
     - [startTrace](#starttrace)
     - [incrementCounter](#incrementcounter)
     - [stopTrace](#stoptrace)
@@ -1611,6 +1613,27 @@ FirebasePlugin.setAnalyticsCollectionEnabled(true); // Enables analytics data co
 FirebasePlugin.setAnalyticsCollectionEnabled(false); // Disables analytics data collection
 ```
 
+### isAnalyticsCollectionEnabled
+Indicates whether analytics data collection is enabled.
+
+Notes: 
+- This value applies both to the current app session and subsequent app sessions until such time as it is changed.
+- It returns the value set by [setAnalyticsCollectionEnabled()](#setanalyticscollectionenabled).
+- If automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup), this will always return `true`.
+
+**Parameters**:
+- {function} success - callback function which will be invoked on success.
+Will be passed a {boolean} indicating if the setting is enabled.
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.isAnalyticsCollectionEnabled(function(enabled){
+    console.log("Analytics data collection is "+(enabled ? "enabled" : "disabled"));
+}, function(error){
+    console.error("Error getting Analytics data collection setting: "+error);
+});
+```
+
 ### logEvent
 Log an event using Analytics:
 
@@ -2438,6 +2461,27 @@ Manually enable/disable performance data collection, e.g. if [disabled on app st
 FirebasePlugin.setPerformanceCollectionEnabled(true); // Enables performance data collection
 
 FirebasePlugin.setPerformanceCollectionEnabled(false); // Disables performance data collection
+```
+
+### isPerformanceCollectionEnabled
+Indicates whether performance data collection is enabled.
+
+Notes: 
+- This value applies both to the current app session and subsequent app sessions until such time as it is changed.
+- It returns the value set by [setPerformanceCollectionEnabled()](#setperformancecollectionenabled).
+- If automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup), this will always return `true`.
+
+**Parameters**:
+- {function} success - callback function which will be invoked on success.
+Will be passed a {boolean} indicating if the setting is enabled.
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.isPerformanceCollectionEnabled(function(enabled){
+    console.log("Performance data collection is "+(enabled ? "enabled" : "disabled"));
+}, function(error){
+    console.error("Error getting Performance data collection setting: "+error);
+});
 ```
 
 ### startTrace

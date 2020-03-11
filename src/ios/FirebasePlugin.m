@@ -28,6 +28,8 @@
 static NSString*const LOG_TAG = @"FirebasePlugin[native]";
 static NSInteger const kNotificationStackSize = 10;
 static NSString*const FIREBASE_CRASHLYTICS_COLLECTION_ENABLED = @"FIREBASE_CRASHLYTICS_COLLECTION_ENABLED";
+static NSString*const FIREBASE_ANALYTICS_COLLECTION_ENABLED = @"FIREBASE_ANALYTICS_COLLECTION_ENABLED";
+static NSString*const FIREBASE_PERFORMANCE_COLLECTION_ENABLED = @"FIREBASE_PERFORMANCE_COLLECTION_ENABLED";
 
 static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
@@ -64,6 +66,14 @@ static NSDictionary* googlePlist;
         }else{
             isCrashlyticsEnabled = YES;
             [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:YES];
+        }
+        
+        if([self getGooglePlistFlagWithDefaultValue:FIREBASE_ANALYTICS_COLLECTION_ENABLED defaultValue:YES]){
+            [self setPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED flag:YES];
+        }
+        
+        if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
+            [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:YES];
         }
         
         // Check for permission and register for remote notifications if granted
@@ -871,14 +881,34 @@ static NSDictionary* googlePlist;
      [self.commandDelegate runInBackground:^{
          @try {
             BOOL enabled = [[command argumentAtIndex:0] boolValue];
-
-            [FIRAnalytics setAnalyticsCollectionEnabled:enabled];
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            CDVPluginResult* pluginResult;
+            if([self getGooglePlistFlagWithDefaultValue:FIREBASE_ANALYTICS_COLLECTION_ENABLED defaultValue:YES]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set Analytics data collection at runtime as it's hard-coded to ENABLED at build-time in the plist"];
+            }else if(enabled && [self getPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Analytics data collection is already set to enabled"];
+            }else if(!enabled && ![self getPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Analytics data collection is already set to disabled"];
+            }else{
+                [FIRAnalytics setAnalyticsCollectionEnabled:enabled];
+                [self setPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED flag:enabled];
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            }
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
          }
      }];
+}
+
+- (void)isAnalyticsCollectionEnabled:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[self getPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
 }
 
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
@@ -1150,16 +1180,35 @@ static NSDictionary* googlePlist;
      [self.commandDelegate runInBackground:^{
          @try {
              BOOL enabled = [[command argumentAtIndex:0] boolValue];
-
-             [[FIRPerformance sharedInstance] setDataCollectionEnabled:enabled];
-
-             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+             CDVPluginResult* pluginResult;
+             if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set Performance data collection at runtime as it's hard-coded to ENABLED at build-time in the plist"];
+             }else if(enabled && [self getPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED]){
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Performance data collection is already set to enabled"];
+             }else if(!enabled && ![self getPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED]){
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Performance data collection is already set to disabled"];
+             }else{
+                 [[FIRPerformance sharedInstance] setDataCollectionEnabled:enabled];
+                 [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:enabled];
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+             }
 
              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
          }
      }];
+}
+
+- (void)isPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[self getPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
 }
 
 - (void)startTrace:(CDVInvokedUrlCommand *)command {

@@ -108,6 +108,8 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static final int GOOGLE_SIGN_IN = 0x1;
     protected static final String SETTINGS_NAME = "settings";
     private static final String CRASHLYTICS_COLLECTION_ENABLED = "firebase_crashlytics_collection_enabled";
+    private static final String ANALYTICS_COLLECTION_ENABLED = "firebase_analytics_collection_enabled";
+    private static final String PERFORMANCE_COLLECTION_ENABLED = "firebase_performance_collection_enabled";
 
     private static boolean inBackground = true;
     private static ArrayList<Bundle> notificationStack = null;
@@ -143,6 +145,14 @@ public class FirebasePlugin extends CordovaPlugin {
                     }else{
                         isCrashlyticsEnabled = true;
                         setPreference(CRASHLYTICS_COLLECTION_ENABLED, true);
+                    }
+
+                    if(getMetaDataFromManifest(ANALYTICS_COLLECTION_ENABLED)){
+                        setPreference(ANALYTICS_COLLECTION_ENABLED, true);
+                    }
+
+                    if(getMetaDataFromManifest(PERFORMANCE_COLLECTION_ENABLED)){
+                        setPreference(PERFORMANCE_COLLECTION_ENABLED, true);
                     }
 
                     FirebaseApp.initializeApp(applicationContext);
@@ -314,8 +324,14 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("setAnalyticsCollectionEnabled")) {
                 this.setAnalyticsCollectionEnabled(callbackContext, args.getBoolean(0));
                 return true;
+            } else if (action.equals("isAnalyticsCollectionEnabled")) {
+                this.isAnalyticsCollectionEnabled(callbackContext);
+                return true;
             } else if (action.equals("setPerformanceCollectionEnabled")) {
                 this.setPerformanceCollectionEnabled(callbackContext, args.getBoolean(0));
+                return true;
+            } else if (action.equals("isPerformanceCollectionEnabled")) {
+                this.isPerformanceCollectionEnabled(callbackContext);
                 return true;
             } else if (action.equals("setCrashlyticsCollectionEnabled")) {
                 this.setCrashlyticsCollectionEnabled(callbackContext, args.getBoolean(0));
@@ -1595,8 +1611,30 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    mFirebaseAnalytics.setAnalyticsCollectionEnabled(enabled);
-                    callbackContext.success();
+                    if(getMetaDataFromManifest(ANALYTICS_COLLECTION_ENABLED)){
+                        callbackContext.error("Cannot set Analytics data collection at runtime as it's hard-coded to ENABLED at build-time in the manifest");
+                    }else if(enabled && getPreference(ANALYTICS_COLLECTION_ENABLED)){
+                        callbackContext.error("Analytics data collection is already set to enabled");
+                    }else if(!enabled && !getPreference(ANALYTICS_COLLECTION_ENABLED)){
+                        callbackContext.error("Analytics data collection is already set to disabled");
+                    }else{
+                        mFirebaseAnalytics.setAnalyticsCollectionEnabled(enabled);
+                        setPreference(ANALYTICS_COLLECTION_ENABLED, enabled);
+                        callbackContext.success();
+                    }
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void isAnalyticsCollectionEnabled(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    callbackContext.success(getPreference(ANALYTICS_COLLECTION_ENABLED) ? 1 : 0);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                     e.printStackTrace();
@@ -1609,8 +1647,30 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    FirebasePerformance.getInstance().setPerformanceCollectionEnabled(enabled);
-                    callbackContext.success();
+                    if(getMetaDataFromManifest(PERFORMANCE_COLLECTION_ENABLED)){
+                        callbackContext.error("Cannot set Performance data collection at runtime as it's hard-coded to ENABLED at build-time in the manifest");
+                    }else if(enabled && getPreference(PERFORMANCE_COLLECTION_ENABLED)){
+                        callbackContext.error("Performance data collection is already set to enabled");
+                    }else if(!enabled && !getPreference(PERFORMANCE_COLLECTION_ENABLED)){
+                        callbackContext.error("Performance data collection is already set to disabled");
+                    }else{
+                        FirebasePerformance.getInstance().setPerformanceCollectionEnabled(enabled);
+                        setPreference(PERFORMANCE_COLLECTION_ENABLED, enabled);
+                        callbackContext.success();
+                    }
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void isPerformanceCollectionEnabled(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    callbackContext.success(getPreference(PERFORMANCE_COLLECTION_ENABLED) ? 1 : 0);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                     e.printStackTrace();
