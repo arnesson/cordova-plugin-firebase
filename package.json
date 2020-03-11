@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-firebasex",
-  "version": "9.0.0-dev",
+  "version": "9.0.0",
   "description": "Cordova plugin for Google Firebase",
   "types": "./types/index.d.ts",
   "author": {
