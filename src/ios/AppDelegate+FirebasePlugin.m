@@ -130,12 +130,6 @@ static bool authStateChangeListenerInitialized = false;
     [FirebasePlugin.firebasePlugin _logMessage:@"FCM direct channel = false"];
 }
 
-- (BOOL)application:(nonnull UIApplication *)application
-            openURL:(nonnull NSURL *)url
-            options:(nonnull NSDictionary<NSString *, id> *)options {
-    return [[GIDSignIn sharedInstance] handleURL:url];
-}
-
 # pragma mark - Google SignIn
 - (void)signIn:(GIDSignIn *)signIn
 didSignInForUser:(GIDGoogleUser *)user

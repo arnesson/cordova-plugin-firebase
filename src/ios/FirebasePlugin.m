@@ -53,6 +53,7 @@ static NSDictionary* googlePlist;
     firestore = firestoreInstance;
 }
 
+// @override abstract
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
@@ -85,6 +86,12 @@ static NSDictionary* googlePlist;
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
+}
+
+// @override abstract
+- (void)handleOpenURL:(NSNotification*)notification{
+    NSURL* url = [notification object];
+    [[GIDSignIn sharedInstance] handleURL:url];
 }
 
 - (void)setAutoInitEnabled:(CDVInvokedUrlCommand *)command {
