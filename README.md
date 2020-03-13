@@ -5,7 +5,7 @@ Brings push notifications, analytics, event tracking, crash reporting and more f
 
 Supported platforms: Android and iOS
 
-#cli_build branch
+# cli_build branch
 This branch of the plugin is specifically intended for those building (directly or indirectly) via the Cordova CLI.
 It removes the Firebase Inapp Messaging and Google Tag Manager SDK components due to these causing CLI builds to fail (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)).
 
