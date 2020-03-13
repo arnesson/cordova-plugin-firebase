@@ -5,6 +5,20 @@ Brings push notifications, analytics, event tracking, crash reporting and more f
 
 Supported platforms: Android and iOS
 
+#cli_build branch
+This branch of the plugin is specifically intended for those building (directly or indirectly) via the Cordova CLI.
+It removes the Firebase Inapp Messaging and Google Tag Manager SDK components due to these causing CLI builds to fail (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)).
+
+To use it, install an npm release with the `-cli` suffix, e.g.:
+
+    cordova plugin add cordova-plugin-firebasex@9.0.1-cli
+    
+Or install it directly from this branch:
+
+    cordova plugin add https://github.com/dpa99c/cordova-plugin-firebasex#cli_build
+
+If you wish to use either of these components, please use the [master](https://github.com/dpa99c/cordova-plugin-firebasex) branch or install a major plugin release via the NPM registry and build using Xcode.
+
 <!-- DONATE -->
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZRD3W47HQ3EMJ)
 
@@ -196,7 +210,6 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_CONFIG_VERSION`
 - `ANDROID_FIREBASE_PERF_VERSION`
 - `ANDROID_FIREBASE_AUTH_VERSION`
-- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION`
 - `ANDROID_CRASHLYTICS_VERSION`
 - `ANDROID_CRASHLYTICS_NDK_VERSION`
@@ -361,7 +374,6 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
-- `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION` => `com.google.firebase:firebase-inappmessaging-display`
 - `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
 - `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
 - `ANDROID_GSON_VERSION` => `com.google.code.gson:gson`
@@ -1176,27 +1188,12 @@ The [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) c
 You can test this by building and running the example project app, and sending the [notification_custom_receiver](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/notification_custom_receiver.json) and [data_custom_receiver](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/data_custom_receiver.json) test messages using the [built-in FCM client](https://github.com/dpa99c/cordova-plugin-firebasex-test#messaging-client).
 
 # InApp Messaging
-Engage active app users with contextual messages.
-The SDK component is included in the plugin but no explicit plugin API calls are required to use inapp messaging.
-
-See the [iOS](https://firebase.google.com/docs/in-app-messaging/get-started?platform=ios#send_a_test_message) and [Android](https://firebase.google.com/docs/in-app-messaging/get-started?platform=android#send_a_test_message) guides for how to send a test message.
+The Firebase Inapp Messaging SDK component has been removed from this [cli_build](https://github.com/dpa99c/cordova-plugin-firebasex/tree/cli_build) branch of the plugin due to the iOS component causing CLI builds to fail (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)).
+If you wish to use Firebase Inapp Messaging, please use the [master](https://github.com/dpa99c/cordova-plugin-firebasex) branch or install a plugin release via the NPM registry and build using Xcode.
 
 # Google Tag Manager
-Download your container-config json file from Tag Manager and add a `<resource-file>` node in your `config.xml`.
-
-## Android
-```xml
-<platform name="android">
-    <resource-file src="GTM-XXXXXXX.json" target="assets/containers/GTM-XXXXXXX.json" />
-    ...
-```
-
-## iOS
-```xml
-<platform name="ios">
-    <resource-file src="GTM-YYYYYYY.json" />
-    ...
-```
+The Google Tag Manager component has been removed from this [cli_build](https://github.com/dpa99c/cordova-plugin-firebasex/tree/cli_build) branch of the plugin due to the iOS component causing CLI builds to fail (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)).
+If you wish to use Google Tag Manager, please use the [master](https://github.com/dpa99c/cordova-plugin-firebasex) branch or install a plugin release via the NPM registry and build using Xcode.
 
 # API
 The list of available methods for this plugin is described below.
