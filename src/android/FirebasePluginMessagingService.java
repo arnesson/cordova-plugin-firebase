@@ -287,17 +287,16 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 }
 
                 int largeIconResID;
-                if (customLargeIconResID != 0) {
-                    largeIconResID = customLargeIconResID;
-                    Log.d(TAG, "Large icon: custom="+icon);
-                }else if (defaultLargeIconResID != 0) {
-                    Log.d(TAG, "Large icon: default="+defaultLargeIconName);
-                    largeIconResID = defaultLargeIconResID;
-                } else {
-                    Log.d(TAG, "Large icon: application");
-                    largeIconResID = getApplicationInfo().icon;
+                if (customLargeIconResID != 0 || defaultLargeIconResID != 0) {
+					if (customLargeIconResID != 0) {
+	                    largeIconResID = customLargeIconResID;
+	                    Log.d(TAG, "Large icon: custom="+icon);
+	                }else{
+	                    Log.d(TAG, "Large icon: default="+defaultLargeIconName);
+	                    largeIconResID = defaultLargeIconResID;
+	                }
+	                notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), largeIconResID));
                 }
-                notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), largeIconResID));
             }
 
             // Color
