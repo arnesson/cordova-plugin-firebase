@@ -3,6 +3,8 @@
     * *BREAKING CHANGE* to function signature.
     * Merged from PR [#367](https://github.com/dpa99c/cordova-plugin-firebasex/pull/367).
 
+* (Android): Don't display app icon for large notification icon on Android. Resolves [#343](https://github.com/dpa99c/cordova-plugin-firebasex/issues/343).
+
 # Version 9.0.1-cli
 * Document `cli_build` branch.
 * *BREAKING CHANGE*: Remove Firebase Inapp Messaging and Google Tag Manager SDK components due to causing Cordova CLI build issues.
