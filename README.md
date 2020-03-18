@@ -51,12 +51,15 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Android background notifications](#android-background-notifications)
     - [Android foreground notifications](#android-foreground-notifications)
     - [Android Notification Channels](#android-notification-channels)
+      - [Android 7 and below](#android-7-and-below)
     - [Android Notification Icons](#android-notification-icons)
       - [Android Default Notification Icon](#android-default-notification-icon)
       - [Android Large Notification Icon](#android-large-notification-icon)
       - [Android Custom Notification Icons](#android-custom-notification-icons)
     - [Android Notification Color](#android-notification-color)
     - [Android Notification Sound](#android-notification-sound)
+      - [Android 8.0 and above](#android-80-and-above)
+      - [On Android 7 and below](#on-android-7-and-below)
   - [iOS notifications](#ios-notifications)
     - [iOS background notifications](#ios-background-notifications)
     - [iOS notification sound](#ios-notification-sound)
@@ -608,27 +611,54 @@ However, if you set the `notification_foreground` key in the `data` section of t
     
 ### Android Notification Channels
 - Android 8 (O) introduced [notification channels](https://developer.android.com/training/notify-user/channels).
-- Notification channels are configured by the app and used to determine the sound/lights/vibration settings of system notifications.
-- By default, this plugin creates a default channel with [default properties]((#default-android-channel-properties)
+- Notification channels are configured by the app and used to determine the **sound/lights/vibration** settings of system notifications.
+- By default, this plugin creates a default channel with [default properties](#default-android-channel-properties)
     - These can be overridden via the [setDefaultChannel](#setdefaultchannel) function. 
-- The plugin  enables the creation of additional custom channels via the [createChannel](#createchannel) function.
+- The plugin enables the creation of additional custom channels via the [createChannel](#createchannel) function.
 
-On Android 7 and below, the sound setting of system notifications is specified in the notification message itself, for example:
+First you need to create a custom channel with the desired settings, for example:
+
+```javascript
+var channel  = {
+    id: "my_channel_id",
+    sound: "mysound",
+    vibration: true,
+    light: true,
+    lightColor: parseInt("FF0000FF", 16).toString(),
+    importance: 4,
+    badge: true,
+    visibility: 1
+};
+
+FirebasePlugin.createChannel(channel,
+function(){
+    console.log('Channel created: ' + channel.id);
+},
+function(error){
+   console.log('Create channel error: ' + error);
+});
+```
+
+Then reference it from your message payload:
 
 ```json
 {
   "name": "my_notification",
-    "notification": {
-      "body": "Notification body",
-      "title": "Notification title"
-    },
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
   "android": {
     "notification": {
-      "sound": "my_sound",
-      "tag": "default"
+      "channel_id": "my_channel_id"
+    }
   }
 }
 ```
+
+#### Android 7 and below
+- the channel referenced in the message payload will be ignored
+- the sound setting of system notifications is specified in the notification message itself - see [Android Notification Sound](#android-notification-sound).
 
 
 ### Android Notification Icons
@@ -792,7 +822,63 @@ To do this, you can add `<resource-file>` tags to your `config.xml` to deploy th
 </platform>
 ```
 
-In a notification message, you specify the sound file name in the `android.notification` section, for example:
+To ensure your custom sounds works on all versions of Android, be sure to include both the channel name and sound name in your message payload (see below for details), for example:
+
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "android": {
+    "notification": {
+      "channel_id": "my_channel_id",
+      "sound": "my_sound"
+    }
+  }
+}
+```
+
+#### Android 8.0 and above
+On Android 8.0 and above, the notification sound is specified by which [Android notification channel](#android-notification-channels) is referenced in the notification message payload.
+First create a channel that references your sound, for example:
+
+```javascript
+var channel  = {
+    id: "my_channel_id",
+    sound: "my_sound"
+};
+
+FirebasePlugin.createChannel(channel,
+function(){
+    console.log('Channel created: ' + channel.id);
+},
+function(error){
+   console.log('Create channel error: ' + error);
+});
+```
+
+Then reference that channel in your message payload:
+
+```json
+{
+  "name": "my_notification",
+  "notification": {
+    "body": "Notification body",
+    "title": "Notification title"
+  },
+  "android": {
+    "notification": {
+      "channel_id": "my_channel_id"
+    }
+  }
+}
+```
+
+#### On Android 7 and below
+On Android 7 and below, you need to specify the sound file name in the `android.notification` section of the message payload.
+For example:
 
 ```json
 {
@@ -822,7 +908,7 @@ And in a data message by specifying it in the `data` section:
   }
 } 
 ```
-    
+  
 - To play the default notification sound, set `"sound": "default"`.
 - To display a silent notification (no sound), omit the `sound` key from the message.
 
