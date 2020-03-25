@@ -427,7 +427,7 @@ If your iOS app build contains too many debug symbols (i.e. because you include 
 
     ITMS-90381: Too many symbol files - These symbols have no corresponding slice in any binary [16EBC8AC-DAA9-39CF-89EA-6A58EB5A5A2F.symbols, 1B105D69-2039-36A4-A04D-96C1C5BAF235.symbols, 476EACDF-583B-3B29-95B9-253CB41097C8.symbols, 9789B03B-6774-3BC9-A8F0-B9D44B08DCCB.symbols, 983BAE60-D245-3291-9F9C-D25E610846AC.symbols].
 
-To prevent this, you can set the `IOS_STRIP_DEBUG` plugin variable which prevents symbolification of all libraries included via Cocoapods [see here](https://stackoverflow.com/a/48518656/777265):
+To prevent this, you can set the `IOS_STRIP_DEBUG` plugin variable which prevents symbolification of all libraries included via Cocoapods ([see here for more information](https://stackoverflow.com/a/48518656/777265)):
 
     cordova plugin add cordova-plugin-firebasex --variable IOS_STRIP_DEBUG=true
 
