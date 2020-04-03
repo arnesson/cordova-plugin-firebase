@@ -136,6 +136,15 @@ interface FirebasePlugin {
         success?: () => void,
         error?: (err: string) => void
     ): void
+    signInUserWithCustomToken(
+        customToken: string,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
+    signInUserAnonymously(
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
     authenticateUserWithGoogle(
         clientId: string,
         success?: () => void,

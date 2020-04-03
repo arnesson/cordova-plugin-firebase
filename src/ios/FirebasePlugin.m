@@ -557,6 +557,38 @@ static NSDictionary* googlePlist;
     }
 }
 
+- (void)signInUserWithCustomToken:(CDVInvokedUrlCommand*)command {
+    @try {
+        NSString* customToken = [command.arguments objectAtIndex:0];
+        [[FIRAuth auth] signInWithCustomToken:customToken
+                                 completion:^(FIRAuthDataResult * _Nullable authResult,
+                                              NSError * _Nullable error) {
+          @try {
+              [self handleAuthResult:authResult error:error command:command];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)signInUserAnonymously:(CDVInvokedUrlCommand*)command {
+    @try {
+        [[FIRAuth auth] signInAnonymouslyWithCompletion:^(FIRAuthDataResult * _Nullable authResult,
+                                              NSError * _Nullable error) {
+          @try {
+              [self handleAuthResult:authResult error:error command:command];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command{
     @try {
         self.googleSignInCallbackId = command.callbackId;
