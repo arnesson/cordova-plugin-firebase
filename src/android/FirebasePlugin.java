@@ -23,12 +23,14 @@ import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -1006,8 +1008,24 @@ public class FirebasePlugin extends CordovaPlugin {
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
                         return;
                     }
+                    // Sign out of Firebase
                     FirebaseAuth.getInstance().signOut();
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+
+                    // Try to sign out of Google
+                    try{
+                        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build();
+                        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(cordovaActivity, gso);
+                        mGoogleSignInClient.signOut()
+                                .addOnCompleteListener(cordovaActivity, new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+                                    }
+                                });
+                    }catch(Exception googleSignOutException){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+                    }
+
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
