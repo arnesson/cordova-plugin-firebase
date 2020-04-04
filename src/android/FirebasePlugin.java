@@ -1038,6 +1038,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
                     returnResults.put("uid", user.getUid());
                     returnResults.put("providerId", user.getProviderId());
+                    returnResults.put("isAnonymous", user.isAnonymous());
 
                     user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
                         @Override
