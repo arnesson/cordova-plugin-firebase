@@ -1383,6 +1383,31 @@ static NSDictionary* googlePlist;
     }];
 }
 
+- (void)documentExistsInFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* documentId = [command.arguments objectAtIndex:0];
+            NSString* collection = [command.arguments objectAtIndex:1];
+            
+            FIRDocumentReference* docRef = [[firestore collectionWithPath:collection] documentWithPath:documentId];
+            if(docRef != nil){
+                [docRef getDocumentWithCompletion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+                    if (error != nil) {
+                        [self sendPluginError:error.localizedDescription:command];
+                    }else{
+                        BOOL docExists = snapshot.data != nil;
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:docExists] callbackId:command.callbackId];
+                    }
+                }];
+            }else{
+                [self sendPluginError:@"Collection not found":command];
+            }
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 - (void)fetchDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
         @try {
@@ -1394,12 +1419,14 @@ static NSDictionary* googlePlist;
                 [docRef getDocumentWithCompletion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
                     if (error != nil) {
                         [self sendPluginError:error.localizedDescription:command];
-                    } else {
+                    } else if(snapshot.data != nil) {
                         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:snapshot.data] callbackId:command.callbackId];
+                    }else{
+                        [self sendPluginError:@"Document not found in collection":command];
                     }
                 }];
             }else{
-                [self sendPluginError:@"Document not found in collection":command];
+                [self sendPluginError:@"Collection not found":command];
             }
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];

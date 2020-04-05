@@ -353,6 +353,13 @@ exports.deleteDocumentFromFirestoreCollection = function (documentId, collection
     exec(success, error, "FirebasePlugin", "deleteDocumentFromFirestoreCollection", [documentId.toString(), collection]);
 };
 
+exports.documentExistsInFirestoreCollection = function (documentId, collection, success, error) {
+    if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
+    if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "documentExistsInFirestoreCollection", [documentId.toString(), collection]);
+};
+
 exports.fetchDocumentInFirestoreCollection = function (documentId, collection, success, error) {
     if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
