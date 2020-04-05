@@ -1,4 +1,5 @@
 * (Android): Don't display app icon for large notification icon on Android. Resolves [#343](https://github.com/dpa99c/cordova-plugin-firebasex/issues/343).
+* (Android & iOS) Sign out of Google signing out of Firebase. Resolves [#353](https://github.com/dpa99c/cordova-plugin-firebasex/issues/353).
 
 # Version 9.0.1
 * Re-add Firebase Inapp Messaging SDK component to master branch. 

@@ -656,6 +656,13 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
+        
+        // Sign out of Google
+        if([[GIDSignIn sharedInstance] currentUser] != nil){
+            [[GIDSignIn sharedInstance] signOut];
+        }
+        
+        // Sign out of Firebase
         NSError *signOutError;
         BOOL status = [[FIRAuth auth] signOut:&signOutError];
         if (!status) {
