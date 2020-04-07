@@ -3,6 +3,8 @@
     * *BREAKING CHANGE* to function signature.
     * Merged from PR [#367](https://github.com/dpa99c/cordova-plugin-firebasex/pull/367).
 
+# Version 9.0.2-cli
+
 * (Android): Don't display app icon for large notification icon on Android. Resolves [#343](https://github.com/dpa99c/cordova-plugin-firebasex/issues/343).
 * (Android & iOS) Sign out of Google signing out of Firebase. Resolves [#353](https://github.com/dpa99c/cordova-plugin-firebasex/issues/353).
 * (Android & iOS) Add `documentExistsInFirestoreCollection()` and fix resolution of `fetchDocumentInFirestoreCollection()`.
