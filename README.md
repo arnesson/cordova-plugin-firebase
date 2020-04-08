@@ -2469,7 +2469,6 @@ FirebasePlugin.getByteArray("key", function(bytes) {
 ```
 
 ### getInfo
-Android only.
 Get the current state of the FirebaseRemoteConfig singleton object:
 
 **Parameters**:
@@ -2480,6 +2479,10 @@ Get the current state of the FirebaseRemoteConfig singleton object:
 FirebasePlugin.getInfo(function(info) {
     // the status of the developer mode setting (true/false)
     console.log(info.configSettings.developerModeEnabled);
+    // (iOS only) for how much (secs) fetch cache is valid and data will not be refetched
+    console.log(info.configSettings.minimumFetchInterval);
+    // (iOS only) value in seconds to abandon a pending fetch request made to the backend
+    console.log(info.configSettings.fetchTimeout);
     // the timestamp (milliseconds since epoch) of the last successful fetch
     console.log(info.fetchTimeMillis);
     // the status of the most recent fetch attempt (int)
