@@ -717,7 +717,7 @@ static NSDictionary* googlePlist;
         [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
         [userInfo setValue:user.uid forKey:@"uid"];
         [userInfo setValue:user.providerID forKey:@"providerId"];
-        [userInfo setValue:user.isAnonymous forKey:@"isAnonymous"];
+        [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
         [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
             [userInfo setValue:token forKey:@"idToken"];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
