@@ -1220,6 +1220,37 @@ static NSDictionary* googlePlist;
     }];
 }
 
+- (void)getInfo:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+            NSInteger minimumFetchInterval = remoteConfig.configSettings.minimumFetchInterval;
+            NSInteger fetchTimeout = remoteConfig.configSettings.fetchTimeout;
+            NSDate* lastFetchTime = remoteConfig.lastFetchTime;
+            FIRRemoteConfigFetchStatus lastFetchStatus = remoteConfig.lastFetchStatus;
+            // isDeveloperModeEnabled is deprecated new recommnded way to check is minimumFetchInterval == 0
+            BOOL isDeveloperModeEnabled = minimumFetchInterval == 0 ? true : false;
+
+            NSDictionary* configSettings = @{
+                @"developerModeEnabled": [NSNumber numberWithBool:isDeveloperModeEnabled],
+                @"minimumFetchInterval": [NSNumber numberWithInteger:minimumFetchInterval],
+                @"fetchTimeout": [NSNumber numberWithInteger:fetchTimeout],
+            };
+
+            NSDictionary* infoObject = @{
+                @"configSettings": configSettings,
+                @"fetchTimeMillis": (lastFetchTime ? [NSNumber numberWithInteger:(lastFetchTime.timeIntervalSince1970 * 1000)] : [NSNull null]),
+                @"lastFetchStatus": [NSNumber numberWithInteger:(lastFetchStatus)],
+            };
+
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:infoObject];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 /*
  * Performance
  */
