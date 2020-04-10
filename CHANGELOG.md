@@ -1,3 +1,61 @@
+# Version 9.0.2
+* (Android): Don't display app icon for large notification icon on Android. Resolves [#343](https://github.com/dpa99c/cordova-plugin-firebasex/issues/343).
+* (Android & iOS) Sign out of Google signing out of Firebase. Resolves [#353](https://github.com/dpa99c/cordova-plugin-firebasex/issues/353).
+* (Android & iOS) Add `documentExistsInFirestoreCollection()` and fix resolution of `fetchDocumentInFirestoreCollection()`.
+
+# Version 9.0.1
+* Re-add Firebase Inapp Messaging SDK component to master branch. 
+* Document `cli_build` branch. See [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326).
+
+# Version 9.0.0
+* *BREAKING CHANGE*: Change method signature of `setCrashlyticsCollectionEnabled()` to `(enabled, success, error)` (from `()`) to allow enabling/disabling of Crashlytics at runtime and align it with `setPerformanceCollectionEnabled()` and `setAnalyticsCollectionEnabled()`
+* Add `isCrashlyticsCollectionEnabled()` and `isCrashlyticsCollectionCurrentlyEnabled()` to respectively check if persistent Crashlytics setting is enabled and if Crashlytics is enabling during the current app session.
+* Add `isAnalyticsCollectionEnabled()` and `isPerformanceCollectionEnabled()` to check if persistent settings are enabled.
+* *BREAKING CHANGE*: Remove Firebase Inapp Messaging SDK component due to causing Cordova CLI build issues.
+    * Resolves [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326).
+* (iOS) Override CDVPlugin class abstract method `handleOpenURL` instead of implementing app delegate method `application:openURL:options` to prevent conflicts with other plugins. 
+    * Resolves [#328](https://github.com/dpa99c/cordova-plugin-firebasex/issues/328).
+* (Android) Fix parsing of existing `colors.xml` when it only contains a single `<color>` to prevent overwriting the existing value.
+    * Fixes [#284](https://github.com/dpa99c/cordova-plugin-firebasex/issues/284).
+
+# Version 8.1.1
+* (Doc) Document custom FCM message handling.
+* (Doc) Rationalise heading levels.
+* (iOS) Implement message receiver mechanism (equivalent to existing Android mechanism) to enable custom handling of specific message types.
+* (Android) Extend custom receiver to handle payload obtained from system notification message bundle received while in background/not running.
+* (Android) Ignore invocation of auth state change listener at app start (same as on iOS) to prevent error due to race condition with plugin initialisation.
+
+
+# Version 8.1.0
+* Add support for Firebase inapp messaging
+    * Merged from PR [#312](https://github.com/dpa99c/cordova-plugin-firebasex/pull/312).
+* Add support for Firestore realtime database. Resolves [#190](https://github.com/dpa99c/cordova-plugin-firebasex/issues/190).
+* (Doc) Add note regarding persistence of data collection settings. Resolves [#315](https://github.com/dpa99c/cordova-plugin-firebasex/issues/315).
+* (iOS) Added missing Google Tag Manager Pod for iOS.
+    * Merged from PR [#318](https://github.com/dpa99c/cordova-plugin-firebasex/pull/318).
+* (iOS) Don't set `FirebaseScreenReportEnabled=false` in app list when `FIREBASE_ANALYTICS_COLLECTION_ENABLE=false`. Resolves [#317](https://github.com/dpa99c/cordova-plugin-firebasex/issues/317).
+* (Android) Disable strict version check in Google Services plugin for Gradle as it causes erroneous build failures.
+
+# Version 8.0.1
+* Add `registerAuthStateChangeListener()` to support invocation of a callback function on the Firebase Authentication state changing. 
+Resolves [#311](https://github.com/dpa99c/cordova-plugin-firebasex/issues/311). 
+* (Android) Bump Firebase SDK dependency versions to latest releases. Resolves [#279](https://github.com/dpa99c/cordova-plugin-firebasex/issues/279).
+* (iOS) Bump podspec versions for Firebase SDK components to [latest release (v6.17.0)](https://firebase.google.com/support/release-notes/ios#version_6170_-_february_11_2020)
+
+# Version 8.0.0
+* *BREAKING CHANGE*:  Rework `verifyPhoneNumber()` to preserve and reference the native credentials object (rather than attempting to extract and parse its properties to JS). Fixes [#176](https://github.com/dpa99c/cordova-plugin-firebasex/issues/176).
+* Add other Firebase Authentication methods: Google Sign In, Sign In with Apple, email/password sign in, and authentication utility methods. Partially resolves [#208](https://github.com/dpa99c/cordova-plugin-firebasex/issues/208).
+* (Android) Add check `google-services` plugin does not already exist. Fixes [#282](https://github.com/dpa99c/cordova-plugin-firebasex/issues/282).
+* (iOS) Update pinned Firebase SDK versions to latest v6.13.0. Resolves [#232](https://github.com/dpa99c/cordova-plugin-firebasex/issues/232).
+
+# Version 7.0.2
+* (Android) Fix error caused by local variable
+    * Merged from PR [#229](https://github.com/dpa99c/cordova-plugin-firebasex/pull/229).
+* (iOS Hook) Fix retrieving Xcode project path
+    * Merged from PR [#234](https://github.com/dpa99c/cordova-plugin-firebasex/pull/234).
+* (Android) Check google-services plugin doesn't already exist in Gradle script   
+    * Merged from PR [#281](https://github.com/dpa99c/cordova-plugin-firebasex/pull/281).
+
 # Version 7.0.1
 * (Android) Replace references to cordovaActivity with applicationContext when app is not running and therefore cordovaActivity doesn't exist. 
 Resolves [#165](https://github.com/dpa99c/cordova-plugin-firebasex/issues/165).

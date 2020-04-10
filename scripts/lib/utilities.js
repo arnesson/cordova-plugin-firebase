@@ -22,7 +22,7 @@ fs.ensureDirSync = function(dir){
 };
 
 Utilities.parsePackageJson = function(){
-    return JSON.parse(fs.readFileSync('./package.json'));
+    return JSON.parse(fs.readFileSync(path.resolve('./package.json')));
 };
 
 Utilities.parseConfigXml = function(){
@@ -39,13 +39,13 @@ Utilities.parsePluginXml = function(){
 
 Utilities.parseXmlFileToJson = function(filepath, parseOpts){
     parseOpts = parseOpts || {compact: true};
-    return JSON.parse(parser.xml2json(fs.readFileSync(filepath, 'utf-8'), parseOpts));
+    return JSON.parse(parser.xml2json(fs.readFileSync(path.resolve(filepath), 'utf-8'), parseOpts));
 };
 
 Utilities.writeJsonToXmlFile = function(jsonObj, filepath, parseOpts){
     parseOpts = parseOpts || {compact: true, spaces: 4};
     var xmlStr = parser.json2xml(JSON.stringify(jsonObj), parseOpts);
-    fs.writeFileSync(filepath, xmlStr);
+    fs.writeFileSync(path.resolve(filepath), xmlStr);
 };
 
 /**
@@ -67,13 +67,13 @@ Utilities.copyKey = function(platform){
         var file = platform.src[i];
         if(this.fileExists(file)){
             try{
-                var contents = fs.readFileSync(file).toString();
+                var contents = fs.readFileSync(path.resolve(file)).toString();
 
                 try{
                     var destinationPath = platform.dest;
                     var folder = destinationPath.substring(0, destinationPath.lastIndexOf('/'));
                     fs.ensureDirSync(folder);
-                    fs.writeFileSync(destinationPath, contents);
+                    fs.writeFileSync(path.resolve(destinationPath), contents);
                 }catch(e){
                     // skip
                 }
@@ -86,17 +86,17 @@ Utilities.copyKey = function(platform){
     }
 };
 
-Utilities.fileExists = function(path){
+Utilities.fileExists = function(filePath){
     try{
-        return fs.statSync(path).isFile();
+        return fs.statSync(path.resolve(filePath)).isFile();
     }catch(e){
         return false;
     }
 };
 
-Utilities.directoryExists = function(path){
+Utilities.directoryExists = function(dirPath){
     try{
-        return fs.statSync(path).isDirectory();
+        return fs.statSync(path.resolve(dirPath)).isDirectory();
     }catch(e){
         return false;
     }

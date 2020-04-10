@@ -21,8 +21,20 @@ repositories {
 }
 
 cdvPluginPostBuildExtras.add({
+    rootProject.subprojects {
+        if (name == "app") {
+            if (!plugins.hasPlugin('com.google.gms.google-services')) {
+                apply {
+                    plugin com.google.gms.googleservices.GoogleServicesPlugin
+                }
+
+                // Disable strict version check as it causes problems
+                com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+            }
+        }
+    }
     // Use class instead of id (string) to be able to apply plugin from non-root gradle file
-    apply plugin: com.google.gms.googleservices.GoogleServicesPlugin
+
     apply plugin: com.crashlytics.tools.gradle.CrashlyticsPlugin
 
     // Enable Crashlytics NDK reporting
@@ -30,3 +42,5 @@ cdvPluginPostBuildExtras.add({
         enableNdk true
     }
 })
+
+
