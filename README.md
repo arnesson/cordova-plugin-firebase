@@ -126,6 +126,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [deleteUser](#deleteuser)
     - [createUserWithEmailAndPassword](#createuserwithemailandpassword)
     - [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)
+    - [signInUserWithCustomToken](#signInUserWithCustomToken)
+    - [signInUserAnonymously](#signInUserAnonymously)
     - [verifyPhoneNumber](#verifyphonenumber)
       - [Android](#android-2)
       - [iOS](#ios-2)
@@ -2124,6 +2126,43 @@ Example usage:
 
 ```javascript
     FirebasePlugin.signInUserWithEmailAndPassword(email, password, function() {
+        console.log("Successfully signed in");
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to sign in", error);
+    });
+```
+
+### signInUserWithCustomToken
+Signs in user with custom token.
+
+**Parameters**:
+- {string} customToken - the custom token 
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.signInUserWithCustomToken(customToken, function() {
+        console.log("Successfully signed in");
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to sign in", error);
+    });
+```
+
+### signInUserAnonymously
+Signs in user anonymously.
+
+**Parameters**:
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.signInUserAnonymously(function() {
         console.log("Successfully signed in");
         // User is now signed in
     }, function(error) {

@@ -278,6 +278,12 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("signInUserWithEmailAndPassword")) {
                 this.signInUserWithEmailAndPassword(callbackContext, args);
                 return true;
+            } else if (action.equals("signInUserWithCustomToken")) {
+                this.signInUserWithCustomToken(callbackContext, args);
+                return true;
+            } else if (action.equals("signInUserAnonymously")) {
+                this.signInUserAnonymously(callbackContext);
+                return true;
             } else if (action.equals("signInWithCredential")) {
                 this.signInWithCredential(callbackContext, args);
                 return true;
@@ -1053,6 +1059,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
                     returnResults.put("uid", user.getUid());
                     returnResults.put("providerId", user.getProviderId());
+                    returnResults.put("isAnonymous", user.isAnonymous());
 
                     user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
                         @Override
@@ -1538,6 +1545,37 @@ public class FirebasePlugin extends CordovaPlugin {
                         returnResults.put("id", id);
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
                     }
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void signInUserWithCustomToken(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String customToken = args.getString(0);
+
+                    if(customToken == null || customToken.equals("")){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Custom token must be specified"));
+                        return;
+                    }
+
+                    FirebaseAuth.getInstance().signInWithCustomToken(customToken).addOnCompleteListener(cordova.getActivity(), new AuthResultOnCompleteListener(callbackContext));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void signInUserAnonymously(final CallbackContext callbackContext){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(cordova.getActivity(), new AuthResultOnCompleteListener(callbackContext));
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }

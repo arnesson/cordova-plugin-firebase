@@ -12,6 +12,8 @@
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
 - (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)signInUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
+- (void)signInUserWithCustomToken:(CDVInvokedUrlCommand*)command;
+- (void)signInUserAnonymously:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithApple:(CDVInvokedUrlCommand*)command;
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command;

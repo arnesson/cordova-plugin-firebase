@@ -557,6 +557,38 @@ static NSDictionary* googlePlist;
     }
 }
 
+- (void)signInUserWithCustomToken:(CDVInvokedUrlCommand*)command {
+    @try {
+        NSString* customToken = [command.arguments objectAtIndex:0];
+        [[FIRAuth auth] signInWithCustomToken:customToken
+                                 completion:^(FIRAuthDataResult * _Nullable authResult,
+                                              NSError * _Nullable error) {
+          @try {
+              [self handleAuthResult:authResult error:error command:command];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)signInUserAnonymously:(CDVInvokedUrlCommand*)command {
+    @try {
+        [[FIRAuth auth] signInAnonymouslyWithCompletion:^(FIRAuthDataResult * _Nullable authResult,
+                                              NSError * _Nullable error) {
+          @try {
+              [self handleAuthResult:authResult error:error command:command];
+          }@catch (NSException *exception) {
+              [self handlePluginExceptionWithContext:exception :command];
+          }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command{
     @try {
         self.googleSignInCallbackId = command.callbackId;
@@ -692,6 +724,7 @@ static NSDictionary* googlePlist;
         [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
         [userInfo setValue:user.uid forKey:@"uid"];
         [userInfo setValue:user.providerID forKey:@"providerId"];
+        [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
         [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
             [userInfo setValue:token forKey:@"idToken"];
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
