@@ -1580,6 +1580,30 @@ Example FCM v1 API notification message payload for invoking the above example c
 
 ```
 
+If your Android app plays multiple sounds or effects, it's a good idea to create a channel for each likely combination. This is because once a channel is created you cannot override sounds/effects.
+IE, expanding on the createChannel example:
+```javascript
+let soundList = ["train","woop","clock","radar","sonar"];
+for (let key of soundList) {
+    let name = "yourchannelprefix_" + key;
+    channel.id = name;
+    channel.sound = key;
+    channel.name = "Your description " + key;
+
+    // Create the channel
+    window.FirebasePlugin.createChannel(channel,
+        function(){
+            console.log('Notification Channel created: ' + channel.id + " " + JSON.stringify(channel));
+        },
+        function(error){
+            console.log('Create notification channel error: ' + error);
+        });
+}
+```
+
+Note, if you just have one sound / effect combination that the user can customise, just use setDefaultChannel when any changes are made.
+
+
 ### setDefaultChannel
 Android 8+ only.
 Overrides the properties for the default channel.
