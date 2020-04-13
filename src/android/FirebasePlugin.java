@@ -45,11 +45,14 @@ import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.OAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Query.Direction;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -74,6 +77,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.List;
@@ -2250,8 +2254,52 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     String collection = args.getString(0);
-                    firestore.collection(collection)
-                            .get()
+                    JSONArray filters = args.getJSONArray(1);
+                    Query query = firestore.collection(collection);
+
+                    for(int i = 0; i < filters.length(); i++) {
+                        JSONArray filter = filters.getJSONArray(i);
+                        switch(filter.getString(0)) {
+                            case "where": 
+                                if (Objects.equals(filter.getString(2), new String("=="))) {
+                                    query = query.whereEqualTo(filter.getString(1), filter.getString(3));
+                                }
+                                if (Objects.equals(filter.getString(2), new String("<"))) {
+                                    query = query.whereLessThan(filter.getString(1), filter.getString(3));
+                                }
+                                if (Objects.equals(filter.getString(2), new String(">"))) {
+                                    query = query.whereGreaterThan(filter.getString(1), filter.getString(3));
+                                }
+                                if (Objects.equals(filter.getString(2), new String("<="))) {
+                                    query = query.whereLessThanOrEqualTo(filter.getString(1), filter.getString(3));
+                                }
+                                if (Objects.equals(filter.getString(2), new String(">="))) {
+                                    query = query.whereGreaterThanOrEqualTo(filter.getString(1), filter.getString(3));
+                                }
+                                if (Objects.equals(filter.getString(2), new String("array-contains"))) {
+                                    query = query.whereArrayContains(filter.getString(1), filter.getString(3));
+                                }
+                                break;
+                            case "orderBy": 
+                                Direction direction = Direction.ASCENDING;
+                                if (Objects.equals(filter.getString(2), new String("desc"))) {
+                                    direction = Direction.DESCENDING;
+                                }
+                                query = query.orderBy(filter.getString(1), direction);
+                                break;
+                            case "startAt":
+                                query = query.startAt(filter.getString(1));
+                                break;
+                            case "endAt":
+                                query = query.endAt(filter.getString(1));
+                                break;
+                            case "limit":
+                                query = query.limit(filter.getLong(1));
+                                break;
+                        }
+                    }
+                    
+                    query.get()
                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {

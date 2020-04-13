@@ -2860,6 +2860,7 @@ Fetches all the documents in the specific collection.
 
 **Parameters**:
 - {string} collection - name of top-level collection to fetch.
+- {array} filters - used to filter your collection. You can use same values as firebase doc (web like) [https://firebase.google.com/docs/firestore/query-data/queries]
 - {function} success - callback function to call on successfully deleting the document.
 Will be passed an {object} containing all the documents in the collection, indexed by document ID.
 If a Firebase collection with that name does not exist or it contains no documents, the object will be empty.
@@ -2867,7 +2868,11 @@ If a Firebase collection with that name does not exist or it contains no documen
 
 ```javascript
 var collection = "my_collection";
-FirebasePlugin.fetchFirestoreCollection(collection, function(documents){
+var filters = [
+    ['where', 'field', '==', 'value'],
+    ['orderBy', 'field', 'desc']
+];
+FirebasePlugin.fetchFirestoreCollection(collection, filters, function(documents){
     console.log("Successfully fetched collection: "+JSON.stringify(documents));
 }, function(error){
     console.error("Error fetching collection: "+error);
