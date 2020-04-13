@@ -1527,8 +1527,51 @@ static NSDictionary* googlePlist;
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* collection = [command.arguments objectAtIndex:0];
+            NSArray* filters = [command.arguments objectAtIndex:1];
+            FIRQuery* query = [firestore collectionWithPath:collection];
 
-            [[firestore collectionWithPath:collection] getDocumentsWithCompletion:^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
+            for (int i = 0; i < [filters count]; i++) {
+                NSArray* filter = [filters objectAtIndex:i];
+                if ([[filter objectAtIndex:0] isEqualToString:@"where"]) {
+                        if ([[filter objectAtIndex:2] isEqualToString:@"=="]) {
+                            query = [query queryWhereField:[filter objectAtIndex:1] isEqualTo:[filter objectAtIndex:3]];
+                        }
+                        if ([[filter objectAtIndex:2] isEqualToString:@"<"]) {
+                            query = [query queryWhereField:[filter objectAtIndex:1] isLessThan:[filter objectAtIndex:3]];
+                        }
+                        if ([[filter objectAtIndex:2] isEqualToString:@">"]) {
+                            query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThan:[filter objectAtIndex:3]];
+                        }
+                        if ([[filter objectAtIndex:2] isEqualToString:@"<="]) {
+                            query = [query queryWhereField:[filter objectAtIndex:1] isLessThanOrEqualTo:[filter objectAtIndex:3]];
+                        }
+                        if ([[filter objectAtIndex:2] isEqualToString:@">="]) {
+                            query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThanOrEqualTo:[filter objectAtIndex:3]];
+                        }
+                        if ([[filter objectAtIndex:2] isEqualToString:@"array-contains"]) {
+                            query = [query queryWhereField:[filter objectAtIndex:1] arrayContains:[filter objectAtIndex:3]];
+                        }
+                    continue;
+                }
+                if ([[filter objectAtIndex:0] isEqualToString:@"orderBy"]) {
+                    query = [query queryOrderedByField:[filter objectAtIndex:1] descending:([[filter objectAtIndex:2] isEqualToString:@"desc"])];
+                    continue;
+                }
+                if ([[filter objectAtIndex:0] isEqualToString:@"startAt"]) {
+                    query = [query queryStartingAtValues:[filter objectAtIndex:1]];
+                    continue;
+                }
+                if ([[filter objectAtIndex:0] isEqualToString:@"endAt"]) {
+                    query = [query queryEndingAtValues:[filter objectAtIndex:1]];
+                    continue;
+                }
+                if ([[filter objectAtIndex:0] isEqualToString:@"limit"]) {
+                    query = [query queryLimitedTo:[(NSNumber *)[filter objectAtIndex:1] integerValue]];
+                    continue;
+                }
+            }
+
+            [query getDocumentsWithCompletion:^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
                 if (error != nil) {
                     [self sendPluginError:error.localizedDescription:command];
                 } else {
