@@ -1,3 +1,4 @@
+* (Android & iOS) Add `reloadCurrentUser()`
 * (Doc) `createChannel()` suggestion for multiple sounds
     * Merged from PR [#225](https://github.com/dpa99c/cordova-plugin-firebasex/pull/225).
 * (iOS) Implement `getInfo()` for iOS.

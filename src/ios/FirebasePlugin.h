@@ -22,6 +22,7 @@
 - (void)isUserSignedIn:(CDVInvokedUrlCommand*)command;
 - (void)signOutUser:(CDVInvokedUrlCommand*)command;
 - (void)getCurrentUser:(CDVInvokedUrlCommand*)command;
+- (void)reloadCurrentUser:(CDVInvokedUrlCommand*)command;
 - (void)updateUserProfile:(CDVInvokedUrlCommand*)command;
 - (void)updateUserEmail:(CDVInvokedUrlCommand*)command;
 - (void)sendUserEmailVerification:(CDVInvokedUrlCommand*)command;

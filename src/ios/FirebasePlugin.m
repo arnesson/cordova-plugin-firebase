@@ -715,23 +715,48 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
+        [self extractAndReturnUserInfo:command];
         
-        NSMutableDictionary* userInfo = [NSMutableDictionary new];
-        [userInfo setValue:user.displayName forKey:@"name"];
-        [userInfo setValue:user.email forKey:@"email"];
-        [userInfo setValue:@(user.isEmailVerified ? true : false) forKey:@"emailIsVerified"];
-        [userInfo setValue:user.phoneNumber forKey:@"phoneNumber"];
-        [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
-        [userInfo setValue:user.uid forKey:@"uid"];
-        [userInfo setValue:user.providerID forKey:@"providerId"];
-        [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
-        [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
-            [userInfo setValue:token forKey:@"idToken"];
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)reloadCurrentUser:(CDVInvokedUrlCommand *)command {
+    
+    @try {
+        FIRUser* user = [FIRAuth auth].currentUser;
+        if(!user){
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
+            return;
+        }
+        [user reloadWithCompletion:^(NSError * _Nullable error) {
+            if (error != nil) {
+                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description] callbackId:command.callbackId];
+            }else {
+                [self extractAndReturnUserInfo:command];
+            }
         }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
+}
+
+- (void) extractAndReturnUserInfo:(CDVInvokedUrlCommand *)command {
+    FIRUser* user = [FIRAuth auth].currentUser;
+    NSMutableDictionary* userInfo = [NSMutableDictionary new];
+    [userInfo setValue:user.displayName forKey:@"name"];
+    [userInfo setValue:user.email forKey:@"email"];
+    [userInfo setValue:@(user.isEmailVerified ? true : false) forKey:@"emailIsVerified"];
+    [userInfo setValue:user.phoneNumber forKey:@"phoneNumber"];
+    [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
+    [userInfo setValue:user.uid forKey:@"uid"];
+    [userInfo setValue:user.providerID forKey:@"providerId"];
+    [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
+    [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
+        [userInfo setValue:token forKey:@"idToken"];
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+    }];
 }
 
 - (void)updateUserProfile:(CDVInvokedUrlCommand*)command {

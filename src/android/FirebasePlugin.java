@@ -302,6 +302,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("getCurrentUser")) {
                 this.getCurrentUser(callbackContext, args);
                 return true;
+            } else if (action.equals("reloadCurrentUser")) {
+                this.reloadCurrentUser(callbackContext, args);
+                return true;
             } else if (action.equals("updateUserProfile")) {
                 this.updateUserProfile(callbackContext, args);
                 return true;
@@ -1051,28 +1054,60 @@ public class FirebasePlugin extends CordovaPlugin {
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
                         return;
                     }
-                    JSONObject returnResults = new JSONObject();
-                    returnResults.put("name", user.getDisplayName());
-                    returnResults.put("email", user.getEmail());
-                    returnResults.put("emailIsVerified", user.isEmailVerified());
-                    returnResults.put("phoneNumber", user.getPhoneNumber());
-                    returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
-                    returnResults.put("uid", user.getUid());
-                    returnResults.put("providerId", user.getProviderId());
-                    returnResults.put("isAnonymous", user.isAnonymous());
+                    extractAndReturnUserInfo(callbackContext);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
 
-                    user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
-                        @Override
-                        public void onSuccess(GetTokenResult result) {
-                            try {
-                                String idToken = result.getToken();
-                                returnResults.put("idToken", idToken);
-                                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
-                            } catch (Exception e) {
-                                handleExceptionWithContext(e, callbackContext);
-                            }
-                        }
-                    });
+    public void reloadCurrentUser(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(user == null){
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "No user is currently signed"));
+                        return;
+                    }
+                    user.reload()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    try {
+                                        extractAndReturnUserInfo(callbackContext);
+                                    } catch (Exception e) {
+                                        handleExceptionWithContext(e, callbackContext);
+                                    }
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void extractAndReturnUserInfo(final CallbackContext callbackContext) throws Exception{
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        JSONObject returnResults = new JSONObject();
+        returnResults.put("name", user.getDisplayName());
+        returnResults.put("email", user.getEmail());
+        returnResults.put("emailIsVerified", user.isEmailVerified());
+        returnResults.put("phoneNumber", user.getPhoneNumber());
+        returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
+        returnResults.put("uid", user.getUid());
+        returnResults.put("providerId", user.getProviderId());
+        returnResults.put("isAnonymous", user.isAnonymous());
+
+        user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
+            @Override
+            public void onSuccess(GetTokenResult result) {
+                try {
+                    String idToken = result.getToken();
+                    returnResults.put("idToken", idToken);
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
