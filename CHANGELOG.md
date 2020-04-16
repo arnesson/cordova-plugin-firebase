@@ -1,3 +1,8 @@
+# Version 9.1.0
+* (Android & iOS) *BREAKING CHANGE*: Add support for filters to `fetchDocumentInFirestoreCollection()`
+    * *BREAKING CHANGE* to function signature.
+    * Merged from PR [#367](https://github.com/dpa99c/cordova-plugin-firebasex/pull/367).
+
 # Version 9.0.3
 * (Android & iOS) Add `reloadCurrentUser()`
 * (Doc) `createChannel()` suggestion for multiple sounds
