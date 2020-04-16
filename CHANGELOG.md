@@ -1,8 +1,19 @@
-# Version 9.0.3-cli
+# Version 9.1.0-cli
 * (Android & iOS) *BREAKING CHANGE*: Add support for filters to `fetchDocumentInFirestoreCollection()`
     * *BREAKING CHANGE* to function signature.
     * Merged from PR [#367](https://github.com/dpa99c/cordova-plugin-firebasex/pull/367).
+* (Android) Fix regression bug which causes CLI builds to fail on Android. 
+Resolves [#369](https://github.com/dpa99c/cordova-plugin-firebasex/issues/369).  
 
+# Version 9.0.3-cli
+* (Android & iOS) Add `reloadCurrentUser()`
+* (Doc) `createChannel()` suggestion for multiple sounds
+    * Merged from PR [#225](https://github.com/dpa99c/cordova-plugin-firebasex/pull/225).
+* (iOS) Implement `getInfo()` for iOS.
+    * Merged from PR [#363](https://github.com/dpa99c/cordova-plugin-firebasex/pull/363).
+* (Android & iOS) Add `signInUserWithCustomToken()` AND `signInUserAnonymously()` auth methods
+    * Merged from PR [#359](https://github.com/dpa99c/cordova-plugin-firebasex/pull/359).
+    
 # Version 9.0.2-cli
 
 * (Android): Don't display app icon for large notification icon on Android. Resolves [#343](https://github.com/dpa99c/cordova-plugin-firebasex/issues/343).
