@@ -1,3 +1,10 @@
+# Version 9.1.1
+* (iOS): Bump Firebase SDK components to v6.23.0.
+    * Relates to [#373](https://github.com/dpa99c/cordova-plugin-firebasex/issues/373).
+    * See https://firebase.google.com/support/release-notes/ios#version_6230_-_april_21_2020.
+* (Android) Bump Firebase SDK (and other Gradle dependencies) to latest versions.
+    * See https://firebase.google.com/support/release-notes/android#2020-04-23
+
 # Version 9.1.0
 * (Android & iOS) *BREAKING CHANGE*: Add support for filters to `fetchDocumentInFirestoreCollection()`
     * *BREAKING CHANGE* to function signature.
