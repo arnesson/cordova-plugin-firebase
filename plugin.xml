@@ -131,13 +131,13 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="Firebase/Core" spec="6.22.0"/>
-				<pod name="Firebase/Auth" spec="6.22.0"/>
-				<pod name="Firebase/Messaging" spec="6.22.0"/>
-				<pod name="Firebase/Performance" spec="6.22.0"/>
-				<pod name="Firebase/RemoteConfig" spec="6.22.0"/>
-				<pod name="Firebase/InAppMessaging" spec="6.22.0"/>
-				<pod name="Firebase/Firestore" spec="6.22.0"/>
+				<pod name="Firebase/Core" spec="6.23.0"/>
+				<pod name="Firebase/Auth" spec="6.23.0"/>
+				<pod name="Firebase/Messaging" spec="6.23.0"/>
+				<pod name="Firebase/Performance" spec="6.23.0"/>
+				<pod name="Firebase/RemoteConfig" spec="6.23.0"/>
+				<pod name="Firebase/InAppMessaging" spec="6.23.0"/>
+				<pod name="Firebase/Firestore" spec="6.23.0"/>
 				<pod name="Fabric" spec="1.10.2"/>
 				<pod name="Crashlytics" spec="3.14.0"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
