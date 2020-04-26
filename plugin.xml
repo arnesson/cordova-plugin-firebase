@@ -61,13 +61,13 @@
 		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 
 		<!-- Default versions for Gradle dependencies -->
-		<preference name="ANDROID_PLAY_SERVICES_AUTH_VERSION" default="17.0.0" />
-		<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.2.1" />
-		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="20.0.0" />
-		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="19.0.3" />
-		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="19.0.1" />
-		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="19.1.0" />
-		<preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="21.4.0" />
+		<preference name="ANDROID_PLAY_SERVICES_AUTH_VERSION" default="18.0.0" />
+		<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.4.0" />
+		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="20.1.6" />
+		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="19.1.4" />
+		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="19.0.7" />
+		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="19.3.1" />
+		<preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="21.4.3" />
 		<preference name="ANDROID_CRASHLYTICS_VERSION" default="2.10.1" />
 		<preference name="ANDROID_CRASHLYTICS_NDK_VERSION" default="2.1.1" />
 		<preference name="ANDROID_GSON_VERSION" default="2.8.6" />
