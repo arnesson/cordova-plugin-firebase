@@ -116,7 +116,7 @@ interface FirebasePlugin {
         stackTrace?: object,
         success?: () => void,
         error?: (err: string) => void
-    )
+    ): void
     verifyPhoneNumber(
         success: (value: object) => void,
         error: (err: string) => void,
