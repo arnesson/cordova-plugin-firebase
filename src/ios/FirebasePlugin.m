@@ -37,6 +37,7 @@ static BOOL isCrashlyticsEnabled = NO;
 static NSMutableDictionary* authCredentials;
 static NSString* currentNonce; // used for Apple Sign In
 static FIRFirestore* firestore;
+static FIRFunctions* functions;
 static NSUserDefaults* preferences;
 static NSDictionary* googlePlist;
 
@@ -51,6 +52,10 @@ static NSDictionary* googlePlist;
 
 + (void) setFirestore:(FIRFirestore*) firestoreInstance{
     firestore = firestoreInstance;
+}
+
++ (void) setFunctions:(FIRFunctions*) functionsInstance{
+    functions = functionsInstance;
 }
 
 // @override abstract
@@ -1582,6 +1587,31 @@ static NSDictionary* googlePlist;
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:documents] callbackId:command.callbackId];
                 }
             }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+/**
+ * Functions
+ */
+
+- (void)functionsHttpsCallable:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* name = [command.arguments objectAtIndex:0];
+            
+            [[functions HTTPSCallableWithName:name] 
+                callWithObject:[command.arguments objectAtIndex:1]
+                completion:ˆ(FIRHTTPSCallableResult * _Nullable result, NSError * _Nullable error) {
+                    if (error != nil) {
+                        [self sendPluginError:error.localizedDescription:command];
+                    } else {
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result.data] callbackId:command.callbackId];
+                    }
+                }
+            ];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
         }

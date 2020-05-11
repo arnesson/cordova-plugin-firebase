@@ -31,6 +31,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,6 +54,9 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Query.Direction;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -100,6 +104,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static FirebasePlugin instance = null;
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseFirestore firestore;
+    private FirebaseFunctions functions;
     private Gson gson;
     private FirebaseAuth.AuthStateListener authStateListener;
     private boolean authStateChangeListenerInitialized = false;
@@ -167,7 +172,8 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-					firestore = FirebaseFirestore.getInstance();
+                    firestore = FirebaseFirestore.getInstance();
+                    functions = FirebaseFunctions.getInstance();
                     gson = new Gson();
 
                     if (extras != null && extras.size() > 1) {
@@ -398,6 +404,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 return true;
             } else if (action.equals("fetchFirestoreCollection")) {
                 this.fetchFirestoreCollection(args, callbackContext);
+                return true;
+            } else if (action.equals("functionsHttpsCallable")) {
+                this.functionsHttpsCallable(args, callbackContext);
                 return true;
             } else if (action.equals("grantPermission")
                     || action.equals("setBadgeNumber")
@@ -1102,7 +1111,7 @@ public class FirebasePlugin extends CordovaPlugin {
         returnResults.put("phoneNumber", user.getPhoneNumber());
         returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
         returnResults.put("uid", user.getUid());
-        returnResults.put("providerId", user.getProviderId());
+        returnResults.put("providerId", user.getIdToken(false).getResult().getSignInProvider());
         returnResults.put("isAnonymous", user.isAnonymous());
 
         user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
@@ -2325,6 +2334,54 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    private void functionsHttpsCallable(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String name = args.getString(0);
+                    functions.getHttpsCallable(name)
+                        .call(args.get(1))
+                        .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                            @Override
+                            public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                                try{
+                                    if (httpsCallableResult.getData() instanceof Map) {
+                                        callbackContext.success(mapToJsonObject((Map<String, Object>) httpsCallableResult.getData()));
+                                    } else if (httpsCallableResult.getData() instanceof ArrayList) {
+                                        callbackContext.success(objectToJsonArray(httpsCallableResult.getData()));
+                                    } else {
+                                        callbackContext.success((String) httpsCallableResult.getData());
+                                    }
+                                } catch (Exception e){
+                                    handleExceptionWithContext(e, callbackContext);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                try {
+                                    this.onFailure((FirebaseFunctionsException) e);
+                                } catch (JSONException ex) {
+                                    handleExceptionWithContext(ex, callbackContext);
+                                }
+                            }
+
+                            void onFailure(@NonNull FirebaseFunctionsException e) throws JSONException {
+                                if (e.getDetails() == null) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                    return;
+                                }
+                                callbackContext.error(mapToJsonObject((Map<String, Object>) e.getDetails()));
+                            }
+                        });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
 
     protected static void handleExceptionWithContext(Exception e, CallbackContext context) {
         String msg = e.toString();
@@ -2504,6 +2561,16 @@ public class FirebasePlugin extends CordovaPlugin {
     private JSONObject mapToJsonObject(Map<String, Object> map) throws JSONException {
         String jsonString = gson.toJson(map);
         return new JSONObject(jsonString);
+    }
+
+    private JSONObject objectToJsonObject(Object object) throws JSONException {
+        String jsonString = gson.toJson(object);
+        return new JSONObject(jsonString);
+    }
+
+    private JSONArray objectToJsonArray(Object object) throws JSONException {
+        String jsonString = gson.toJson(object);
+        return new JSONArray(jsonString);
     }
 
     private void logMessageToCrashlytics(String message){
