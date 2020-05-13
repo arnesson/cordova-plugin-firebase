@@ -5,6 +5,8 @@ Brings push notifications, analytics, event tracking, crash reporting and more f
 
 Supported platforms: Android and iOS
 
+**IMPORTANT:** Before opening an issue against this plugin, please read [Reporting issues](#reporting-issues).
+
 <!-- DONATE -->
 [![donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZRD3W47HQ3EMJ)
 
@@ -44,6 +46,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 - [Disable data collection on startup](#disable-data-collection-on-startup)
 - [Example project](#example-project)
 - [Reporting issues](#reporting-issues)
+  - [Reporting a bug or problem](#reporting-a-bug-or-problem)
+  - [Requesting a new feature](#requesting-a-new-feature)
 - [Cloud messaging](#cloud-messaging)
   - [Background notifications](#background-notifications)
   - [Foreground notifications](#foreground-notifications)
@@ -501,16 +505,54 @@ Please use this as a working reference.
 Before reporting any issues, please (if possible) test against the example project to rule out causes external to this plugin.
 
 # Reporting issues
-Before reporting an issue with this plugin, please do the following:
-- check a similar issue is not already open (or closed) against this plugin.
-- try to reproduce the issue using the example project
-	- or if that's not possible, using an isolated test project that you are able to share
-	- this will eliminate bugs in your code or conflicts with other code as possible causes of the issue
-- any issue which is suspected of being caused by the Ionic Native wrapper should be [reported against Ionic Native](https://github.com/ionic-team/ionic-native/issues/new)
-	- Ionic Native Typescript wrappers are maintained by the Ionic Team
+**IMPORTANT:** Please read the following carefully. 
+Failure to follow the issue template guidelines below will result in the issue being immediately closed.
+
+## Reporting a bug or problem
+Before [opening a bug issue](https://github.com/dpa99c/cordova-plugin-firebasex/issues/new?assignees=&labels=&template=bug_report.md&title=), please do the following:
+- *DO NOT* open issues asking for support in using/integrating the plugin into your project
+    - Only open issues for suspected bugs/issues with the plugin that are generic and will affect other users
+    - I don't have time to offer free technical support: this is free open-source software
+    - Ask for help on StackOverflow, Ionic Forums, etc.
+    - Use the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) as a known working reference
+    - Any issues requesting support will be closed immediately.
+- *DO NOT* open issues related to the  [Ionic Typescript wrapper for this plugin](https://github.com/ionic-team/ionic-native/blob/master/src/%40ionic-native/plugins/firebase-x/index.ts)
+    - This is owned/maintained by [Ionic](https://github.com/ionic-team) and is not part of this plugin
+    - Please raise such issues/PRs against [Ionic Native](https://github.com/ionic-team/ionic-native/) instead.
 	- To verify an if an issue is caused by this plugin or its Typescript wrapper, please re-test using the vanilla Javascript plugin interface (without the Ionic Native wrapper).
-- if you are having build problems, ensure you have thoroughly read the [Build environment notes](#build-environment-notes) section and searched existing open/closed issues for a similar problem.
-- if you are migrating from `cordova-plugin-firebase` to `cordova-plugin-firebasex` please make sure you have read the [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase) section.
+	- Any issue opened here which is obviously an Ionic Typescript wrapper issue will be closed immediately.
+- If you are migrating from [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) to `cordova-plugin-firebasex` please make sure you have read the [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase) section.
+- Read the above documentation thoroughly
+    - For example, if you're having a build issue ensure you've read through the [build environment notes](#build-environment-notes)
+    - If an iOS CLI build is failing, ensure you've read the [Cordova CLI builds](#cordova-cli-builds) section
+- Check the [CHANGELOG](https://github.com/dpa99c/cordova-plugin-firebasex/blob/master/CHANGELOG.md) for any breaking changes that may be causing your issue.
+- Check a similar issue (open or closed) does not already exist against this plugin.
+	- Duplicates or near-duplicates will be closed immediately.
+- When [creating a new issue](https://github.com/dpa99c/cordova-plugin-firebasex/issues/new/choose)
+    - Choose the "Bug report" template
+    - Fill out the relevant sections of the template and delete irrelevant sections
+    - *WARNING:* Failure to complete the issue template will result in the issue being closed immediately. 
+- Reproduce the issue using the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test)
+	- This will eliminate bugs in your code or conflicts with other code as possible causes of the issue
+	- This will also validate your development environment using a known working codebase
+	- If reproducing the issue using the example project is not possible, create an isolated test project that you are able to share
+- Include full verbose console output when reporting build issues
+    - If the full console output is too large to insert directly into the Github issue, then post it on an external site such as [Pastebin](https://pastebin.com/) and link to it from the issue 
+    - Often the details of an error causing a build failure is hidden away when building with the CLI
+        - To get the full detailed console output, append the `--verbose` flag to CLI build commands
+        - e.g. `cordova build ios --verbose`
+    - Failure to include the full console output will result in the issue being closed immediately
+- If the issue relates to the plugin documentation (and not the code), please of a [documentation issue](https://github.com/dpa99c/cordova-plugin-firebasex/issues/new?assignees=&labels=&template=documentation-issue.md&title=)
+
+## Requesting a new feature
+Before [opening a feature request issue](https://github.com/dpa99c/cordova-plugin-firebasex/issues/new?assignees=&labels=&template=feature_request.md&title=), please do the following:
+- Check the above documentation to ensure the feature you are requesting doesn't already exist
+- Check the list if open/closed issues to check if there's a reason that feature hasn't been included already
+- Ensure the feature you are requesting is actually possible to implement and generically useful to other users than yourself
+- Where possible, post a link to the documentation related to the feature you are requesting
+- Include other relevant links, e.g.
+    - Stack Overflow post illustrating a solution
+    - Code within another Github repo that illustrates a solution 
 
 # Cloud messaging
 
@@ -2880,8 +2922,6 @@ FirebasePlugin.fetchFirestoreCollection(collection, filters, function(documents)
     console.error("Error fetching collection: "+error);
 });
 ```
-
-
 
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.

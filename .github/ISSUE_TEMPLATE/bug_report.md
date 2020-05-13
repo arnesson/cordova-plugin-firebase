@@ -14,16 +14,7 @@ WARNING: Failure to follow the issue template guidelines below will result in th
 
 Only bug reports should be opened here.
 
-Before opening an issue, please do the following:
-- check a similar issue is not already open (or closed) against this plugin.
-	- Duplicates or near-duplicates will be closed immediately.
-- try to reproduce the issue using the example project
-	- or if that's not possible, using an isolated test project that you are able to share
-	- this will eliminate bugs in your code or conflicts with other code as possible causes of the issue
-- any issue which is suspected of being caused by the Ionic Native wrapper should be [reported against Ionic Native](https://github.com/ionic-team/ionic-native/issues/new)
-	- Ionic Native Typescript wrappers are maintained by the Ionic Team
-	- To verify an if an issue is caused by this plugin or its Typescript wrapper, please re-test using the vanilla Javascript plugin interface (without the Ionic Native wrapper).
-	- Any issue opened here which is obviously an Ionic Typescript wrapper issue will be closed immediately.
+Before opening an issue, please read [Reporting issues](https://github.com/dpa99c/cordova-plugin-firebasex#reporting-issues)
 -->
 
 <!-- Fill out the relevant sections below and delete irrelevant sections. -->
