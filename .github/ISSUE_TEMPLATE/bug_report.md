@@ -11,15 +11,29 @@ assignees: ''
 IMPORTANT: PLEASE READ
 
 WARNING: Failure to follow the issue template guidelines below will result in the issue being immediately closed.
-
-Only bug reports should be opened here.
-
-Before opening an issue, please read [Reporting issues](https://github.com/dpa99c/cordova-plugin-firebasex#reporting-issues)
 -->
 
 <!-- Fill out the relevant sections below and delete irrelevant sections. -->
 
 # Bug report
+
+<!-- COMPLETE THIS CHECKLIST -->
+**CHECKLIST**
+- [ ] I have read the [issue reporting guidelines](https://github.com/dpa99c/cordova-plugin-firebasex#reporting-issues)
+
+- [ ] I confirm this is a suspected bug or issue that will affect other users
+<!-- i.e. this is not a request for support in using/integrating the plugin into your specific project -->
+
+- [ ] I have reproduced the issue using the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) or provided the necessary information to reproduce the issue.
+<!-- necessary information e.g. exact steps, FCM notification message content, test case project repo -->
+
+- [ ] I have read [the documentation](https://github.com/dpa99c/cordova-plugin-firebasex) thoroughly and it does not help solve my issue.
+<!-- e.g. if you're having a build issue ensure you've read through the build environment notes -->
+
+- [ ] I have checked that no similar issues (open or closed) already exist.
+<!-- Duplicates or near-duplicates will be closed immediately. -->
+
+
 
 **Current behavior:**
 
