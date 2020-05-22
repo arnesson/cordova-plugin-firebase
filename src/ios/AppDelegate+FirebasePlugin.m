@@ -27,6 +27,7 @@ static AppDelegate* instance;
 static NSDictionary* mutableUserInfo;
 static FIRAuthStateDidChangeListenerHandle authStateChangeListener;
 static bool authStateChangeListenerInitialized = false;
+static bool shouldEstablishDirectChannel = false;
 
 - (void)setDelegate:(id)delegate {
     objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -77,10 +78,12 @@ static bool authStateChangeListenerInitialized = false;
             [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
             [FIRApp configure];
         }
+        
+        shouldEstablishDirectChannel = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"shouldEstablishDirectChannel"] boolValue];
 
         // Set FCM messaging delegate
         [FIRMessaging messaging].delegate = self;
-        [FIRMessaging messaging].shouldEstablishDirectChannel = true;
+        [FIRMessaging messaging].shouldEstablishDirectChannel = shouldEstablishDirectChannel;
         
         // Setup Firestore
         [FirebasePlugin setFirestore:[FIRFirestore firestore]];
@@ -119,15 +122,15 @@ static bool authStateChangeListenerInitialized = false;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [FIRMessaging messaging].shouldEstablishDirectChannel = true;
     self.applicationInBackground = @(NO);
-    [FirebasePlugin.firebasePlugin _logMessage:@"FCM direct channel = true"];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = shouldEstablishDirectChannel;
+    [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"Enter foreground: FCM direct channel = %@", shouldEstablishDirectChannel ? @"true" : @"false"]];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
     self.applicationInBackground = @(YES);
-    [FirebasePlugin.firebasePlugin _logMessage:@"FCM direct channel = false"];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
+    [FirebasePlugin.firebasePlugin _logMessage:@"Enter background: FCM direct channel = false"];
 }
 
 # pragma mark - Google SignIn
