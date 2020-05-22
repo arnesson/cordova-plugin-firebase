@@ -211,7 +211,16 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 
 ### iOS only
 - `IOS_STRIP_DEBUG` - prevents symbolification of all libraries included via Cocoapods. See [Strip debug symbols](#strip-debug-symbols) for more info.
-- `SETUP_RECAPTCHA_VERIFICATION` - automatically sets up reCAPTCHA verification for phone authentication on iOS. See [verifyPhoneNumber](#verifyphonenumber) for more info. 
+    - e.g.  `--variable IOS_STRIP_DEBUG=true`
+    - Defaults to `false` if not specified.
+- `SETUP_RECAPTCHA_VERIFICATION` - automatically sets up reCAPTCHA verification for phone authentication on iOS. See [verifyPhoneNumber](#verifyphonenumber) for more info.
+    - e.g.  `--variable IOS_STRIP_DEBUG=true`
+    - Defaults to `false` if not specified.
+- `IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL` - If `true` Firebase Messaging will automatically establish a socket-based, direct channel to the FCM server.
+   - e.g.  `--variable IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL=true`
+   - Defaults to `false` if not specified.
+   - See [`shouldEstablishDirectChannel`](https://firebase.google.com/docs/reference/ios/firebasemessaging/api/reference/Classes/FIRMessaging#/c:objc(cs)FIRMessaging(py)shouldEstablishDirectChannel)
+   - Note: Firebase Messaging iOS SDK version 7.0 will be a breaking change where the SDK will no longer support iOS Direct Channel API.
 
 ## Supported Cordova Versions
 - cordova: `>= 9`

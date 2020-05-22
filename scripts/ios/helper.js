@@ -200,6 +200,10 @@ module.exports = {
             googlePlist["FIREBASE_CRASHLYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
             googlePlistModified = true;
         }
+        if(typeof pluginVariables['IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL'] !== 'undefined'){
+            appPlist["shouldEstablishDirectChannel"] = (pluginVariables['IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL'] === "true") ;
+            appPlistModified = true;
+        }
         if(pluginVariables['SETUP_RECAPTCHA_VERIFICATION'] === 'true'){
             var reversedClientId = googlePlist['REVERSED_CLIENT_ID'];
 
