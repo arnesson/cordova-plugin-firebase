@@ -751,11 +751,13 @@ static NSDictionary* googlePlist;
     [userInfo setValue:user.phoneNumber forKey:@"phoneNumber"];
     [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
     [userInfo setValue:user.uid forKey:@"uid"];
-    [userInfo setValue:user.providerID forKey:@"providerId"];
     [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
     [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
         [userInfo setValue:token forKey:@"idToken"];
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+        [user getIDTokenResultWithCompletion:^(FIRAuthTokenResult * _Nullable tokenResult, NSError * _Nullable error) {
+            [userInfo setValue:tokenResult.signInProvider forKey:@"providerId"];
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+        }];
     }];
 }
 
@@ -1618,28 +1620,27 @@ static NSDictionary* googlePlist;
 - (void)_logError: (NSString*)msg
 {
     NSLog(@"%@ ERROR: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.error(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.error(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
 - (void)_logInfo: (NSString*)msg
 {
     NSLog(@"%@ INFO: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.info(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.info(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
 - (void)_logMessage: (NSString*)msg
 {
     NSLog(@"%@ LOG: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.log(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.log(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
-- (NSString*)escapeJavascriptString: (NSString*)str
+- (NSString*)escapeDoubleQuotes: (NSString*)str
 {
-    NSString* result = [str stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
-    result = [result stringByReplacingOccurrencesOfString: @"\n" withString: @"\\\n"];
+    NSString *result =[str stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
     return result;
 }
 
