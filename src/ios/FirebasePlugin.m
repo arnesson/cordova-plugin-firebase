@@ -1620,27 +1620,28 @@ static NSDictionary* googlePlist;
 - (void)_logError: (NSString*)msg
 {
     NSLog(@"%@ ERROR: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.error(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.error(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
 - (void)_logInfo: (NSString*)msg
 {
     NSLog(@"%@ INFO: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.info(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.info(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
 - (void)_logMessage: (NSString*)msg
 {
     NSLog(@"%@ LOG: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.log(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.log(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
-- (NSString*)escapeDoubleQuotes: (NSString*)str
+- (NSString*)escapeJavascriptString: (NSString*)str
 {
-    NSString *result =[str stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
+    NSString* result = [str stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
+    result = [result stringByReplacingOccurrencesOfString: @"\n" withString: @"\\\n"];
     return result;
 }
 
