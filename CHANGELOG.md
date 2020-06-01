@@ -1,3 +1,16 @@
+# Version 9.1.2-cli
+* (Android) Fix retrieval of auth provider ID - [see here for more info](https://github.com/firebase/FirebaseUI-Android/issues/329#issuecomment-564409912)
+* (iOS) Align retrieval of auth provider ID with Android.
+* (Typing): correct return type of a method
+    * Merged from PR [#390](https://github.com/dpa99c/cordova-plugin-firebasex/pull/390).
+* (Documentation) Update guidance and requirements when opening issues
+* (iOS): Fix escaping of line endings in multi-line log messages being sent from native iOS implementation to JS console. 
+    * Resolves [#401](https://github.com/dpa99c/cordova-plugin-firebasex/issues/401).
+* (iOS): Set shouldEstablishDirectChannel via a  plugin variable which defaults to false. 
+    Resolves [#406](https://github.com/dpa99c/cordova-plugin-firebasex/issues/406).
+* Bump androidx plugin version dependencies.
+    Resolves [#418](https://github.com/dpa99c/cordova-plugin-firebasex/issues/418).
+
 # Version 9.1.1-cli
 * (iOS): Bump Firebase SDK components to v6.23.0.
     * Relates to [#373](https://github.com/dpa99c/cordova-plugin-firebasex/issues/373).
