@@ -57,6 +57,7 @@ static bool shouldEstablishDirectChannel = false;
     @try{
         instance = self;
         
+        bool isFirebaseInitializedWithPlist = false;
         if(![FIRApp defaultApp]) {
             // get GoogleService-Info.plist file path
             NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
@@ -69,14 +70,22 @@ static bool shouldEstablishDirectChannel = false;
 
                 // configure FIRApp with options
                 [FIRApp configureWithOptions:options];
-                if([FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
-                    [Fabric with:@[[Crashlytics class]]];
-                }
+                
+                isFirebaseInitializedWithPlist = true;
             }else{
                 // no .plist found, try default App
                 [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
                 [FIRApp configure];
             }
+        }else{
+            // Firebase SDK has already been initialised:
+            // Assume that another call (probably from another plugin) did so with the plist
+            isFirebaseInitializedWithPlist = true;
+        }
+        
+        // Initialise Crashlytics
+        if(isFirebaseInitializedWithPlist && [FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
+            [Fabric with:@[[Crashlytics class]]];
         }
         
         shouldEstablishDirectChannel = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"shouldEstablishDirectChannel"] boolValue];
