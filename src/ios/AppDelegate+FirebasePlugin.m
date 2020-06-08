@@ -57,26 +57,26 @@ static bool shouldEstablishDirectChannel = false;
     @try{
         instance = self;
         
-        // get GoogleService-Info.plist file path
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-        
-        // if file is successfully found, use it
-        if(filePath){
-            [FirebasePlugin.firebasePlugin _logMessage:@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]"];
-            // create firebase configure options passing .plist as content
-            FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+        if(![FIRApp defaultApp]) {
+            // get GoogleService-Info.plist file path
+            NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
             
-            // configure FIRApp with options
-            [FIRApp configureWithOptions:options];
-            if([FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
-                [Fabric with:@[[Crashlytics class]]];
+            // if file is successfully found, use it
+            if(filePath){
+                [FirebasePlugin.firebasePlugin _logMessage:@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]"];
+                // create firebase configure options passing .plist as content
+                FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+
+                // configure FIRApp with options
+                [FIRApp configureWithOptions:options];
+                if([FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
+                    [Fabric with:@[[Crashlytics class]]];
+                }
+            }else{
+                // no .plist found, try default App
+                [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
+                [FIRApp configure];
             }
-        }
-        
-        // no .plist found, try default App
-        if (![FIRApp defaultApp] && !filePath) {
-            [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
-            [FIRApp configure];
         }
         
         shouldEstablishDirectChannel = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"shouldEstablishDirectChannel"] boolValue];
