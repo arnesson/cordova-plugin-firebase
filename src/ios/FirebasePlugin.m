@@ -1640,7 +1640,8 @@ static NSDictionary* googlePlist;
 
 - (NSString*)escapeJavascriptString: (NSString*)str
 {
-    NSString* result = [str stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
+    NSString* result = [str stringByReplacingOccurrencesOfString: @"\\\"" withString: @"\""];
+    result = [result stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
     result = [result stringByReplacingOccurrencesOfString: @"\n" withString: @"\\\n"];
     return result;
 }
