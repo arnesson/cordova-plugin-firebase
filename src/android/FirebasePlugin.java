@@ -167,7 +167,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-					firestore = FirebaseFirestore.getInstance();
+                    firestore = FirebaseFirestore.getInstance();
                     gson = new Gson();
 
                     if (extras != null && extras.size() > 1) {
@@ -402,7 +402,7 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("grantPermission")
                     || action.equals("setBadgeNumber")
                     || action.equals("getBadgeNumber")
-            ) {
+                    ) {
                 // Stubs for other platform methods
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
                 return true;
@@ -537,12 +537,12 @@ public class FirebasePlugin extends CordovaPlugin {
                 JSONObject json = new JSONObject();
                 Set<String> keys = bundle.keySet();
                 for (String key : keys) {
-                  try {
-                      json.put(key, bundle.get(key));
-                  } catch (JSONException e) {
-                      handleExceptionWithContext(e, callbackContext);
-                      return;
-                  }
+                    try {
+                        json.put(key, bundle.get(key));
+                    } catch (JSONException e) {
+                        handleExceptionWithContext(e, callbackContext);
+                        return;
+                    }
                 }
 
                 PluginResult pluginresult = new PluginResult(PluginResult.Status.OK, json);
@@ -1133,29 +1133,29 @@ public class FirebasePlugin extends CordovaPlugin {
                     UserProfileChangeRequest profileUpdates;
                     if(profile.has("name") && profile.has("photoUri")){
                         profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(profile.getString("name"))
-                            .setPhotoUri(Uri.parse(profile.getString("photoUri")))
-                            .build();
+                                .setDisplayName(profile.getString("name"))
+                                .setPhotoUri(Uri.parse(profile.getString("photoUri")))
+                                .build();
                     }else if(profile.has("name")){
                         profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(profile.getString("name"))
-                            .build();
+                                .setDisplayName(profile.getString("name"))
+                                .build();
                     }else if(profile.has("photoUri")){
                         profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setPhotoUri(Uri.parse(profile.getString("photoUri")))
-                            .build();
+                                .setPhotoUri(Uri.parse(profile.getString("photoUri")))
+                                .build();
                     }else{
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "'name' and/or 'photoUri' keys must be specified in the profile object"));
                         return;
                     }
 
                     user.updateProfile(profileUpdates)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                FirebasePlugin.instance.handleTaskOutcome(task, callbackContext);
-                            }
-                        });
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    FirebasePlugin.instance.handleTaskOutcome(task, callbackContext);
+                                }
+                            });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -1175,12 +1175,12 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     String email = args.getString(0);
                     user.updateEmail(email)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                FirebasePlugin.instance.handleTaskOutcome(task, callbackContext);
-                            }
-                        });
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    FirebasePlugin.instance.handleTaskOutcome(task, callbackContext);
+                                }
+                            });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -1199,12 +1199,12 @@ public class FirebasePlugin extends CordovaPlugin {
                     }
 
                     user.sendEmailVerification()
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                FirebasePlugin.instance.handleTaskOutcome(task, callbackContext);
-                            }
-                        });
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    FirebasePlugin.instance.handleTaskOutcome(task, callbackContext);
+                                }
+                            });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -1709,17 +1709,9 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    if(getMetaDataFromManifest(ANALYTICS_COLLECTION_ENABLED)){
-                        callbackContext.error("Cannot set Analytics data collection at runtime as it's hard-coded to ENABLED at build-time in the manifest");
-                    }else if(enabled && getPreference(ANALYTICS_COLLECTION_ENABLED)){
-                        callbackContext.error("Analytics data collection is already set to enabled");
-                    }else if(!enabled && !getPreference(ANALYTICS_COLLECTION_ENABLED)){
-                        callbackContext.error("Analytics data collection is already set to disabled");
-                    }else{
-                        mFirebaseAnalytics.setAnalyticsCollectionEnabled(enabled);
-                        setPreference(ANALYTICS_COLLECTION_ENABLED, enabled);
-                        callbackContext.success();
-                    }
+                    mFirebaseAnalytics.setAnalyticsCollectionEnabled(enabled);
+                    setPreference(ANALYTICS_COLLECTION_ENABLED, enabled);
+                    callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                     e.printStackTrace();
@@ -1745,17 +1737,9 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    if(getMetaDataFromManifest(PERFORMANCE_COLLECTION_ENABLED)){
-                        callbackContext.error("Cannot set Performance data collection at runtime as it's hard-coded to ENABLED at build-time in the manifest");
-                    }else if(enabled && getPreference(PERFORMANCE_COLLECTION_ENABLED)){
-                        callbackContext.error("Performance data collection is already set to enabled");
-                    }else if(!enabled && !getPreference(PERFORMANCE_COLLECTION_ENABLED)){
-                        callbackContext.error("Performance data collection is already set to disabled");
-                    }else{
-                        FirebasePerformance.getInstance().setPerformanceCollectionEnabled(enabled);
-                        setPreference(PERFORMANCE_COLLECTION_ENABLED, enabled);
-                        callbackContext.success();
-                    }
+                    FirebasePerformance.getInstance().setPerformanceCollectionEnabled(enabled);
+                    setPreference(PERFORMANCE_COLLECTION_ENABLED, enabled);
+                    callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                     e.printStackTrace();
@@ -1781,16 +1765,8 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    if(getMetaDataFromManifest(CRASHLYTICS_COLLECTION_ENABLED)){
-                        callbackContext.error("Cannot set Crashlytics data collection at runtime as it's hard-coded to ENABLED at build-time in the manifest");
-                    }else if(enabled && getPreference(CRASHLYTICS_COLLECTION_ENABLED)){
-                        callbackContext.error("Crashlytics data collection is already set to enabled");
-                    }else if(!enabled && !getPreference(CRASHLYTICS_COLLECTION_ENABLED)){
-                        callbackContext.error("Crashlytics data collection is already set to disabled");
-                    }else{
-                        setPreference(CRASHLYTICS_COLLECTION_ENABLED, enabled);
-                        callbackContext.success();
-                    }
+                    setPreference(CRASHLYTICS_COLLECTION_ENABLED, enabled);
+                    callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                     e.printStackTrace();
@@ -2260,7 +2236,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     for(int i = 0; i < filters.length(); i++) {
                         JSONArray filter = filters.getJSONArray(i);
                         switch(filter.getString(0)) {
-                            case "where": 
+                            case "where":
                                 if (Objects.equals(filter.getString(2), new String("=="))) {
                                     query = query.whereEqualTo(filter.getString(1), filter.getString(3));
                                 }
@@ -2280,7 +2256,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                     query = query.whereArrayContains(filter.getString(1), filter.getString(3));
                                 }
                                 break;
-                            case "orderBy": 
+                            case "orderBy":
                                 Direction direction = Direction.ASCENDING;
                                 if (Objects.equals(filter.getString(2), new String("desc"))) {
                                     direction = Direction.DESCENDING;
@@ -2298,7 +2274,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                 break;
                         }
                     }
-                    
+
                     query.get()
                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
@@ -2495,7 +2471,7 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
-	private Map<String, Object> jsonStringToMap(String jsonString)  throws JSONException {
+    private Map<String, Object> jsonStringToMap(String jsonString)  throws JSONException {
         Type type = new TypeToken<Map<String, Object>>(){}.getType();
         return gson.fromJson(jsonString, type);
     }
