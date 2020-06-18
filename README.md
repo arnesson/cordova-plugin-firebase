@@ -127,7 +127,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [Crashlytics](#crashlytics)
     - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
     - [isCrashlyticsCollectionEnabled](#iscrashlyticscollectionenabled)
-    - [isCrashlyticsCollectionCurrentlyEnabled](#iscrashlyticscollectioncurrentlyenabled)
     - [setCrashlyticsUserId](#setcrashlyticsuserid)
     - [sendCrash](#sendcrash)
     - [logMessage](#logmessage)
@@ -215,8 +214,8 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_PERF_VERSION`
 - `ANDROID_FIREBASE_AUTH_VERSION`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION`
-- `ANDROID_CRASHLYTICS_VERSION`
-- `ANDROID_CRASHLYTICS_NDK_VERSION`
+- `ANDROID_FIREBASE_CRASHLYTICS_VERSION`
+- `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION`
 - `ANDROID_GSON_VERSION`
 See [Specifying Android library versions](#specifying-android-library-versions) for more info.
 
@@ -387,8 +386,8 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
-- `ANDROID_CRASHLYTICS_VERSION` => `com.crashlytics.sdk.android:crashlytics`
-- `ANDROID_CRASHLYTICS_NDK_VERSION` => `com.crashlytics.sdk.android:crashlytics-ndk`
+- `ANDROID_FIREBASE_CRASHLYTICS_VERSION` => `com.google.firebase:firebase-crashlytics`
+- `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION` => `com.google.firebase:firebase-crashlytics-ndk`
 - `ANDROID_GSON_VERSION` => `com.google.code.gson:gson`
 
 For example:
@@ -401,8 +400,8 @@ For example:
         --variable ANDROID_FIREBASE_CONFIG_VERSION=18.0.0 \
         --variable ANDROID_FIREBASE_PERF_VERSION=18.0.0 \
         --variable ANDROID_FIREBASE_AUTH_VERSION=18.0.0 \
-        --variable ANDROID_CRASHLYTICS_VERSION=2.10.1 \
-        --variable ANDROID_CRASHLYTICS_NDK_VERSION=2.1.0 \
+        --variable ANDROID_FIREBASE_CRASHLYTICS_VERSION=17.0.1 \
+        --variable ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION=17.0.1 \
         
 ### AndroidX
 This plugin has been migrated to use [AndroidX (Jetpack)](https://developer.android.com/jetpack/androidx/migrate) which is the successor to the [Android Support Library](https://developer.android.com/topic/libraries/support-library/index).
@@ -1886,26 +1885,6 @@ FirebasePlugin.isCrashlyticsCollectionEnabled(function(enabled){
 });
 ```
 
-### isCrashlyticsCollectionCurrentlyEnabled
-Indicates whether Crashlytics collection is enabled for the current app session.
-
-Notes: 
-- This value only applies to the current app session - it **does not** apply to the value set by [setCrashlyticsCollectionEnabled()](#setcrashlyticscollectionenabled) which will be applied at the start of the next app session (after the app has fully restarted).
-- This value **does not** persist between app sessions - it's value is for the current session only.
-- If automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup), this will always return `true`.
-
-**Parameters**:
-- {function} success - callback function which will be invoked on success.
-Will be passed a {boolean} indicating if collection is enabled.
-- {function} error - (optional) callback function which will be passed a {string} error message as an argument
-
-```javascript
-FirebasePlugin.isCrashlyticsCollectionCurrentlyEnabled(function(enabled){
-    console.log("Crashlytics data collection is "+(enabled ? "enabled" : "disabled")+" for the current app session");
-}, function(error){
-    console.error("Error getting current Crashlytics data collection state: "+error);
-});
-```
 
 ### setCrashlyticsUserId
 Set Crashlytics user identifier.

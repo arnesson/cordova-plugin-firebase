@@ -34,7 +34,7 @@ module.exports = {
         xcodeProject.parseSync();
 
         // Build the body of the script to be executed during the build phase.
-        var script = '"' + '\\"${PODS_ROOT}/Fabric/run\\"' + '"';
+        var script = '"' + '\\"${PODS_ROOT}/FirebaseCrashlytics/run\\"' + '"';
 
         // Generate a unique ID for our new build phase.
         var id = xcodeProject.generateUuid();
@@ -204,7 +204,7 @@ module.exports = {
             googlePlistModified = true;
         }
         if(typeof pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== 'undefined'){
-            googlePlist["FIREBASE_CRASHLYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
+            googlePlist["FirebaseCrashlyticsCollectionEnabled"] = (pluginVariables['FIREBASE_CRASHLYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
             googlePlistModified = true;
         }
         if(typeof pluginVariables['IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL'] !== 'undefined'){

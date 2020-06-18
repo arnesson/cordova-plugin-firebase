@@ -1,3 +1,8 @@
+* *BREAKING CHANGE:* (Android, iOS) Migrate from Fabric Crashlytics to Firebase Crashlytics.
+** Based on [this commit](https://github.com/vickydlion/cordova-plugin-firebasex/commit/0dfb5753edcd9fc19a0e7a52fdd4fc79d6d976ea) in [PR #432](https://github.com/dpa99c/cordova-plugin-firebasex/pull/432)
+** Resolves [#335](https://github.com/dpa99c/cordova-plugin-firebasex/issues/335).
+** Removes `isCrashlyticsCollectionCurrentlyEnabled()` as it's no longer necessary to manually init Crashlytics and a runtime method exists to enable/disable it.
+
 # Version 9.1.2-cli
 * (Android) Fix retrieval of auth provider ID - [see here for more info](https://github.com/firebase/FirebaseUI-Android/issues/329#issuecomment-564409912)
 * (iOS) Align retrieval of auth provider ID with Android.

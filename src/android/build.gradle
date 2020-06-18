@@ -1,16 +1,13 @@
 buildscript {
     repositories {
         google()
-        maven {
-            url "https://maven.fabric.io/public"
-        }
         mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath "io.fabric.tools:gradle:1.30.0"
         classpath 'com.android.tools.build:gradle:3.4.1'
         classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.1.1'
     }
 }
 repositories {
@@ -35,11 +32,16 @@ cdvPluginPostBuildExtras.add({
     }
     // Use class instead of id (string) to be able to apply plugin from non-root gradle file
 
-    apply plugin: com.crashlytics.tools.gradle.CrashlyticsPlugin
+    apply plugin: com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
-    // Enable Crashlytics NDK reporting
-    crashlytics {
-        enableNdk true
+    android {
+        buildTypes {
+            release {
+               firebaseCrashlytics {
+                  nativeSymbolUploadEnabled true
+               }
+            }
+        }
     }
 })
 
