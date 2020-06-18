@@ -1,7 +1,6 @@
 #import "AppDelegate+FirebasePlugin.h"
 #import "FirebasePlugin.h"
 #import "Firebase.h"
-#import <Fabric/Fabric.h>
 #import <objc/runtime.h>
 
 
@@ -83,10 +82,7 @@ static bool shouldEstablishDirectChannel = false;
             isFirebaseInitializedWithPlist = true;
         }
         
-        // Initialise Crashlytics
-        if(isFirebaseInitializedWithPlist && [FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
-            [Fabric with:@[[Crashlytics class]]];
-        }
+      
         
         shouldEstablishDirectChannel = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"shouldEstablishDirectChannel"] boolValue];
 

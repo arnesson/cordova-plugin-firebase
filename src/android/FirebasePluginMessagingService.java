@@ -17,7 +17,7 @@ import android.text.TextUtils;
 import android.content.ContentResolver;
 import android.graphics.Color;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

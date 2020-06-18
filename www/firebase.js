@@ -201,10 +201,6 @@ exports.isCrashlyticsCollectionEnabled = function (success, error) {
     exec(success, error, "FirebasePlugin", "isCrashlyticsCollectionEnabled", []);
 };
 
-exports.isCrashlyticsCollectionCurrentlyEnabled = function (success, error) {
-    exec(success, error, "FirebasePlugin", "isCrashlyticsCollectionCurrentlyEnabled", []);
-};
-
 exports.logMessage = function (message, success, error) {
     exec(success, error, "FirebasePlugin", "logMessage", [message]);
 };
