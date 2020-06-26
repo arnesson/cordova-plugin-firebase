@@ -1,8 +1,22 @@
-* *BREAKING CHANGE:* (Android, iOS) Migrate from Fabric Crashlytics to Firebase Crashlytics.
-** Based on [this commit](https://github.com/vickydlion/cordova-plugin-firebasex/commit/0dfb5753edcd9fc19a0e7a52fdd4fc79d6d976ea) in [PR #432](https://github.com/dpa99c/cordova-plugin-firebasex/pull/432)
+# Version 10.0.0-cli
+* *BREAKING CHANGE:* (Android, iOS) Migrate from Fabric Crashlytics SDK to Firebase Crashlytics SDK.
+** Based on [this commit](https://github.com/vickydlion/cordova-plugin-firebasex/commit/0dfb5753edcd9fc19a0e7a52fdd4fc79d6d976ea) in [PR #432](https://github.com/dpa99c/cordova-plugin-firebasex/pull/432).
 ** Resolves [#335](https://github.com/dpa99c/cordova-plugin-firebasex/issues/335).
 ** Removes `isCrashlyticsCollectionCurrentlyEnabled()` as it's no longer necessary to manually init Crashlytics and a runtime method exists to enable/disable it.
-
+** For more info see the [Firebase Crashlytics SDK upgrade documentation](https://firebase.google.com/docs/crashlytics/upgrade-sdk).
+* (iOS) Fix exception raised if another plugin as already configured Firebase
+    * Merged from PR [#419](https://github.com/dpa99c/cordova-plugin-firebasex/pull/419).
+* (iOS) Handle case where LD_RUNPATH_SEARCH_PATHS is an array. Resolves [#344](https://github.com/dpa99c/cordova-plugin-firebasex/issues/344).
+* (Android, iOS): Avoid collection state getting out of sync & remove restriction to override config defaults.
+    * Merged from PR [#423](https://github.com/dpa99c/cordova-plugin-firebasex/pull/423).
+* (iOS) Fix escaping already escaped json.
+    * Merged from PR [#430](https://github.com/dpa99c/cordova-plugin-firebasex/pull/430).
+    * Further resolves [#401](https://github.com/dpa99c/cordova-plugin-firebasex/issues/401).
+* (Android): Fix parsing of existing `colors.xml` when it contains multiple existing `<color>` to prevent overwriting the existing values. 
+    * Resolves [#436](https://github.com/dpa99c/cordova-plugin-firebasex/issues/436).
+* (Android, iOS): Return success/failure result when subscribing/unsubscribing from topics.
+    * Resolves [#422](https://github.com/dpa99c/cordova-plugin-firebasex/issues/422).
+    
 # Version 9.1.2-cli
 * (Android) Fix retrieval of auth provider ID - [see here for more info](https://github.com/firebase/FirebaseUI-Android/issues/329#issuecomment-564409912)
 * (iOS) Align retrieval of auth provider ID with Android.
