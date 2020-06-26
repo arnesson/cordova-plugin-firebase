@@ -501,8 +501,7 @@ This will disable data collection (on both Android & iOS) until you call [setAna
        
 Notes:
 - Calling `setXCollectionEnabled()` will have no effect if the corresponding `FIREBASE_X_COLLECTION_ENABLED` variable is set to `true`.
-- Calling `setAnalyticsCollectionEnabled(true|false)` or `setPerformanceCollectionEnabled(true|false)` will enable/disable data collection during the current app session and across subsequent app sessions until such time as the same method is called again with a different value.
-- Calling `setCrashlyticsCollectionEnabled(true|false)` will enable/disable data collection during subsequent app sessions until such time as the same method is called again with a different value. It **does not** affect the current app session. 
+- Calling `setXCollectionEnabled(true|false)` will enable/disable data collection during the current app session and across subsequent app sessions until such time as the same method is called again with a different value.
 
 # Example project
 An example project repo exists to demonstrate and validate the functionality of this plugin:
@@ -1517,9 +1516,15 @@ Topic messaging allows you to send a message to multiple devices that have opted
 
 **Parameters**:
 - {string} topicName - name of topic to subscribe to
+- {function} success - callback function which will be call on successful subscription
+- {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-FirebasePlugin.subscribe("latest_news");
+FirebasePlugin.subscribe("latest_news", function(){
+    console.log("Subscribed to topic");
+}, function(error){
+     console.error("Error subscribing to topic: " + error);
+});
 ```
 
 ### unsubscribe
@@ -1529,9 +1534,15 @@ This will stop you receiving messages for that topic
 
 **Parameters**:
 - {string} topicName - name of topic to unsubscribe from
+- {function} success - callback function which will be call on successful unsubscription
+- {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-FirebasePlugin.unsubscribe("latest_news");
+FirebasePlugin.unsubscribe("latest_news", function(){
+    console.log("Unsubscribed from topic");
+}, function(error){
+     console.error("Error unsubscribing from topic: " + error);
+});
 ```
 
 ### createChannel
@@ -1842,38 +1853,27 @@ FirebasePlugin.setUserProperty("name", "value");
 ```
 
 ## Crashlytics
-By default this plugin will ensure fatal native crashes in your apps are reported to Firebase via Crashlytics. 
+By default this plugin will ensure fatal native crashes in your apps are reported to Firebase via the Firebase (not Fabric) Crashlytics SDK. 
 
 ### setCrashlyticsCollectionEnabled
-Manually enable/disable Crashlytics data collection setting.
-
-Notes: 
-- This setting **will not be applied** in the *current app session* and will only be applied **when the app is next fully restarted**.
-- The setting value then persists between app sessions until such time as it is changed.
-- The setting has no effect if automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup)
-- So if automatic data collection is enabled, calling this will invoke the error callback.
+Manually enable/disable Crashlytics data collection, e.g. if [disabled on app startup](#disable-data-collection-on-startup).
 
 **Parameters**:
-- {boolean} setEnabled - whether to enable or disable Crashlytics data collection in the next app session.
+- {boolean} setEnabled - whether to enable or disable Crashlytics data collection.
 - {function} success - (optional) callback function which will be invoked on success
 - {function} error - (optional) callback function which will be passed a {string} error message as an argument
 
 ```javascript
 var shouldSetEnabled = true;
 FirebasePlugin.setCrashlyticsCollectionEnabled(shouldSetEnabled, function(){
-    console.log("Crashlytics data collection was enabled for the next app session");
+    console.log("Crashlytics data collection is enabled");
 }, function(error){
     console.error("Crashlytics data collection couldn't be enabled: "+error);
 });
 ```
 
 ### isCrashlyticsCollectionEnabled
-Indicates whether the persistent (inter-app session) Crashlytics collection setting is enabled.
-
-Notes: 
-- This value does not apply to the current app session - it applies to the value set by [setCrashlyticsCollectionEnabled()](#setcrashlyticscollectionenabled) which will be applied at the start of the next app session (after the app has fully restarted).
-- The setting value persists between app sessions until such time as it is changed.
-- If automatic data collection was not [disabled on app startup](#disable-data-collection-on-startup), this will always return `true`.
+Indicates whether Crashlytics collection setting is currently enabled.
 
 **Parameters**:
 - {function} success - callback function which will be invoked on success.
@@ -1882,7 +1882,7 @@ Will be passed a {boolean} indicating if the setting is enabled.
 
 ```javascript
 FirebasePlugin.isCrashlyticsCollectionEnabled(function(enabled){
-    console.log("Crashlytics data collection will be "+(enabled ? "enabled" : "disabled")+" in the next app session");
+    console.log("Crashlytics data collection is "+(enabled ? "enabled" : "disabled"));
 }, function(error){
     console.error("Error getting Crashlytics data collection setting: "+error);
 });
