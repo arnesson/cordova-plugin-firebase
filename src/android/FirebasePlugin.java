@@ -143,7 +143,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     Log.d(TAG, "Starting Firebase plugin");
 
-                    if(!getMetaDataFromManifest(CRASHLYTICS_COLLECTION_ENABLED)){
+                    if(getMetaDataFromManifest(CRASHLYTICS_COLLECTION_ENABLED)){
                         setPreference(CRASHLYTICS_COLLECTION_ENABLED, true);
                     }
 
