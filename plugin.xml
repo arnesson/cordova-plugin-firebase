@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebasex" version="10.0.0-cli"
+<plugin id="cordova-plugin-firebasex" version="10.0.0"
 		xmlns="http://apache.org/cordova/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -85,6 +85,7 @@
 	</platform>
 
 	<platform name="ios">
+		<hook type="before_plugin_install" src="scripts/ios/before_plugin_install.js" />
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
@@ -132,7 +133,7 @@
 				<pod name="Firebase/Messaging" spec="6.23.0"/>
 				<pod name="Firebase/Performance" spec="6.23.0"/>
 				<pod name="Firebase/RemoteConfig" spec="6.23.0"/>
-				<pod name="Firebase/Firestore" spec="6.23.0"/>
+				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.23.0"/>
 				<pod name="Firebase/Crashlytics" spec="6.23.0"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
 			</pods>

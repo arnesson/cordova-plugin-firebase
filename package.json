@@ -37,6 +37,7 @@
   "dependencies": {
     "plist": "^3.0.1",
     "xcode": "^3.0.1",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "semver": "^7.3.2"
   }
 }
