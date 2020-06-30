@@ -89,6 +89,7 @@
 	</platform>
 
 	<platform name="ios">
+		<hook type="before_plugin_install" src="scripts/ios/before_plugin_install.js" />
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
@@ -137,7 +138,7 @@
 				<pod name="Firebase/Performance" spec="6.23.0"/>
 				<pod name="Firebase/RemoteConfig" spec="6.23.0"/>
 				<pod name="Firebase/InAppMessaging" spec="6.23.0"/>
-				<pod name="Firebase/Firestore" spec="6.23.0"/>
+				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.23.0"/>
 				<pod name="Firebase/Crashlytics" spec="6.23.0"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
 				<pod name="GoogleTagManager" spec="7.1.2"/>
