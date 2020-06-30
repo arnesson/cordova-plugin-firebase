@@ -1,3 +1,15 @@
+# Version 10.1.0
+* (iOS) Use precompiled pod for Firestore to reduce build times.
+    * *BREAKING CHANGE:* Requires `cocoapods>=1.9` (previously `cocoapods>=1.8`).
+    * Adds hook script to check local cocoapods version during plugin install. 
+    * Based on PR [#440](https://github.com/dpa99c/cordova-plugin-firebasex/pull/440).
+    * Resolves [#407](https://github.com/dpa99c/cordova-plugin-firebasex/issues/407).
+* (Android) Fixed regression bug related to default Crashlytics permission.
+    * See [this comment](https://github.com/dpa99c/cordova-plugin-firebasex/issues/335#issuecomment-651218052).
+* (iOS) Bump pinned Firebase SDK versions to latest 6.27.0
+    * See [release notes](https://firebase.google.com/support/release-notes/ios#version_6270_-_june_16_2020)
+* (Android): Bump Firebase SDK versions to latest for Analytics, Cloud Messaging & Inapp Messaging.
+
 # Version 10.0.0
 * *BREAKING CHANGE:* (Android, iOS) Migrate from Fabric Crashlytics SDK to Firebase Crashlytics SDK.
 ** Based on [this commit](https://github.com/vickydlion/cordova-plugin-firebasex/commit/0dfb5753edcd9fc19a0e7a52fdd4fc79d6d976ea) in [PR #432](https://github.com/dpa99c/cordova-plugin-firebasex/pull/432).
