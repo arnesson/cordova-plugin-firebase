@@ -152,11 +152,11 @@ static NSDictionary* googlePlist;
     @try {
         [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
                                                             NSError * _Nullable error) {
-            if (result.token != nil && error == nil) {
-                [self sendToken:result.token];
-            }else{
-                [self handleStringResultWithPotentialError:error command:command result:result.token];
+        	NSString* token = nil;
+            if (error == nil && result != nil && result.token != nil) {
+                token = result.token;
             }
+            [self handleStringResultWithPotentialError:error command:command result:token];
         }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
