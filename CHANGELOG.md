@@ -1,3 +1,9 @@
+# Version 10.1.1
+* (iOS) Fix regression bug in `getToken()` introduced by [35a2a68e8db3808723c9f2fcb6aa176021f6c77a](https://github.com/dpa99c/cordova-plugin-firebasex/commit/35a2a68e8db3808723c9f2fcb6aa176021f6c77a).
+    * Resolves [#456](https://github.com/dpa99c/cordova-plugin-firebasex/issues/456).
+* (iOS) Update to use Firebase SDK v6.28.0
+    * Resolves [#453](https://github.com/dpa99c/cordova-plugin-firebasex/issues/453).
+
 # Version 10.1.0
 * (iOS) Use precompiled pod for Firestore to reduce build times.
     * *BREAKING CHANGE:* Requires `cocoapods>=1.9` (previously `cocoapods>=1.8`).
