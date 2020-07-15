@@ -454,11 +454,30 @@ By default this preference is set to `false`.
 Note: if you enable this setting, any crashes that occur within libraries included via Cocopods will not be recorded in Crashlytics or other crash reporting services.
 
 ### Cordova CLI builds
-If you are building (directly or indirectly) via the Cordova CLI and encounter build failures on iOS, this is likely due to [an issue with Cordova CLI builds for iOS](https://github.com/apache/cordova-ios/issues/659) when including certain pods into the build (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)). 
+If you are building (directly or indirectly) via the Cordova CLI and a build failures on iOS such as the one below:
 
+    error: Resource "/Build/Products/Debug-iphonesimulator/FirebaseInAppMessaging/InAppMessagingDisplayResources.bundle" not found. Run 'pod install' to update the copy resources script.
+
+
+This is likely due to [an issue with Cordova CLI builds for iOS](https://github.com/apache/cordova-ios/issues/659) when including certain pods into the build (see [#326](https://github.com/dpa99c/cordova-plugin-firebasex/issues/326)):
+ 
 Note that building from Xcode works fine, so if you are able then do this.
 
-Otherwise (e.g. if building via a CI) then you'll need to switch to using the [cli_build branch](https://github.com/dpa99c/cordova-plugin-firebasex/tree/cli_build) of this plugin which removes the Firebase Inapp Messaging and Google Tag Manager SDK components that are causing the build issues.  
+Otherwise (e.g. if building via a CI) then you'll need to switch to using the [cli_build branch](https://github.com/dpa99c/cordova-plugin-firebasex/tree/cli_build) of this plugin:
+
+    cordova plugin rm cordova-plugin-firebasex && cordova plugin add cordova-plugin-firebasex@latest-cli
+
+This removes the Firebase Inapp Messaging and Google Tag Manager SDK components that are causing the build issues.
+The `cli_build` branch is kept in sync with `master` but without the above components.
+
+You can validate your CLI build environment using [this publicly-available `GoogleService-Info.plist`](https://github.coventry.ac.uk/301CEM-1920OCTJAN/301CEM-6957713/raw/master/CanaryApparel/GoogleService-Info.plist):
+
+	cordova create test com.canary.CanaryApparel && cd test
+	curl https://github.coventry.ac.uk/raw/301CEM-1920OCTJAN/301CEM-6957713/master/CanaryApparel/GoogleService-Info.plist -o GoogleService-Info.plist
+	cordova plugin add cordova-plugin-firebasex@latest-cli
+	cordova platform add ios
+	cordova build ios --emulator
+	#build succeeds
 
 # Firebase config setup
 There's a handy [installation and setup guide on medium.com](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821).
