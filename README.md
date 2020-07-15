@@ -409,6 +409,8 @@ Similarly, if your build is failing because multiple plugins are installing diff
 you can try installing [cordova-android-firebase-gradle-release](https://github.com/dpa99c/cordova-android-firebase-gradle-release) to align these.  
 
 ## iOS-specific
+Please ensure you have the latest Xcode release version installed to build your app - direct download links can be [found here](https://stackoverflow.com/a/10335943/777265).
+
 ### Specifying iOS library versions
 This plugin depends on various components such as the Firebase SDK which are pulled in at build-time by Cocoapods on iOS.
 This plugin pins specific versions of these in [its `plugin.xml`](https://github.com/dpa99c/cordova-plugin-firebase/blob/master/plugin.xml) where you can find the currently pinned iOS versions in the  `<pod>`'s, for example:
