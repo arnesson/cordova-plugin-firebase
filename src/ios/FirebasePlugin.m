@@ -1165,8 +1165,8 @@ static NSDictionary* googlePlist;
      [self.commandDelegate runInBackground:^{
          @try {
              FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
-             [remoteConfig activateWithCompletionHandler:^(NSError * _Nullable error) {
-                 [self handleEmptyResultWithPotentialError:error command:command];
+             [remoteConfig activateWithCompletion:^(BOOL changed, NSError* _Nullable error) {
+                 [self handleBoolResultWithPotentialError:error command:command result:true];
              }];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
