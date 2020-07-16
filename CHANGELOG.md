@@ -1,3 +1,7 @@
+# Version 10.1.2
+* (iOS): Bump Firebase SDK versions to v6.28.1 to resolve build freeze issue.
+    * Resolves [#460](https://github.com/dpa99c/cordova-plugin-firebasex/issues/460).
+
 # Version 10.1.1
 * (iOS) Fix regression bug in `getToken()` introduced by [35a2a68e8db3808723c9f2fcb6aa176021f6c77a](https://github.com/dpa99c/cordova-plugin-firebasex/commit/35a2a68e8db3808723c9f2fcb6aa176021f6c77a).
     * Resolves [#456](https://github.com/dpa99c/cordova-plugin-firebasex/issues/456).
