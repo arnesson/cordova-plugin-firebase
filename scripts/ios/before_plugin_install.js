@@ -8,16 +8,16 @@ module.exports = function(context) {
 };
 
 function checkCocoapodsVersion(){
-    var stdout;
+    var version;
     try{
-        stdout = execSync('pod --version', {encoding: 'utf8'}).trim();
+        version = execSync('pod --version', {encoding: 'utf8'}).match(/(\d+\.\d+\.\d+)/)[1];
     }catch(err){
         throw new Error("cocoapods not found - please install cocoapods >="+minCocoapodsVersion);
     }
 
-    if(!semver.valid(stdout)){
-        throw new Error("cocoapods version is invalid - please reinstall cocoapods@"+minCocoapodsVersion + ": "+stdout);
-    }else if(!semver.satisfies(stdout, minCocoapodsVersion)){
-        throw new Error("cocoapods version is out-of-date - please update to cocoapods@"+minCocoapodsVersion + " - current version: "+stdout);
+    if(!semver.valid(version)){
+        throw new Error("cocoapods version is invalid - please reinstall cocoapods@"+minCocoapodsVersion + ": "+version);
+    }else if(!semver.satisfies(version, minCocoapodsVersion)){
+        throw new Error("cocoapods version is out-of-date - please update to cocoapods@"+minCocoapodsVersion + " - current version: "+version);
     }
 }
