@@ -82,6 +82,10 @@ var parsePluginVariables = function(){
             }
         }
     }
+
+    // set platform key path from plugin variable
+    if (pluginVariables.ANDROID_KEY) PLATFORM.ANDROID.src = [pluginVariables.ANDROID_KEY];
+    if (pluginVariables.IOS_KEY) PLATFORM.IOS.src = [pluginVariables.IOS_KEY];
 };
 
 module.exports = function (context) {
