@@ -496,6 +496,16 @@ Check out this [firebase article](https://support.google.com/firebase/answer/701
     GoogleService-Info.plist   <--
     ...
 ```
+
+Or you can set custom location for your platform configuration files using plugin variables in your `config.xml`:
+
+```
+<plugin name="cordova-plugin-firebasex">
+    <variable name="ANDROID_KEY" value="resources/android/google-services.json" />
+    <variable name="IOS_KEY" value="resources/ios/GoogleService-Info.plist" />
+</plugin>
+```
+
 IMPORTANT: The Firebase SDK requires the configuration files to be present and valid, otherwise your app will crash on boot or Firebase features won't work.
 
 # Disable data collection on startup
