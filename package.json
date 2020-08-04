@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-firebasex",
-  "version": "7.0.2",
+  "version": "10.1.2-cli",
   "description": "Cordova plugin for Google Firebase",
   "types": "./types/index.d.ts",
   "author": {
@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "plist": "^3.0.1",
-    "xcode": "^2.0.0",
-    "xml-js": "^1.6.11"
+    "xcode": "^3.0.1",
+    "xml-js": "^1.6.11",
+    "semver": "^7.3.2"
   }
 }

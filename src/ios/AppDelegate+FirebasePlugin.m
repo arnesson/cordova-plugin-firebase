@@ -5,6 +5,7 @@
 
 
 @import UserNotifications;
+@import FirebaseFirestore;
 
 // Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices running iOS 10 and above.
 // Implement FIRMessagingDelegate to receive data message via FCM for devices running iOS 10 and above.
@@ -16,7 +17,16 @@
 
 @implementation AppDelegate (FirebasePlugin)
 
+static AppDelegate* instance;
+
++ (AppDelegate*) instance {
+    return instance;
+}
+
 static NSDictionary* mutableUserInfo;
+static FIRAuthStateDidChangeListenerHandle authStateChangeListener;
+static bool authStateChangeListenerInitialized = false;
+static bool shouldEstablishDirectChannel = false;
 
 - (void)setDelegate:(id)delegate {
     objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -44,28 +54,60 @@ static NSDictionary* mutableUserInfo;
     [self application:application swizzledDidFinishLaunchingWithOptions:launchOptions];
     
     @try{
-        // get GoogleService-Info.plist file path
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
+        instance = self;
         
-        // if file is successfully found, use it
-        if(filePath){
-            NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
-            // create firebase configure options passing .plist as content
-            FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+        bool isFirebaseInitializedWithPlist = false;
+        if(![FIRApp defaultApp]) {
+            // get GoogleService-Info.plist file path
+            NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
             
-            // configure FIRApp with options
-            [FIRApp configureWithOptions:options];
+            // if file is successfully found, use it
+            if(filePath){
+                [FirebasePlugin.firebasePlugin _logMessage:@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]"];
+                // create firebase configure options passing .plist as content
+                FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+
+                // configure FIRApp with options
+                [FIRApp configureWithOptions:options];
+                
+                isFirebaseInitializedWithPlist = true;
+            }else{
+                // no .plist found, try default App
+                [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
+                [FIRApp configure];
+            }
+        }else{
+            // Firebase SDK has already been initialised:
+            // Assume that another call (probably from another plugin) did so with the plist
+            isFirebaseInitializedWithPlist = true;
         }
         
-        // no .plist found, try default App
-        if (![FIRApp defaultApp] && !filePath) {
-            NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
-            [FIRApp configure];
-        }
+      
+        
+        shouldEstablishDirectChannel = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"shouldEstablishDirectChannel"] boolValue];
 
         // Set FCM messaging delegate
         [FIRMessaging messaging].delegate = self;
-        [FIRMessaging messaging].shouldEstablishDirectChannel = true;
+        [FIRMessaging messaging].shouldEstablishDirectChannel = shouldEstablishDirectChannel;
+        
+        // Setup Firestore
+        [FirebasePlugin setFirestore:[FIRFirestore firestore]];
+        
+        // Setup Google SignIn
+        [GIDSignIn sharedInstance].clientID = [FIRApp defaultApp].options.clientID;
+        [GIDSignIn sharedInstance].delegate = self;
+        
+        authStateChangeListener = [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth * _Nonnull auth, FIRUser * _Nullable user) {
+            @try {
+                if(!authStateChangeListenerInitialized){
+                    authStateChangeListenerInitialized = true;
+                }else{
+                    [FirebasePlugin.firebasePlugin executeGlobalJavascript:[NSString stringWithFormat:@"FirebasePlugin._onAuthStateChange(%@)", (user != nil ? @"true": @"false")]];
+                }
+            }@catch (NSException *exception) {
+                [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+            }
+        }];
         
         // Set UNUserNotificationCenter delegate
         self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
@@ -85,20 +127,59 @@ static NSDictionary* mutableUserInfo;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [FIRMessaging messaging].shouldEstablishDirectChannel = true;
     self.applicationInBackground = @(NO);
-    NSLog(@"FCM direct channel = true");
+    [FIRMessaging messaging].shouldEstablishDirectChannel = shouldEstablishDirectChannel;
+    [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"Enter foreground: FCM direct channel = %@", shouldEstablishDirectChannel ? @"true" : @"false"]];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
     self.applicationInBackground = @(YES);
-    NSLog(@"FCM direct channel = false");
+    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
+    [FirebasePlugin.firebasePlugin _logMessage:@"Enter background: FCM direct channel = false"];
+}
+
+# pragma mark - Google SignIn
+- (void)signIn:(GIDSignIn *)signIn
+didSignInForUser:(GIDGoogleUser *)user
+     withError:(NSError *)error {
+    @try{
+        CDVPluginResult* pluginResult;
+        if (error == nil) {
+            GIDAuthentication *authentication = user.authentication;
+            FIRAuthCredential *credential =
+            [FIRGoogleAuthProvider credentialWithIDToken:authentication.idToken
+                                           accessToken:authentication.accessToken];
+            
+            int key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+            NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+            [result setValue:@"true" forKey:@"instantVerification"];
+            [result setValue:[NSNumber numberWithInt:key] forKey:@"id"];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+        } else {
+          pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        }
+        if ([FirebasePlugin firebasePlugin].googleSignInCallbackId != nil) {
+            [[FirebasePlugin firebasePlugin].commandDelegate sendPluginResult:pluginResult callbackId:[FirebasePlugin firebasePlugin].googleSignInCallbackId];
+        }
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
+}
+
+- (void)signIn:(GIDSignIn *)signIn
+didDisconnectWithUser:(GIDGoogleUser *)user
+     withError:(NSError *)error {
+    NSString* msg = @"Google SignIn delegate: didDisconnectWithUser";
+    if(error != nil){
+        [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"%@: %@", msg, error]];
+    }else{
+        [FirebasePlugin.firebasePlugin _logMessage:msg];
+    }
 }
 
 # pragma mark - FIRMessagingDelegate
 - (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken {
-    NSLog(@"didReceiveRegistrationToken: %@", fcmToken);
+    [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"didReceiveRegistrationToken: %@", fcmToken]];
     @try{
         [FirebasePlugin.firebasePlugin sendToken:fcmToken];
     }@catch (NSException *exception) {
@@ -116,7 +197,7 @@ static NSDictionary* mutableUserInfo;
             @try{
                 if (error == nil) {
                     NSString *refreshedToken = result.token;
-                    NSLog(@"tokenRefreshNotification: %@", refreshedToken);
+                    [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"tokenRefreshNotification: %@", refreshedToken]];
                     [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
                 }else{
                     [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"tokenRefreshNotification: %@", error.description]];
@@ -132,7 +213,7 @@ static NSDictionary* mutableUserInfo;
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [FIRMessaging messaging].APNSToken = deviceToken;
-    NSLog(@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken);
+    [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken]];
     [FirebasePlugin.firebasePlugin sendApnsToken:[FirebasePlugin.firebasePlugin hexadecimalStringFromData:deviceToken]];
     
     // Set UNUserNotificationCenter delegate
@@ -145,6 +226,7 @@ static NSDictionary* mutableUserInfo;
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
     @try{
+        [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
         mutableUserInfo = [userInfo mutableCopy];
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
         bool isContentAvailable = false;
@@ -160,7 +242,7 @@ static NSDictionary* mutableUserInfo;
             [mutableUserInfo setValue:@"data" forKey:@"messageType"];
         }
 
-        NSLog(@"didReceiveRemoteNotification: %@", mutableUserInfo);
+        [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"didReceiveRemoteNotification: %@", mutableUserInfo]];
         
         completionHandler(UIBackgroundFetchResultNewData);
         if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]] && isContentAvailable){
@@ -180,7 +262,7 @@ static NSDictionary* mutableUserInfo;
 // Called when a data message is arrives in the foreground and remote notifications permission has been NOT been granted
 - (void)messaging:(FIRMessaging *)messaging didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage {
     @try{
-        NSLog(@"didReceiveMessage: %@", remoteMessage.appData);
+        [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"didReceiveMessage: %@", remoteMessage.appData]];
         
         NSDictionary* appData = [remoteMessage.appData mutableCopy];
         [appData setValue:@"data" forKey:@"messageType"];
@@ -287,13 +369,13 @@ static NSDictionary* mutableUserInfo;
                 UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"local_notification" content:objNotificationContent trigger:trigger];
                 [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
                     if (!error) {
-                        NSLog(@"Local Notification succeeded");
+                        [FirebasePlugin.firebasePlugin _logMessage:@"Local Notification succeeded"];
                     } else {
                         [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"Local Notification failed: %@", error.description]];
                     }
                 }];
             }else{
-                NSLog(@"processMessageForForegroundNotification: cannot show notification as permission denied");
+                [FirebasePlugin.firebasePlugin _logError:@"processMessageForForegroundNotification: cannot show notification as permission denied"];
             }
         }@catch (NSException *exception) {
             [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
@@ -321,7 +403,8 @@ static NSDictionary* mutableUserInfo;
             return;
         }
         
-
+        [[FIRMessaging messaging] appDidReceiveMessage:notification.request.content.userInfo];
+        
         mutableUserInfo = [notification.request.content.userInfo mutableCopy];
         
         NSString* messageType = [mutableUserInfo objectForKey:@"messageType"];
@@ -330,7 +413,8 @@ static NSDictionary* mutableUserInfo;
         }
 
         // Print full message.
-        NSLog(@"willPresentNotification: %@", mutableUserInfo);
+        [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"willPresentNotification: %@", mutableUserInfo]];
+
         
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
         bool isContentAvailable = [[aps objectForKey:@"content-available"] isEqualToNumber:[NSNumber numberWithInt:1]];
@@ -345,7 +429,7 @@ static NSDictionary* mutableUserInfo;
         bool hasSound = [aps objectForKey:@"sound"] != nil;
 
         if(showForegroundNotification){
-            NSLog(@"willPresentNotification: foreground notification alert=%@, badge=%@, sound=%@", hasAlert ? @"YES" : @"NO", hasBadge ? @"YES" : @"NO", hasSound ? @"YES" : @"NO");
+            [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"willPresentNotification: foreground notification alert=%@, badge=%@, sound=%@", hasAlert ? @"YES" : @"NO", hasBadge ? @"YES" : @"NO", hasSound ? @"YES" : @"NO"]];
             if(hasAlert && hasBadge && hasSound){
                 completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionBadge + UNNotificationPresentationOptionSound);
             }else if(hasAlert && hasBadge){
@@ -362,7 +446,7 @@ static NSDictionary* mutableUserInfo;
                 completionHandler(UNNotificationPresentationOptionSound);
             }
         }else{
-            NSLog(@"willPresentNotification: foreground notification not set");
+            [FirebasePlugin.firebasePlugin _logMessage:@"willPresentNotification: foreground notification not set"];
         }
         
         if(![messageType isEqualToString:@"data"]){
@@ -386,10 +470,12 @@ static NSDictionary* mutableUserInfo;
                     withCompletionHandler:completionHandler];
 
         if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![response.notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
-            NSLog(@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger");
+            [FirebasePlugin.firebasePlugin _logMessage:@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger"];
             return;
         }
 
+        [[FIRMessaging messaging] appDidReceiveMessage:response.notification.request.content.userInfo];
+        
         mutableUserInfo = [response.notification.request.content.userInfo mutableCopy];
         
         NSString* tap;
@@ -406,7 +492,7 @@ static NSDictionary* mutableUserInfo;
         
 
         // Print full message.
-        NSLog(@"didReceiveNotificationResponse: %@", mutableUserInfo);
+        [FirebasePlugin.firebasePlugin _logInfo:[NSString stringWithFormat:@"didReceiveNotificationResponse: %@", mutableUserInfo]];
 
         [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 
@@ -420,7 +506,67 @@ static NSDictionary* mutableUserInfo;
 // Receive data message on iOS 10 devices.
 - (void)applicationReceivedRemoteMessage:(FIRMessagingRemoteMessage *)remoteMessage {
     // Print full message
-    NSLog(@"applicationReceivedRemoteMessage: %@", [remoteMessage appData]);
+    [FirebasePlugin.firebasePlugin _logInfo:[NSString stringWithFormat:@"applicationReceivedRemoteMessage: %@", [remoteMessage appData]]];
+}
+
+// Apple Sign In
+- (void)authorizationController:(ASAuthorizationController *)controller
+   didCompleteWithAuthorization:(ASAuthorization *)authorization API_AVAILABLE(ios(13.0)) {
+    @try{
+        CDVPluginResult* pluginResult;
+        NSString* errorMessage = nil;
+        FIROAuthCredential *credential;
+        
+        if ([authorization.credential isKindOfClass:[ASAuthorizationAppleIDCredential class]]) {
+            ASAuthorizationAppleIDCredential *appleIDCredential = authorization.credential;
+            NSString *rawNonce = [FirebasePlugin appleSignInNonce];
+            if(rawNonce == nil){
+                errorMessage = @"Invalid state: A login callback was received, but no login request was sent.";
+            }else if (appleIDCredential.identityToken == nil) {
+                errorMessage = @"Unable to fetch identity token.";
+            }else{
+                NSString *idToken = [[NSString alloc] initWithData:appleIDCredential.identityToken
+                                                          encoding:NSUTF8StringEncoding];
+                if (idToken == nil) {
+                    errorMessage = [NSString stringWithFormat:@"Unable to serialize id token from data: %@", appleIDCredential.identityToken];
+                }else{
+                    // Initialize a Firebase credential.
+                    credential = [FIROAuthProvider credentialWithProviderID:@"apple.com"
+                        IDToken:idToken
+                        rawNonce:rawNonce];
+                    
+                    int key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+                    NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                    [result setValue:@"true" forKey:@"instantVerification"];
+                    [result setValue:[NSNumber numberWithInt:key] forKey:@"id"];
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+                }
+            }
+            if(errorMessage != nil){
+                [FirebasePlugin.firebasePlugin _logError:errorMessage];
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+            }
+            if ([FirebasePlugin firebasePlugin].appleSignInCallbackId != nil) {
+                [[FirebasePlugin firebasePlugin].commandDelegate sendPluginResult:pluginResult callbackId:[FirebasePlugin firebasePlugin].appleSignInCallbackId];
+            }
+        }
+    }@catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
+}
+
+- (void)authorizationController:(ASAuthorizationController *)controller
+           didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0)) {
+    NSString* errorMessage = [NSString stringWithFormat:@"Sign in with Apple errored: %@", error];
+    [FirebasePlugin.firebasePlugin _logError:errorMessage];
+    if ([FirebasePlugin firebasePlugin].appleSignInCallbackId != nil) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
+        [[FirebasePlugin firebasePlugin].commandDelegate sendPluginResult:pluginResult callbackId:[FirebasePlugin firebasePlugin].appleSignInCallbackId];
+    }
+}
+
+- (nonnull ASPresentationAnchor)presentationAnchorForAuthorizationController:(nonnull ASAuthorizationController *)controller  API_AVAILABLE(ios(13.0)){
+    return self.viewController.view.window;
 }
 
 @end
