@@ -483,6 +483,17 @@ You can validate your CLI build environment using [this publicly-available `Goog
 	cordova build ios --emulator
 	#build succeeds
 
+Following the installation steps above, modify the `package.json` file to pin the `cli` variant of this package by removing the `^` or `~` prefix from the package declaration. Failure to do this will result in build issues the next time the `cordova prepare` steps are performed as the non-cli version of the package will replace the cli variant.
+```
+  "dependencies": {
+    "cordova-android": "~8.1.0",
+    "cordova-ios": "^6.1.0",
+    "cordova-plugin-androidx": "^2.0.0",
+    "cordova-plugin-androidx-adapter": "^1.1.1",
+    "cordova-plugin-firebasex": "^10.1.2-cli" --> Change to "10.1.2-cli"
+  },
+```
+
 # Firebase config setup
 There's a handy [installation and setup guide on medium.com](https://medium.com/@felipepucinelli/how-to-add-push-notifications-in-your-cordova-application-using-firebase-69fac067e821).
 However, if using this, remember this forked plugin is `cordova-plugin-firebasex` (not `cordova-plugin-firebase`).
