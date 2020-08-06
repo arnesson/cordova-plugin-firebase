@@ -1,12 +1,11 @@
 #import "AppDelegate.h"
+#import <GoogleSignIn/GoogleSignIn.h>
 
-#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
-#endif
+@import AuthenticationServices;
 
-@interface AppDelegate (FirebasePlugin)
-@property (nonatomic, strong) NSNumber *applicationInBackground;
-#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+@interface AppDelegate (FirebasePlugin) <UIApplicationDelegate, GIDSignInDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding>
++ (AppDelegate *) instance;
+@property (nonatomic, strong) NSNumber * _Nonnull applicationInBackground;
 @property (NS_NONATOMIC_IOSONLY, nullable, weak) id <UNUserNotificationCenterDelegate> delegate;
-#endif
 @end

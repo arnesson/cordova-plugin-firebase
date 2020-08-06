@@ -45,26 +45,38 @@ On Android Lollipop and above you can also set the accent color for the notifica
     <color name="accent">#FF00FFFF</color>
 </resources>
 ```
-
 You will again need to copy this file over to your project to get it to work by adding these lines to your `config.xml`
 ```
 <platform name="android">
 ...
-    <resource-file src="res/native/android/res/values/colors.xml" target="app/src/main/res/values/colors.xml"/>
+<resource-file src="res/native/android/res/values/colors.xml" target="app/src/main/res/values/colors.xml"/>
 </platform>
 ```
 
-### Configure Firebase Color
-We need to copy a metadata flag into the Manifest to tell Firebase which color to use for the icon.  To do this, add the following line to your `config.xml`.
+## My Background Notification Icon Still Does Not Work
+
+Are you testing with the console on Firebase?  If so, your notification is not being sent as a Data payload.  Your 
+notification MUST be sent as "data" payload in order to trigger sendNotification in FirebasePlugin, and correctly 
+set your notification icon.  In order to test your implementation, use a REST client (like Advanced REST Client 
+for Chrome) to post a notification to https://fcm.googleapis.com/fcm/send.  Set HEADERS to 
+
 ```
-<platform name="android">
-....
-    <config-file parent="/manifest/application" target="AndroidManifest.xml">
-        <meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/primary" />
-    </config-file>
-</platform>
+content-type: application/json
+authorization: key=YOURAPIKEY.
 ```
-Note: If you have XML Namespace issues, which I encountered when trying to build in Android Studio, add this `xmlns:android="http://schemas.android.com/apk/res/android"` to the widget element at the root of the `config.xml`.
+
+Set the body as follows:
+```
+{"data":{
+"body" : "Hello from web",
+"title": "REST Client",
+"imageUrl" : OPTIONAL FOR PR1001,
+"iconBigUrl" : OPTIONAL FOR PR1001
+},
+"to": DEVICETOKEN
+}
+
+
 
 # Final Result
 
@@ -89,4 +101,5 @@ If you added a custom icon and color, your `config.xml` should include something
         </config-file>
     </platform>
 </widget>
+
 ```
