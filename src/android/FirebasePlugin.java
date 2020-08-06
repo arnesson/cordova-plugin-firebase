@@ -99,6 +99,7 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static FirebasePlugin instance = null;
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseCrashlytics firebaseCrashlytics;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private FirebaseFirestore firestore;
     private Gson gson;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -839,25 +840,23 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void activateFetched(final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                try {
-                    final boolean activated = FirebaseRemoteConfig.getInstance().activateFetched();
-                    callbackContext.success(String.valueOf(activated));
-                } catch (Exception e) {
-                    handleExceptionWithContext(e, callbackContext);
-                }
-            }
-        });
-    }
-
     private void fetch(CallbackContext callbackContext) {
-        fetch(callbackContext, FirebaseRemoteConfig.getInstance().fetch());
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .build();
+        mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
+
+        fetch(callbackContext, mFirebaseRemoteConfig.fetch());
     }
 
     private void fetch(CallbackContext callbackContext, long cacheExpirationSeconds) {
-        fetch(callbackContext, FirebaseRemoteConfig.getInstance().fetch(cacheExpirationSeconds));
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(cacheExpirationSeconds)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
+
+        fetch(callbackContext, mFirebaseRemoteConfig.fetch());
     }
 
     private void fetch(final CallbackContext callbackContext, final Task<Void> task) {
