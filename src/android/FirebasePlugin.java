@@ -839,6 +839,19 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+    
+    private void activateFetched(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    final boolean activated = mFirebaseRemoteConfig.activateFetched();
+                    callbackContext.success(String.valueOf(activated));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
 
     private void fetch(CallbackContext callbackContext) {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
