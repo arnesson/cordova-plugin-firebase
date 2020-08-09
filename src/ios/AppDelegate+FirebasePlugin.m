@@ -500,7 +500,11 @@ didDisconnectWithUser:(GIDGoogleUser *)user
             [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
         }
         
-
+        // Dynamic Actions
+        if (response.actionIdentifier && ![response.actionIdentifier isEqual:UNNotificationDefaultActionIdentifier]) {
+            [mutableUserInfo setValue:response.actionIdentifier forKey:@"action"];
+        }
+        
         // Print full message.
         [FirebasePlugin.firebasePlugin _logInfo:[NSString stringWithFormat:@"didReceiveNotificationResponse: %@", mutableUserInfo]];
 
