@@ -2300,7 +2300,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     try {
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() || task.getException() == null) {
                             callbackContext.success();
                         }else if(task.getException() != null){
                             callbackContext.error(task.getException().getMessage());
@@ -2319,7 +2319,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
     private void handleAuthTaskOutcome(@NonNull Task<AuthResult> task, CallbackContext callbackContext) {
         try {
-            if (task.isSuccessful()) {
+            if (task.isSuccessful() || task.getException() == null) {
                 callbackContext.success();
             }else{
                 String errMessage = task.getException().getMessage();
