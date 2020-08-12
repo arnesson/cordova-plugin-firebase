@@ -68,6 +68,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [iOS background notifications](#ios-background-notifications)
     - [iOS notification sound](#ios-notification-sound)
     - [iOS badge number](#ios-badge-number)
+    - [iOS actionable notifications](#ios-actionable-notifications)
   - [Data messages](#data-messages)
     - [Data message notifications](#data-message-notifications)
       - [Android data message notifications](#android-data-message-notifications)
@@ -1128,6 +1129,94 @@ In a data message, specify the `notification_ios_badge` key in the `data` sectio
   }
 }
 ```
+
+### iOS actionable notifications
+[Actionable notifications](https://developer.apple.com/documentation/usernotifications/declaring_your_actionable_notification_types) are supported on iOS:
+
+<img width="300" src="https://user-images.githubusercontent.com/2345062/90025071-88c0a180-dcad-11ea-86f7-033f84601a56.png"/>
+<img width="300" src="https://user-images.githubusercontent.com/2345062/90028234-531db780-dcb1-11ea-9df3-6bfcf8f2e9d8.png"/>
+
+To use them in your app you must do the following:
+
+1. Add a `pn-actions.json` file to your Cordova project which defines categories and actions, for example:
+
+```json
+    {
+      "PushNotificationActions": [
+        {
+          "category": "news",
+          "actions": [
+            {
+              "id": "read", "title": "Read"
+            },
+            {
+              "id": "skip", "title": "Skip"
+            },
+            {
+              "id": "add", "title": "Add to list"
+            }
+          ]
+        }
+      ]
+    }
+```
+
+2. Reference it as a resource file in your `config.xml`:
+
+```xml
+    <platform name="ios">
+        ...
+        <resource-file src="relative/path/to/pn-actions.json" />
+    </platform>
+```
+
+3. Add a category entry to your FCM message payload which references one of your categories:
+
+```json
+{
+  "notification": {
+      "title": "iOS Actionable Notification",
+      "body": "With custom buttons"
+  },
+  "apns": {
+    "payload": {
+      "aps": {
+        "category": "news"
+      }
+    }
+  }
+}
+```
+
+When the notification arrives, if the user presses an action button the [`onMessageReceived()`](#onmessagereceived) function is invoked with the notification message payload, including the corresponding action ID.
+For example:
+
+```json
+{
+    "action": "read",
+    "google.c.a.e": "1",
+    "notification_foreground": "true",
+    "aps": {
+        "alert": {
+            "title": "iOS Actionable Notification",
+            "body": "With custom buttons"
+        },
+        "category": "news"
+    },
+    "gcm.message_id": "1597240847657854",
+    "tap": "background",
+    "messageType": "notification"
+}
+```
+
+So you can obtain the category with `message.aps.category` and the action with `message.action` and handle this appropriately in your app code.
+
+Notes:
+- Actionable notifications are currently only available for iOS - not Android
+- To reveal the notification action buttons, the user must drag downwards on the notification dialog
+- Actionable notifications work with both foreground and background (system) notifications
+- If your app is in the background/not running when the notification message arrives and a system notification is displayed, if the user chooses an action (instead of tapping the notification dialog body), your app will not be launched/foregrounded but [`onMessageReceived()`](#onmessagereceived) will be invoked, enabling your app code to handle the user's action selection silently in the background.
+- You can test out actionable notifications by building and running [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) app and sending the [ios_notification_actionable.json](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/ios_notification_actionable.json) FCM message using the [built-in FCM v1 HTTP API client](https://github.com/dpa99c/cordova-plugin-firebasex-test#messaging-client) which contains a category defined in the example [pn-actions.json](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/res/ios/pn-actions.json).
 
 ## Data messages
 FCM data messages are sent as an arbitrary k/v structure and by default are passed to the app for it to handle them.
