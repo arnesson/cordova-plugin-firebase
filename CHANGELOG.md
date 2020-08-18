@@ -1,3 +1,9 @@
+# Version 10.2.0
+* (iOS) Fix crashes on receiving push notifications on iOS due to delegate chaining.
+** Resolves [#385](https://github.com/dpa99c/cordova-plugin-firebasex/issues/385).
+** Reverts commit 4e9a0f4a1fd4ceb871af40629e1ddf146f287ca8 "co-existence with cordova-plugin-local-notification on iOS"
+** Since upon testing, this plugin does not work with `cordova-plugin-local-notification` present in the same project even with this code in place.
+** And the conflict between the 2 plugins will need to be addressed separately under [#230](https://github.com/dpa99c/cordova-plugin-firebasex/issues/230).
 * (iOS) Add support for iOS actionable notifications
     * Merged from PR [#482](https://github.com/dpa99c/cordova-plugin-firebasex/pull/482).
 * (Android): Handle task outcomes where task is not successful but exception is null.
