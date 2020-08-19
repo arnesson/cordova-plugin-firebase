@@ -1165,19 +1165,21 @@ To use them in your app you must do the following:
           "category": "news",
           "actions": [
             {
-              "id": "read", "title": "Read"
+              "id": "read", "title": "Read", "foreground": true
             },
             {
               "id": "skip", "title": "Skip"
             },
             {
-              "id": "add", "title": "Add to list"
+              "id": "delete", "title": "Delete", "destructive": true
             }
           ]
         }
       ]
     }
 ```
+
+Note the `foreground` and `destructive` options correspond to the equivalent [UNNotificationActionOptions](https://developer.apple.com/documentation/usernotifications/unnotificationactionoptions?language=objc).
 
 2. Reference it as a resource file in your `config.xml`:
 

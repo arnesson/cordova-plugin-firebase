@@ -73,7 +73,7 @@ static NSMutableDictionary* firestoreListeners;
         if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:YES];
         }
-
+        
         // Set actionable categories if pn-actions.json exist in bundle
         [self setActionableNotifications];
 
@@ -92,7 +92,7 @@ static NSMutableDictionary* firestoreListeners;
 
 // Dynamic actions from pn-actions.json
 - (void)setActionableNotifications {
-
+    
     // Parse JSON
     NSString *path = [[NSBundle mainBundle] pathForResource:@"pn-actions" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:path];
@@ -109,9 +109,19 @@ static NSMutableDictionary* firestoreListeners;
         for (NSDictionary *action in actions) {
             NSString *actionId = [action objectForKey:@"id"];
             NSString *actionTitle = [action objectForKey:@"title"];
-
+            UNNotificationActionOptions options = UNNotificationActionOptionNone;
+            
+            id mode = [action objectForKey:@"foreground"];
+            if (mode != nil && (([mode isKindOfClass:[NSString class]] && [mode isEqualToString:@"true"]) || [mode boolValue])) {
+                options |= UNNotificationActionOptionForeground;
+            }
+            id destructive = [action objectForKey:@"destructive"];
+            if (destructive != nil && (([destructive isKindOfClass:[NSString class]] && [destructive isEqualToString:@"true"]) || [destructive boolValue])) {
+                options |= UNNotificationActionOptionDestructive;
+            }
+            
             [buttons addObject:[UNNotificationAction actionWithIdentifier:actionId
-                title:NSLocalizedString(actionTitle, nil) options:UNNotificationActionOptionNone]];
+                title:NSLocalizedString(actionTitle, nil) options:options]];
         }
 
         [categories addObject:[UNNotificationCategory categoryWithIdentifier:category
@@ -287,7 +297,7 @@ static NSMutableDictionary* firestoreListeners;
                                 [self registerForRemoteNotifications];
                             }
                             [self handleBoolResultWithPotentialError:error command:command result:granted];
-
+                            
                         }@catch (NSException *exception) {
                             [self handlePluginExceptionWithContext:exception :command];
                         }
