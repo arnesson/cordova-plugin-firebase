@@ -113,9 +113,11 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [setUserProperty](#setuserproperty)
   - [Crashlytics](#crashlytics)
     - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
+    - [didCrashOnPreviousExecution](#didCrashOnPreviousExecution)
     - [isCrashlyticsCollectionEnabled](#iscrashlyticscollectionenabled)
     - [setCrashlyticsUserId](#setcrashlyticsuserid)
     - [sendCrash](#sendcrash)
+    - [setCustomKey](#setCustomKey)
     - [logMessage](#logmessage)
     - [logError](#logerror)
   - [Authentication](#authentication)
@@ -2007,6 +2009,22 @@ FirebasePlugin.setCrashlyticsCollectionEnabled(shouldSetEnabled, function(){
 });
 ```
 
+### didCrashOnPreviousExecution
+Checks whether the app crashed on its previous run.
+
+**Parameters**:
+- {function} success - callback function which will be invoked on success.
+Will be passed a {boolean} indicating whether the app crashed on its previous run.
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.didCrashOnPreviousExecution(function(didCrashOnPreviousExecution){
+    console.log(`Did crash on previous execution: ${didCrashOnPreviousExecution}`));
+}, function(error){
+    console.error(`Error getting Crashlytics did crash on previous execution: ${error}`);
+});
+```
+
 ### isCrashlyticsCollectionEnabled
 Indicates whether Crashlytics collection setting is currently enabled.
 
@@ -2023,7 +2041,6 @@ FirebasePlugin.isCrashlyticsCollectionEnabled(function(enabled){
 });
 ```
 
-
 ### setCrashlyticsUserId
 Set Crashlytics user identifier.
 
@@ -2039,7 +2056,6 @@ See [the Firebase docs for more](https://firebase.google.com/docs/crashlytics/cu
 FirebasePlugin.setCrashlyticsUserId("user_id");
 ```
 
-
 ### sendCrash
 Simulates (causes) a fatal native crash which causes a crash event to be sent to Crashlytics (useful for testing).
 See [the Firebase documentation](https://firebase.google.com/docs/crashlytics/force-a-crash?authuser=0#force_a_crash_to_test_your_implementation) regarding crash testing.
@@ -2048,6 +2064,36 @@ Crashes will appear under `Event type = "Crashes"` in the Crashlytics console.
 **Parameters**: None
 
 ```javascript
+FirebasePlugin.sendCrash();
+```
+
+### setCustomKey
+Records a custom key and value to be associated with subsequent fatal and non-fatal reports.
+
+Multiple calls to this method with the same key will update the value for that key.
+
+The value of any key at the time of a fatal or non-fatal event will be associated with that event.
+
+Keys and associated values are visible in the session view on the Firebase Crashlytics console.
+
+A maximum of 64 key/value pairs can be written, and new keys added beyond that limit will be ignored. Keys or values that exceed 1024 characters will be truncated.
+
+**Parameters**:
+- {string} key - A unique key
+- {string | number | boolean} value - 	A value to be associated with the given key
+- {function} success - (optional) callback function which will be invoked on success
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.setCustomKey('number', 3.5, function(){
+        console.log("set custom key: number, with value: 3.5");
+    },function(error){
+        console.error("Failed to set-custom key", error);
+    });
+FirebasePlugin.setCustomKey('bool', true);
+FirebasePlugin.setCustomKey('string', 'Ipsum lorem');
+// Following is just used to trigger report for Firebase
+FirebasePlugin.logMessage("about to send a crash for testing!");
 FirebasePlugin.sendCrash();
 ```
 
