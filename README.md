@@ -117,7 +117,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [isCrashlyticsCollectionEnabled](#iscrashlyticscollectionenabled)
     - [setCrashlyticsUserId](#setcrashlyticsuserid)
     - [sendCrash](#sendcrash)
-    - [setCustomKey](#setCustomKey)
+    - [setCrashlyticsCustomKey](#setCrashlyticsCustomKey)
     - [logMessage](#logmessage)
     - [logError](#logerror)
   - [Authentication](#authentication)
@@ -2067,7 +2067,7 @@ Crashes will appear under `Event type = "Crashes"` in the Crashlytics console.
 FirebasePlugin.sendCrash();
 ```
 
-### setCustomKey
+### setCrashlyticsCustomKey
 Records a custom key and value to be associated with subsequent fatal and non-fatal reports.
 
 Multiple calls to this method with the same key will update the value for that key.
@@ -2085,13 +2085,13 @@ A maximum of 64 key/value pairs can be written, and new keys added beyond that l
 - {function} error - (optional) callback function which will be passed a {string} error message as an argument
 
 ```javascript
-FirebasePlugin.setCustomKey('number', 3.5, function(){
+FirebasePlugin.setCrashlyticsCustomKey('number', 3.5, function(){
         console.log("set custom key: number, with value: 3.5");
     },function(error){
         console.error("Failed to set-custom key", error);
     });
-FirebasePlugin.setCustomKey('bool', true);
-FirebasePlugin.setCustomKey('string', 'Ipsum lorem');
+FirebasePlugin.setCrashlyticsCustomKey('bool', true);
+FirebasePlugin.setCrashlyticsCustomKey('string', 'Ipsum lorem');
 // Following is just used to trigger report for Firebase
 FirebasePlugin.logMessage("about to send a crash for testing!");
 FirebasePlugin.sendCrash();

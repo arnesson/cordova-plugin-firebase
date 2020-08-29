@@ -354,8 +354,8 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("clearAllNotifications")) {
                 this.clearAllNotifications(callbackContext);
                 return true;
-            } else if (action.equals("setCustomKey")) {
-                this.setCustomKey(callbackContext, args);
+            } else if (action.equals("setCrashlyticsCustomKey")) {
+                this.setCrashlyticsCustomKey(callbackContext, args);
                 return true;
             } else if (action.equals("logMessage")) {
                 logMessage(args, callbackContext);
@@ -763,7 +763,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void setCustomKey(final CallbackContext callbackContext, final JSONArray data) {
+    private void setCrashlyticsCustomKey(final CallbackContext callbackContext, final JSONArray data) {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 if(isCrashlyticsEnabled()){

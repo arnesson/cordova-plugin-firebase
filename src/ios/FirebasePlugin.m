@@ -72,7 +72,7 @@ static NSDictionary* googlePlist;
         if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:YES];
         }
-        
+
         // Set actionable categories if pn-actions.json exist in bundle
         [self setActionableNotifications];
 
@@ -90,7 +90,7 @@ static NSDictionary* googlePlist;
 
 // Dynamic actions from pn-actions.json
 - (void)setActionableNotifications {
-    
+
     // Parse JSON
     NSString *path = [[NSBundle mainBundle] pathForResource:@"pn-actions" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:path];
@@ -102,20 +102,20 @@ static NSDictionary* googlePlist;
     for (NSDictionary *item in actionsArray) {
         NSMutableArray *buttons = [NSMutableArray new];
         NSString *category = [item objectForKey:@"category"];
-        
+
         NSArray *actions = [item objectForKey:@"actions"];
         for (NSDictionary *action in actions) {
             NSString *actionId = [action objectForKey:@"id"];
             NSString *actionTitle = [action objectForKey:@"title"];
-        
+
             [buttons addObject:[UNNotificationAction actionWithIdentifier:actionId
                 title:NSLocalizedString(actionTitle, nil) options:UNNotificationActionOptionNone]];
         }
-        
+
         [categories addObject:[UNNotificationCategory categoryWithIdentifier:category
                     actions:buttons intentIdentifiers:@[] options:UNNotificationCategoryOptionNone]];
     }
-    
+
     // Initialize categories
     [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:categories];
 }
@@ -1159,7 +1159,7 @@ static NSDictionary* googlePlist;
     }];
 }
 
-- (void)setCustomKey:(CDVInvokedUrlCommand*)command{
+- (void)setCrashlyticsCustomKey:(CDVInvokedUrlCommand*)command{
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* key = [command argumentAtIndex:0 withDefault:@""];
