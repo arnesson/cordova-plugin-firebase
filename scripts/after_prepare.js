@@ -57,7 +57,9 @@ var parsePluginVariables = function(){
         }
     });
     prefs.forEach(function(pref){
-        pluginVariables[pref._attributes.name] = pref._attributes.default;
+        if (pref._attributes){
+            pluginVariables[pref._attributes.name] = pref._attributes.default;
+        }
     });
 
     // Parse config.xml
