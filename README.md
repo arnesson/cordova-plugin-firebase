@@ -1950,7 +1950,11 @@ Log an event using Analytics:
 
 **Parameters**:
 - {string} eventName - name of event to log to Firebase Analytics
-- {object} eventProperties - key/value object of event properties (must be serializable)
+    - [Limit](https://support.google.com/firebase/answer/9237506?hl=en) of 40 characters
+- {object} eventProperties - key/value object of custom event properties.
+    - This must be a flat (non-nested) object.
+    - The value must be a primitive type such as string/number/etc. (not a complex object such as array or nested object).
+    - [Limit](https://support.google.com/firebase/answer/9237506?hl=en) of 40 characters for parameter name and 100 characters for parameter value.
 
 ```javascript
 FirebasePlugin.logEvent("select_content", {content_type: "page_view", item_id: "home"});
