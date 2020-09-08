@@ -72,7 +72,7 @@ static NSDictionary* googlePlist;
         if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:YES];
         }
-        
+
         // Set actionable categories if pn-actions.json exist in bundle
         [self setActionableNotifications];
 
@@ -90,7 +90,7 @@ static NSDictionary* googlePlist;
 
 // Dynamic actions from pn-actions.json
 - (void)setActionableNotifications {
-    
+
     // Parse JSON
     NSString *path = [[NSBundle mainBundle] pathForResource:@"pn-actions" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:path];
@@ -102,20 +102,20 @@ static NSDictionary* googlePlist;
     for (NSDictionary *item in actionsArray) {
         NSMutableArray *buttons = [NSMutableArray new];
         NSString *category = [item objectForKey:@"category"];
-        
+
         NSArray *actions = [item objectForKey:@"actions"];
         for (NSDictionary *action in actions) {
             NSString *actionId = [action objectForKey:@"id"];
             NSString *actionTitle = [action objectForKey:@"title"];
-        
+
             [buttons addObject:[UNNotificationAction actionWithIdentifier:actionId
                 title:NSLocalizedString(actionTitle, nil) options:UNNotificationActionOptionNone]];
         }
-        
+
         [categories addObject:[UNNotificationCategory categoryWithIdentifier:category
                     actions:buttons intentIdentifiers:@[] options:UNNotificationCategoryOptionNone]];
     }
-    
+
     // Initialize categories
     [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:categories];
 }
@@ -285,7 +285,7 @@ static NSDictionary* googlePlist;
                                 [self registerForRemoteNotifications];
                             }
                             [self handleBoolResultWithPotentialError:error command:command result:granted];
-                            
+
                         }@catch (NSException *exception) {
                             [self handlePluginExceptionWithContext:exception :command];
                         }
@@ -1086,6 +1086,24 @@ static NSDictionary* googlePlist;
     return [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED];
 }
 
+-(void)didCrashOnPreviousExecution:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+            if(![self isCrashlyticsEnabled]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot query didCrashOnPreviousExecution - Crashlytics collection is disabled"];
+            } else {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[[FIRCrashlytics crashlytics] didCrashDuringPreviousExecution]];
+            }
+
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
@@ -1133,6 +1151,25 @@ static NSDictionary* googlePlist;
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log message - Crashlytics collection is disabled"];
             }else if(message){
                 [[FIRCrashlytics crashlytics] logWithFormat:@"%@", message];
+            }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)setCrashlyticsCustomKey:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* key = [command argumentAtIndex:0 withDefault:@""];
+            NSString* value = [command argumentAtIndex:1 withDefault:@""];
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+            if(![self isCrashlyticsEnabled]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set custom key/valuee - Crashlytics collection is disabled"];
+            }else {
+                [[FIRCrashlytics crashlytics] setCustomValue: value forKey: key];
             }
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {

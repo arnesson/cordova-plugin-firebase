@@ -61,6 +61,8 @@
 // Crashlytics
 - (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)isCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
+- (void)didCrashOnPreviousExecution:(CDVInvokedUrlCommand *)command;
+- (void)setCrashlyticsCustomKey:(CDVInvokedUrlCommand *)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
 - (void)logMessage:(CDVInvokedUrlCommand*)command;
 - (void)sendCrash:(CDVInvokedUrlCommand*)command;

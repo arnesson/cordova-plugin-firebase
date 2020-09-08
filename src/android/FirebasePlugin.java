@@ -255,6 +255,9 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("getInfo")) {
                 this.getInfo(callbackContext);
                 return true;
+            } else if (action.equals("didCrashOnPreviousExecution")) {
+                this.didCrashOnPreviousExecution(callbackContext);
+                return true;
             } else if (action.equals("setConfigSettings")) {
                 this.setConfigSettings(callbackContext, args.getJSONObject(0));
                 return true;
@@ -350,6 +353,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 return true;
             } else if (action.equals("clearAllNotifications")) {
                 this.clearAllNotifications(callbackContext);
+                return true;
+            } else if (action.equals("setCrashlyticsCustomKey")) {
+                this.setCrashlyticsCustomKey(callbackContext, args);
                 return true;
             } else if (action.equals("logMessage")) {
                 logMessage(args, callbackContext);
@@ -757,6 +763,41 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    private void setCrashlyticsCustomKey(final CallbackContext callbackContext, final JSONArray data) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                if(isCrashlyticsEnabled()){
+                    try {
+                        Object value = data.get(1);
+                        // Floats can be omitted since they're not passed through JSONArray
+                        if(value instanceof Integer) {
+                            firebaseCrashlytics.setCustomKey(data.getString(0), data.getInt(1));
+                            callbackContext.success();
+                        }else if (value instanceof Double) {
+                            firebaseCrashlytics.setCustomKey(data.getString(0), data.getDouble(1));
+                            callbackContext.success();
+                        }else if (value instanceof Long) {
+                            firebaseCrashlytics.setCustomKey(data.getString(0), data.getLong(1));
+                            callbackContext.success();
+                        }else if (value instanceof String) {
+                            firebaseCrashlytics.setCustomKey(data.getString(0), data.getString(1));
+                            callbackContext.success();
+                        }else if (value instanceof Boolean) {
+                            firebaseCrashlytics.setCustomKey(data.getString(0), data.getBoolean(1));
+                            callbackContext.success();
+                        }else {
+                            callbackContext.error("Cannot set custom key - Value is not an acceptable type");
+                        }
+                    }catch(Exception e) {
+                        handleExceptionWithContext(e, callbackContext);
+                    }
+                }else{
+                    callbackContext.error("Cannot set custom key - Crashlytics collection is disabled");
+                }
+            }
+        });
+    }
+
     private void logMessage(final JSONArray data,
                             final CallbackContext callbackContext) {
 
@@ -917,6 +958,22 @@ public class FirebasePlugin extends CordovaPlugin {
                     callbackContext.success(info);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void didCrashOnPreviousExecution(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                if(isCrashlyticsEnabled()){
+                    try {
+                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, firebaseCrashlytics.didCrashOnPreviousExecution()));
+                    } catch (Exception e) {
+                        handleExceptionWithContext(e, callbackContext);
+                    }
+                } else{
+                    callbackContext.error("Cannot query didCrashOnPreviousExecution - Crashlytics collection is disabled");
                 }
             }
         });
