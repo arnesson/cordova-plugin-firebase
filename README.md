@@ -2756,6 +2756,8 @@ FirebasePlugin.fetchAndActivate(function(activated) {
 ### resetRemoteConfig
 Deletes all activated, fetched and defaults configs and resets all Firebase Remote Config settings.
 
+Android only.
+
 **Parameters**:
 - {function} success - callback function to call on successful reset.
 - {function} error - callback function which will be passed a {string} error message as an argument

@@ -1247,6 +1247,44 @@ static NSDictionary* googlePlist;
      }];
 }
 
+- (void)fetchAndActivate:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+            [remoteConfig fetchAndActivateWithCompletionHandler:^(FIRRemoteConfigFetchAndActivateStatus status, NSError * _Nullable error) {
+                bool activated = (status == FIRRemoteConfigFetchAndActivateStatusSuccessFetchedFromRemote || status == FIRRemoteConfigFetchAndActivateStatusSuccessUsingPreFetchedData);
+                [self handleBoolResultWithPotentialError:error command:command result:activated];
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)resetRemoteConfig:(CDVInvokedUrlCommand*)command {
+    [self sendPluginErrorWithMessage:@"resetRemoteConfig is not currently available on iOS" :command];
+}
+
+- (void)getAll:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+            NSArray* keys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceRemote];
+            NSMutableDictionary* result = [[NSMutableDictionary alloc] init];;
+            
+            for (NSString* key in keys) {
+                [result setObject:remoteConfig[key].stringValue forKey:key];
+            }
+    
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+
 - (void)getValue:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         @try {
