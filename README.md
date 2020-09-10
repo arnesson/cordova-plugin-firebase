@@ -113,11 +113,11 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [setUserProperty](#setuserproperty)
   - [Crashlytics](#crashlytics)
     - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
-    - [didCrashOnPreviousExecution](#didCrashOnPreviousExecution)
+    - [didCrashOnPreviousExecution](#didcrashonpreviousexecution)
     - [isCrashlyticsCollectionEnabled](#iscrashlyticscollectionenabled)
     - [setCrashlyticsUserId](#setcrashlyticsuserid)
     - [sendCrash](#sendcrash)
-    - [setCrashlyticsCustomKey](#setCrashlyticsCustomKey)
+    - [setCrashlyticsCustomKey](#setcrashlyticscustomkey)
     - [logMessage](#logmessage)
     - [logError](#logerror)
   - [Authentication](#authentication)
@@ -150,11 +150,11 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [Remote Config](#remote-config)
     - [fetch](#fetch)
     - [activateFetched](#activatefetched)
+    - [fetchAndActivate](#fetchandactivate)
+    - [resetRemoteConfig](#resetremoteconfig)
     - [getValue](#getvalue)
-    - [getByteArray](#getbytearray)
     - [getInfo](#getinfo)
-    - [setConfigSettings](#setconfigsettings)
-    - [setDefaults](#setdefaults)
+    - [getAll](#getall)
   - [Performance](#performance)
     - [setPerformanceCollectionEnabled](#setperformancecollectionenabled)
     - [isPerformanceCollectionEnabled](#isperformancecollectionenabled)
@@ -2700,7 +2700,8 @@ Example usage:
 Fetch Remote Config parameter values for your app:
 
 **Parameters**:
-- {integer} cacheExpirationSeconds (optional) - cache expiration in seconds
+- {integer} cacheExpirationSeconds (optional) - cache expiration in seconds.
+According to [the documentation](https://firebase.google.com/docs/remote-config/use-config-web#throttling) the default behavior is to cache for 12 hours, so if you want to quickly detect changes make sure you set this value.
 - {function} success - callback function on successfully fetching remote config
 - {function} error - callback function which will be passed a {string} error message as an argument
 
@@ -2722,7 +2723,7 @@ FirebasePlugin.fetch(600, function () {
 Activate the Remote Config fetched config:
 
 **Parameters**:
-- {function} success - callback function which will be passed a {boolean} argument indicating whether fetched config was successfully activated
+- {function} success - callback function which will be passed a {boolean} argument indicating whether result the current call activated the fetched config.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
@@ -2735,37 +2736,50 @@ FirebasePlugin.activateFetched(function(activated) {
 });
 ```
 
-### getValue
-Retrieve a Remote Config value:
+### fetchAndActivate
+Fetches and activates the Remote Config in a single operation.
 
 **Parameters**:
-- {string} key - key for which to fetch associated value
-- {function} success - callback function which will be passed a {any} argument containing the value stored against the specified key.
+- {function} success - callback function which will be passed a {boolean} argument indicating whether result the current call activated the fetched config.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-FirebasePlugin.getValue("key", function(value) {
-    console.log(value);
+FirebasePlugin.fetchAndActivate(function(activated) {
+    // activated will be true if there was a fetched config activated,
+    // or false if no fetched config was found, or the fetched config was already activated.
+    console.log(activated);
 }, function(error) {
     console.error(error);
 });
 ```
 
-### getByteArray
-Android only.
-Retrieve a Remote Config byte array:
+### resetRemoteConfig
+Deletes all activated, fetched and defaults configs and resets all Firebase Remote Config settings.
 
 **Parameters**:
-- {string} key - key for which to fetch associated value
-- {function} success - callback function which will be passed a {string} argument containing the Base64 encoded string that represents the value stored against the specified key.
+- {function} success - callback function to call on successful reset.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-FirebasePlugin.getByteArray("key", function(bytes) {
-    // a Base64 encoded string that represents the value for "key"
-    console.log(bytes.base64);
-    // a numeric array containing the values of the byte array (i.e. [0xFF, 0x00])
-    console.log(bytes.array);
+FirebasePlugin.resetRemoteConfig(function() {
+    console.log("Successfully reset remote config");
+}, function(error) {
+    console.error("Error resetting remote config: " + error);
+});
+```
+
+### getValue
+Retrieve a Remote Config value:
+
+**Parameters**:
+- {string} key - key for which to fetch associated value
+- {function} success - callback function which will be passed a {string} argument containing the value stored against the specified key.
+If the expected value is of a different primitive type (e.g. `boolean`, `integer`) you should cast the value to the appropriate type.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.getValue("key", function(value) {
+    console.log(value);
 }, function(error) {
     console.error(error);
 });
@@ -2799,49 +2813,23 @@ FirebasePlugin.getInfo(function(info) {
 });
 ```
 
-### setConfigSettings
-Android only.
-Change the settings for the FirebaseRemoteConfig object's operations:
+### getAll
+Returns all Remote Config as key/value pairs
 
 **Parameters**:
-- {object} configSettings - object specifying the remote config settings
-- {function} success - callback function to be call on successfully setting the remote config settings
+- {function} success - callback function which will be passed an {object} argument where key is the remote config key and value is the value as a string. If the expected key value is a different primitive type then cast it to the appropriate type.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-var settings = {
-    developerModeEnabled: true
-}
-FirebasePlugin.setConfigSettings(settings);
+FirebasePlugin.getAll(function(values) {
+    for(var key in values){
+        console.log(key + "=" + values[key]);
+    }
+}, function(error) {
+    console.error(error);
+});
 ```
 
-### setDefaults
-Android only.
-Set defaults in the Remote Config:
-
-**Parameters**:
-- {object} defaultSettings - object specifying the default remote config settings
-- {function} success - callback function to be call on successfully setting the remote config setting defaults
-- {function} error - callback function which will be passed a {string} error message as an argument
-
-```javascript
-// define defaults
-var defaults = {
-    // map property name to value in Remote Config defaults
-    mLong: 1000,
-    mString: 'hello world',
-    mDouble: 3.14,
-    mBoolean: true,
-    // map "mBase64" to a Remote Config byte array represented by a Base64 string
-    // Note: the Base64 string is in an array in order to differentiate from a string config value
-    mBase64: ["SGVsbG8gV29ybGQ="],
-    // map "mBytes" to a Remote Config byte array represented by a numeric array
-    mBytes: [0xFF, 0x00]
-}
-// set defaults
-FirebasePlugin.setDefaults(defaults);
-
-```
 
 ## Performance
 
