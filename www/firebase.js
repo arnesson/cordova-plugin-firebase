@@ -227,6 +227,14 @@ exports.setCrashlyticsUserId = function (userId, success, error) {
     exec(success, error, "FirebasePlugin", "setCrashlyticsUserId", [userId]);
 };
 
+exports.setCrashlyticsCustomKey = function (key, value, success, error) {
+    exec(success, error, "FirebasePlugin", "setCrashlyticsCustomKey", [key, value]);
+};
+
+exports.didCrashOnPreviousExecution = function (success, error) {
+    exec(success, error, "FirebasePlugin", "didCrashOnPreviousExecution", []);
+};
+
 
 // Authentication
 exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, fakeVerificationCode) {
