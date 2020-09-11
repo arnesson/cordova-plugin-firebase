@@ -169,6 +169,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [documentExistsInFirestoreCollection](#documentexistsinfirestorecollection)
     - [fetchDocumentInFirestoreCollection](#fetchdocumentinfirestorecollection)
     - [fetchFirestoreCollection](#fetchfirestorecollection)
+    - [listenToDocumentInFirestoreCollection](#listentodocumentinfirestorecollection)
+    - [listenToFirestoreCollection](#listentofirestorecollection)
+    - [removeFirestoreListener](#removefirestorelistener)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -3094,6 +3097,220 @@ FirebasePlugin.fetchFirestoreCollection(collection, filters, function(documents)
 }, function(error){
     console.error("Error fetching collection: "+error);
 });
+```
+
+### listenToDocumentInFirestoreCollection
+Adds a listener to detect real-time changes to the specified document.
+
+Upon adding a listener using this function, the success callback function will be invoked with an `id` event which specifies the native ID of the added listener.
+This can be used to subsequently remove the listener using [`removeFirestoreListener()`](#removefirestorelistener).
+For example:
+
+```json
+{
+  "eventType": "id",
+  "id": 12345
+}
+```
+
+The callback will also be immediately invoked again with a `change` event which contains a snapshot of the document at the time of adding the listener.
+Then each time the document is changed, either locally or remotely, the callback will be invoked with another `change` event detailing the change.
+
+Event fields:
+- `source` - specifies if the change was `local` (made locally on the app) or `remote` (made via the server).
+- `fromCache` - specifies whether the snapshot was read from local cache
+- `snapshot` - a snapshot of document at the time of the change.
+    - May not be present if change event is due to a metadata change.
+
+For example:
+
+```json
+{
+    "eventType": "change",
+    "source": "remote",
+    "fromCache": true,
+    "snapshot": {
+        "a_field": "a_value"
+    }
+}
+```
+
+See the [Firestore documentation](https://firebase.google.com/docs/firestore/query-data/listen) for more info on real-time listeners.
+
+
+**Parameters**:
+- {function} success - callback function to call on successfully adding the listener AND on subsequently detecting changes to that document.
+Will be passed an {object} representing the `id` or `change` event.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+- {string} documentId - document ID of the document to listen to.
+- {string} collection - name of top-level collection to listen to the document in.
+- {boolean} includeMetadata - whether to listen for changes to document metadata.
+    - Defaults to `false`.
+    - See [Events for metadata changes](https://firebase.google.com/docs/firestore/query-data/listen#events-metadata-changes) for more info.
+
+
+```javascript
+var documentId = "my_doc";
+var collection = "my_collection";
+var includeMetadata = true;
+var listenerId;
+
+FirebasePlugin.listenToDocumentInFirestoreCollection(function(event){
+    switch(event.eventType){
+        case "id":
+            listenerId = event.id;
+            console.log("Successfully added document listener with id="+listenerId);
+            break;
+        case "change":
+            console.log("Detected document change");
+            console.log("Source of change: " + event.source);
+            console.log("Read from local cache: " + event.fromCache);
+            if(event.snapshot){
+                console.log("Document snapshot: " + JSON.stringify(event.snapshot));
+            }
+            break;
+    }
+}, function(error){
+    console.error("Error adding listener: "+error);
+}, documentId, collection, includeMetadata);
+```
+
+### listenToFirestoreCollection
+Adds a listener to detect real-time changes to documents in a Firestore collection.
+
+Upon adding a listener using this function, the success callback function will be invoked with an `id` event which specifies the native ID of the added listener.
+This can be used to subsequently remove the listener using [`removeFirestoreListener()`](#removefirestorelistener).
+For example:
+
+```json
+{
+  "eventType": "id",
+  "id": 12345
+}
+```
+The callback will also be immediately invoked again with a `change` event which contains a snapshot of all documents in the collection at the time of adding the listener.
+Then each time document(s) in the collection change, either locally or remotely, the callback will be invoked with another `change` event detailing the change.
+
+Event fields:
+- `documents` - key/value list of document changes indexed by document ID. For each document change:
+    - `source` - specifies if the change was `local` (made locally on the app) or `remote` (made via the server).
+    - `fromCache` - specifies whether the snapshot was read from local cache
+    - `type` - specifies the change type:
+        - `added` - document was added to collection
+        - `modified` - document was modified in collection
+        - `removed` - document was removed from collection
+        - `metadata` - document metadata changed
+    - `snapshot` - a snapshot of document at the time of the change.
+        - May not be present if change event is due to a metadata change.
+
+For example:
+
+```json
+{
+    "eventType": "change",
+    "documents":{
+        "a_doc": {
+            "source": "remote",
+            "fromCache": false,
+            "type": "added",
+            "snapshot": {
+                "a_field": "a_value"
+            }
+        },
+        "another_doc": {
+            "source": "remote",
+            "fromCache": false,
+            "type": "removed",
+            "snapshot": {
+                "foo": "bar"
+            }
+        }
+    }
+}
+```
+
+See the [Firestore documentation](https://firebase.google.com/docs/firestore/query-data/listen) for more info on real-time listeners.
+
+
+**Parameters**:
+- {function} success - callback function to call on successfully adding the listener AND on subsequently detecting changes to that collection.
+Will be passed an {object} representing the `id` or `change` event.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+- {string} collection - name of top-level collection to listen to the document in.
+- {array} filters - a list of filters to sort/filter the documents returned from your collection.
+    - Supports `where`, `orderBy`, `startAt`, `endAt` and `limit` filters.
+    - See the [Firestore documentation](https://firebase.google.com/docs/firestore/query-data/queries) for more details.
+- {boolean} includeMetadata - whether to listen for changes to document metadata.
+    - Defaults to `false`.
+    - See [Events for metadata changes](https://firebase.google.com/docs/firestore/query-data/listen#events-metadata-changes) for more info.
+
+
+```javascript
+var collection = "my_collection";
+var filters = [
+    ['where', 'field', '==', 'value'],
+    ['orderBy', 'field', 'desc']
+];
+var includeMetadata = true;
+var listenerId;
+
+FirebasePlugin.listenToFirestoreCollection(function(event){
+    switch(event.eventType){
+        case "id":
+            listenerId = event.id;
+            console.log("Successfully added collection listener with id="+listenerId);
+            break;
+        case "change":
+            console.log("Detected collection change");
+            if(event.documents){
+                for(var documentId in event.documents){
+                    console.log("Document ID: " + documentId);
+
+                    var docChange = event.documents[documentId];
+                    console.log("Source of change: " + docChange.source);
+                    console.log("Change type: " + docChange.type);
+                    console.log("Read from local cache: " + docChange.fromCache);
+                    if(docChange.snapshot){
+                        console.log("Document snapshot: " + JSON.stringify(docChange.snapshot));
+                    }
+                }
+            }
+            break;
+    }
+}, function(error){
+    console.error("Error adding listener: "+error);
+}, collection, filters, includeMetadata);
+```
+
+### removeFirestoreListener
+Removes an existing native Firestore listener (see [detaching listeners](https://firebase.google.com/docs/firestore/query-data/listen#detach_a_listener)) added with [`listenToDocumentInFirestoreCollection()`](#listentodocumentinfirestorecollection) or [`listenToFirestoreCollection()`](#listentofirestorecollection).
+
+Upon adding a listener using either of the above functions, the success callback function will be invoked with an `id` event which specifies the native ID of the added listener.
+For example:
+
+```json
+{
+  "eventType": "id",
+  "id": 12345
+}
+```
+
+This can be used to subsequently remove the listener using this function.
+
+You should remove listeners when you're not using them as while active they maintain a continual HTTP connection to the Firebase servers costing memory, bandwith and money: see [best practices for realtime updates](https://firebase.google.com/docs/firestore/best-practices#realtime_updates) and [billing for realtime updates](https://firebase.google.com/docs/firestore/pricing#listens).
+
+
+**Parameters**:
+- {function} success - callback function to call on successfully removing the listener.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+- {string|number} listenerId - ID of the listener to remove
+
+```javascript
+FirebasePlugin.removeFirestoreListener(function(){
+    console.log("Successfully removed listener");
+}, function(error){
+    console.error("Error removing listener: "+error);
+}, listenerId);
 ```
 
 # Credits
