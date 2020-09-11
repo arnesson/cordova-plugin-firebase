@@ -169,6 +169,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [documentExistsInFirestoreCollection](#documentexistsinfirestorecollection)
     - [fetchDocumentInFirestoreCollection](#fetchdocumentinfirestorecollection)
     - [fetchFirestoreCollection](#fetchfirestorecollection)
+   - [Functions](#functions)
+    - [functionsHttpsCallable](#functionshttpscallable)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -3095,6 +3097,33 @@ FirebasePlugin.fetchFirestoreCollection(collection, filters, function(documents)
     console.error("Error fetching collection: "+error);
 });
 ```
+
+## Functions
+(Android only)
+
+### functionsHttpsCallable
+Call a firebase [Https Callable function](https://firebase.google.com/docs/functions/callable)
+
+**Parameters**:
+- {string} name - the name of the function
+- {object} args - arguments to send to the function
+- {function} success - callback function to call on successfully completed the function call.
+Will be passed an {object/array/string} containing the data returned by the function
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+var functionName = "myBackendFunction";
+var args = {
+    arg1: 'First argument',
+    arg2: 'second argument'
+};
+FirebasePlugin.functionsHttpsCallable(functionName, args, function(result){
+    console.log("Successfully called function: "+JSON.stringify(result));
+}, function(error){
+    console.error("Error calling function: "+JSON.stringify(error));
+});
+```
+
 
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.
