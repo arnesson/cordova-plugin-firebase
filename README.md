@@ -258,7 +258,6 @@ You should be aware of the following breaking changes compared with `cordova-plu
     * `cordova-android@8` (Android platform)
     * `cordova-ios@5` (iOS platform)
 * Migrated to AndroidX from legacy Android Support Library
-    * add dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) and [cordova-plugin-androidx-adapter](https://github.com/dpa99c/cordova-plugin-androidx-adapter)
 * Migrated to Cocoapods to satisfy Firebase SDK dependencies on iOS
 * `onNotificationOpen()` renamed to `onMessageReceived()`
     * `tap` parameter is only set when user taps on a notification (not when a message is received from FCM)
@@ -400,12 +399,23 @@ For example:
 
 ### AndroidX
 This plugin has been migrated to use [AndroidX (Jetpack)](https://developer.android.com/jetpack/androidx/migrate) which is the successor to the [Android Support Library](https://developer.android.com/topic/libraries/support-library/index).
-This is implemented by adding a dependency on [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) which enables AndroidX in the Android platform of a Cordova project.
-
 This is because the [major release of the Firebase and Play Services libraries on 17 June 2019](https://developers.google.com/android/guides/releases#june_17_2019) were migrated to AndroidX.
 
-Therefore if your project includes any plugins which are dependent on the legacy Android Support Library, you should add [cordova-plugin-androidx-adapter](https://github.com/dpa99c/cordova-plugin-androidx-adapter) to your project.
-This plugin will dynamically migrate any plugin code from the Android Support Library to AndroidX equivalents.
+The `cordova-android@9` platform adds implicit support for AndroidX so (if you haven't already done so) you should update to this platform version:
+
+    cordova platform rm android && cordova platform add android@latest
+
+and enable AndroidX by setting the following preference in your `config.xml`:
+
+    <preference name="AndroidXEnabled" value="true" />
+
+If you are unable to update from `cordova-android@8`, you can add [cordova-plugin-androidx](https://github.com/dpa99c/cordova-plugin-androidx) to your project which enables AndroidX in the Android platform project:
+
+    cordova plugin add cordova-plugin-androidx
+
+If your project includes any plugins which are dependent on the legacy Android Support Library (to which AndroidX is the successor), you should add [cordova-plugin-androidx-adapter](https://github.com/dpa99c/cordova-plugin-androidx-adapter) to your project which will dynamically migrate any plugin code from the Android Support Library to AndroidX equivalents:
+
+    cordova plugin add cordova-plugin-androidx-adapter
 
 ## Google Play Services and Firebase libraries
 Your Android build may fail if you are installing multiple plugins that use the Google Play Services library.

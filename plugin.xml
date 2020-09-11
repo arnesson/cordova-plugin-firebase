@@ -6,9 +6,6 @@
 
 	<license>MIT</license>
 
-	<dependency id="cordova-plugin-androidx" version="^2.0.0" />
-	<dependency id="cordova-plugin-androidx-adapter" version="^1.1.1" />
-
 	<engines>
 		<engine name="cordova" version=">=9" />
 		<engine name="cordova-android" version=">=8" />
