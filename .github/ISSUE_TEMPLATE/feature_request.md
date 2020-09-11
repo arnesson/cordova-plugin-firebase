@@ -11,6 +11,8 @@ WARNING: Failure to follow the issue template guidelines below will result in th
 
 Only feature requests should be opened here.
 
+Before opening an issue, please read [Reporting issues](https://github.com/dpa99c/cordova-plugin-firebasex#reporting-issues)
+
 -->
 
 

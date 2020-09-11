@@ -3,7 +3,6 @@
 #import "AppDelegate+FirebasePlugin.h"
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
-#import <Crashlytics/Crashlytics.h>
 #import <GoogleSignIn/GoogleSignIn.h>
 @import FirebaseInstanceID;
 @import FirebaseMessaging;
@@ -27,13 +26,13 @@
 
 static NSString*const LOG_TAG = @"FirebasePlugin[native]";
 static NSInteger const kNotificationStackSize = 10;
-static NSString*const FIREBASE_CRASHLYTICS_COLLECTION_ENABLED = @"FIREBASE_CRASHLYTICS_COLLECTION_ENABLED";
+static NSString*const FIREBASE_CRASHLYTICS_COLLECTION_ENABLED = @"FIREBASE_CRASHLYTICS_COLLECTION_ENABLED"; //preference
+static NSString*const FirebaseCrashlyticsCollectionEnabled = @"FirebaseCrashlyticsCollectionEnabled"; //plist
 static NSString*const FIREBASE_ANALYTICS_COLLECTION_ENABLED = @"FIREBASE_ANALYTICS_COLLECTION_ENABLED";
 static NSString*const FIREBASE_PERFORMANCE_COLLECTION_ENABLED = @"FIREBASE_PERFORMANCE_COLLECTION_ENABLED";
 
 static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
-static BOOL isCrashlyticsEnabled = NO;
 static NSMutableDictionary* authCredentials;
 static NSString* currentNonce; // used for Apple Sign In
 static FIRFirestore* firestore;
@@ -62,35 +61,68 @@ static NSDictionary* googlePlist;
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
-    
+
     @try {
         preferences = [NSUserDefaults standardUserDefaults];
         googlePlist = [NSMutableDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"]];
-        
-        if(![self getGooglePlistFlagWithDefaultValue:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED defaultValue:YES]){
-            isCrashlyticsEnabled = [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED];
-        }else{
-            isCrashlyticsEnabled = YES;
+
+        if([self getGooglePlistFlagWithDefaultValue:FirebaseCrashlyticsCollectionEnabled defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:YES];
         }
-        
+
         if([self getGooglePlistFlagWithDefaultValue:FIREBASE_ANALYTICS_COLLECTION_ENABLED defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED flag:YES];
         }
-        
+
         if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:YES];
         }
-        
+
+        // Set actionable categories if pn-actions.json exist in bundle
+        [self setActionableNotifications];
+
         // Check for permission and register for remote notifications if granted
         [self _hasPermission:^(BOOL result) {}];
-        
+
         [GIDSignIn sharedInstance].presentingViewController = self.viewController;
-        
+
         authCredentials = [[NSMutableDictionary alloc] init];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
+}
+
+
+// Dynamic actions from pn-actions.json
+- (void)setActionableNotifications {
+
+    // Parse JSON
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"pn-actions" ofType:@"json"];
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+
+    // Assign actions for categories
+    NSMutableSet *categories = [[NSMutableSet alloc] init];
+    NSArray *actionsArray = [dict objectForKey:@"PushNotificationActions"];
+    for (NSDictionary *item in actionsArray) {
+        NSMutableArray *buttons = [NSMutableArray new];
+        NSString *category = [item objectForKey:@"category"];
+
+        NSArray *actions = [item objectForKey:@"actions"];
+        for (NSDictionary *action in actions) {
+            NSString *actionId = [action objectForKey:@"id"];
+            NSString *actionTitle = [action objectForKey:@"title"];
+
+            [buttons addObject:[UNNotificationAction actionWithIdentifier:actionId
+                title:NSLocalizedString(actionTitle, nil) options:UNNotificationActionOptionNone]];
+        }
+
+        [categories addObject:[UNNotificationCategory categoryWithIdentifier:category
+                    actions:buttons intentIdentifiers:@[] options:UNNotificationCategoryOptionNone]];
+    }
+
+    // Initialize categories
+    [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:categories];
 }
 
 // @override abstract
@@ -144,12 +176,7 @@ static NSDictionary* googlePlist;
 
     FIRInstanceIDHandler handler = ^(NSString *_Nullable instID, NSError *_Nullable error) {
         @try {
-            if (error) {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-            } else {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:instID];
-            }
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            [self handleStringResultWithPotentialError:error command:command result:instID];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
         }
@@ -166,14 +193,11 @@ static NSDictionary* googlePlist;
     @try {
         [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
                                                             NSError * _Nullable error) {
-            CDVPluginResult* pluginResult;
-            if (error == nil) {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result.token];
-            }else{
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+        	NSString* token = nil;
+            if (error == nil && result != nil && result.token != nil) {
+                token = result.token;
             }
-            
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            [self handleStringResultWithPotentialError:error command:command result:token];
         }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
@@ -205,7 +229,7 @@ static NSDictionary* googlePlist;
     if (dataLength == 0) {
         return nil;
     }
-      
+
     const unsigned char *dataBuffer = data.bytes;
     NSMutableString *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
     for (int i = 0; i < dataLength; ++i) {
@@ -262,16 +286,11 @@ static NSDictionary* googlePlist;
                      completionHandler:^(BOOL granted, NSError * _Nullable error) {
                         @try {
                             NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
-                            CDVPluginResult* pluginResult;
-                            if (error == nil) {
-                                if(granted){
-                                    [self registerForRemoteNotifications];
-                                }
-                                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:granted];
-                            }else{
-                                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+                            if (error == nil && granted) {
+                                [self registerForRemoteNotifications];
                             }
-                            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                            [self handleBoolResultWithPotentialError:error command:command result:granted];
+
                         }@catch (NSException *exception) {
                             [self handlePluginExceptionWithContext:exception :command];
                         }
@@ -290,7 +309,7 @@ static NSDictionary* googlePlist;
 - (void)registerForRemoteNotifications {
     NSLog(@"registerForRemoteNotifications");
     if(registeredForRemoteNotifications) return;
-    
+
     [self runOnMainThread:^{
         @try {
             [[UIApplication sharedApplication] registerForRemoteNotifications];
@@ -322,7 +341,7 @@ static NSDictionary* googlePlist;
     [self runOnMainThread:^{
         @try {
             long badge = [[UIApplication sharedApplication] applicationIconBadgeNumber];
-            
+
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:badge];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
@@ -335,7 +354,9 @@ static NSDictionary* googlePlist;
     @try {
         NSString* topic = [NSString stringWithFormat:@"%@", [command.arguments objectAtIndex:0]];
 
-        [[FIRMessaging messaging] subscribeToTopic: topic];
+        [[FIRMessaging messaging] subscribeToTopic: topic completion:^(NSError * _Nullable error) {
+            [self handleEmptyResultWithPotentialError:error command:command];
+        }];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -348,7 +369,9 @@ static NSDictionary* googlePlist;
     @try {
         NSString* topic = [NSString stringWithFormat:@"%@", [command.arguments objectAtIndex:0]];
 
-        [[FIRMessaging messaging] unsubscribeFromTopic: topic];
+        [[FIRMessaging messaging] unsubscribeFromTopic: topic completion:^(NSError * _Nullable error) {
+            [self handleEmptyResultWithPotentialError:error command:command];
+        }];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -360,13 +383,7 @@ static NSDictionary* googlePlist;
 - (void)unregister:(CDVInvokedUrlCommand *)command {
     @try {
         [[FIRInstanceID instanceID] deleteIDWithHandler:^void(NSError *_Nullable error) {
-            CDVPluginResult* pluginResult;
-            if (error == nil) {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-            }else{
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-            }
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            [self handleEmptyResultWithPotentialError:error command:command];
         }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
@@ -396,13 +413,10 @@ static NSDictionary* googlePlist;
         [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
                                                             NSError * _Nullable error) {
             @try {
-                if (error == nil) {
-                    if (result.token != nil && error == nil) {
-                        [self sendToken:result.token];
-                    }
+                if (result.token != nil && error == nil) {
+                    [self sendToken:result.token];
                 }else{
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    [self handleStringResultWithPotentialError:error command:command result:result.token];
                 }
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithContext:exception :command];
@@ -481,7 +495,7 @@ static NSDictionary* googlePlist;
         @try {
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-            
+
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
@@ -598,7 +612,7 @@ static NSDictionary* googlePlist;
     @try {
         self.googleSignInCallbackId = command.callbackId;
         [[GIDSignIn sharedInstance] signIn];
-        
+
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -613,13 +627,13 @@ static NSDictionary* googlePlist;
         if (@available(iOS 13.0, *)) {
             self.appleSignInCallbackId = command.callbackId;
             [self startSignInWithAppleFlow];
-            
+
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
             [pluginResult setKeepCallbackAsBool:YES];
         } else {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"OS version is too low - Apple Sign In requires iOS 13.0+"];
         }
-        
+
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
@@ -630,7 +644,7 @@ static NSDictionary* googlePlist;
     @try {
         FIRAuthCredential* credential = [self obtainAuthCredential:[command.arguments objectAtIndex:0] command:command];
         if(credential == nil) return;
-        
+
         [[FIRAuth auth] signInWithCredential:credential
                                   completion:^(FIRAuthDataResult * _Nullable authResult,
                                                NSError * _Nullable error) {
@@ -648,10 +662,10 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         FIRAuthCredential* credential = [self obtainAuthCredential:[command.arguments objectAtIndex:0] command:command];
         if(credential == nil) return;
-        
+
         [user reauthenticateWithCredential:credential completion:^(FIRAuthDataResult * _Nullable authResult, NSError * _Nullable error) {
             [self handleAuthResult:authResult error:error command:command];
         }];
@@ -664,13 +678,13 @@ static NSDictionary* googlePlist;
     @try {
         FIRAuthCredential* credential = [self obtainAuthCredential:[command.arguments objectAtIndex:0] command:command];
         if(credential == nil) return;
-        
+
         [[FIRAuth auth].currentUser linkWithCredential:credential
                                   completion:^(FIRAuthDataResult * _Nullable authResult,
                                                NSError * _Nullable error) {
             [self handleAuthResult:authResult error:error command:command];
         }];
-        
+
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
@@ -680,7 +694,7 @@ static NSDictionary* googlePlist;
     @try {
         bool isSignedIn = [FIRAuth auth].currentUser ? true : false;
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isSignedIn] callbackId:command.callbackId];
-        
+
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
@@ -693,12 +707,12 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         // Sign out of Google
         if([[GIDSignIn sharedInstance] currentUser] != nil){
             [[GIDSignIn sharedInstance] signOut];
         }
-        
+
         // Sign out of Firebase
         NSError *signOutError;
         BOOL status = [[FIRAuth auth] signOut:&signOutError];
@@ -713,7 +727,7 @@ static NSDictionary* googlePlist;
 }
 
 - (void)getCurrentUser:(CDVInvokedUrlCommand *)command {
-    
+
     @try {
         FIRUser* user = [FIRAuth auth].currentUser;
         if(!user){
@@ -721,14 +735,14 @@ static NSDictionary* googlePlist;
             return;
         }
         [self extractAndReturnUserInfo:command];
-        
+
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
 }
 
 - (void)reloadCurrentUser:(CDVInvokedUrlCommand *)command {
-    
+
     @try {
         FIRUser* user = [FIRAuth auth].currentUser;
         if(!user){
@@ -737,7 +751,7 @@ static NSDictionary* googlePlist;
         }
         [user reloadWithCompletion:^(NSError * _Nullable error) {
             if (error != nil) {
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description] callbackId:command.callbackId];
+                [self handleEmptyResultWithPotentialError:error command:command];
             }else {
                 [self extractAndReturnUserInfo:command];
             }
@@ -756,11 +770,13 @@ static NSDictionary* googlePlist;
     [userInfo setValue:user.phoneNumber forKey:@"phoneNumber"];
     [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
     [userInfo setValue:user.uid forKey:@"uid"];
-    [userInfo setValue:user.providerID forKey:@"providerId"];
     [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
     [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
         [userInfo setValue:token forKey:@"idToken"];
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+        [user getIDTokenResultWithCompletion:^(FIRAuthTokenResult * _Nullable tokenResult, NSError * _Nullable error) {
+            [userInfo setValue:tokenResult.signInProvider forKey:@"providerId"];
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
+        }];
     }];
 }
 
@@ -771,9 +787,9 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         NSDictionary* profile = [command.arguments objectAtIndex:0];
-        
+
         FIRUserProfileChangeRequest* changeRequest = [user profileChangeRequest];
         if([profile objectForKey:@"name"] != nil){
             changeRequest.displayName = [profile objectForKey:@"name"];
@@ -781,10 +797,10 @@ static NSDictionary* googlePlist;
         if([profile objectForKey:@"photoUri"] != nil){
             changeRequest.photoURL = [NSURL URLWithString:[profile objectForKey:@"photoUri"]];
         }
-        
+
         [changeRequest commitChangesWithCompletion:^(NSError *_Nullable error) {
           @try {
-              [self handleResultWithPotentialError:error command:command];
+              [self handleEmptyResultWithPotentialError:error command:command];
           }@catch (NSException *exception) {
               [self handlePluginExceptionWithContext:exception :command];
           }
@@ -801,11 +817,11 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         NSString* email = [command.arguments objectAtIndex:0];
         [user updateEmail:email completion:^(NSError *_Nullable error) {
           @try {
-              [self handleResultWithPotentialError:error command:command];
+              [self handleEmptyResultWithPotentialError:error command:command];
           }@catch (NSException *exception) {
               [self handlePluginExceptionWithContext:exception :command];
           }
@@ -822,10 +838,10 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         [user sendEmailVerificationWithCompletion:^(NSError *_Nullable error) {
           @try {
-              [self handleResultWithPotentialError:error command:command];
+              [self handleEmptyResultWithPotentialError:error command:command];
           }@catch (NSException *exception) {
               [self handlePluginExceptionWithContext:exception :command];
           }
@@ -842,11 +858,11 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         NSString* password = [command.arguments objectAtIndex:0];
         [user updatePassword:password completion:^(NSError *_Nullable error) {
           @try {
-              [self handleResultWithPotentialError:error command:command];
+              [self handleEmptyResultWithPotentialError:error command:command];
           }@catch (NSException *exception) {
               [self handlePluginExceptionWithContext:exception :command];
           }
@@ -861,7 +877,7 @@ static NSDictionary* googlePlist;
         NSString* email = [command.arguments objectAtIndex:0];
         [[FIRAuth auth] sendPasswordResetWithEmail:email completion:^(NSError *_Nullable error) {
           @try {
-              [self handleResultWithPotentialError:error command:command];
+              [self handleEmptyResultWithPotentialError:error command:command];
           }@catch (NSException *exception) {
               [self handlePluginExceptionWithContext:exception :command];
           }
@@ -878,10 +894,10 @@ static NSDictionary* googlePlist;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
-        
+
         [user deleteWithCompletion:^(NSError *_Nullable error) {
           @try {
-              [self handleResultWithPotentialError:error command:command];
+              [self handleEmptyResultWithPotentialError:error command:command];
           }@catch (NSException *exception) {
               [self handlePluginExceptionWithContext:exception :command];
           }
@@ -959,17 +975,10 @@ static NSDictionary* googlePlist;
          @try {
             BOOL enabled = [[command argumentAtIndex:0] boolValue];
             CDVPluginResult* pluginResult;
-            if([self getGooglePlistFlagWithDefaultValue:FIREBASE_ANALYTICS_COLLECTION_ENABLED defaultValue:YES]){
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set Analytics data collection at runtime as it's hard-coded to ENABLED at build-time in the plist"];
-            }else if(enabled && [self getPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED]){
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Analytics data collection is already set to enabled"];
-            }else if(!enabled && ![self getPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED]){
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Analytics data collection is already set to disabled"];
-            }else{
-                [FIRAnalytics setAnalyticsCollectionEnabled:enabled];
-                [self setPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED flag:enabled];
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-            }
+            [FIRAnalytics setAnalyticsCollectionEnabled:enabled];
+            [self setPreferenceFlag:FIREBASE_ANALYTICS_COLLECTION_ENABLED flag:enabled];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
@@ -1050,26 +1059,16 @@ static NSDictionary* googlePlist;
 /*
  * Crashlytics
  */
-- (BOOL) _shouldEnableCrashlytics {
-    return ![self getGooglePlistFlagWithDefaultValue:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED defaultValue:YES] && [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED];
-}
 
 - (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand *)command {
      [self.commandDelegate runInBackground:^{
          @try {
              BOOL enabled = [[command argumentAtIndex:0] boolValue];
              CDVPluginResult* pluginResult;
-             if([self getGooglePlistFlagWithDefaultValue:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED defaultValue:YES]){
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set Crashlytics data collection at runtime as it's hard-coded to ENABLED at build-time in the plist"];
-             }else if(enabled && [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED]){
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Crashlytics data collection is already set to enabled"];
-             }else if(!enabled && ![self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED]){
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Crashlytics data collection is already set to disabled"];
-             }else{
-                 [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:enabled];
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-             }
-             
+             [[FIRCrashlytics crashlytics] setCrashlyticsCollectionEnabled:enabled];
+             [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:enabled];
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
@@ -1080,7 +1079,7 @@ static NSDictionary* googlePlist;
 - (void)isCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command{
     [self.commandDelegate runInBackground:^{
         @try {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED]];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[self isCrashlyticsEnabled]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1088,10 +1087,21 @@ static NSDictionary* googlePlist;
     }];
 }
 
-- (void)isCrashlyticsCollectionCurrentlyEnabled:(CDVInvokedUrlCommand*)command{
+-(BOOL)isCrashlyticsEnabled{
+    return [self getPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED];
+}
+
+-(void)didCrashOnPreviousExecution:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         @try {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isCrashlyticsEnabled];
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+            if(![self isCrashlyticsEnabled]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot query didCrashOnPreviousExecution - Crashlytics collection is disabled"];
+            } else {
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[[FIRCrashlytics crashlytics] didCrashDuringPreviousExecution]];
+            }
+
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1102,41 +1112,38 @@ static NSDictionary* googlePlist;
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
-        
+
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         @try {
-            if(!isCrashlyticsEnabled){
+            if(![self isCrashlyticsEnabled]){
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log error - Crashlytics collection is disabled"];
             }
             // We can optionally be passed a stack trace from stackTrace.js which we'll put in userInfo.
             else if ([command.arguments count] > 1) {
                 NSArray* stackFrames = [command.arguments objectAtIndex:1];
-                
+
                 NSString* message = errorMessage;
                 NSString* name = @"Uncaught Javascript exception";
                 NSMutableArray *customFrames = [[NSMutableArray alloc] init];
-                
+                FIRExceptionModel *exceptionModel = [FIRExceptionModel exceptionModelWithName:name reason:message];
+
                 for (NSDictionary* stackFrame in stackFrames) {
-                    CLSStackFrame *customFrame = [CLSStackFrame stackFrame];
-                    [customFrame setSymbol:stackFrame[@"functionName"]];
-                    [customFrame setFileName:stackFrame[@"fileName"]];
-                    [customFrame setLibrary:stackFrame[@"source"]];
-                    [customFrame setOffset:(uint64_t) [stackFrame[@"columnNumber"] intValue]];
-                    [customFrame setLineNumber:(uint32_t) [stackFrame[@"lineNumber"] intValue]];
+                    FIRStackFrame *customFrame = [FIRStackFrame stackFrameWithSymbol:stackFrame[@"functionName"] file:stackFrame[@"fileName"] line:(uint32_t) [stackFrame[@"lineNumber"] intValue]];
                     [customFrames addObject:customFrame];
                 }
-                [[Crashlytics sharedInstance] recordCustomExceptionName:name reason:message frameArray:customFrames];
+                exceptionModel.stackTrace = customFrames;
+                [[FIRCrashlytics crashlytics] recordExceptionModel:exceptionModel];
             }else{
                 //TODO detect and handle non-stack userInfo and pass to recordError
                 NSMutableDictionary* userInfo = [[NSMutableDictionary alloc] init];
                 NSError *error = [NSError errorWithDomain:errorMessage code:0 userInfo:userInfo];
-                [CrashlyticsKit recordError:error];
+                [[FIRCrashlytics crashlytics] recordError:error];
             }
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         } @catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
         }
-    
+
     }];
 }
 
@@ -1145,10 +1152,29 @@ static NSDictionary* googlePlist;
         @try {
             NSString* message = [command argumentAtIndex:0 withDefault:@""];
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-            if(!isCrashlyticsEnabled){
+            if(![self isCrashlyticsEnabled]){
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log message - Crashlytics collection is disabled"];
             }else if(message){
-                CLSNSLog(@"%@",message);
+                [[FIRCrashlytics crashlytics] logWithFormat:@"%@", message];
+            }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)setCrashlyticsCustomKey:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* key = [command argumentAtIndex:0 withDefault:@""];
+            NSString* value = [command argumentAtIndex:1 withDefault:@""];
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+            if(![self isCrashlyticsEnabled]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set custom key/valuee - Crashlytics collection is disabled"];
+            }else {
+                [[FIRCrashlytics crashlytics] setCustomValue: value forKey: key];
             }
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
@@ -1158,17 +1184,17 @@ static NSDictionary* googlePlist;
 }
 
 - (void)sendCrash:(CDVInvokedUrlCommand*)command{
-    [[Crashlytics sharedInstance] crash];
+    assert(NO);
 }
 
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand *)command {
     @try {
         NSString* userId = [command.arguments objectAtIndex:0];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        if(!isCrashlyticsEnabled){
+        if(![self isCrashlyticsEnabled]){
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set user ID - Crashlytics collection is disabled"];
         }else{
-            [CrashlyticsKit setUserIdentifier:userId];
+            [[FIRCrashlytics crashlytics] setUserID:userId];
         }
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }@catch (NSException *exception) {
@@ -1188,27 +1214,23 @@ static NSDictionary* googlePlist;
               int expirationDuration = [[command.arguments objectAtIndex:0] intValue];
 
               [remoteConfig fetchWithExpirationDuration:expirationDuration completionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
-                  CDVPluginResult *pluginResult;
-                  if (error != nil) {
-                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-                  }else if (status == FIRRemoteConfigFetchStatusSuccess) {
-                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                  if (status == FIRRemoteConfigFetchStatusSuccess && error == nil){
+                      [self sendPluginSuccess:command];
+                  }else if (error != nil) {
+                      [self handleEmptyResultWithPotentialError:error command:command];
                   } else {
-                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                      [self sendPluginError:command];
                   }
-                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
               }];
           } else {
               [remoteConfig fetchWithCompletionHandler:^(FIRRemoteConfigFetchStatus status, NSError * _Nullable error) {
-                  CDVPluginResult *pluginResult;
-                  if (error != nil) {
-                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-                  }else if (status == FIRRemoteConfigFetchStatusSuccess) {
-                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                  if (status == FIRRemoteConfigFetchStatusSuccess && error == nil){
+                      [self sendPluginSuccess:command];
+                  }else if (error != nil) {
+                      [self handleEmptyResultWithPotentialError:error command:command];
                   } else {
-                      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+                      [self sendPluginError:command];
                   }
-                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
               }];
           }
         }@catch (NSException *exception) {
@@ -1221,14 +1243,8 @@ static NSDictionary* googlePlist;
      [self.commandDelegate runInBackground:^{
          @try {
              FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
-             [remoteConfig activateWithCompletionHandler:^(NSError * _Nullable error) {
-                 CDVPluginResult *pluginResult;
-                 if (error != nil) {
-                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-                 } else {
-                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-                 }
-                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+             [remoteConfig activateWithCompletion:^(BOOL changed, NSError* _Nullable error) {
+                 [self handleBoolResultWithPotentialError:error command:command result:true];
              }];
          }@catch (NSException *exception) {
              [self handlePluginExceptionWithContext:exception :command];
@@ -1289,17 +1305,9 @@ static NSDictionary* googlePlist;
          @try {
              BOOL enabled = [[command argumentAtIndex:0] boolValue];
              CDVPluginResult* pluginResult;
-             if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot set Performance data collection at runtime as it's hard-coded to ENABLED at build-time in the plist"];
-             }else if(enabled && [self getPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED]){
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Performance data collection is already set to enabled"];
-             }else if(!enabled && ![self getPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED]){
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Performance data collection is already set to disabled"];
-             }else{
-                 [[FIRPerformance sharedInstance] setDataCollectionEnabled:enabled];
-                 [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:enabled];
-                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-             }
+             [[FIRPerformance sharedInstance] setDataCollectionEnabled:enabled];
+             [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:enabled];
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
 
              [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
          }@catch (NSException *exception) {
@@ -1399,12 +1407,7 @@ static NSDictionary* googlePlist;
             NSString* collection = [command.arguments objectAtIndex:1];
             __block FIRDocumentReference *ref =
             [[firestore collectionWithPath:collection] addDocumentWithData:document completion:^(NSError * _Nullable error) {
-              if (error != nil) {
-                  [self sendPluginError:error.localizedDescription:command];
-              } else {
-                  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:ref.documentID];
-                  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-              }
+                [self handleStringResultWithPotentialError:error command:command result:ref.documentID];
             }];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1418,13 +1421,9 @@ static NSDictionary* googlePlist;
             NSString* documentId = [command.arguments objectAtIndex:0];
             NSDictionary* document = [command.arguments objectAtIndex:1];
             NSString* collection = [command.arguments objectAtIndex:2];
-            
+
             [[[firestore collectionWithPath:collection] documentWithPath:documentId] setData:document completion:^(NSError * _Nullable error) {
-              if (error != nil) {
-                [self sendPluginError:error.localizedDescription:command];
-              } else {
-                [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
-              }
+                [self handleEmptyResultWithPotentialError:error command:command];
             }];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1438,18 +1437,14 @@ static NSDictionary* googlePlist;
             NSString* documentId = [command.arguments objectAtIndex:0];
             NSDictionary* document = [command.arguments objectAtIndex:1];
             NSString* collection = [command.arguments objectAtIndex:2];
-            
+
             FIRDocumentReference* docRef = [[firestore collectionWithPath:collection] documentWithPath:documentId];
             if(docRef != nil){
                 [docRef updateData:document completion:^(NSError * _Nullable error) {
-                    if (error != nil) {
-                        [self sendPluginError:error.localizedDescription:command];
-                    } else {
-                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
-                    }
+                    [self handleEmptyResultWithPotentialError:error command:command];
                 }];
             }else{
-                [self sendPluginError:@"Document not found in collection":command];
+                [self sendPluginErrorWithMessage:@"Document not found in collection":command];
             }
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1465,11 +1460,7 @@ static NSDictionary* googlePlist;
 
             [[[firestore collectionWithPath:collection] documentWithPath:documentId]
                 deleteDocumentWithCompletion:^(NSError * _Nullable error) {
-                  if (error != nil) {
-                    [self sendPluginError:error.localizedDescription:command];
-                  } else {
-                    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
-                  }
+                    [self handleEmptyResultWithPotentialError:error command:command];
             }];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1482,19 +1473,15 @@ static NSDictionary* googlePlist;
         @try {
             NSString* documentId = [command.arguments objectAtIndex:0];
             NSString* collection = [command.arguments objectAtIndex:1];
-            
+
             FIRDocumentReference* docRef = [[firestore collectionWithPath:collection] documentWithPath:documentId];
             if(docRef != nil){
                 [docRef getDocumentWithCompletion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
-                    if (error != nil) {
-                        [self sendPluginError:error.localizedDescription:command];
-                    }else{
-                        BOOL docExists = snapshot.data != nil;
-                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:docExists] callbackId:command.callbackId];
-                    }
+                    BOOL docExists = snapshot.data != nil;
+                    [self handleBoolResultWithPotentialError:error command:command result:docExists];
                 }];
             }else{
-                [self sendPluginError:@"Collection not found":command];
+                [self sendPluginErrorWithMessage:@"Collection not found":command];
             }
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1507,20 +1494,20 @@ static NSDictionary* googlePlist;
         @try {
             NSString* documentId = [command.arguments objectAtIndex:0];
             NSString* collection = [command.arguments objectAtIndex:1];
-            
+
             FIRDocumentReference* docRef = [[firestore collectionWithPath:collection] documentWithPath:documentId];
             if(docRef != nil){
                 [docRef getDocumentWithCompletion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
                     if (error != nil) {
-                        [self sendPluginError:error.localizedDescription:command];
+                        [self sendPluginErrorWithMessage:error.localizedDescription:command];
                     } else if(snapshot.data != nil) {
                         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:snapshot.data] callbackId:command.callbackId];
                     }else{
-                        [self sendPluginError:@"Document not found in collection":command];
+                        [self sendPluginErrorWithMessage:@"Document not found in collection":command];
                     }
                 }];
             }else{
-                [self sendPluginError:@"Collection not found":command];
+                [self sendPluginErrorWithMessage:@"Collection not found":command];
             }
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
@@ -1578,7 +1565,7 @@ static NSDictionary* googlePlist;
 
             [query getDocumentsWithCompletion:^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
                 if (error != nil) {
-                    [self sendPluginError:error.localizedDescription:command];
+                    [self sendPluginErrorWithMessage:error.localizedDescription:command];
                 } else {
                     NSMutableDictionary* documents = [[NSMutableDictionary alloc] init];;
                     for (FIRDocumentSnapshot *document in snapshot.documents) {
@@ -1621,11 +1608,47 @@ static NSDictionary* googlePlist;
 /********************************/
 #pragma mark - utility functions
 /********************************/
-- (void) sendPluginError: (NSString*) errorMessage :(CDVInvokedUrlCommand*)command
+- (void) sendPluginSuccess:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
+
+- (void) sendPluginError:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+}
+
+- (void) sendPluginErrorWithMessage: (NSString*) errorMessage :(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMessage];
     [self _logError:errorMessage];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void) sendPluginErrorWithError:(NSError*)error command:(CDVInvokedUrlCommand*)command{
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description] callbackId:command.callbackId];
+}
+
+- (void) handleEmptyResultWithPotentialError:(NSError*) error command:(CDVInvokedUrlCommand*)command {
+     if (error) {
+         [self sendPluginErrorWithError:error command:command];
+     }else{
+         [self sendPluginSuccess:command];
+     }
+}
+
+- (void) handleStringResultWithPotentialError:(NSError*) error command:(CDVInvokedUrlCommand*)command result:(NSString*)result {
+     if (error) {
+         [self sendPluginErrorWithError:error command:command];
+     }else{
+         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result] callbackId:command.callbackId];
+     }
+}
+
+- (void) handleBoolResultWithPotentialError:(NSError*) error command:(CDVInvokedUrlCommand*)command result:(BOOL)result {
+     if (error) {
+         [self sendPluginErrorWithError:error command:command];
+     }else{
+         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:result] callbackId:command.callbackId];
+     }
 }
 
 - (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command
@@ -1648,27 +1671,29 @@ static NSDictionary* googlePlist;
 - (void)_logError: (NSString*)msg
 {
     NSLog(@"%@ ERROR: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.error(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.error(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
 - (void)_logInfo: (NSString*)msg
 {
     NSLog(@"%@ INFO: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.info(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.info(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
 - (void)_logMessage: (NSString*)msg
 {
     NSLog(@"%@ LOG: %@", LOG_TAG, msg);
-    NSString* jsString = [NSString stringWithFormat:@"console.log(\"%@: %@\")", LOG_TAG, [self escapeDoubleQuotes:msg]];
+    NSString* jsString = [NSString stringWithFormat:@"console.log(\"%@: %@\")", LOG_TAG, [self escapeJavascriptString:msg]];
     [self executeGlobalJavascript:jsString];
 }
 
-- (NSString*)escapeDoubleQuotes: (NSString*)str
+- (NSString*)escapeJavascriptString: (NSString*)str
 {
-    NSString *result =[str stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
+    NSString* result = [str stringByReplacingOccurrencesOfString: @"\\\"" withString: @"\""];
+    result = [result stringByReplacingOccurrencesOfString: @"\"" withString: @"\\\""];
+    result = [result stringByReplacingOccurrencesOfString: @"\n" withString: @"\\\n"];
     return result;
 }
 
@@ -1692,17 +1717,17 @@ static NSDictionary* googlePlist;
 
 - (FIRAuthCredential*)obtainAuthCredential:(NSDictionary*)credential command:(CDVInvokedUrlCommand *)command {
     FIRAuthCredential* authCredential = nil;
-    
+
     if(credential == nil){
         NSString* errMsg = @"credential object must be passed as first and only argument";
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errMsg] callbackId:command.callbackId];
         return authCredential;
     }
-    
+
     NSString* key = [credential objectForKey:@"id"];
     NSString* verificationId = [credential objectForKey:@"verificationId"];
     NSString* code = [credential objectForKey:@"code"];
-    
+
     if(key != nil){
         authCredential = [authCredentials objectForKey:key];
         if(authCredential == nil){
@@ -1742,20 +1767,10 @@ static NSDictionary* googlePlist;
     while (key < 0 || [authCredentials objectForKey:[NSNumber numberWithInt:key]] != nil) {
         key = arc4random_uniform(100000);
     }
-    
+
     [authCredentials setObject:authCredential forKey:[NSNumber numberWithInt:key]];
 
     return key;
-}
-
-- (void) handleResultWithPotentialError:(NSError*) error command:(CDVInvokedUrlCommand*)command {
-     CDVPluginResult* pluginResult;
-     if (error) {
-       pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
-     }else{
-         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-     }
-     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void) setPreferenceFlag:(NSString*) name flag:(BOOL)flag {

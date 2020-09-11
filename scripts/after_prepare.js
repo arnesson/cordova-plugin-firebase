@@ -57,7 +57,9 @@ var parsePluginVariables = function(){
         }
     });
     prefs.forEach(function(pref){
-        pluginVariables[pref._attributes.name] = pref._attributes.default;
+        if (pref._attributes){
+            pluginVariables[pref._attributes.name] = pref._attributes.default;
+        }
     });
 
     // Parse config.xml
@@ -82,6 +84,10 @@ var parsePluginVariables = function(){
             }
         }
     }
+
+    // set platform key path from plugin variable
+    if (pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH) PLATFORM.ANDROID.src = [pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH];
+    if (pluginVariables.IOS_FIREBASE_CONFIG_FILEPATH) PLATFORM.IOS.src = [pluginVariables.IOS_FIREBASE_CONFIG_FILEPATH];
 };
 
 module.exports = function (context) {
@@ -127,7 +133,7 @@ module.exports = function (context) {
                 },
                 _text: accentColor
             };
-            if($resources.color && $resources.color._text){
+            if($resources.color && Object.keys($resources.color).length){
                 if(typeof $resources.color.length === 'undefined'){
                     $resources.color = [$resources.color];
                 }

@@ -53,10 +53,14 @@ interface FirebasePlugin {
     ): void
     clearAllNotifications(): void
     subscribe(
-        topic: string
+        topic: string,
+        success?: () => void,
+        error?: (err: string) => void
     ): void
     unsubscribe(
-        topic: string
+        topic: string,
+        success?: () => void,
+        error?: (err: string) => void
     ): void
     isAutoInitEnabled(
         success: (enabled: boolean) => void,

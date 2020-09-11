@@ -11,7 +11,7 @@ WARNING: Failure to follow the issue template guidelines below will result in th
 
 Only documentation issues should be opened here.
 
-Before opening an issue, please check a similar issue is not already open (or closed). Duplicates or near-duplicates will be closed immediately.
+Before opening an issue, please read [Reporting issues](https://github.com/dpa99c/cordova-plugin-firebasex#reporting-issues)
 -->
 
 

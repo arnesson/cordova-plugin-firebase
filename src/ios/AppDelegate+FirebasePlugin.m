@@ -1,7 +1,6 @@
 #import "AppDelegate+FirebasePlugin.h"
 #import "FirebasePlugin.h"
 #import "Firebase.h"
-#import <Fabric/Fabric.h>
 #import <objc/runtime.h>
 
 
@@ -14,7 +13,6 @@
 @end
 
 #define kApplicationInBackgroundKey @"applicationInBackground"
-#define kDelegateKey @"delegate"
 
 @implementation AppDelegate (FirebasePlugin)
 
@@ -27,14 +25,7 @@ static AppDelegate* instance;
 static NSDictionary* mutableUserInfo;
 static FIRAuthStateDidChangeListenerHandle authStateChangeListener;
 static bool authStateChangeListenerInitialized = false;
-
-- (void)setDelegate:(id)delegate {
-    objc_setAssociatedObject(self, kDelegateKey, delegate, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (id)delegate {
-    return objc_getAssociatedObject(self, kDelegateKey);
-}
+static bool shouldEstablishDirectChannel = false;
 
 + (void)load {
     Method original = class_getInstanceMethod(self, @selector(application:didFinishLaunchingWithOptions:));
@@ -56,31 +47,39 @@ static bool authStateChangeListenerInitialized = false;
     @try{
         instance = self;
         
-        // get GoogleService-Info.plist file path
-        NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-        
-        // if file is successfully found, use it
-        if(filePath){
-            [FirebasePlugin.firebasePlugin _logMessage:@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]"];
-            // create firebase configure options passing .plist as content
-            FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+        bool isFirebaseInitializedWithPlist = false;
+        if(![FIRApp defaultApp]) {
+            // get GoogleService-Info.plist file path
+            NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
             
-            // configure FIRApp with options
-            [FIRApp configureWithOptions:options];
-            if([FirebasePlugin.firebasePlugin _shouldEnableCrashlytics]){
-                [Fabric with:@[[Crashlytics class]]];
+            // if file is successfully found, use it
+            if(filePath){
+                [FirebasePlugin.firebasePlugin _logMessage:@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]"];
+                // create firebase configure options passing .plist as content
+                FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
+
+                // configure FIRApp with options
+                [FIRApp configureWithOptions:options];
+                
+                isFirebaseInitializedWithPlist = true;
+            }else{
+                // no .plist found, try default App
+                [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
+                [FIRApp configure];
             }
+        }else{
+            // Firebase SDK has already been initialised:
+            // Assume that another call (probably from another plugin) did so with the plist
+            isFirebaseInitializedWithPlist = true;
         }
         
-        // no .plist found, try default App
-        if (![FIRApp defaultApp] && !filePath) {
-            [FirebasePlugin.firebasePlugin _logError:@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]"];
-            [FIRApp configure];
-        }
+      
+        
+        shouldEstablishDirectChannel = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"shouldEstablishDirectChannel"] boolValue];
 
         // Set FCM messaging delegate
         [FIRMessaging messaging].delegate = self;
-        [FIRMessaging messaging].shouldEstablishDirectChannel = true;
+        [FIRMessaging messaging].shouldEstablishDirectChannel = shouldEstablishDirectChannel;
         
         // Setup Firestore
         [FirebasePlugin setFirestore:[FIRFirestore firestore]];
@@ -103,10 +102,6 @@ static bool authStateChangeListenerInitialized = false;
                 [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
             }
         }];
-        
-        // Set UNUserNotificationCenter delegate
-        self.delegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
-        [UNUserNotificationCenter currentNotificationCenter].delegate = self;
 
         // Set NSNotificationCenter observer
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
@@ -122,15 +117,15 @@ static bool authStateChangeListenerInitialized = false;
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [FIRMessaging messaging].shouldEstablishDirectChannel = true;
     self.applicationInBackground = @(NO);
-    [FirebasePlugin.firebasePlugin _logMessage:@"FCM direct channel = true"];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = shouldEstablishDirectChannel;
+    [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"Enter foreground: FCM direct channel = %@", shouldEstablishDirectChannel ? @"true" : @"false"]];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
     self.applicationInBackground = @(YES);
-    [FirebasePlugin.firebasePlugin _logMessage:@"FCM direct channel = false"];
+    [FIRMessaging messaging].shouldEstablishDirectChannel = false;
+    [FirebasePlugin.firebasePlugin _logMessage:@"Enter background: FCM direct channel = false"];
 }
 
 # pragma mark - Google SignIn
@@ -389,9 +384,6 @@ didDisconnectWithUser:(GIDGoogleUser *)user
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
     
     @try{
-        [self.delegate userNotificationCenter:center
-                  willPresentNotification:notification
-                    withCompletionHandler:completionHandler];
 
         if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
             [FirebasePlugin.firebasePlugin _logError:@"willPresentNotification: aborting as not a supported UNNotificationTrigger"];
@@ -460,10 +452,7 @@ didDisconnectWithUser:(GIDGoogleUser *)user
           withCompletionHandler:(void (^)(void))completionHandler
 {
     @try{
-        [self.delegate userNotificationCenter:center
-           didReceiveNotificationResponse:response
-                    withCompletionHandler:completionHandler];
-
+        
         if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![response.notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
             [FirebasePlugin.firebasePlugin _logMessage:@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger"];
             return;
@@ -485,7 +474,11 @@ didDisconnectWithUser:(GIDGoogleUser *)user
             [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
         }
         
-
+        // Dynamic Actions
+        if (response.actionIdentifier && ![response.actionIdentifier isEqual:UNNotificationDefaultActionIdentifier]) {
+            [mutableUserInfo setValue:response.actionIdentifier forKey:@"action"];
+        }
+        
         // Print full message.
         [FirebasePlugin.firebasePlugin _logInfo:[NSString stringWithFormat:@"didReceiveNotificationResponse: %@", mutableUserInfo]];
 
