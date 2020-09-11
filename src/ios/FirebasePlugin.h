@@ -90,15 +90,11 @@
 - (void)fetchDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)fetchFirestoreCollection:(CDVInvokedUrlCommand*)command;
 
-// Functions
-- (void)functionsHttpsCallable:(CDVInvokedUrlCommand*)command;
-
 
 // Internals
 + (FirebasePlugin *) firebasePlugin;
 + (NSString*) appleSignInNonce;
 + (void) setFirestore:(FIRFirestore*) firestoreInstance;
-+ (void) setFunctions:(FIRFunctions*) functionsInstance;
 - (void) handlePluginExceptionWithContext: (NSException*) exception :(CDVInvokedUrlCommand*)command;
 - (void) handlePluginExceptionWithoutContext: (NSException*) exception;
 - (void) _logError: (NSString*)msg;

@@ -142,7 +142,6 @@
 				<pod name="Firebase/RemoteConfig" spec="6.28.1"/>
 				<pod name="Firebase/InAppMessaging" spec="6.28.1"/>
 				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.28.1"/>
-				<pod name="Firebase/Functions" spec="6.23.0"/>
 				<pod name="Firebase/Crashlytics" spec="6.28.1"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
 				<pod name="GoogleTagManager" spec="7.1.2"/>
