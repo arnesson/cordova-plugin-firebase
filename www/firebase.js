@@ -408,7 +408,7 @@ exports.listenToFirestoreCollection = function (success, error, collection, filt
 };
 
 exports.removeFirestoreListener = function (success, error, listenerId) {
-    if(typeof listenerId !== 'string') return error("'listenerId' must be a string specifying the Firestore listener ID");
+    if(typeof listenerId === 'undefined') return error("'listenerId' must be specified");
 
     exec(success, error, "FirebasePlugin", "removeFirestoreListener", [listenerId.toString()]);
 };

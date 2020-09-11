@@ -38,6 +38,7 @@ static NSString* currentNonce; // used for Apple Sign In
 static FIRFirestore* firestore;
 static NSUserDefaults* preferences;
 static NSDictionary* googlePlist;
+static NSMutableDictionary* firestoreListeners;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -82,6 +83,7 @@ static NSDictionary* googlePlist;
         [GIDSignIn sharedInstance].presentingViewController = self.viewController;
 
         authCredentials = [[NSMutableDictionary alloc] init];
+        firestoreListeners = [[NSMutableDictionary alloc] init];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
@@ -441,9 +443,7 @@ static NSDictionary* googlePlist;
             return;
         }
         if (self.notificationCallbackId != nil) {
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo];
-            [pluginResult setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notificationCallbackId];
+            [self sendPluginDictionaryResultAndKeepCallback:userInfo command:self.commandDelegate callbackId:self.notificationCallbackId];
         } else {
             if (!self.notificationStack) {
                 self.notificationStack = [[NSMutableArray alloc] init];
@@ -464,9 +464,7 @@ static NSDictionary* googlePlist;
 - (void)sendToken:(NSString *)token {
     @try {
         if (self.tokenRefreshCallbackId != nil) {
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
-            [pluginResult setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.tokenRefreshCallbackId];
+            [self sendPluginStringResultAndKeepCallback:token command:self.commandDelegate callbackId:self.tokenRefreshCallbackId];
         }
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :self.commandDelegate];
@@ -476,9 +474,7 @@ static NSDictionary* googlePlist;
 - (void)sendApnsToken:(NSString *)token {
     @try {
         if (self.apnsTokenRefreshCallbackId != nil) {
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
-            [pluginResult setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.apnsTokenRefreshCallbackId];
+            [self sendPluginStringResultAndKeepCallback:token command:self.commandDelegate callbackId:self.apnsTokenRefreshCallbackId];
         }
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :self.commandDelegate];
@@ -608,9 +604,7 @@ static NSDictionary* googlePlist;
         self.googleSignInCallbackId = command.callbackId;
         [[GIDSignIn sharedInstance] signIn];
 
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        [self sendPluginNoResultAndKeepCallback:command callbackId:command.callbackId];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
@@ -1548,54 +1542,61 @@ static NSDictionary* googlePlist;
     }];
 }
 
+- (void)listenToDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* documentId = [command.arguments objectAtIndex:0];
+            NSString* collection = [command.arguments objectAtIndex:1];
+            bool includeMetadata = [command.arguments objectAtIndex:2];
+
+            id<FIRListenerRegistration> listener = [[[firestore collectionWithPath:collection] documentWithPath:documentId]
+                addSnapshotListenerWithIncludeMetadataChanges:includeMetadata
+                                                     listener:^(FIRDocumentSnapshot *snapshot, NSError *error) {
+                @try {
+                    if(snapshot != nil){
+                        NSMutableDictionary* document = [[NSMutableDictionary alloc] init];;
+                        [document setObject:@"change" forKey:@"eventType"];
+                        if(snapshot.data != nil){
+                            [document setObject:snapshot.data forKey:@"snapshot"];
+                        }
+                        if(snapshot.metadata != nil){
+                            [document setObject:[NSNumber numberWithBool:snapshot.metadata.fromCache] forKey:@"fromCache"];
+                            [document setObject:snapshot.metadata.hasPendingWrites ? @"local" : @"remote" forKey:@"source"];
+                        }
+                        [self sendPluginDictionaryResultAndKeepCallback:document command:command callbackId:command.callbackId];
+                    }else{
+                        [self sendPluginErrorWithError:error command:command];
+                    }
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithContext:exception :command];
+                }
+            }];
+            
+            NSMutableDictionary* jsResult = [[NSMutableDictionary alloc] init];;
+            [jsResult setObject:@"id" forKey:@"eventType"];
+            NSNumber* key = [self saveFirestoreListener:listener];
+            [jsResult setObject:key forKey:@"id"];
+            [self sendPluginDictionaryResultAndKeepCallback:jsResult command:command callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 - (void)fetchFirestoreCollection:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* collection = [command.arguments objectAtIndex:0];
-            NSArray* filters = [command.arguments objectAtIndex:1];
-            FIRQuery* query = [firestore collectionWithPath:collection];
-
-            for (int i = 0; i < [filters count]; i++) {
-                NSArray* filter = [filters objectAtIndex:i];
-                if ([[filter objectAtIndex:0] isEqualToString:@"where"]) {
-                        if ([[filter objectAtIndex:2] isEqualToString:@"=="]) {
-                            query = [query queryWhereField:[filter objectAtIndex:1] isEqualTo:[filter objectAtIndex:3]];
-                        }
-                        if ([[filter objectAtIndex:2] isEqualToString:@"<"]) {
-                            query = [query queryWhereField:[filter objectAtIndex:1] isLessThan:[filter objectAtIndex:3]];
-                        }
-                        if ([[filter objectAtIndex:2] isEqualToString:@">"]) {
-                            query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThan:[filter objectAtIndex:3]];
-                        }
-                        if ([[filter objectAtIndex:2] isEqualToString:@"<="]) {
-                            query = [query queryWhereField:[filter objectAtIndex:1] isLessThanOrEqualTo:[filter objectAtIndex:3]];
-                        }
-                        if ([[filter objectAtIndex:2] isEqualToString:@">="]) {
-                            query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThanOrEqualTo:[filter objectAtIndex:3]];
-                        }
-                        if ([[filter objectAtIndex:2] isEqualToString:@"array-contains"]) {
-                            query = [query queryWhereField:[filter objectAtIndex:1] arrayContains:[filter objectAtIndex:3]];
-                        }
-                    continue;
-                }
-                if ([[filter objectAtIndex:0] isEqualToString:@"orderBy"]) {
-                    query = [query queryOrderedByField:[filter objectAtIndex:1] descending:([[filter objectAtIndex:2] isEqualToString:@"desc"])];
-                    continue;
-                }
-                if ([[filter objectAtIndex:0] isEqualToString:@"startAt"]) {
-                    query = [query queryStartingAtValues:[filter objectAtIndex:1]];
-                    continue;
-                }
-                if ([[filter objectAtIndex:0] isEqualToString:@"endAt"]) {
-                    query = [query queryEndingAtValues:[filter objectAtIndex:1]];
-                    continue;
-                }
-                if ([[filter objectAtIndex:0] isEqualToString:@"limit"]) {
-                    query = [query queryLimitedTo:[(NSNumber *)[filter objectAtIndex:1] integerValue]];
-                    continue;
-                }
+            NSArray* filters = nil;
+            if([command.arguments objectAtIndex:1] != [NSNull null]){
+                filters = [command.arguments objectAtIndex:1];
             }
-
+            
+            FIRQuery* query = [firestore collectionWithPath:collection];
+            if(filters != nil){
+                [self applyFiltersToFirestoreCollectionQuery:filters query:query];
+            }
+            
             [query getDocumentsWithCompletion:^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
                 if (error != nil) {
                     [self sendPluginErrorWithMessage:error.localizedDescription:command];
@@ -1613,11 +1614,176 @@ static NSDictionary* googlePlist;
     }];
 }
 
+- (void)listenToFirestoreCollection:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSString* collection = [command.arguments objectAtIndex:0];
+            NSArray* filters = nil;
+            if([command.arguments objectAtIndex:1] != [NSNull null]){
+                filters = [command.arguments objectAtIndex:1];
+            }
+            bool includeMetadata = [command.arguments objectAtIndex:2];
+            
+            FIRQuery* query = [firestore collectionWithPath:collection];
+            if(filters != nil){
+                [self applyFiltersToFirestoreCollectionQuery:filters query:query];
+            }
+            
+            id<FIRListenerRegistration> listener = [query
+                addSnapshotListenerWithIncludeMetadataChanges:includeMetadata
+                listener:^(FIRQuerySnapshot *snapshot, NSError *error) {
+                    @try {
+                        if(snapshot != nil){
+                            NSMutableDictionary* jsResult = [[NSMutableDictionary alloc] init];
+                            [jsResult setObject:@"change" forKey:@"eventType"];
+                            
+                            NSMutableDictionary* documents = [[NSMutableDictionary alloc] init];
+                            bool hasDocuments = false;
+                            for (FIRDocumentChange* dc in snapshot.documentChanges) {
+                                hasDocuments = true;
+                                NSMutableDictionary* document = [[NSMutableDictionary alloc] init];
+                                if (dc.type == FIRDocumentChangeTypeAdded) {
+                                    [document setObject:@"new" forKey:@"type"];
+                                }else if (dc.type == FIRDocumentChangeTypeModified) {
+                                    [document setObject:@"modified" forKey:@"type"];
+                                }else if (dc.type == FIRDocumentChangeTypeRemoved) {
+                                    [document setObject:@"removed" forKey:@"type"];
+                                }else{
+                                    [document setObject:@"metadata" forKey:@"type"];
+                                }
+                                if(dc.document.data != nil){
+                                    [document setObject:dc.document.data forKey:@"snapshot"];
+                                }
+                                if(dc.document.metadata != nil){
+                                    [document setObject:[NSNumber numberWithBool:dc.document.metadata.fromCache] forKey:@"fromCache"];
+                                    [document setObject:dc.document.metadata.hasPendingWrites ? @"local" : @"remote" forKey:@"source"];
+                                }
+                                [documents setObject:document forKey:dc.document.documentID];
+                            }
+                            if(hasDocuments){
+                                [jsResult setObject:documents forKey:@"documents"];
+                            }
+                            [self sendPluginDictionaryResultAndKeepCallback:jsResult command:command callbackId:command.callbackId];
+                        }else{
+                            [self sendPluginErrorWithError:error command:command];
+                        }
+                    }@catch (NSException *exception) {
+                        [self handlePluginExceptionWithContext:exception :command];
+                    }
+                }
+            ];
+
+            NSMutableDictionary* jsResult = [[NSMutableDictionary alloc] init];;
+            [jsResult setObject:@"id" forKey:@"eventType"];
+            NSNumber* key = [self saveFirestoreListener:listener];
+            [jsResult setObject:key forKey:@"id"];
+            [self sendPluginDictionaryResultAndKeepCallback:jsResult command:command callbackId:command.callbackId];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void) applyFiltersToFirestoreCollectionQuery:(NSArray*)filters query:(FIRQuery*)query {
+    for (int i = 0; i < [filters count]; i++) {
+        NSArray* filter = [filters objectAtIndex:i];
+        if ([[filter objectAtIndex:0] isEqualToString:@"where"]) {
+                if ([[filter objectAtIndex:2] isEqualToString:@"=="]) {
+                    query = [query queryWhereField:[filter objectAtIndex:1] isEqualTo:[filter objectAtIndex:3]];
+                }
+                if ([[filter objectAtIndex:2] isEqualToString:@"<"]) {
+                    query = [query queryWhereField:[filter objectAtIndex:1] isLessThan:[filter objectAtIndex:3]];
+                }
+                if ([[filter objectAtIndex:2] isEqualToString:@">"]) {
+                    query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThan:[filter objectAtIndex:3]];
+                }
+                if ([[filter objectAtIndex:2] isEqualToString:@"<="]) {
+                    query = [query queryWhereField:[filter objectAtIndex:1] isLessThanOrEqualTo:[filter objectAtIndex:3]];
+                }
+                if ([[filter objectAtIndex:2] isEqualToString:@">="]) {
+                    query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThanOrEqualTo:[filter objectAtIndex:3]];
+                }
+                if ([[filter objectAtIndex:2] isEqualToString:@"array-contains"]) {
+                    query = [query queryWhereField:[filter objectAtIndex:1] arrayContains:[filter objectAtIndex:3]];
+                }
+            continue;
+        }
+        if ([[filter objectAtIndex:0] isEqualToString:@"orderBy"]) {
+            query = [query queryOrderedByField:[filter objectAtIndex:1] descending:([[filter objectAtIndex:2] isEqualToString:@"desc"])];
+            continue;
+        }
+        if ([[filter objectAtIndex:0] isEqualToString:@"startAt"]) {
+            query = [query queryStartingAtValues:[filter objectAtIndex:1]];
+            continue;
+        }
+        if ([[filter objectAtIndex:0] isEqualToString:@"endAt"]) {
+            query = [query queryEndingAtValues:[filter objectAtIndex:1]];
+            continue;
+        }
+        if ([[filter objectAtIndex:0] isEqualToString:@"limit"]) {
+            query = [query queryLimitedTo:[(NSNumber *)[filter objectAtIndex:1] integerValue]];
+            continue;
+        }
+    }
+}
+
+- (NSNumber*) saveFirestoreListener: (id<FIRListenerRegistration>) firestoreListener {
+    int id = [self generateId];
+    NSNumber* key = [NSNumber numberWithInt:id];
+    [firestoreListeners setObject:firestoreListener forKey:key];
+    return key;
+}
+
+- (void) removeFirestoreListener:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSNumber* listenerId = @([[command.arguments objectAtIndex:0] intValue]);
+            bool removed = [self _removeFirestoreListener:listenerId];
+            if(removed){
+                [self sendPluginSuccess:command];
+            }else{
+                [self sendPluginErrorWithMessage:@"Listener ID not found" :command];
+            }
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (bool) _removeFirestoreListener: (NSNumber*) key {
+    bool removed = false;
+    if([firestoreListeners objectForKey:key] != nil){
+        id<FIRListenerRegistration> firestoreListener = [firestoreListeners objectForKey:key];
+        [firestoreListener remove];
+        [firestoreListeners removeObjectForKey:key];
+        removed = true;
+    }
+    return removed;
+}
+
 /********************************/
 #pragma mark - utility functions
 /********************************/
 - (void) sendPluginSuccess:(CDVInvokedUrlCommand*)command{
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
+
+- (void) sendPluginNoResultAndKeepCallback:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void) sendPluginStringResultAndKeepCallback:(NSString*)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void) sendPluginDictionaryResultAndKeepCallback:(NSDictionary*)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
 - (void) sendPluginError:(CDVInvokedUrlCommand*)command{
@@ -1771,13 +1937,19 @@ static NSDictionary* googlePlist;
 }
 
 - (int) saveAuthCredential: (FIRAuthCredential*) authCredential {
+    int key = [self generateId];
+    [authCredentials setObject:authCredential forKey:[NSNumber numberWithInt:key]];
+    return key;
+}
+
+- (int) generateId {
     int key = -1;
-    while (key < 0 || [authCredentials objectForKey:[NSNumber numberWithInt:key]] != nil) {
+    while (key < 0
+       || [authCredentials objectForKey:[NSNumber numberWithInt:key]] != nil
+       || [firestoreListeners objectForKey:[NSNumber numberWithInt:key]] != nil
+    ) {
         key = arc4random_uniform(100000);
     }
-
-    [authCredentials setObject:authCredential forKey:[NSNumber numberWithInt:key]];
-
     return key;
 }
 

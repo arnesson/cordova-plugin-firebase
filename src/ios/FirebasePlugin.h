@@ -92,6 +92,9 @@
 - (void)documentExistsInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)fetchDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)fetchFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)listenToDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)listenToFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)removeFirestoreListener:(CDVInvokedUrlCommand*)command;
 
 
 // Internals
