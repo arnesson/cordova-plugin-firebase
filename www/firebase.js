@@ -262,6 +262,10 @@ exports.signInUserWithEmailAndPassword = function (email, password, success, err
     exec(success, error, "FirebasePlugin", "signInUserWithEmailAndPassword", [email, password]);
 };
 
+exports.authenticateUserWithEmailAndPassword = function (email, password, success, error) {
+    exec(success, error, "FirebasePlugin", "authenticateUserWithEmailAndPassword", [email, password]);
+};
+
 exports.signInUserWithCustomToken = function (customToken, success, error) {
   exec(success, error, "FirebasePlugin", "signInUserWithCustomToken", [customToken]);
 };

@@ -567,6 +567,23 @@ static NSMutableDictionary* firestoreListeners;
     }
 }
 
+- (void)authenticateUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command {
+    @try {
+        NSString* email = [command.arguments objectAtIndex:0];
+        NSString* password = [command.arguments objectAtIndex:1];
+        FIRAuthCredential* authCredential = [FIREmailAuthProvider credentialWithEmail:email password:password];
+        NSNumber* key = [self saveAuthCredential:authCredential];
+        
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+        [result setValue:@"true" forKey:@"instantVerification"];
+        [result setValue:key forKey:@"id"];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)signInUserWithCustomToken:(CDVInvokedUrlCommand*)command {
     @try {
         NSString* customToken = [command.arguments objectAtIndex:0];
@@ -1968,9 +1985,10 @@ static NSMutableDictionary* firestoreListeners;
      }
 }
 
-- (int) saveAuthCredential: (FIRAuthCredential*) authCredential {
-    int key = [self generateId];
-    [authCredentials setObject:authCredential forKey:[NSNumber numberWithInt:key]];
+- (NSNumber*) saveAuthCredential: (FIRAuthCredential*) authCredential {
+    int id = [self generateId];
+    NSNumber* key = [NSNumber numberWithInt:id];
+    [authCredentials setObject:authCredential forKey:key];
     return key;
 }
 

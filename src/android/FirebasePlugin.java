@@ -22,6 +22,8 @@ import androidx.core.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.firebase.auth.EmailAuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import com.google.android.gms.auth.api.Auth;
@@ -265,6 +267,8 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.createUserWithEmailAndPassword(callbackContext, args);
             } else if (action.equals("signInUserWithEmailAndPassword")) {
                 this.signInUserWithEmailAndPassword(callbackContext, args);
+            } else if (action.equals("authenticateUserWithEmailAndPassword")) {
+                this.authenticateUserWithEmailAndPassword(callbackContext, args);
             } else if (action.equals("signInUserWithCustomToken")) {
                 this.signInUserWithCustomToken(callbackContext, args);
             } else if (action.equals("signInUserAnonymously")) {
@@ -1495,6 +1499,37 @@ public class FirebasePlugin extends CordovaPlugin {
                     }
 
                     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).addOnCompleteListener(cordova.getActivity(), new AuthResultOnCompleteListener(callbackContext));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void authenticateUserWithEmailAndPassword(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String email = args.getString(0);
+                    String password = args.getString(1);
+
+                    if(email == null || email.equals("")){
+                        callbackContext.error("User email address must be specified");
+                        return;
+                    }
+
+                    if(password == null || password.equals("")){
+                        callbackContext.error("User password must be specified");
+                        return;
+                    }
+
+                    AuthCredential authCredential = EmailAuthProvider.getCredential(email, password);
+                    String id = FirebasePlugin.instance.saveAuthCredential(authCredential);
+
+                    JSONObject returnResults = new JSONObject();
+                    returnResults.put("instantVerification", true);
+                    returnResults.put("id", id);
+                    callbackContext.success(returnResults);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }

@@ -138,6 +138,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [verifyPhoneNumber](#verifyphonenumber)
       - [Android](#android-2)
       - [iOS](#ios-2)
+    - [authenticateUserWithEmailAndPassword](#authenticateuserwithemailandpassword)
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
       - [Android](#android-3)
     - [authenticateUserWithApple](#authenticateuserwithapple)
@@ -154,9 +155,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [resetRemoteConfig](#resetremoteconfig)
     - [getValue](#getvalue)
     - [getInfo](#getinfo)
+    - [getAll](#getall)
     - [setConfigSettings](#setconfigsettings)
     - [setDefaults](#setdefaults)
-    - [getAll](#getall)
   - [Performance](#performance)
     - [setPerformanceCollectionEnabled](#setperformancecollectionenabled)
     - [isPerformanceCollectionEnabled](#isperformancecollectionenabled)
@@ -2541,6 +2542,33 @@ You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs
     cordova plugin add cordova-plugin-firebasex --variable SETUP_RECAPTCHA_VERIFICATION=true
 
 This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
+
+
+### authenticateUserWithEmailAndPassword
+Authenticates the user with email/password-based user account to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+
+**Parameters**:
+- {string} email - user email address
+- {string} password - user password
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+    FirebasePlugin.authenticateUserWithEmailAndPassword(email, password, function(credential) {
+        console.log("Successfully authenticated with email/password");
+        FirebasePlugin.reauthenticateWithCredential(credential, function() {
+            console.log("Successfully re-authenticated");
+        }, function(error) {
+            console.error("Failed to re-authenticate", error);
+        });
+        // User is now signed in
+    }, function(error) {
+        console.error("Failed to authenticate with email/password", error);
+    });
+```
 
 ### authenticateUserWithGoogle
 Authenticates the user with a Google account to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.

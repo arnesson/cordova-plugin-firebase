@@ -12,6 +12,7 @@
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
 - (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)signInUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
+- (void)authenticateUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)signInUserWithCustomToken:(CDVInvokedUrlCommand*)command;
 - (void)signInUserAnonymously:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command;
@@ -110,7 +111,7 @@
 - (void) _logInfo: (NSString*)msg;
 - (void) _logMessage: (NSString*)msg;
 - (BOOL) _shouldEnableCrashlytics;
-- (int) saveAuthCredential: (FIRAuthCredential *) authCredential;
+- (NSNumber*) saveAuthCredential: (FIRAuthCredential *) authCredential;
 - (void)executeGlobalJavascript: (NSString*)jsString;
 
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
