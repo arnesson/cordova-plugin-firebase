@@ -76,6 +76,9 @@
 - (void)fetchAndActivate:(CDVInvokedUrlCommand*)command;
 - (void)getAll:(CDVInvokedUrlCommand*)command;
 - (void)resetRemoteConfig:(CDVInvokedUrlCommand*)command;
+- (void)setConfigSettings:(CDVInvokedUrlCommand*)command;
+- (void)setDefaults:(CDVInvokedUrlCommand*)command;
+
 
 // Performance
 - (void)setPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;

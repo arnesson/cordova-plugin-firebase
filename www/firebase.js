@@ -163,6 +163,14 @@ exports.getInfo = function (success, error) {
   exec(success, error, "FirebasePlugin", "getInfo", []);
 };
 
+exports.setConfigSettings = function (fetchTimeout, minimumFetchInterval, success, error) {
+  exec(success, error, "FirebasePlugin", "setConfigSettings", [fetchTimeout, minimumFetchInterval]);
+};
+
+exports.setDefaults = function (defaults, success, error) {
+  exec(success, error, "FirebasePlugin", "setDefaults", [defaults]);
+};
+
 exports.getAll = function (success, error) {
     exec(success, error, "FirebasePlugin", "getAll", []);
 };

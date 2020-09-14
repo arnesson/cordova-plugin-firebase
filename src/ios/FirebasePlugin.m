@@ -1194,6 +1194,38 @@ static NSMutableDictionary* firestoreListeners;
 /*
  * Remote config
  */
+- (void)setConfigSettings:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            FIRRemoteConfigSettings* settings = [[FIRRemoteConfigSettings alloc] init];
+            
+            if([command.arguments objectAtIndex:0] != [NSNull null]){
+                settings.fetchTimeout = [[command.arguments objectAtIndex:0] longValue];
+            }
+            
+            if([command.arguments objectAtIndex:1] != [NSNull null]){
+                settings.minimumFetchInterval = [[command.arguments objectAtIndex:1] longValue];
+            }
+            [self sendPluginSuccess:command];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void)setDefaults:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSDictionary* defaults = [command.arguments objectAtIndex:0];
+            FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+            [remoteConfig setDefaults:defaults];
+            [self sendPluginSuccess:command];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 - (void)fetch:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         @try {
@@ -1263,8 +1295,8 @@ static NSMutableDictionary* firestoreListeners;
     [self.commandDelegate runInBackground:^{
         @try {
             FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
-            NSArray* keys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceRemote];
-            NSMutableDictionary* result = [[NSMutableDictionary alloc] init];;
+            NSArray* keys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceDefault];
+            NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
             
             for (NSString* key in keys) {
                 [result setObject:remoteConfig[key].stringValue forKey:key];

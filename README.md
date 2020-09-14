@@ -154,6 +154,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [resetRemoteConfig](#resetremoteconfig)
     - [getValue](#getvalue)
     - [getInfo](#getinfo)
+    - [setConfigSettings](#setconfigsettings)
+    - [setDefaults](#setdefaults)
     - [getAll](#getall)
   - [Performance](#performance)
     - [setPerformanceCollectionEnabled](#setperformancecollectionenabled)
@@ -2809,11 +2811,9 @@ Get the current state of the FirebaseRemoteConfig singleton object:
 
 ```javascript
 FirebasePlugin.getInfo(function(info) {
-    // the status of the developer mode setting (true/false)
-    console.log(info.configSettings.developerModeEnabled);
-    // (iOS only) for how much (secs) fetch cache is valid and data will not be refetched
+    // how many (secs) fetch cache is valid and data will not be refetched
     console.log(info.configSettings.minimumFetchInterval);
-    // (iOS only) value in seconds to abandon a pending fetch request made to the backend
+    // value in seconds to abandon a pending fetch request made to the backend
     console.log(info.configSettings.fetchTimeout);
     // the timestamp (milliseconds since epoch) of the last successful fetch
     console.log(info.fetchTimeMillis);
@@ -2845,6 +2845,57 @@ FirebasePlugin.getAll(function(values) {
 });
 ```
 
+### setConfigSettings
+Changes the default Remote Config settings:
+- Fetch timeout sets how long your app should wait for new Remote Config values before timing out.
+    - Useful when you don’t want your application to wait longer than X seconds to fetch new Remote Config values
+- Minimum fetch interval sets the minimum interval for which you want to check for any new Remote Config parameter values.
+    - Keep in mind that setting too short an interval in production might cause your app to run into rate limits.
+
+**Parameters**:
+- {integer} fetchTimeout - fetch timeout in seconds.
+    - Default is 60 seconds.
+    - Specify as `null` value to omit setting this value.
+- {integer} minimumFetchInterval - minimum fetch inteval in seconds.
+    - Default is 12 hours.
+    - Specify as `null` value to omit setting this value.
+    - Set to `0` to disable minimum interval entirely (**DO NOT** do this in production)
+- {function} success - callback function to be call on successfully setting the remote config settings
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+var fetchTimeout = 60;
+var minimumFetchInterval = 3600;
+FirebasePlugin.setConfigSettings(fetchTimeout, minimumFetchInterval, function(){
+    console.log("Successfully set Remote Config settings");
+}, function(error){
+   console.error("Error setting Remote Config settings: " + error);
+});
+```
+
+### setDefaults
+Sets in-app default values for your Remote Config parameters until such time as values are populated from the remote service via a fetch/activate operation.
+
+**Parameters**:
+- {object} defaults - object specifying the default remote config settings
+    - key is the name of your Remote Config parameter
+    - value is the default value
+- {function} success - callback function to be call on successfully setting the remote config parameter defaults
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+// define defaults
+var defaults = {
+    my_int: 1,
+    my_double: 3.14,
+    my_boolean: true,
+    my_string: 'hello world',
+    my_json: {"foo": "bar"}
+}
+// set defaults
+FirebasePlugin.setDefaults(defaults);
+
+```
 
 ## Performance
 

@@ -264,6 +264,16 @@ interface FirebasePlugin {
         success: (info: object) => void,
         error: (err: string) => void
     ): void
+    setConfigSettings(
+        configSettings: object,
+        success: (info: object) => void,
+        error: (err: string) => void
+    ): void
+    setDefaults(
+        defaultSettings: object,
+        success: (info: object) => void,
+        error: (err: string) => void
+    ): void
     setPerformanceCollectionEnabled(
         setEnabled: boolean
     ): void

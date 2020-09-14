@@ -248,6 +248,13 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.getAll(callbackContext);
             } else if (action.equals("didCrashOnPreviousExecution")) {
                 this.didCrashOnPreviousExecution(callbackContext);
+
+            } else if (action.equals("setConfigSettings")) {
+                this.setConfigSettings(callbackContext, args);
+
+            } else if (action.equals("setDefaults")) {
+                this.setDefaults(callbackContext, args.getJSONObject(0));
+
             } else if (action.equals("verifyPhoneNumber")) {
                 this.verifyPhoneNumber(callbackContext, args);
             } else if (action.equals("authenticateUserWithGoogle")) {
@@ -924,6 +931,40 @@ public class FirebasePlugin extends CordovaPlugin {
                         jsonValues.put(key, value.asString());
                     }
                     callbackContext.success(jsonValues);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+	
+	private void setConfigSettings(final CallbackContext callbackContext, final JSONArray args) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseRemoteConfigSettings.Builder settings = new FirebaseRemoteConfigSettings.Builder();
+
+                    if(args.get(0) != null){
+                        settings.setFetchTimeoutInSeconds(args.getLong(0));
+                    }
+
+                    if(args.get(1) != null){
+                        settings.setMinimumFetchIntervalInSeconds(args.getLong(1));
+                    }
+
+                    handleTaskOutcome(FirebaseRemoteConfig.getInstance().setConfigSettingsAsync(settings.build()), callbackContext);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void setDefaults(final CallbackContext callbackContext, final JSONObject defaults) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    handleTaskOutcome(FirebaseRemoteConfig.getInstance().setDefaultsAsync(defaultsToMap(defaults)), callbackContext);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
