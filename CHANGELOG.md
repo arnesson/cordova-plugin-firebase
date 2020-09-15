@@ -1,9 +1,33 @@
+* (Android & iOS): Bump pinned Firebase SDK component versions to latest releases.
+* Added support for `didCrashOnPreviousExecution()` and `setCrashlyticsCustomKey()`
+    * Merged from PR [#492](https://github.com/dpa99c/cordova-plugin-firebasex/pull/492).
+* (Doc) Clarify requirements for parameters passed to `logEvent()`.
+    * Resolves [#491](https://github.com/dpa99c/cordova-plugin-firebasex/issues/491).
+* Implement Remote Config v2 API
+    * Add new methods: `fetchAndActivate()`, `resetRemoteConfig()`, `getAll()`
+    * *BREAKING CHANGE:* Change API signature and implementations for `setConfigSettings()` and `setDefaults()` on Android,
+    and implement for iOS.
+    * Resolves [#155](https://github.com/dpa99c/cordova-plugin-firebasex/issues/155).
+* (Android) *BREAKING CHANGE:* Remove dependency on `cordova-plugin-androidx` and `cordova-plugin-androidx-adapter`
+* Add support for Firestore real-time listeners: `listenToDocumentInFirestoreCollection()`, `listenToFirestoreCollection()`, `removeFirestoreListener()`
+* (Types) Update typedef for recent API changes
+* (iOS) Set Sign In with Apple entitlement automatically.
+    * Resolves [#485](https://github.com/dpa99c/cordova-plugin-firebasex/issues/485).
+* Add `authenticateUserWithEmailAndPassword()`
+    * Resolves [#486](https://github.com/dpa99c/cordova-plugin-firebasex/issues/486).
+* (iOS) Remove superfluous braces from `FirebasePluginMessageReceiver.h`
+    * Resolves [#493](https://github.com/dpa99c/cordova-plugin-firebasex/issues/493).
+* Support optional `valueType` parameter when filtering Firestore collections.
+    * Resolves [#496](https://github.com/dpa99c/cordova-plugin-firebasex/issues/496).
+* (iOS) Add support for foreground and destructive `UNNotificationActionOptions`
+    * Cherrypicked from PR [#487](https://github.com/dpa99c/cordova-plugin-firebasex/pull/487)
+
 # Version 10.2.0
 * (iOS) Fix crashes on receiving push notifications on iOS due to delegate chaining.
-** Resolves [#385](https://github.com/dpa99c/cordova-plugin-firebasex/issues/385).
-** Reverts commit 4e9a0f4a1fd4ceb871af40629e1ddf146f287ca8 "co-existence with cordova-plugin-local-notification on iOS"
-** Since upon testing, this plugin does not work with `cordova-plugin-local-notification` present in the same project even with this code in place.
-** And the conflict between the 2 plugins will need to be addressed separately under [#230](https://github.com/dpa99c/cordova-plugin-firebasex/issues/230).
+    * Resolves [#385](https://github.com/dpa99c/cordova-plugin-firebasex/issues/385).
+    * Reverts commit 4e9a0f4a1fd4ceb871af40629e1ddf146f287ca8 "co-existence with cordova-plugin-local-notification on iOS"
+    * Since upon testing, this plugin does not work with `cordova-plugin-local-notification` present in the same project even with this code in place.
+    * And the conflict between the 2 plugins will need to be addressed separately under [#230](https://github.com/dpa99c/cordova-plugin-firebasex/issues/230).
 * (iOS) Add support for iOS actionable notifications
     * Merged from PR [#482](https://github.com/dpa99c/cordova-plugin-firebasex/pull/482).
 * (Android): Handle task outcomes where task is not successful but exception is null.
