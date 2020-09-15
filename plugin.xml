@@ -100,12 +100,6 @@
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		<config-file target="*/Entitlements-Debug.plist" parent="aps-environment">
-			<string>development</string>
-		</config-file>
-		<config-file target="*/Entitlements-Release.plist" parent="aps-environment">
-			<string>production</string>
-		</config-file>
 		<config-file target="*/Entitlements-Debug.plist" parent="com.apple.developer.applesignin">
 			<array>
 				<string>Default</string>
@@ -116,6 +110,13 @@
 				<string>Default</string>
 			</array>
 		</config-file>
+		<config-file target="*/Entitlements-Debug.plist" parent="aps-environment">
+			<string>development</string>
+		</config-file>
+		<config-file target="*/Entitlements-Release.plist" parent="aps-environment">
+			<string>production</string>
+		</config-file>
+
 
 		<config-file target="*-Info.plist" parent="UIBackgroundModes">
 			<array>
