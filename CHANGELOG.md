@@ -1,3 +1,4 @@
+# Version 11.0.0
 * (Android & iOS): Bump pinned Firebase SDK component versions to latest releases.
 * Added support for `didCrashOnPreviousExecution()` and `setCrashlyticsCustomKey()`
     * Merged from PR [#492](https://github.com/dpa99c/cordova-plugin-firebasex/pull/492).
