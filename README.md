@@ -3157,9 +3157,30 @@ Fetches all the documents in the specific collection.
 
 **Parameters**:
 - {string} collection - name of top-level collection to fetch.
-- {array} filters - a list of filters to sort/filter the documents returned from your collection.
+- {array} filters (optional) - a list of filters to sort/filter the documents returned from your collection.
     - Supports `where`, `orderBy`, `startAt`, `endAt` and `limit` filters.
-    - See the [Firestore documentation](https://firebase.google.com/docs/firestore/query-data/queries) for more details.
+        - See the [Firestore documentation](https://firebase.google.com/docs/firestore/query-data/queries) for more details.
+    - Each filter is defined as an array of filter components:
+        - `where`: [`where`, `fieldName`, `operator`, `value`, `valueType`]
+            - `fieldName` - name of field to match
+            - `operator` - operator to apply to match
+                - supported operators: `==`, `<`, `>`, `<=`, `>=`, `array-contains`
+            - `value` - field value to match
+            - `valueType` (optional) - type of variable to fetch value as
+                - supported types: `string`, `boolean`, `integer`, `double`, `long`
+                - if not specified, defaults to `string`
+        - `startAt`: [`startAt`, `value`, `valueType`]
+            - `value` - field value to start at
+            - `valueType` (optional) - type of variable to fetch value as (as above)
+        - `endAt`: [`endAt`, `value`, `valueType`]
+            - `value` - field value to end at
+            - `valueType` (optional) - type of variable to fetch value as (as above)
+        - `orderBy`: [`orderBy`, `fieldName`, `sortDirection`]
+            - `fieldName` - name of field to order by
+            - `sortDirection` - direction to order in: `asc` or `desc`
+        - `limit`: [`limit`, `value`]
+            - `value` - `integer` defining maximum number of results to return.
+
 - {function} success - callback function to call on successfully deleting the document.
 Will be passed an {object} containing all the documents in the collection, indexed by document ID.
 If a Firebase collection with that name does not exist or it contains no documents, the object will be empty.
@@ -3168,9 +3189,15 @@ If a Firebase collection with that name does not exist or it contains no documen
 ```javascript
 var collection = "my_collection";
 var filters = [
-    ['where', 'field', '==', 'value'],
-    ['orderBy', 'field', 'desc']
+    ['where', 'my_string', '==', 'foo'],
+    ['where', 'my_integer', '>=', 0, 'integer'],
+    ['where', 'my_boolean', '==', true, 'boolean'],
+    ['orderBy', 'an_integer', 'desc'],
+    ['startAt', 'an_integer', 10, 'integer'],
+    ['endAt', 'an_integer', 100, 'integer'],
+    ['limit', 100000]
 ];
+
 FirebasePlugin.fetchFirestoreCollection(collection, filters, function(documents){
     console.log("Successfully fetched collection: "+JSON.stringify(documents));
 }, function(error){
@@ -3316,10 +3343,9 @@ See the [Firestore documentation](https://firebase.google.com/docs/firestore/que
 Will be passed an {object} representing the `id` or `change` event.
 - {function} error - callback function which will be passed a {string} error message as an argument.
 - {string} collection - name of top-level collection to listen to the document in.
-- {array} filters - a list of filters to sort/filter the documents returned from your collection.
-    - Supports `where`, `orderBy`, `startAt`, `endAt` and `limit` filters.
-    - See the [Firestore documentation](https://firebase.google.com/docs/firestore/query-data/queries) for more details.
-- {boolean} includeMetadata - whether to listen for changes to document metadata.
+- {array} filters (optional) - a list of filters to sort/filter the documents returned from your collection.
+    - See [fetchFirestoreCollection](#fetchfirestorecollection)
+- {boolean} includeMetadata (optional) - whether to listen for changes to document metadata.
     - Defaults to `false`.
     - See [Events for metadata changes](https://firebase.google.com/docs/firestore/query-data/listen#events-metadata-changes) for more info.
 

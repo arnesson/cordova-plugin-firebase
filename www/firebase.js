@@ -400,7 +400,7 @@ exports.fetchDocumentInFirestoreCollection = function (documentId, collection, s
 
 exports.fetchFirestoreCollection = function (collection, filters, success, error) {
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
-    if(filters && (typeof filters !== 'object' || typeof filters.length === 'undefined')) return error("'filters' must be a array specifying a list of filters to apply to documents in the Firestore collection");
+    if(filters && (typeof filters !== 'object' || typeof filters.length === 'undefined' || (filters.length && typeof filters[0] !== 'object'))) return error("'filters' must be a array specifying a list of filters (as arrays) to apply to documents in the Firestore collection");
 
     exec(success, error, "FirebasePlugin", "fetchFirestoreCollection", [collection, filters || []]);
 };

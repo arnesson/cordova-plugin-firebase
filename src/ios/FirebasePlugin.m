@@ -1643,7 +1643,7 @@ static NSMutableDictionary* firestoreListeners;
             
             FIRQuery* query = [firestore collectionWithPath:collection];
             if(filters != nil){
-                [self applyFiltersToFirestoreCollectionQuery:filters query:query];
+                query = [self applyFiltersToFirestoreCollectionQuery:filters query:query];
             }
             
             [query getDocumentsWithCompletion:^(FIRQuerySnapshot * _Nullable snapshot, NSError * _Nullable error) {
@@ -1675,7 +1675,7 @@ static NSMutableDictionary* firestoreListeners;
             
             FIRQuery* query = [firestore collectionWithPath:collection];
             if(filters != nil){
-                [self applyFiltersToFirestoreCollectionQuery:filters query:query];
+                query = [self applyFiltersToFirestoreCollectionQuery:filters query:query];
             }
             
             id<FIRListenerRegistration> listener = [query
@@ -1733,27 +1733,27 @@ static NSMutableDictionary* firestoreListeners;
     }];
 }
 
-- (void) applyFiltersToFirestoreCollectionQuery:(NSArray*)filters query:(FIRQuery*)query {
+- (FIRQuery*) applyFiltersToFirestoreCollectionQuery:(NSArray*)filters query:(FIRQuery*)query {
     for (int i = 0; i < [filters count]; i++) {
         NSArray* filter = [filters objectAtIndex:i];
         if ([[filter objectAtIndex:0] isEqualToString:@"where"]) {
                 if ([[filter objectAtIndex:2] isEqualToString:@"=="]) {
-                    query = [query queryWhereField:[filter objectAtIndex:1] isEqualTo:[filter objectAtIndex:3]];
+                    query = [query queryWhereField:[filter objectAtIndex:1] isEqualTo: [self getFilterValueAsType:filter valueIndex:3 typeIndex:4]];
                 }
                 if ([[filter objectAtIndex:2] isEqualToString:@"<"]) {
-                    query = [query queryWhereField:[filter objectAtIndex:1] isLessThan:[filter objectAtIndex:3]];
+                    query = [query queryWhereField:[filter objectAtIndex:1] isLessThan:[self getFilterValueAsType:filter valueIndex:3 typeIndex:4]];
                 }
                 if ([[filter objectAtIndex:2] isEqualToString:@">"]) {
-                    query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThan:[filter objectAtIndex:3]];
+                    query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThan:[self getFilterValueAsType:filter valueIndex:3 typeIndex:4]];
                 }
                 if ([[filter objectAtIndex:2] isEqualToString:@"<="]) {
-                    query = [query queryWhereField:[filter objectAtIndex:1] isLessThanOrEqualTo:[filter objectAtIndex:3]];
+                    query = [query queryWhereField:[filter objectAtIndex:1] isLessThanOrEqualTo:[self getFilterValueAsType:filter valueIndex:3 typeIndex:4]];
                 }
                 if ([[filter objectAtIndex:2] isEqualToString:@">="]) {
-                    query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThanOrEqualTo:[filter objectAtIndex:3]];
+                    query = [query queryWhereField:[filter objectAtIndex:1] isGreaterThanOrEqualTo:[self getFilterValueAsType:filter valueIndex:3 typeIndex:4]];
                 }
                 if ([[filter objectAtIndex:2] isEqualToString:@"array-contains"]) {
-                    query = [query queryWhereField:[filter objectAtIndex:1] arrayContains:[filter objectAtIndex:3]];
+                    query = [query queryWhereField:[filter objectAtIndex:1] arrayContains:[self getFilterValueAsType:filter valueIndex:3 typeIndex:4]];
                 }
             continue;
         }
@@ -1762,11 +1762,11 @@ static NSMutableDictionary* firestoreListeners;
             continue;
         }
         if ([[filter objectAtIndex:0] isEqualToString:@"startAt"]) {
-            query = [query queryStartingAtValues:[filter objectAtIndex:1]];
+            query = [query queryStartingAtValues:[self getFilterValueAsType:filter valueIndex:1 typeIndex:2]];
             continue;
         }
         if ([[filter objectAtIndex:0] isEqualToString:@"endAt"]) {
-            query = [query queryEndingAtValues:[filter objectAtIndex:1]];
+            query = [query queryEndingAtValues:[self getFilterValueAsType:filter valueIndex:1 typeIndex:2]];
             continue;
         }
         if ([[filter objectAtIndex:0] isEqualToString:@"limit"]) {
@@ -1774,6 +1774,54 @@ static NSMutableDictionary* firestoreListeners;
             continue;
         }
     }
+    return query;
+}
+
+- (id) getFilterValueAsType: (NSArray*)filter  valueIndex:(int)valueIndex typeIndex:(int)typeIndex{
+    id typedValue = [filter objectAtIndex:valueIndex];
+    
+    NSString* type = @"string";
+    if([filter objectAtIndex:typeIndex] != nil){
+        type = [filter objectAtIndex:typeIndex];
+    }
+    
+    if([type isEqual:@"boolean"]){
+        if([typedValue isKindOfClass:[NSNumber class]]){
+            typedValue = [NSNumber numberWithBool:typedValue];
+        }else if([typedValue isKindOfClass:[NSString class]]){
+            bool boolValue = [typedValue boolValue];
+            typedValue = [NSNumber numberWithBool:boolValue];
+        }
+    } else if([type isEqual:@"integer"] || [type isEqual:@"long"]){
+        if([typedValue isKindOfClass:[NSString class]]){
+            NSInteger intValue = [typedValue integerValue];
+            typedValue = [NSNumber numberWithInteger:intValue];
+        }
+    } else if([type isEqual:@"double"]){
+        if([typedValue isKindOfClass:[NSString class]]){
+            double doubleValue = [typedValue doubleValue];
+            typedValue = [NSNumber numberWithDouble:doubleValue];
+        }
+    } else{ //string
+        if([typedValue isKindOfClass:[NSNumber class]]){
+            if([self isBoolNumber:typedValue]){
+                bool boolValue = [typedValue boolValue];
+                typedValue = boolValue ? @"true" : @"false";
+            }else{
+                typedValue = [typedValue stringValue];
+            }
+        }
+    }
+    
+    return typedValue;
+}
+
+// https://stackoverflow.com/a/30223989/777265
+- (BOOL) isBoolNumber:(NSNumber *)num
+{
+   CFTypeID boolID = CFBooleanGetTypeID(); // the type ID of CFBoolean
+   CFTypeID numID = CFGetTypeID((__bridge CFTypeRef)(num)); // the type ID of num
+   return numID == boolID;
 }
 
 - (NSNumber*) saveFirestoreListener: (id<FIRListenerRegistration>) firestoreListener {

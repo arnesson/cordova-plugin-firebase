@@ -2272,7 +2272,9 @@ public class FirebasePlugin extends CordovaPlugin {
                     JSONArray filters = args.getJSONArray(1);
                     Query query = firestore.collection(collection);
 
-                    applyFiltersToFirestoreCollectionQuery(filters, query);
+                    if(filters != null){
+                        query = applyFiltersToFirestoreCollectionQuery(filters, query);
+                    }
 
                     query.get()
                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -2314,7 +2316,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     Query query = firestore.collection(collection);
 
                     if(filters != null){
-                        applyFiltersToFirestoreCollectionQuery(filters, query);
+                        query = applyFiltersToFirestoreCollectionQuery(filters, query);
                     }
 
                     ListenerRegistration registration = query
@@ -2380,28 +2382,31 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void applyFiltersToFirestoreCollectionQuery(JSONArray filters, Query query) throws JSONException{
+    private Query applyFiltersToFirestoreCollectionQuery(JSONArray filters, Query query) throws JSONException{
         for(int i = 0; i < filters.length(); i++) {
             JSONArray filter = filters.getJSONArray(i);
             switch(filter.getString(0)) {
                 case "where":
-                    if (Objects.equals(filter.getString(2), new String("=="))) {
-                        query = query.whereEqualTo(filter.getString(1), filter.getString(3));
-                    }
-                    if (Objects.equals(filter.getString(2), new String("<"))) {
-                        query = query.whereLessThan(filter.getString(1), filter.getString(3));
-                    }
-                    if (Objects.equals(filter.getString(2), new String(">"))) {
-                        query = query.whereGreaterThan(filter.getString(1), filter.getString(3));
-                    }
-                    if (Objects.equals(filter.getString(2), new String("<="))) {
-                        query = query.whereLessThanOrEqualTo(filter.getString(1), filter.getString(3));
-                    }
-                    if (Objects.equals(filter.getString(2), new String(">="))) {
-                        query = query.whereGreaterThanOrEqualTo(filter.getString(1), filter.getString(3));
-                    }
-                    if (Objects.equals(filter.getString(2), new String("array-contains"))) {
-                        query = query.whereArrayContains(filter.getString(1), filter.getString(3));
+                    String fieldName = filter.getString(1);
+                    String operator = filter.getString(2);
+                    switch (operator){
+                        case "<":
+                            query = query.whereLessThan(fieldName, getFilterValueAsType(filter, 3, 4));
+                            break;
+                        case ">":
+                            query = query.whereGreaterThan(fieldName, getFilterValueAsType(filter, 3, 4));
+                            break;
+                        case "<=":
+                            query = query.whereLessThanOrEqualTo(fieldName, getFilterValueAsType(filter, 3, 4));
+                            break;
+                        case ">=":
+                            query = query.whereGreaterThanOrEqualTo(fieldName, getFilterValueAsType(filter, 3, 4));
+                            break;
+                        case "array-contains":
+                            query = query.whereArrayContains(fieldName, getFilterValueAsType(filter, 3, 4));
+                            break;
+                        default:
+                            query = query.whereEqualTo(fieldName, getFilterValueAsType(filter, 3, 4));
                     }
                     break;
                 case "orderBy":
@@ -2412,16 +2417,44 @@ public class FirebasePlugin extends CordovaPlugin {
                     query = query.orderBy(filter.getString(1), direction);
                     break;
                 case "startAt":
-                    query = query.startAt(filter.getString(1));
+                    query = query.startAt(getFilterValueAsType(filter, 1, 2));
                     break;
                 case "endAt":
-                    query = query.endAt(filter.getString(1));
+                    query = query.endAt(getFilterValueAsType(filter, 1, 2));
                     break;
                 case "limit":
                     query = query.limit(filter.getLong(1));
                     break;
             }
         }
+        return query;
+    }
+
+    private Object getFilterValueAsType(JSONArray filter, int valueIndex, int typeIndex) throws JSONException{
+        Object typedValue;
+        String type = "string";
+        if(!filter.isNull(typeIndex)){
+            type = filter.getString(typeIndex);
+        }
+
+        switch (type){
+            case "boolean":
+                typedValue = filter.getBoolean(valueIndex);
+                break;
+            case "integer":
+                typedValue = filter.getInt(valueIndex);
+                break;
+            case "double":
+                typedValue = filter.getDouble(valueIndex);
+                break;
+            case "long":
+                typedValue = filter.getLong(valueIndex);
+                break;
+            default:
+                typedValue = filter.getString(valueIndex);
+        }
+
+        return typedValue;
     }
 
 
