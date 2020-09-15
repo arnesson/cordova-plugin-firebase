@@ -142,16 +142,16 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="Firebase/Core" spec="6.28.1"/>
-				<pod name="Firebase/Auth" spec="6.28.1"/>
-				<pod name="Firebase/Messaging" spec="6.28.1"/>
-				<pod name="Firebase/Performance" spec="6.28.1"/>
-				<pod name="Firebase/RemoteConfig" spec="6.28.1"/>
-				<pod name="Firebase/InAppMessaging" spec="6.28.1"/>
-				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.28.1"/>
-				<pod name="Firebase/Crashlytics" spec="6.28.1"/>
+				<pod name="Firebase/Core" spec="6.32.2"/>
+				<pod name="Firebase/Auth" spec="6.32.2"/>
+				<pod name="Firebase/Messaging" spec="6.32.2"/>
+				<pod name="Firebase/Performance" spec="6.32.2"/>
+				<pod name="Firebase/RemoteConfig" spec="6.32.2"/>
+				<pod name="Firebase/InAppMessaging" spec="6.32.2"/>
+				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.32.2"/>
+				<pod name="Firebase/Crashlytics" spec="6.32.2"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
-				<pod name="GoogleTagManager" spec="7.1.2"/>
+				<pod name="GoogleTagManager" spec="7.1.4"/>
 			</pods>
 		</podspec>
 
