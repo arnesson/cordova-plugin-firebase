@@ -239,8 +239,8 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 
 ## Supported Cordova Versions
 - cordova: `>= 9`
-- cordova-android: `>= 8`
-- cordova-ios: `>= 5`
+- cordova-android: `>= 9`
+- cordova-ios: `>= 6`
 
 ## Supported Mobile Platform Versions
 - Android `>= 4.1`
