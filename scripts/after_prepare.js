@@ -11,95 +11,61 @@ var fs = require('fs');
 var path = require("path");
 var Utilities = require("./lib/utilities");
 
-var appName = Utilities.getAppName();
+var appName;
 var pluginVariables = {};
 
 var IOS_DIR = 'platforms/ios';
 var ANDROID_DIR = 'platforms/android';
-var PLUGIN_ID = 'cordova-plugin-firebasex';
+var PLUGIN_ID;
 
-var PLATFORM = {
-    IOS: {
-        dest: IOS_DIR + '/' + appName + '/Resources/GoogleService-Info.plist',
-        src: [
-            'GoogleService-Info.plist',
-            IOS_DIR + '/www/GoogleService-Info.plist',
-            'www/GoogleService-Info.plist'
-        ],
-        appPlist: IOS_DIR + '/' + appName + '/'+appName+'-Info.plist',
-        entitlementsDebugPlist: IOS_DIR + '/' + appName + '/Entitlements-Debug.plist',
-        entitlementsReleasePlist: IOS_DIR + '/' + appName + '/Entitlements-Release.plist',
-    },
-    ANDROID: {
-        dest: ANDROID_DIR + '/app/google-services.json',
-        src: [
-            'google-services.json',
-            ANDROID_DIR + '/assets/www/google-services.json',
-            'www/google-services.json',
-            ANDROID_DIR + '/app/src/main/google-services.json'
-        ],
-        colorsXml:{
-            src: './plugins/' + Utilities.getPluginId() +'/src/android/colors.xml',
-            target: ANDROID_DIR + '/app/src/main/res/values/colors.xml'
-        }
-    }
-};
+var PLATFORM;
 
-
-var parsePluginVariables = function(){
-    // Parse plugin.xml
-    var plugin = Utilities.parsePluginXml();
-    var prefs = [];
-    if(plugin.plugin.preference){
-        prefs = prefs.concat(plugin.plugin.preference);
-    }
-    plugin.plugin.platform.forEach(function(platform){
-        if(platform.preference){
-            prefs = prefs.concat(platform.preference);
-        }
-    });
-    prefs.forEach(function(pref){
-        if (pref._attributes){
-            pluginVariables[pref._attributes.name] = pref._attributes.default;
-        }
-    });
-
-    // Parse config.xml
-    var config = Utilities.parseConfigXml();
-    (config.widget.plugin ? [].concat(config.widget.plugin) : []).forEach(function(plugin){
-        (plugin.variable ? [].concat(plugin.variable) : []).forEach(function(variable){
-            if((plugin._attributes.name === PLUGIN_ID || plugin._attributes.id === PLUGIN_ID) && variable._attributes.name && variable._attributes.value){
-                pluginVariables[variable._attributes.name] = variable._attributes.value;
-            }
-        });
-    });
-
-    // Parse package.json
-    var packageJSON = Utilities.parsePackageJson();
-    if(packageJSON.cordova && packageJSON.cordova.plugins){
-        for(const pluginId in packageJSON.cordova.plugins){
-            if(pluginId === PLUGIN_ID){
-                for(const varName in packageJSON.cordova.plugins[pluginId]){
-                    var varValue = packageJSON.cordova.plugins[pluginId][varName];
-                    pluginVariables[varName] = varValue;
-                }
+var setupEnv = function(){
+    appName = Utilities.getAppName();
+    PLUGIN_ID = Utilities.getPluginId();
+    PLATFORM = {
+        IOS: {
+            dest: IOS_DIR + '/' + appName + '/Resources/GoogleService-Info.plist',
+            src: [
+                'GoogleService-Info.plist',
+                IOS_DIR + '/www/GoogleService-Info.plist',
+                'www/GoogleService-Info.plist'
+            ],
+            appPlist: IOS_DIR + '/' + appName + '/' + appName + '-Info.plist',
+            entitlementsDebugPlist: IOS_DIR + '/' + appName + '/Entitlements-Debug.plist',
+            entitlementsReleasePlist: IOS_DIR + '/' + appName + '/Entitlements-Release.plist',
+        },
+        ANDROID: {
+            dest: ANDROID_DIR + '/app/google-services.json',
+            src: [
+                'google-services.json',
+                ANDROID_DIR + '/assets/www/google-services.json',
+                'www/google-services.json',
+                ANDROID_DIR + '/app/src/main/google-services.json'
+            ],
+            colorsXml: {
+                src: './plugins/' + Utilities.getPluginId() + '/src/android/colors.xml',
+                target: ANDROID_DIR + '/app/src/main/res/values/colors.xml'
             }
         }
-    }
+    };
+}
+
+module.exports = function(context){
+    //get platform from the context supplied by cordova
+    var platforms = context.opts.platforms;
+    Utilities.setContext(context);
+    setupEnv();
+
+    pluginVariables = Utilities.parsePluginVariables();
 
     // set platform key path from plugin variable
-    if (pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH) PLATFORM.ANDROID.src = [pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH];
-    if (pluginVariables.IOS_FIREBASE_CONFIG_FILEPATH) PLATFORM.IOS.src = [pluginVariables.IOS_FIREBASE_CONFIG_FILEPATH];
-};
+    if(pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH) PLATFORM.ANDROID.src = [pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH];
+    if(pluginVariables.IOS_FIREBASE_CONFIG_FILEPATH) PLATFORM.IOS.src = [pluginVariables.IOS_FIREBASE_CONFIG_FILEPATH];
 
-module.exports = function (context) {
-
-  //get platform from the context supplied by cordova
-  var platforms = context.opts.platforms;
-  parsePluginVariables();
 
     // Copy key files to their platform specific folders
-    if (platforms.indexOf('android') !== -1 && Utilities.directoryExists(ANDROID_DIR)) {
+    if(platforms.indexOf('android') !== -1 && Utilities.directoryExists(ANDROID_DIR)){
         Utilities.log('Preparing Firebase on Android');
         Utilities.copyKey(PLATFORM.ANDROID);
 
@@ -152,7 +118,7 @@ module.exports = function (context) {
         }
     }
 
-    if (platforms.indexOf('ios') !== -1 && Utilities.directoryExists(IOS_DIR)){
+    if(platforms.indexOf('ios') !== -1 && Utilities.directoryExists(IOS_DIR)){
         Utilities.log('Preparing Firebase on iOS');
         Utilities.copyKey(PLATFORM.IOS);
 
