@@ -233,6 +233,9 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
    - Note: Firebase Messaging iOS SDK version 7.0 will be a breaking change where the SDK will no longer support iOS Direct Channel API.
 - `IOS_FIREBASE_CONFIG_FILEPATH` - sets a custom filepath to `GoogleService-Info.plist` file as a path relative to the project root
     - e.g. `--variable IOS_FIREBASE_CONFIG_FILEPATH="resources/ios/GoogleService-Info.plist"`
+- `IOS_ENABLE_APPLE_SIGNIN` - enables the Sign In with Apple capability in Xcode.
+    - `--variable IOS_ENABLE_APPLE_SIGNIN=true`
+    - Ensure the associated app provisioning profile also has this capability enabled.
 
 ## Supported Cordova Versions
 - cordova: `>= 9`
@@ -2604,6 +2607,11 @@ For details how to do the above, see the [Google Sign-In on Android page](https:
 
 ### authenticateUserWithApple
 Authenticates the user with an Apple account using Sign In with Apple to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+
+To use Sign In with Apple you must ensure your app's provisioning profile has this capability and it is enabled in your Xcode project.
+You can enable the capability in Xcode by setting the `IOS_ENABLE_APPLE_SIGNIN` plugin variable at plugin installation time:
+
+    cordova plugin add cordova-plugin-firebasex --variable IOS_ENABLE_APPLE_SIGNIN=true
 
 **Parameters**:
 - {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:

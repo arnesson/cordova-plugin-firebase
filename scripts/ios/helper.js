@@ -189,11 +189,14 @@ module.exports = {
             console.log('cordova-plugin-firebasex: Applied IOS_STRIP_DEBUG to Podfile');
         }
     },
-    applyPluginVarsToPlists: function(googlePlistPath, appPlistPath, pluginVariables){
-        var googlePlist = plist.parse(fs.readFileSync(path.resolve(googlePlistPath), 'utf8')),
-            appPlist = plist.parse(fs.readFileSync(path.resolve(appPlistPath), 'utf8')),
+    applyPluginVarsToPlists: function(pluginVariables, iosPlatform){
+        var googlePlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.dest), 'utf8')),
+            appPlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.appPlist), 'utf8')),
+            entitlementsDebugPlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.entitlementsDebugPlist), 'utf8')),
+            entitlementsReleasePlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.entitlementsReleasePlist), 'utf8')),
             googlePlistModified = false,
-            appPlistModified = false;
+            appPlistModified = false,
+            entitlementsPlistsModified = false;
 
         if(typeof pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== 'undefined'){
             googlePlist["FIREBASE_ANALYTICS_COLLECTION_ENABLED"] = (pluginVariables['FIREBASE_ANALYTICS_COLLECTION_ENABLED'] !== "false" ? "true" : "false") ;
@@ -231,8 +234,17 @@ module.exports = {
             appPlist['CFBundleURLTypes'][i] = entry;
             appPlistModified = true;
         }
+        if(pluginVariables['IOS_ENABLE_APPLE_SIGNIN'] === 'true'){
+            entitlementsDebugPlist["com.apple.developer.applesignin"] = ["Default"];
+            entitlementsReleasePlist["com.apple.developer.applesignin"] = ["Default"];
+            entitlementsPlistsModified = true;
+        }
 
-        if(googlePlistModified) fs.writeFileSync(path.resolve(googlePlistPath), plist.build(googlePlist));
-        if(appPlistModified) fs.writeFileSync(path.resolve(appPlistPath), plist.build(appPlist));
+        if(googlePlistModified) fs.writeFileSync(path.resolve(iosPlatform.dest), plist.build(googlePlist));
+        if(appPlistModified) fs.writeFileSync(path.resolve(iosPlatform.appPlist), plist.build(appPlist));
+        if(entitlementsPlistsModified){
+            fs.writeFileSync(path.resolve(iosPlatform.entitlementsDebugPlist), plist.build(entitlementsDebugPlist));
+            fs.writeFileSync(path.resolve(iosPlatform.entitlementsReleasePlist), plist.build(entitlementsReleasePlist));
+        }
     }
 };

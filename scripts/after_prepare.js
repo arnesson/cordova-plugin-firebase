@@ -27,6 +27,8 @@ var PLATFORM = {
             'www/GoogleService-Info.plist'
         ],
         appPlist: IOS_DIR + '/' + appName + '/'+appName+'-Info.plist',
+        entitlementsDebugPlist: IOS_DIR + '/' + appName + '/Entitlements-Debug.plist',
+        entitlementsReleasePlist: IOS_DIR + '/' + appName + '/Entitlements-Release.plist',
     },
     ANDROID: {
         dest: ANDROID_DIR + '/app/google-services.json',
@@ -161,6 +163,6 @@ module.exports = function (context) {
         if(pluginVariables['IOS_STRIP_DEBUG'] && pluginVariables['IOS_STRIP_DEBUG'] === 'true'){
             helper.stripDebugSymbols();
         }
-        helper.applyPluginVarsToPlists(PLATFORM.IOS.dest, PLATFORM.IOS.appPlist, pluginVariables);
+        helper.applyPluginVarsToPlists(pluginVariables, PLATFORM.IOS);
     }
 };
