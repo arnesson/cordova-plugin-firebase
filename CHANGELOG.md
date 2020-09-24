@@ -1,6 +1,8 @@
 * (iOS) Check if file contents for `pn-actions.json` exists before attempting to use it.
     * Resolves [#512](https://github.com/dpa99c/cordova-plugin-firebasex/issues/512).
     * Bug introduced by PR [#482](https://github.com/dpa99c/cordova-plugin-firebasex/pull/482).
+* (Android) Add the Firebase Performance Monitoring Gradle plugin to monitor network traffic.
+    * Resolves [#520](https://github.com/dpa99c/cordova-plugin-firebasex/issues/520).
 
 # Version 11.0.1
 * (iOS) Set the Sign In with Apple capability based on the `IOS_ENABLE_APPLE_SIGNIN` plugin variable.
