@@ -70,6 +70,7 @@
 		<preference name="ANDROID_FIREBASE_CRASHLYTICS_VERSION" default="17.2.1" />
 		<preference name="ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" default="17.2.1" />
 		<preference name="ANDROID_GSON_VERSION" default="2.8.6" />
+		<preference name="ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION" default="1.3.1" />
 
 		<framework src="com.google.android.gms:play-services-tagmanager:$ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" />
 		<framework src="com.google.android.gms:play-services-auth:$ANDROID_PLAY_SERVICES_AUTH_VERSION" />

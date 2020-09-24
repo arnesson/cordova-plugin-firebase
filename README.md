@@ -213,11 +213,13 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_CRASHLYTICS_VERSION`
 - `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION`
 - `ANDROID_GSON_VERSION`
+- `ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION`
 See [Specifying Android library versions](#specifying-android-library-versions) for more info.
 
 - `ANDROID_ICON_ACCENT` - sets the default accent color for system notifications. See [Android Notification Color](#android-notification-color) for more info.
 - `ANDROID_FIREBASE_CONFIG_FILEPATH` - sets a custom filepath to `google-services.json` file as a path relative to the project root
     - e.g. `--variable ANDROID_FIREBASE_CONFIG_FILEPATH="resources/android/google-services.json"`
+- `ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION` - overrides the default version of the [Firebase Performance Monitoring Gradle plugin for Android](https://firebase.google.com/docs/perf-mon/get-started-android?authuser=0#add-perfmon-plugin)
 
 ### iOS only
 - `IOS_STRIP_DEBUG` - prevents symbolification of all libraries included via Cocoapods. See [Strip debug symbols](#strip-debug-symbols) for more info.

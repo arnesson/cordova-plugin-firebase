@@ -1,3 +1,6 @@
+* (Android) Add the Firebase Performance Monitoring Gradle plugin to monitor network traffic.
+    * Resolves [#520](https://github.com/dpa99c/cordova-plugin-firebasex/issues/520).
+
 # Version 11.0.1
 * (iOS) Set the Sign In with Apple capability based on the `IOS_ENABLE_APPLE_SIGNIN` plugin variable.
     * Resolves [#511](https://github.com/dpa99c/cordova-plugin-firebasex/issues/511).

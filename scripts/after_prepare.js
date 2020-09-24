@@ -9,7 +9,7 @@
  */
 var fs = require('fs');
 var path = require("path");
-var Utilities = require("./lib/utilities");
+var utilities = require("./lib/utilities");
 
 var appName;
 var pluginVariables = {};
@@ -21,8 +21,8 @@ var PLUGIN_ID;
 var PLATFORM;
 
 var setupEnv = function(){
-    appName = Utilities.getAppName();
-    PLUGIN_ID = Utilities.getPluginId();
+    appName = utilities.getAppName();
+    PLUGIN_ID = utilities.getPluginId();
     PLATFORM = {
         IOS: {
             dest: IOS_DIR + '/' + appName + '/Resources/GoogleService-Info.plist',
@@ -44,8 +44,12 @@ var setupEnv = function(){
                 ANDROID_DIR + '/app/src/main/google-services.json'
             ],
             colorsXml: {
-                src: './plugins/' + Utilities.getPluginId() + '/src/android/colors.xml',
+                src: './plugins/' + utilities.getPluginId() + '/src/android/colors.xml',
                 target: ANDROID_DIR + '/app/src/main/res/values/colors.xml'
+            },
+            performanceGradlePlugin: {
+                classDef: 'com.google.firebase:perf-plugin',
+                pluginDef: 'com.google.firebase.firebase-perf'
             }
         }
     };
@@ -54,10 +58,10 @@ var setupEnv = function(){
 module.exports = function(context){
     //get platform from the context supplied by cordova
     var platforms = context.opts.platforms;
-    Utilities.setContext(context);
+    utilities.setContext(context);
     setupEnv();
 
-    pluginVariables = Utilities.parsePluginVariables();
+    pluginVariables = utilities.parsePluginVariables();
 
     // set platform key path from plugin variable
     if(pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH) PLATFORM.ANDROID.src = [pluginVariables.ANDROID_FIREBASE_CONFIG_FILEPATH];
@@ -65,15 +69,18 @@ module.exports = function(context){
 
 
     // Copy key files to their platform specific folders
-    if(platforms.indexOf('android') !== -1 && Utilities.directoryExists(ANDROID_DIR)){
-        Utilities.log('Preparing Firebase on Android');
-        Utilities.copyKey(PLATFORM.ANDROID);
+    if(platforms.indexOf('android') !== -1 && utilities.directoryExists(ANDROID_DIR)){
+        utilities.log('Preparing Firebase on Android');
+        utilities.copyKey(PLATFORM.ANDROID);
 
+        var androidHelper = require("./lib/android");
+
+        // Apply colours
         if(!fs.existsSync(path.resolve(PLATFORM.ANDROID.colorsXml.target))){
             fs.copyFileSync(path.resolve(PLATFORM.ANDROID.colorsXml.src), path.resolve(PLATFORM.ANDROID.colorsXml.target));
         }
 
-        const $colorsXml = Utilities.parseXmlFileToJson(PLATFORM.ANDROID.colorsXml.target, {compact: true});
+        const $colorsXml = utilities.parseXmlFileToJson(PLATFORM.ANDROID.colorsXml.target, {compact: true});
         var accentColor = pluginVariables.ANDROID_ICON_ACCENT,
             $resources = $colorsXml.resources,
             existingAccent = false,
@@ -113,14 +120,18 @@ module.exports = function(context){
         }
 
         if(writeChanges){
-            Utilities.writeJsonToXmlFile($colorsXml, PLATFORM.ANDROID.colorsXml.target);
-            Utilities.log('Updated colors.xml with accent color');
+            utilities.writeJsonToXmlFile($colorsXml, PLATFORM.ANDROID.colorsXml.target);
+            utilities.log('Updated colors.xml with accent color');
         }
+
+        // Add Performance Monitoring gradle plugin for Android network traffic
+        androidHelper.addDependencyToRootGradle(PLATFORM.ANDROID.performanceGradlePlugin.classDef+":"+pluginVariables["ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION"]);
+        androidHelper.applyPluginToAppGradle(PLATFORM.ANDROID.performanceGradlePlugin.pluginDef);
     }
 
-    if(platforms.indexOf('ios') !== -1 && Utilities.directoryExists(IOS_DIR)){
-        Utilities.log('Preparing Firebase on iOS');
-        Utilities.copyKey(PLATFORM.IOS);
+    if(platforms.indexOf('ios') !== -1 && utilities.directoryExists(IOS_DIR)){
+        utilities.log('Preparing Firebase on iOS');
+        utilities.copyKey(PLATFORM.IOS);
 
         var helper = require("./ios/helper");
         var xcodeProjectPath = helper.getXcodeProjectPath();
