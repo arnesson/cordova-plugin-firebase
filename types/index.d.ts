@@ -138,6 +138,11 @@ interface FirebasePlugin {
         timeOutDuration: number,
         fakeVerificationCode?: string
     ): void
+    setLanguageCode(
+        lang: string,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
     createUserWithEmailAndPassword(
         email: string,
         password: string,

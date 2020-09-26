@@ -10,6 +10,7 @@
 
 // Authentication
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
+- (void)setLanguageCode:(CDVInvokedUrlCommand*)command;
 - (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)signInUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;

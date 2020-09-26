@@ -254,6 +254,10 @@ exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, f
     }, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
 };
 
+exports.setLanguageCode = function (lang, success, error) {
+    exec(success, error, "FirebasePlugin", "setLanguageCode", [lang]);
+};
+
 exports.createUserWithEmailAndPassword = function (email, password, success, error) {
     exec(success, error, "FirebasePlugin", "createUserWithEmailAndPassword", [email, password]);
 };

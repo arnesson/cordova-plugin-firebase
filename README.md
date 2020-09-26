@@ -138,6 +138,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [verifyPhoneNumber](#verifyphonenumber)
       - [Android](#android-2)
       - [iOS](#ios-2)
+    - [setLanguageCode](#setLanguageCode)
     - [authenticateUserWithEmailAndPassword](#authenticateuserwithemailandpassword)
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
       - [Android](#android-3)
@@ -2550,6 +2551,17 @@ You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs
 
 This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
 
+### setLanguageCode
+Sets the user-facing language code for auth operations that can be internationalized, such as sendEmailVerification() or verifyPhoneNumber(). This language code should follow the conventions defined by the IETF in BCP47.
+
+**Parameters**:
+- {string} lang - language to change, ex: 'fr' for french
+
+Example usage:
+
+```javascript
+    FirebasePlugin.setLanguageCode('fr'); // will switch to french
+```
 
 ### authenticateUserWithEmailAndPassword
 Authenticates the user with email/password-based user account to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
