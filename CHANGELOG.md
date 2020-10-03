@@ -1,3 +1,4 @@
+# Version 11.0.2
 * (iOS) Check if file contents for `pn-actions.json` exists before attempting to use it.
     * Resolves [#512](https://github.com/dpa99c/cordova-plugin-firebasex/issues/512).
     * Bug introduced by PR [#482](https://github.com/dpa99c/cordova-plugin-firebasex/pull/482).
