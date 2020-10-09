@@ -64,6 +64,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Android Notification Sound](#android-notification-sound)
       - [Android 8.0 and above](#android-80-and-above)
       - [On Android 7 and below](#on-android-7-and-below)
+    - [Android cloud message types](#android-cloud-message-types)
   - [iOS notifications](#ios-notifications)
     - [iOS background notifications](#ios-background-notifications)
     - [iOS notification sound](#ios-notification-sound)
@@ -138,7 +139,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [verifyPhoneNumber](#verifyphonenumber)
       - [Android](#android-2)
       - [iOS](#ios-2)
-    - [setLanguageCode](#setLanguageCode)
+    - [setLanguageCode](#setlanguagecode)
     - [authenticateUserWithEmailAndPassword](#authenticateuserwithemailandpassword)
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
       - [Android](#android-3)
@@ -1035,6 +1036,22 @@ And in a data message by specifying it in the `data` section:
 
 - To play the default notification sound, set `"sound": "default"`.
 - To display a silent notification (no sound), omit the `sound` key from the message.
+
+### Android cloud message types
+The type of payload data in an FCM message influences how the message will be delivered to the app dependent on its run state, as outlined in [this Firebase documentation](https://firebase.google.com/docs/cloud-messaging/android/receive).
+
+|App run state | Notification payload | Data payload | Notification+Data payload |
+|----------|----------------------|--------------|---------------------------|
+| Foreground | `onMessageReceived` | `onMessageReceived` | `onMessageReceived` |
+| Background | System tray<sup>[[1]](#messagetypefootnote1)</sup>| `onMessageReceived` | Notification payload: System tray<sup>[[1]](#messagetypefootnote1)</sup> <br/> Data payload: `onMessageReceived` via extras of New Intent<sup>[[2]](#messagetypefootnote2)</sup> |
+| Not running | System tray<sup>[[1]](#messagetypefootnote1)</sup> | **Never received**<sup>[[3]](#messagetypefootnote3)</sup> | Notification payload: System tray<sup>[[1]](#messagetypefootnote1)</sup> <br/> Data payload: `onMessageReceived` via extras of Launch Intent<sup>[[2]](#messagetypefootnote2)</sup> |
+
+<a name="messagetypefootnote1">1</a>: If user taps the system notification, its payload is delivered to `onMessageReceived`
+
+<a name="messagetypefootnote2">2</a>: The data payload is only delivered as an extras Bundle Intent if the user taps the system notification.
+Otherwise it will not be delivered as outlined in [this Firebase documentation](https://firebase.google.com/docs/cloud-messaging/concept-options#notification-messages-with-optional-data-payload).
+
+<a name="messagetypefootnote3">3</a>: If the app is not running/has been task-killed when the data message arrives, it will never be received by the app.
 
 ## iOS notifications
 Notifications on iOS can be customised to specify the sound and badge number that's displayed when the notification arrives.
