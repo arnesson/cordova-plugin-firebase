@@ -1,4 +1,6 @@
 * (Android) Make Firebase Performance Monitoring Gradle plugin optional (disabled by default) via `ANDROID_FIREBASE_PERFORMANCE_MONITORING` plugin variable due to increased build times/memory usage when it's included.
+* (Android) Add defensive code in `handleExceptionWithContext()` to prevent app crashes.
+    * Resolves [#535](https://github.com/dpa99c/cordova-plugin-firebasex/issues/535).
 
 # Version 11.0.2
 * (iOS) Check if file contents for `pn-actions.json` exists before attempting to use it.

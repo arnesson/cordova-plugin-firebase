@@ -2525,7 +2525,9 @@ public class FirebasePlugin extends CordovaPlugin {
     protected static void handleExceptionWithContext(Exception e, CallbackContext context) {
         String msg = e.toString();
         Log.e(TAG, msg);
-        instance.logExceptionToCrashlytics(e);
+        if (instance != null) {
+            instance.logExceptionToCrashlytics(e);
+        }
         context.error(msg);
     }
 
