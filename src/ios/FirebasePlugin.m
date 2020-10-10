@@ -1238,6 +1238,8 @@ static NSMutableDictionary* firestoreListeners;
 - (void)setConfigSettings:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
         @try {
+            FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
+            
             FIRRemoteConfigSettings* settings = [[FIRRemoteConfigSettings alloc] init];
             
             if([command.arguments objectAtIndex:0] != [NSNull null]){
@@ -1247,6 +1249,9 @@ static NSMutableDictionary* firestoreListeners;
             if([command.arguments objectAtIndex:1] != [NSNull null]){
                 settings.minimumFetchInterval = [[command.arguments objectAtIndex:1] longValue];
             }
+            
+            remoteConfig.configSettings = settings;
+            
             [self sendPluginSuccess:command];
         }@catch (NSException *exception) {
             [self handlePluginExceptionWithContext:exception :command];
