@@ -18,6 +18,7 @@
 
 	<platform name="android">
 		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
+		<preference name="ANDROID_FIREBASE_PERFORMANCE_MONITORING" default="false" />
 
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />

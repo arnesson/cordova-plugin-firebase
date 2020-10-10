@@ -124,9 +124,11 @@ module.exports = function(context){
             utilities.log('Updated colors.xml with accent color');
         }
 
-        // Add Performance Monitoring gradle plugin for Android network traffic
-        androidHelper.addDependencyToRootGradle(PLATFORM.ANDROID.performanceGradlePlugin.classDef+":"+pluginVariables["ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION"]);
-        androidHelper.applyPluginToAppGradle(PLATFORM.ANDROID.performanceGradlePlugin.pluginDef);
+        if(pluginVariables['ANDROID_FIREBASE_PERFORMANCE_MONITORING'] && pluginVariables['ANDROID_FIREBASE_PERFORMANCE_MONITORING'] === 'true'){
+            // Add Performance Monitoring gradle plugin for Android network traffic
+            androidHelper.addDependencyToRootGradle(PLATFORM.ANDROID.performanceGradlePlugin.classDef+":"+pluginVariables["ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION"]);
+            androidHelper.applyPluginToAppGradle(PLATFORM.ANDROID.performanceGradlePlugin.pluginDef);
+        }
     }
 
     if(platforms.indexOf('ios') !== -1 && utilities.directoryExists(IOS_DIR)){

@@ -82,6 +82,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 - [Google Tag Manager](#google-tag-manager)
   - [Android](#android-1)
   - [iOS](#ios-1)
+- [Performance Monitoring](#performance-monitoring)
+  - [Android Performance Monitoring Gradle plugin](#android-performance-monitoring-gradle-plugin)
 - [API](#api)
   - [Notifications and data messages](#notifications-and-data-messages)
     - [getToken](#gettoken)
@@ -216,11 +218,15 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION`
 - `ANDROID_GSON_VERSION`
 - `ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION`
+- `ANDROID_FIREBASE_PERFORMANCE_MONITORING`
 See [Specifying Android library versions](#specifying-android-library-versions) for more info.
 
 - `ANDROID_ICON_ACCENT` - sets the default accent color for system notifications. See [Android Notification Color](#android-notification-color) for more info.
 - `ANDROID_FIREBASE_CONFIG_FILEPATH` - sets a custom filepath to `google-services.json` file as a path relative to the project root
     - e.g. `--variable ANDROID_FIREBASE_CONFIG_FILEPATH="resources/android/google-services.json"`
+- `ANDROID_FIREBASE_PERFORMANCE_MONITORING` - sets whether to add the [Firebase Performance Monitoring Gradle plugin for Android](https://firebase.google.com/docs/perf-mon/get-started-android?authuser=0#add-perfmon-plugin) to the build.
+    - e.g.  `--variable ANDROID_FIREBASE_PERFORMANCE_MONITORING=true`
+    - Defaults to `false` if not specified.
 - `ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION` - overrides the default version of the [Firebase Performance Monitoring Gradle plugin for Android](https://firebase.google.com/docs/perf-mon/get-started-android?authuser=0#add-perfmon-plugin)
 
 ### iOS only
@@ -1424,6 +1430,19 @@ Download your container-config json file from Tag Manager and add a `<resource-f
     <resource-file src="GTM-YYYYYYY.json" />
     ...
 ```
+
+# Performance Monitoring
+The [Firebase Performance Monitoring SDK](https://firebase.google.com/docs/perf-mon) enables you to measure, monitor and analyze the performance of your app in the Firebase console.
+It enables you to measure metrics such as app startup, screen rendering and network requests.
+
+## Android Performance Monitoring Gradle plugin
+- The [Firebase Performance Monitoring Gradle plugin for Android](https://firebase.google.com/docs/perf-mon/get-started-android?authuser=0#add-perfmon-plugin) is required to enable automatic monitoring of network requests in Android apps.
+- However, as [outlined here](https://proandroiddev.com/hidden-costs-of-firebase-performance-and-how-to-avoid-them-a54f96bafcb1), adding this Gradle plugin to your Android builds can significantly increase Android build times and memory usage.
+- For this reason, the Gradle plugin is not added to your Android app builds by default.
+- If you want to add it to make use of automatic network request monitoring on Android, set the `ANDROID_FIREBASE_PERFORMANCE_MONITORING` [plugin variable](#plugin-variables) flag at plugin install time:
+    - `--variable ANDROID_FIREBASE_PERFORMANCE_MONITORING=true`
+- If you choose to add it, the Gradle plugin currently requires Gradle v6.1.1 and Android Studio v4.0 or above.
+- Note: on iOS when this plugin is installed, automatic network request monitoring takes place with requiring any extra configuration.
 
 # API
 The list of available methods for this plugin is described below.
