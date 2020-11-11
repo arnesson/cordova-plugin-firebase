@@ -3,7 +3,9 @@
 #import "Firebase.h"
 #import <objc/runtime.h>
 
+
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+/*
 @import UserNotifications;
 
 // Implement UNUserNotificationCenterDelegate to receive display notification via APNS for devices
@@ -11,6 +13,7 @@
 // devices running iOS 10 and above.
 @interface AppDelegate () <UNUserNotificationCenterDelegate, FIRMessagingDelegate>
 @end
+ */
 #endif
 
 #define kApplicationInBackgroundKey @"applicationInBackground"
@@ -66,6 +69,7 @@
         [FIRApp configure];
     }
 
+    /*
     // [START set_messaging_delegate]
     [FIRMessaging messaging].delegate = self;
     // [END set_messaging_delegate]
@@ -76,7 +80,7 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tokenRefreshNotification:)
                                                  name:kFIRInstanceIDTokenRefreshNotification object:nil];
-
+*/
     self.applicationInBackground = @(YES);
 
     return YES;
@@ -88,7 +92,7 @@
     }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[FIRMessaging messaging] disconnect];
+    // [[FIRMessaging messaging] disconnect];
     self.applicationInBackground = @(YES);
     NSLog(@"Disconnected from FCM");
 }
@@ -97,30 +101,32 @@
     // Note that this callback will be fired everytime a new token is generated, including the first
     // time. So if you need to retrieve the token as soon as it is available this is where that
     // should be done.
-    NSString *refreshedToken = [[FIRInstanceID instanceID] token];
-    NSLog(@"InstanceID token: %@", refreshedToken);
-
-    // Connect to FCM since connection may have failed when attempted before having a token.
-    [self connectToFcm];
-    [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
+//    NSString *refreshedToken = [[FIRInstanceID instanceID] token];
+//    NSLog(@"InstanceID token: %@", refreshedToken);
+//
+//    // Connect to FCM since connection may have failed when attempted before having a token.
+//    [self connectToFcm];
+//    [FirebasePlugin.firebasePlugin sendToken:refreshedToken];
 }
 
 - (void)connectToFcm {
-    [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
-        if (error != nil) {
-            NSLog(@"Unable to connect to FCM. %@", error);
-        } else {
-            NSLog(@"Connected to FCM.");
-            NSString *refreshedToken = [[FIRInstanceID instanceID] token];
-            NSLog(@"InstanceID token: %@", refreshedToken);
-        }
-    }];
+//    [[FIRMessaging messaging] connectWithCompletion:^(NSError * _Nullable error) {
+//        if (error != nil) {
+//            NSLog(@"Unable to connect to FCM. %@", error);
+//        } else {
+//            NSLog(@"Connected to FCM.");
+//            NSString *refreshedToken = [[FIRInstanceID instanceID] token];
+//            NSLog(@"InstanceID token: %@", refreshedToken);
+//        }
+//    }];
 }
 
+/*
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [FIRMessaging messaging].APNSToken = deviceToken;
     NSLog(@"deviceToken1 = %@", deviceToken);
 }
+ */
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     NSDictionary *mutableUserInfo = [userInfo mutableCopy];
@@ -132,6 +138,7 @@
 
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
+
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
     fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
@@ -193,7 +200,7 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
 
-	__block NSURL *urlForSend = nil; // Initialize with current url
+    __block NSURL *urlForSend = nil; // Initialize with current url
     void (^triggerHandleOpenUrl)(void) = ^{
         if ( urlForSend == nil )
             return;
@@ -234,6 +241,7 @@
 // [START ios_10_data_message]
 // Receive data messages on iOS 10+ directly from FCM (bypassing APNs) when the app is in the foreground.
 // To enable direct data messages, you can set [Messaging messaging].shouldEstablishDirectChannel to YES.
+/*
 - (void)messaging:(FIRMessaging *)messaging didReceiveMessage:(FIRMessagingRemoteMessage *)remoteMessage {
     NSLog(@"Received data message: %@", remoteMessage.appData);
 
@@ -241,10 +249,13 @@
     // notifications is yet missing. This will only work when the app is in the foreground.
     [FirebasePlugin.firebasePlugin sendNotification:remoteMessage.appData];
 }
+    */
 
+    /*
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
   NSLog(@"Unable to register for remote notifications: %@", error);
 }
+
 
 // [END ios_10_data_message]
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
@@ -299,5 +310,6 @@
     NSLog(@"%@", [remoteMessage appData]);
 }
 #endif
+*/
 
 @end

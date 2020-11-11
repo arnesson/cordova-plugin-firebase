@@ -51,12 +51,12 @@ function addRepos(buildGradle) {
 	// modify the line to add the necessary repo
 	// Crashlytics goes under buildscripts which is the first grouping in the file
 
-	if ( buildGradle.indexOf('Fabrics Maven repository from cordova-plugin-firebase') == -1 ){
-		var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase'
-		var modifiedLine = fabricMavenRepo + '\n' + match[0];
-		// modify the actual line
-		buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
-	}
+	// if ( buildGradle.indexOf('Fabrics Maven repository from cordova-plugin-firebase') == -1 ){
+	// 	var fabricMavenRepo = whitespace + 'maven { url \'https://maven.fabric.io/public\' } // Fabrics Maven repository from cordova-plugin-firebase'
+	// 	var modifiedLine = fabricMavenRepo + '\n' + match[0];
+	// 	// modify the actual line
+	// 	buildGradle = buildGradle.replace(/^(\s*)jcenter\(\)/m, modifiedLine);
+	// }
 
 	if ( buildGradle.indexOf('Google\'s Maven repository from cordova-plugin-firebase') > -1 )
 		return buildGradle;
@@ -111,7 +111,12 @@ function addFrameworks(buildGradle, useFrameworks){
 		+'\n'+whitespace+'implementation \'me.leolin:ShortcutBadger:1.1.4@aar\'';
 
 	useFrameworks.forEach(function(framework){
-		lines += '\n'+whitespace+'implementation \''+ framework +'\'';
+		if ( framework.indexOf('com.google.firebase:firebase-bom') > -1  ){
+			lines += '\n'+whitespace+'implementation platform(\''+ framework +'\')';
+		}else{
+			lines += '\n'+whitespace+'implementation \''+ framework +'\'';
+		}
+
 	});
 
 	lines += '\n'+whitespace+'\/\/ FIREBASE FRAMEWORKS END';
@@ -229,7 +234,7 @@ module.exports = {
 			var firebasePlugins =
 				'apply plugin: \'com.android.application\'\n'+
 				'apply plugin: \'com.google.gms.google-services\' // from cordova-plugin-firebase\n'+
-				'apply plugin: \'io.fabric\' // from cordova-plugin-firebase\n'+
+				'apply plugin: \'com.google.firebase.crashlytics\' // from cordova-plugin-firebase\n'+
 				'apply plugin: \'com.google.firebase.firebase-perf\' // from cordova-plugin-firebase\n';
 
 			buildGradle = buildGradle.replace(/apply plugin: \'com.android.application\'\n/m, firebasePlugins);

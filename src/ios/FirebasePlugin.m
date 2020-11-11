@@ -2,10 +2,10 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
 #import "Firebase.h"
-#import <Fabric/Fabric.h>
-#import <Crashlytics/Crashlytics.h>
-@import FirebaseInstanceID;
-@import FirebaseMessaging;
+// #import <Fabric/Fabric.h>
+// #import <Crashlytics/Crashlytics.h>
+// @import FirebaseInstanceID;
+// @import FirebaseMessaging;
 @import FirebaseAnalytics;
 @import FirebaseRemoteConfig;
 @import FirebasePerformance;
@@ -37,16 +37,17 @@ static FirebasePlugin *firebasePlugin;
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
 
-	// For Crashlytics: this enables the browser to correctly detect the error stack
-	// Ref: https://bugs.webkit.org/show_bug.cgi?id=154916
-	// Ref: https://stackoverflow.com/questions/36013645/setting-disable-web-security-and-allow-file-access-from-files-in-ios-wkwebvi
-	NSString* allowFileAccess = [self.commandDelegate.settings objectForKey:[@"FirebasePluginAllowFileAccess" lowercaseString]];
+    // For Crashlytics: this enables the browser to correctly detect the error stack
+    // Ref: https://bugs.webkit.org/show_bug.cgi?id=154916
+    // Ref: https://stackoverflow.com/questions/36013645/setting-disable-web-security-and-allow-file-access-from-files-in-ios-wkwebvi
+    NSString* allowFileAccess = [self.commandDelegate.settings objectForKey:[@"FirebasePluginAllowFileAccess" lowercaseString]];
     if ([self.webView isKindOfClass:WKWebView.class] && [allowFileAccess isEqualToString:@"true"]){
         WKWebView *wkWebView = (WKWebView *) self.webView;
         [wkWebView.configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
     }
 }
 
+/*
 - (void)getId:(CDVInvokedUrlCommand *)command {
     __block CDVPluginResult *pluginResult;
 
@@ -62,17 +63,31 @@ static FirebasePlugin *firebasePlugin;
 
     [[FIRInstanceID instanceID] getIDWithHandler:handler];
 }
+*/
 
 // DEPRECATED - alias of getToken
+/*
 - (void)getInstanceId:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [self getToken:command];
 }
 
 - (void)getToken:(CDVInvokedUrlCommand *)command {
-    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[[FIRInstanceID instanceID] token]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [[FIRInstanceID instanceID] instanceIDWithHandler:^
+     (FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
+        CDVPluginResult *pluginResult = nil;
+        if (error != nil) {
+            // NSLog(@"Error fetching remote instance ID: %@", error);
+
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: error.localizedDescription];
+        } else {
+            // NSLog(@"Remote instance ID token: %@", result.token);
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result.token];
+        }
+
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
 }
+*/
 
 - (void)hasPermission:(CDVInvokedUrlCommand *)command {
     BOOL enabled = NO;
@@ -114,7 +129,7 @@ static FirebasePlugin *firebasePlugin;
         return;
     }
 
-
+/*
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
     UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
     [[UNUserNotificationCenter currentNotificationCenter]
@@ -142,6 +157,7 @@ static FirebasePlugin *firebasePlugin;
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 #endif
+*/
 
     return;
 }
@@ -197,7 +213,7 @@ static FirebasePlugin *firebasePlugin;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
-
+/*
 - (void)subscribe:(CDVInvokedUrlCommand *)command {
     NSString* topic = [NSString stringWithFormat:@"/topics/%@", [command.arguments objectAtIndex:0]];
 
@@ -240,11 +256,16 @@ static FirebasePlugin *firebasePlugin;
 
 - (void)onTokenRefresh:(CDVInvokedUrlCommand *)command {
     self.tokenRefreshCallbackId = command.callbackId;
-    NSString* currentToken = [[FIRInstanceID instanceID] token];
 
-    if (currentToken != nil) {
-        [self sendToken:currentToken];
-    }
+    [[FIRInstanceID instanceID] instanceIDWithHandler:^
+     (FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
+        if (error == nil) {
+            NSString* currentToken = result.token;
+            if (currentToken != nil) {
+                [self sendToken:currentToken];
+            }
+        }
+    }];
 }
 
 - (void)sendNotification:(NSDictionary *)userInfo {
@@ -265,6 +286,7 @@ static FirebasePlugin *firebasePlugin;
         }
     }
 }
+*/
 
 - (void)sendToken:(NSString *)token {
     if (self.tokenRefreshCallbackId != nil) {
@@ -276,7 +298,7 @@ static FirebasePlugin *firebasePlugin;
 
 - (void)logEvent:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-		NSString* name           = [command.arguments objectAtIndex:0];
+        NSString* name           = [command.arguments objectAtIndex:0];
         NSDictionary* parameters = [command.arguments objectAtIndex:1];
 
          [FIRAnalytics logEventWithName:name parameters:parameters];
@@ -289,7 +311,8 @@ static FirebasePlugin *firebasePlugin;
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* errorMessage = [command.arguments objectAtIndex:0];
-        CLSNSLog(@"%@", errorMessage);
+        // CLSNSLog(@"%@", errorMessage);
+        [[FIRCrashlytics crashlytics] log:errorMessage];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -300,7 +323,8 @@ static FirebasePlugin *firebasePlugin;
         NSString* message = [command argumentAtIndex:0 withDefault:@""];
         if(message)
         {
-            CLSNSLog(@"%@",message);
+            // CLSNSLog(@"%@",message);
+            [[FIRCrashlytics crashlytics] log:message];
         }
     }];
 }
@@ -311,33 +335,36 @@ static FirebasePlugin *firebasePlugin;
 
 
         NSString *message = NSLocalizedString([command argumentAtIndex:0 withDefault:@"Unknown error"], nil);
-        NSArray *lines    = [command argumentAtIndex:1 withDefault:[[NSArray alloc] init] ];
+        NSArray  *lines   = [command argumentAtIndex:1 withDefault:[[NSArray alloc] init] ];
         NSString *domain  = NSLocalizedString([command argumentAtIndex:2 withDefault:[[NSBundle mainBundle] bundleIdentifier]], nil);
 
 
         NSMutableArray *stack = [[NSMutableArray alloc] init];
+        NSMutableArray<FIRStackFrame *> *stackTrace = [[NSMutableArray<FIRStackFrame *> alloc] init];
 
         for (NSDictionary *data in lines) {
-            NSString *filename = [data valueForKey:@"fileName"];
-            NSInteger *lineNumber = [[data valueForKey:@"lineNumber"] integerValue];
-            NSInteger *offset  = [[data valueForKey:@"columnNumber"] integerValue];
-            NSString *symbol  = [data valueForKey:@"source"];
-            NSString *library = [data valueForKey:@"functionName"];
+            NSString *filename    = [data valueForKey:@"fileName"];
+            NSInteger lineNumber = [[data valueForKey:@"lineNumber"] integerValue];
+            NSInteger offset     = [[data valueForKey:@"columnNumber"] integerValue];
+            NSString *symbol      = [data valueForKey:@"source"];
+            NSString *library     = [data valueForKey:@"functionName"];
             // int *address = [data valueForKey:@"fileName"];
 
-            // NSLog(filename);
-            CLSStackFrame *line = [[CLSStackFrame alloc] init];
-            line.fileName   = filename;
-            line.lineNumber = (int) lineNumber;
-            line.offset     = (int) offset;
-            line.symbol     = symbol;
-            line.library    = library;
-            // line.address    = 0;
+            NSArray *arrayOfSymbol = [symbol componentsSeparatedByString:@"@"];
+            if (arrayOfSymbol.count > 0 ){
+                symbol = arrayOfSymbol[0];
+            }
 
-            [stack addObject:line];
+
+            FIRStackFrame *line = [FIRStackFrame stackFrameWithSymbol:symbol file:filename line:lineNumber];
+            [stackTrace addObject:line];
+
         }
 
-        [CrashlyticsKit recordCustomExceptionName:domain reason:message frameArray:stack];
+        FIRExceptionModel *model = [FIRExceptionModel exceptionModelWithName:@"JavascriptException" reason:message];
+        model.stackTrace = [stackTrace copy];// stackTrace;
+
+        [[FIRCrashlytics crashlytics] recordExceptionModel:model];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -357,7 +384,7 @@ static FirebasePlugin *firebasePlugin;
 
         NSError *error = [NSError errorWithDomain: domain code: code userInfo: userInfo];
 
-        [CrashlyticsKit recordError:error];
+        [[FIRCrashlytics crashlytics] recordError:error];
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -365,14 +392,14 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)sendCrash:(CDVInvokedUrlCommand*)command{
-    [[Crashlytics sharedInstance] crash];
+    // [[Crashlytics sharedInstance] crash];
+    @[][1];
 }
 
 - (void)setCrashlyticsUserId:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
         NSString* userId = [command.arguments objectAtIndex:0];
-
-        [CrashlyticsKit setUserIdentifier:userId];
+        [[FIRCrashlytics crashlytics] setUserID:userId];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -513,7 +540,7 @@ static FirebasePlugin *firebasePlugin;
 
 - (void)incrementMetric:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-		NSString* traceName = [command.arguments objectAtIndex:0];
+        NSString* traceName = [command.arguments objectAtIndex:0];
         NSString* counterNamed = [command.arguments objectAtIndex:1];
         int64_t* increment = (int64_t)[command.arguments objectAtIndex:2];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -634,8 +661,9 @@ static FirebasePlugin *firebasePlugin;
      [self.commandDelegate runInBackground:^{
         BOOL enabled = [[command argumentAtIndex:0] boolValue];
 
-        [[FIRAnalyticsConfiguration sharedInstance] setAnalyticsCollectionEnabled:enabled];
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        // [[FIRAnalyticsConfiguration sharedInstance] setAnalyticsCollectionEnabled:enabled];
+         [FIRAnalytics setAnalyticsCollectionEnabled:enabled];
+         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
      }];
 }
@@ -653,7 +681,7 @@ static FirebasePlugin *firebasePlugin;
 }
 
 - (void)clearAllNotifications:(CDVInvokedUrlCommand *)command {
-	[self.commandDelegate runInBackground:^{
+    [self.commandDelegate runInBackground:^{
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 

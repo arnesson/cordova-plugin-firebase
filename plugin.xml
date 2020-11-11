@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebase" version="2.1.0"
+<plugin id="cordova-plugin-firebase" version="3.0.0"
 xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -50,20 +50,22 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<source-file src="src/android/colors.xml" target-dir="res/values" />
 
 		<dependency-classpath name="com.android.tools.build:gradle:3.4.1" />
-		<dependency-classpath name="com.google.gms:google-services:4.2.0" />
-		<dependency-classpath name="io.fabric.tools:gradle:1.29.0" />
-		<dependency-classpath name="com.google.firebase:perf-plugin:1.2.1" />
+		<dependency-classpath name="com.google.gms:google-services:4.3.4" />
+		<dependency-classpath name="com.google.firebase:firebase-crashlytics-gradle:2.3.0" />
+		<dependency-classpath name="com.google.firebase:perf-plugin:1.3.3" />
 
-		<framework-implementation name="com.google.android.gms:play-services-analytics-impl:16.0.7" />
+		<framework-implementation name="com.google.android.gms:play-services-analytics-impl:16.0.8" />
 		<framework-implementation name="com.google.android.gms:play-services-measurement-base@[16.0.4]" />
-		<framework-implementation name="com.google.firebase:firebase-core:16.0.9" />
-		<framework-implementation name="com.google.firebase:firebase-auth:17.0.0" />
-		<framework-implementation name="com.google.firebase:firebase-messaging:18.0.0" />
-		<framework-implementation name="com.google.firebase:firebase-config:17.0.0" />
-		<framework-implementation name="com.google.firebase:firebase-perf:17.0.0" />
-		<framework-implementation name="com.google.firebase:firebase-dynamic-links:17.0.0" />
-		<framework-implementation name="com.google.android.gms:play-services-tagmanager:16.0.8" />
-		<framework-implementation name="com.crashlytics.sdk.android:crashlytics:2.10.0" />
+
+		<framework-implementation name="com.google.firebase:firebase-bom:26.0.0" />
+
+		<framework-implementation name="com.google.firebase:firebase-crashlytics" />
+		<framework-implementation name="com.google.firebase:firebase-analytics" />
+		<framework-implementation name="com.google.firebase:firebase-config" />
+		<framework-implementation name="com.google.firebase:firebase-perf" />
+		<framework-implementation name="com.google.firebase:firebase-dynamic-links" />
+		<framework-implementation name="com.google.firebase:firebase-auth" />
+		<framework-implementation name="com.google.firebase:firebase-messaging" />
 
 	</platform>
 
