@@ -72,8 +72,6 @@ public class FirebasePlugin extends CordovaPlugin {
     private static CallbackContext notificationCallbackContext;
     private static CallbackContext tokenRefreshCallbackContext;
 
-    private static FirebaseCrashlytics crashlytics;
-
     @Override
     protected void pluginInitialize() {
         final Context context = this.cordova.getActivity().getApplicationContext();
@@ -95,9 +93,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     notificationStack.add(extras);
                 }
             }
-
-            // Get
-            this.crashlytics = FirebaseCrashlytics.getInstance();
         });
     }
 
