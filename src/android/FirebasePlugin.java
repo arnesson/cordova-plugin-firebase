@@ -2306,8 +2306,12 @@ public class FirebasePlugin extends CordovaPlugin {
                                         callbackContext.success(mapToJsonObject((Map<String, Object>) httpsCallableResult.getData()));
                                     } else if (httpsCallableResult.getData() instanceof ArrayList) {
                                         callbackContext.success(objectToJsonArray(httpsCallableResult.getData()));
-                                    } else {
+                                    } else if (httpsCallableResult.getData() instanceof Integer) {
+                                        callbackContext.success((int) httpsCallableResult.getData());
+                                    } else if (httpsCallableResult.getData() instanceof String) {
                                         callbackContext.success((String) httpsCallableResult.getData());
+                                    } else {
+                                        callbackContext.success((byte[]) httpsCallableResult.getData());
                                     }
                                 } catch (Exception e){
                                     handleExceptionWithContext(e, callbackContext);
@@ -2317,19 +2321,27 @@ public class FirebasePlugin extends CordovaPlugin {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                try {
+                                if (e instanceof FirebaseFunctionsException) {
                                     this.onFailure((FirebaseFunctionsException) e);
-                                } catch (JSONException ex) {
-                                    handleExceptionWithContext(ex, callbackContext);
+                                    return;
                                 }
+                                handleExceptionWithContext(e, callbackContext);
                             }
 
-                            void onFailure(@NonNull FirebaseFunctionsException e) throws JSONException {
+                            void onFailure(@NonNull FirebaseFunctionsException e) {
                                 if (e.getDetails() == null) {
                                     handleExceptionWithContext(e, callbackContext);
                                     return;
                                 }
-                                callbackContext.error(mapToJsonObject((Map<String, Object>) e.getDetails()));
+                                if (e.getDetails() instanceof String) {
+                                    callbackContext.error(e.getDetails().toString());
+                                } else {
+                                    try {
+                                        callbackContext.error(mapToJsonObject((Map<String, Object>) e.getDetails()));
+                                    } catch (JSONException ex) {
+                                        handleExceptionWithContext(ex, callbackContext);
+                                    }
+                                }
                             }
                         });
                 } catch (Exception e) {
