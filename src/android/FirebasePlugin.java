@@ -98,6 +98,11 @@ import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -172,7 +177,15 @@ public class FirebasePlugin extends CordovaPlugin {
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
                     firestore = FirebaseFirestore.getInstance();
-                    gson = new Gson();
+                    gson = new GsonBuilder()
+                    .registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
+                        public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
+                            if (src.isNaN() || src.isInfinite())
+                                return new JsonPrimitive(src.toString());
+                            return new JsonPrimitive(src);
+                        }
+                    })
+                    .create();
 
                     if (extras != null && extras.size() > 1) {
                         if (FirebasePlugin.notificationStack == null) {
@@ -943,7 +956,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-	
+
 	private void setConfigSettings(final CallbackContext callbackContext, final JSONArray args) throws JSONException {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -1478,7 +1491,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-    
+
     public void createUserWithEmailAndPassword(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
