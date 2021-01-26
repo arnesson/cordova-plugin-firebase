@@ -1,13 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebasex" version="10.2.0"
+<plugin id="cordova-plugin-firebasex" version="11.0.3"
 		xmlns="http://apache.org/cordova/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
 
 	<license>MIT</license>
-
-	<dependency id="cordova-plugin-androidx" version="^2.0.0" />
-	<dependency id="cordova-plugin-androidx-adapter" version="^1.1.1" />
 
 	<engines>
 		<engine name="cordova" version=">=9" />
@@ -21,6 +18,7 @@
 
 	<platform name="android">
 		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
+		<preference name="ANDROID_FIREBASE_PERFORMANCE_MONITORING" default="false" />
 
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
@@ -62,18 +60,19 @@
 
 		<!-- Default versions for Gradle dependencies -->
 		<preference name="ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" default="17.0.0" />
-		<preference name="ANDROID_PLAY_SERVICES_AUTH_VERSION" default="18.0.0" />
-		<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.4.3" />
-		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="20.2.1" />
-		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="19.1.4" />
-		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="19.0.7" />
-		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="19.3.1" />
-		<preference name="ANDROID_FIREBASE_INAPPMESSAGING_VERSION" default="19.0.7" />
-		<preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="21.4.3" />
-		<preference name="ANDROID_FIREBASE_FUNCTIONS_VERSION" default="19.1.0" />
-		<preference name="ANDROID_FIREBASE_CRASHLYTICS_VERSION" default="17.0.1" />
-		<preference name="ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" default="17.0.1" />
+		<preference name="ANDROID_PLAY_SERVICES_AUTH_VERSION" default="18.1.0" />
+		<preference name="ANDROID_FIREBASE_ANALYTICS_VERSION" default="17.5.0" />
+		<preference name="ANDROID_FIREBASE_MESSAGING_VERSION" default="20.3.0" />
+		<preference name="ANDROID_FIREBASE_CONFIG_VERSION" default="19.2.0" />
+		<preference name="ANDROID_FIREBASE_PERF_VERSION" default="19.0.9" />
+		<preference name="ANDROID_FIREBASE_AUTH_VERSION" default="19.4.0" />
+		<preference name="ANDROID_FIREBASE_INAPPMESSAGING_VERSION" default="19.1.1" />
+		<preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="21.7.0" />
+		<preference name="ANDROID_FIREBASE_FUNCTIONS_VERSION" default="19.2.0" />
+		<preference name="ANDROID_FIREBASE_CRASHLYTICS_VERSION" default="17.2.2" />
+		<preference name="ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" default="17.2.2" />
 		<preference name="ANDROID_GSON_VERSION" default="2.8.6" />
+		<preference name="ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION" default="1.3.1" />
 
 		<framework src="com.google.android.gms:play-services-tagmanager:$ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" />
 		<framework src="com.google.android.gms:play-services-auth:$ANDROID_PLAY_SERVICES_AUTH_VERSION" />
@@ -99,18 +98,21 @@
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
-		<config-file parent="/*" target="config.xml">
+		<config-file target="config.xml" parent="/*">
 			<feature name="FirebasePlugin">
 				<param name="ios-package" value="FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
 		</config-file>
-		<config-file parent="aps-environment" target="*/Entitlements-Debug.plist">
+
+		<config-file target="*/Entitlements-Debug.plist" parent="aps-environment">
 			<string>development</string>
 		</config-file>
-		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
+		<config-file target="*/Entitlements-Release.plist" parent="aps-environment">
 			<string>production</string>
 		</config-file>
+
+
 		<config-file target="*-Info.plist" parent="UIBackgroundModes">
 			<array>
 				<string>remote-notification</string>
@@ -135,16 +137,16 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="Firebase/Core" spec="6.28.1"/>
-				<pod name="Firebase/Auth" spec="6.28.1"/>
-				<pod name="Firebase/Messaging" spec="6.28.1"/>
-				<pod name="Firebase/Performance" spec="6.28.1"/>
-				<pod name="Firebase/RemoteConfig" spec="6.28.1"/>
-				<pod name="Firebase/InAppMessaging" spec="6.28.1"/>
-				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.28.1"/>
-				<pod name="Firebase/Crashlytics" spec="6.28.1"/>
+				<pod name="Firebase/Core" spec="6.33.0"/>
+				<pod name="Firebase/Auth" spec="6.33.0"/>
+				<pod name="Firebase/Messaging" spec="6.33.0"/>
+				<pod name="Firebase/Performance" spec="6.33.0"/>
+				<pod name="Firebase/RemoteConfig" spec="6.33.0"/>
+				<pod name="Firebase/InAppMessaging" spec="6.33.0"/>
+				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="6.33.0"/>
+				<pod name="Firebase/Crashlytics" spec="6.33.0"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
-				<pod name="GoogleTagManager" spec="7.1.2"/>
+				<pod name="GoogleTagManager" spec="7.1.4"/>
 			</pods>
 		</podspec>
 

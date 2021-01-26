@@ -137,10 +137,10 @@ didSignInForUser:(GIDGoogleUser *)user
             [FIRGoogleAuthProvider credentialWithIDToken:authentication.idToken
                                            accessToken:authentication.accessToken];
             
-            int key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+            NSNumber* key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
             NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
             [result setValue:@"true" forKey:@"instantVerification"];
-            [result setValue:[NSNumber numberWithInt:key] forKey:@"id"];
+            [result setValue:key forKey:@"id"];
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
         } else {
           pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
@@ -520,10 +520,10 @@ didDisconnectWithUser:(GIDGoogleUser *)user
                         IDToken:idToken
                         rawNonce:rawNonce];
                     
-                    int key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+                    NSNumber* key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
                     NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
                     [result setValue:@"true" forKey:@"instantVerification"];
-                    [result setValue:[NSNumber numberWithInt:key] forKey:@"id"];
+                    [result setValue:key forKey:@"id"];
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
                 }
             }

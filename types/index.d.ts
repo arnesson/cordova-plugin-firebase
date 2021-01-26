@@ -1,4 +1,4 @@
-interface IChannelOptions {
+export interface IChannelOptions {
     id: string
     name?: string
     description?: string
@@ -11,7 +11,7 @@ interface IChannelOptions {
     visibility?: -1 | 0 | 1
 }
 
-interface FirebasePlugin {
+export interface FirebasePlugin {
     getId(
         success: (value: string) => void,
         error: (err: string) => void
@@ -108,8 +108,18 @@ interface FirebasePlugin {
         userValue: string
     ): void
     setCrashlyticsCollectionEnabled(): void
+    didCrashOnPreviousExecution(
+        success?: (didCrashOnPreviousExecution: boolean) => void,
+        error?: (err: string) => void
+    )
     setCrashlyticsUserId(
         userId: string
+    ): void
+    setCrashlyticsCustomKey(
+        key: string,
+        value: string | number | boolean,
+        success?: () => void,
+        error?: (err: string) => void
     ): void
     sendCrash(): void
     logMessage(
@@ -127,6 +137,11 @@ interface FirebasePlugin {
         phoneNumber: string,
         timeOutDuration: number,
         fakeVerificationCode?: string
+    ): void
+    setLanguageCode(
+        lang: string,
+        success?: () => void,
+        error?: (err: string) => void
     ): void
     createUserWithEmailAndPassword(
         email: string,
@@ -233,14 +248,21 @@ interface FirebasePlugin {
         success: (activated: boolean) => void,
         error: (err: string) => void
     ): void
+    fetchAndActivate(
+        success: (activated: boolean) => void,
+        error: (err: string) => void
+    ): void
+    resetRemoteConfig(
+        success: () => void,
+        error: (err: string) => void
+    ): void
     getValue(
         key: string,
         success: (value: string) => void,
         error: (err: string) => void
     ): void
-    getByteArray(
-        key: string,
-        success: (value: object) => void,
+    getAll(
+        success: (values: object) => void,
         error: (err: string) => void
     ): void
     getInfo(
@@ -308,8 +330,28 @@ interface FirebasePlugin {
     ): void
     fetchFirestoreCollection(
         collection: string,
-        success: (collection: object) => void,
-        error: (err: string) => void
+        filters?: [object],
+        success?: (collection: object) => void,
+        error?: (err: string) => void
+    ): void
+    listenToDocumentInFirestoreCollection(
+        success: (event: object) => void,
+        error: (err: string) => void,
+        documentId: string,
+        collection: string,
+        includeMetadata?: boolean
+    ): void
+    listenToFirestoreCollection(
+        success: (event: object) => void,
+        error: (err: string) => void,
+        collection: string,
+        filters?: [object],
+        includeMetadata?: boolean
+    ): void
+    removeFirestoreListener(
+        success: () => void,
+        error: (err: string) => void,
+        listenerId: string
     ): void
 }
 declare var FirebasePlugin: FirebasePlugin;

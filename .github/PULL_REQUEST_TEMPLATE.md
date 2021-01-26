@@ -12,11 +12,16 @@ What kind of change does this PR introduce?
 <!-- Fill out the relevant sections below and delete irrelevant sections. -->
 
 ## PR Checklist
-For bug fixes / features, please check if your PR fulfills the following requirements:
+Please check your PR fulfills the following requirements:
 
-- [ ] Testing has been carried out for the changes have been added
-- [ ] Regression testing has been carried out for existing functionality
-- [ ] Docs have been added / updated
+Bugfixes:
+- [ ] Regression testing has been carried out using the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) to ensure the intended bug is fixed and no regression bugs have been inadvertently introduced.
+
+New features/enhancements:
+- [ ] Exhaustive testing has been carried out for the new functionality
+- [ ] Regression testing has been carried out to ensure no existing functionality is adversely affected
+- [ ] Documentation has been added / updated
+- [ ] The [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) has been update to validate/demonstrate the new functionality.
 
 ## What is the purpose of this PR?
 <!-- Describe any current behavior that you are modifying, or link to a relevant issue. -->
