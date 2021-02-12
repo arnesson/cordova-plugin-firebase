@@ -649,20 +649,42 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
-            throws JSONException {
+    private Bundle createBundleFromJSONObject(final JSONObject params) throws JSONException {
         final Bundle bundle = new Bundle();
-        Iterator iter = params.keys();
+        Iterator<String> iter = params.keys();
         while (iter.hasNext()) {
-            String key = (String) iter.next();
-            Object value = params.get(key);
-
-            if (value instanceof Integer || value instanceof Double) {
-                bundle.putFloat(key, ((Number) value).floatValue());
+            String key = iter.next();
+            Object obj = params.get(key);
+            if (obj instanceof Integer) {
+                bundle.putInt(key, (Integer) obj);
+            } else if (obj instanceof Double) {
+                bundle.putDouble(key, (Double) obj);
+            } else if (obj instanceof Float) {
+                bundle.putFloat(key, (Float) obj);
+            } else if (obj instanceof JSONObject) {
+                Bundle item = this.createBundleFromJSONObject((JSONObject) obj);
+                bundle.putBundle(key, item);
+            } else if (obj instanceof JSONArray) {
+                JSONArray objArr = (JSONArray) obj;
+                ArrayList<Bundle> bundleArray = new ArrayList<Bundle>(objArr.length());
+                for (int idx = 0; idx < objArr.length(); idx++) {
+                    Object tmp = objArr.get(idx);
+                    if (tmp instanceof JSONObject) {
+                        Bundle item = createBundleFromJSONObject(objArr.getJSONObject(idx));
+                        bundleArray.add(item);
+                    }
+                }
+                bundle.putParcelableArrayList(key, bundleArray);
             } else {
-                bundle.putString(key, value.toString());
+                bundle.putString(key, obj.toString());
             }
         }
+        return bundle;
+    }
+
+    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
+            throws JSONException {
+        final Bundle bundle = this.createBundleFromJSONObject(params);
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
