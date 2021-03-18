@@ -1341,7 +1341,16 @@ static NSMutableDictionary* firestoreListeners;
     [self.commandDelegate runInBackground:^{
         @try {
             FIRRemoteConfig* remoteConfig = [FIRRemoteConfig remoteConfig];
-            NSArray* keys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceDefault];
+            NSArray* defaultKeys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceDefault];
+            NSArray* remoteKeys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceRemote];
+            NSArray* staticKeys = [remoteConfig allKeysFromSource:FIRRemoteConfigSourceStatic];
+            NSArray* keys = defaultKeys;
+            if([keys count] == 0){
+                keys = remoteKeys;
+            }
+            if([keys count] == 0){
+                keys = staticKeys;
+            }
             NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
             
             for (NSString* key in keys) {
