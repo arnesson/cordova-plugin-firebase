@@ -181,7 +181,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();                  
+                    firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -954,7 +954,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     JSONObject info = new JSONObject();
 
                     JSONObject settings = new JSONObject();
-                    settings.put("developerModeEnabled", remoteConfigInfo.getConfigSettings().isDeveloperModeEnabled());
                     info.put("configSettings", settings);
 
                     info.put("fetchTimeMillis", remoteConfigInfo.getFetchTimeMillis());
