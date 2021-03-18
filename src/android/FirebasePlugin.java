@@ -102,6 +102,11 @@ import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -176,11 +181,18 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();
-
+                    firestore = FirebaseFirestore.getInstance();                  
                     functions = FirebaseFunctions.getInstance();
 
-                    gson = new Gson();
+                    gson = new GsonBuilder()
+                    .registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
+                        public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
+                            if (src.isNaN() || src.isInfinite())
+                                return new JsonPrimitive(src.toString());
+                            return new JsonPrimitive(src);
+                        }
+                    })
+                    .create();
 
                     if (extras != null && extras.size() > 1) {
                         if (FirebasePlugin.notificationStack == null) {
@@ -659,20 +671,42 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
-            throws JSONException {
+    private Bundle createBundleFromJSONObject(final JSONObject params) throws JSONException {
         final Bundle bundle = new Bundle();
-        Iterator iter = params.keys();
+        Iterator<String> iter = params.keys();
         while (iter.hasNext()) {
-            String key = (String) iter.next();
-            Object value = params.get(key);
-
-            if (value instanceof Integer || value instanceof Double) {
-                bundle.putFloat(key, ((Number) value).floatValue());
+            String key = iter.next();
+            Object obj = params.get(key);
+            if (obj instanceof Integer) {
+                bundle.putInt(key, (Integer) obj);
+            } else if (obj instanceof Double) {
+                bundle.putDouble(key, (Double) obj);
+            } else if (obj instanceof Float) {
+                bundle.putFloat(key, (Float) obj);
+            } else if (obj instanceof JSONObject) {
+                Bundle item = this.createBundleFromJSONObject((JSONObject) obj);
+                bundle.putBundle(key, item);
+            } else if (obj instanceof JSONArray) {
+                JSONArray objArr = (JSONArray) obj;
+                ArrayList<Bundle> bundleArray = new ArrayList<Bundle>(objArr.length());
+                for (int idx = 0; idx < objArr.length(); idx++) {
+                    Object tmp = objArr.get(idx);
+                    if (tmp instanceof JSONObject) {
+                        Bundle item = createBundleFromJSONObject(objArr.getJSONObject(idx));
+                        bundleArray.add(item);
+                    }
+                }
+                bundle.putParcelableArrayList(key, bundleArray);
             } else {
-                bundle.putString(key, value.toString());
+                bundle.putString(key, obj.toString());
             }
         }
+        return bundle;
+    }
+
+    private void logEvent(final CallbackContext callbackContext, final String name, final JSONObject params)
+            throws JSONException {
+        final Bundle bundle = this.createBundleFromJSONObject(params);
 
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -953,7 +987,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-	
+
 	private void setConfigSettings(final CallbackContext callbackContext, final JSONArray args) throws JSONException {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -1488,7 +1522,7 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
-    
+
     public void createUserWithEmailAndPassword(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
