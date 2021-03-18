@@ -17,6 +17,7 @@
 @implementation AppDelegate (FirebasePlugin)
 
 static AppDelegate* instance;
+static id <UNUserNotificationCenterDelegate> _previousDelegate;
 
 + (AppDelegate*) instance {
     return instance;
@@ -203,6 +204,10 @@ didDisconnectWithUser:(GIDGoogleUser *)user
     [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken]];
     [FirebasePlugin.firebasePlugin sendApnsToken:[FirebasePlugin.firebasePlugin hexadecimalStringFromData:deviceToken]];
     
+    if ([UNUserNotificationCenter currentNotificationCenter].delegate != nil) {
+        _previousDelegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
+    }
+    
     // Set UNUserNotificationCenter delegate
     [UNUserNotificationCenter currentNotificationCenter].delegate = self;
 }
@@ -383,8 +388,16 @@ didDisconnectWithUser:(GIDGoogleUser *)user
     @try{
 
         if (![notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
-            [FirebasePlugin.firebasePlugin _logError:@"willPresentNotification: aborting as not a supported UNNotificationTrigger"];
-            return;
+            if (_previousDelegate) {
+                // bubbling notification
+                [_previousDelegate userNotificationCenter:center
+                          willPresentNotification:notification
+                            withCompletionHandler:completionHandler];
+                return;
+            } else {
+                [FirebasePlugin.firebasePlugin _logError:@"willPresentNotification: aborting as not a supported UNNotificationTrigger"];
+                return;
+            }
         }
         
         [[FIRMessaging messaging] appDidReceiveMessage:notification.request.content.userInfo];
@@ -451,8 +464,16 @@ didDisconnectWithUser:(GIDGoogleUser *)user
     @try{
         
         if (![response.notification.request.trigger isKindOfClass:UNPushNotificationTrigger.class] && ![response.notification.request.trigger isKindOfClass:UNTimeIntervalNotificationTrigger.class]){
-            [FirebasePlugin.firebasePlugin _logMessage:@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger"];
-            return;
+            if (_previousDelegate) {
+                // bubbling event
+                [_previousDelegate userNotificationCenter:center
+                               didReceiveNotificationResponse:response
+                            withCompletionHandler:completionHandler];
+                return;
+            } else {
+                [FirebasePlugin.firebasePlugin _logMessage:@"didReceiveNotificationResponse: aborting as not a supported UNNotificationTrigger"];
+                return;
+            }
         }
 
         [[FIRMessaging messaging] appDidReceiveMessage:response.notification.request.content.userInfo];
