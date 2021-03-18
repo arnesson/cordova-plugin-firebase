@@ -428,3 +428,8 @@ exports.removeFirestoreListener = function (success, error, listenerId) {
 
     exec(success, error, "FirebasePlugin", "removeFirestoreListener", [listenerId.toString()]);
 };
+
+exports.functionsHttpsCallable = function (name, args, success, error) {
+  if(typeof name !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+  exec(success, error, "FirebasePlugin", "functionsHttpsCallable", [name, args]);
+};
