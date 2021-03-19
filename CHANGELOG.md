@@ -1,3 +1,24 @@
+# Version 12.0.0
+* (iOS) BREAKING CHANGE: Major version update to Firebase iOS SDK from v6 to v7 ([v7.8.1 - 12 March 2021](https://firebase.google.com/support/release-notes/ios#version_781_-_march_12_2021))
+    * Requires `cocoapods@1.10` (previously `cocoapods@1.9`)
+    * Removes `developerModeEnabled` property from `getInfo()` Remote Config response as this was removed in the latest Firebase SDK
+    * Removes direct channel support for Firebase Messaging as no longer supported by Firebase iOS SDK v7.
+* (Android) BREAKING CHANGE: Major version update to Firebase Android BOM from v25 to v26 ([v26.7.0 - 11 March 2021](https://firebase.google.com/support/release-notes/android#bom_v26-7-0))
+    * Removes `developerModeEnabled` property from `getInfo()` Remote Config response as this was removed in the latest Firebase SDK
+* (iOS) Bugfix: Fix conflict with [cordova-plugin-local-notifications](https://github.com/katzer/cordova-plugin-local-notifications) to enable both remote notifications via this plugin and local notifications via that plugin to work simultaneously in the same app.
+    * Merged from PR [#573](https://github.com/dpa99c/cordova-plugin-firebasex/pull/573).
+    * Resolves [#230](https://github.com/dpa99c/cordova-plugin-firebasex/issues/230).
+* (Android) Feature: add support for calling [Firebase Functions](https://firebase.google.com/docs/functions/callable)
+    * Merged from PR [#509](https://github.com/dpa99c/cordova-plugin-firebasex/pull/509).
+* (iOS) Bugfix: Add base class to `FirebasePluginMessageReceiverManager` to prevent Xcode build error
+    * Merged from PR [#579](https://github.com/dpa99c/cordova-plugin-firebasex/pull/579).
+* (Android) Bugfix: Fix GSON serialization of `NaN` values in Firestore
+    * Merged from PR [#584](https://github.com/dpa99c/cordova-plugin-firebasex/pull/584).
+* (Android) Bugfix: Fix serialization of JSON arrays and objects in `logEvent()` for Analytics
+    * Merged from PR [#598](https://github.com/dpa99c/cordova-plugin-firebasex/pull/598).
+* (iOS) Bugfix: Fix reading of all Remote Config keys in `getAll()` by falling back if default source is empty.
+
+
 # Version 11.0.3
 * (Android) Make Firebase Performance Monitoring Gradle plugin optional (disabled by default) via `ANDROID_FIREBASE_PERFORMANCE_MONITORING` plugin variable due to increased build times/memory usage when it's included.
 * (Android) Add defensive code in `handleExceptionWithContext()` to prevent app crashes.

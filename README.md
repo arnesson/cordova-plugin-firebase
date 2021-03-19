@@ -461,7 +461,7 @@ Therefore if you need to change the specified versions, you'll currently need to
 ### Cocoapods
 This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
-Therefore please make sure you have `cocoapods@>=1.9` installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
+Please make sure you have `cocoapods@>=1.10` installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
 
 If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
 
