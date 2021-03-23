@@ -3,6 +3,7 @@
     * Requires `cocoapods@1.10` (previously `cocoapods@1.9`)
     * Removes `developerModeEnabled` property from `getInfo()` Remote Config response as this was removed in the latest Firebase SDK
     * Removes direct channel support for Firebase Messaging as no longer supported by Firebase iOS SDK v7.
+    * Resolves [#561](https://github.com/dpa99c/cordova-plugin-firebasex/issues/561).
 * (Android) BREAKING CHANGE: Major version update to Firebase Android BOM from v25 to v26 ([v26.7.0 - 11 March 2021](https://firebase.google.com/support/release-notes/android#bom_v26-7-0))
     * Removes `developerModeEnabled` property from `getInfo()` Remote Config response as this was removed in the latest Firebase SDK
 * (iOS) Bugfix: Fix conflict with [cordova-plugin-local-notifications](https://github.com/katzer/cordova-plugin-local-notifications) to enable both remote notifications via this plugin and local notifications via that plugin to work simultaneously in the same app.
@@ -17,6 +18,17 @@
 * (Android) Bugfix: Fix serialization of JSON arrays and objects in `logEvent()` for Analytics
     * Merged from PR [#598](https://github.com/dpa99c/cordova-plugin-firebasex/pull/598).
 * (iOS) Bugfix: Fix reading of all Remote Config keys in `getAll()` by falling back if default source is empty.
+* (iOS) Bugfix: Register notification delegate during didFinishLaunching to ensure notifications are ready when app starts.
+    * Resolves [#542](https://github.com/dpa99c/cordova-plugin-firebasex/issues/542).
+* (iOS) Bugfix: Make interaction with firestoreListeners thread-safe.
+    * Resolves [#574](https://github.com/dpa99c/cordova-plugin-firebasex/issues/574).
+* (iOS) Bugfix: Ensure traces array is always defined before referencing it.
+    * Resolves [#602](https://github.com/dpa99c/cordova-plugin-firebasex/issues/602).
+* (iOS) Bugfix: Gracefully handle sending empty error message to logError.
+    * Resolves [#555](https://github.com/dpa99c/cordova-plugin-firebasex/issues/555).
+* (iOS) Bugfix: Gracefully handle errors in fetching token data when returning user info.
+* (Android) Bugfix: Gracefully handle errors when attempting to retrieve ID token when fetching current user info.
+    * Resolves [#566](https://github.com/dpa99c/cordova-plugin-firebasex/issues/566).
 
 
 # Version 11.0.3
