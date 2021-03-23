@@ -803,9 +803,13 @@ static NSMutableDictionary* firestoreListeners;
     [userInfo setValue:user.uid forKey:@"uid"];
     [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
     [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
-        [userInfo setValue:token forKey:@"idToken"];
+        if(error == nil){
+            [userInfo setValue:token forKey:@"idToken"];
+        }
         [user getIDTokenResultWithCompletion:^(FIRAuthTokenResult * _Nullable tokenResult, NSError * _Nullable error) {
-            [userInfo setValue:tokenResult.signInProvider forKey:@"providerId"];
+            if(error == nil){
+                [userInfo setValue:tokenResult.signInProvider forKey:@"providerId"];
+            }
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
         }];
     }];
