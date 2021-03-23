@@ -73,6 +73,11 @@ static bool authStateChangeListenerInitialized = false;
             isFirebaseInitializedWithPlist = true;
         }
     
+        // Set UNUserNotificationCenter delegate
+        if ([UNUserNotificationCenter currentNotificationCenter].delegate != nil) {
+            _previousDelegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
+        }
+        [UNUserNotificationCenter currentNotificationCenter].delegate = self;
 
         // Set FCM messaging delegate
         [FIRMessaging messaging].delegate = self;
@@ -169,13 +174,6 @@ didDisconnectWithUser:(GIDGoogleUser *)user
     [FIRMessaging messaging].APNSToken = deviceToken;
     [FirebasePlugin.firebasePlugin _logMessage:[NSString stringWithFormat:@"didRegisterForRemoteNotificationsWithDeviceToken: %@", deviceToken]];
     [FirebasePlugin.firebasePlugin sendApnsToken:[FirebasePlugin.firebasePlugin hexadecimalStringFromData:deviceToken]];
-    
-    if ([UNUserNotificationCenter currentNotificationCenter].delegate != nil) {
-        _previousDelegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
-    }
-    
-    // Set UNUserNotificationCenter delegate
-    [UNUserNotificationCenter currentNotificationCenter].delegate = self;
 }
 
 //Tells the app that a remote notification arrived that indicates there is data to be fetched.
