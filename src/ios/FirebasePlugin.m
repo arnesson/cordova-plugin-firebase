@@ -1142,12 +1142,13 @@ static NSMutableDictionary* firestoreListeners;
 
 - (void)logError:(CDVInvokedUrlCommand *)command {
     [self.commandDelegate runInBackground:^{
-        NSString* errorMessage = [command.arguments objectAtIndex:0];
-
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         @try {
+            NSString* errorMessage = [command.arguments objectAtIndex:0];
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             if(![self isCrashlyticsEnabled]){
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log error - Crashlytics collection is disabled"];
+            }else if([command.arguments objectAtIndex:0] == [NSNull null]){
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot log error - error message is empty"];
             }
             // We can optionally be passed a stack trace from stackTrace.js which we'll put in userInfo.
             else if ([command.arguments count] > 1) {
