@@ -1860,10 +1860,12 @@ static NSMutableDictionary* firestoreListeners;
 }
 
 - (NSNumber*) saveFirestoreListener: (id<FIRListenerRegistration>) firestoreListener {
-    int id = [self generateId];
-    NSNumber* key = [NSNumber numberWithInt:id];
-    [firestoreListeners setObject:firestoreListener forKey:key];
-    return key;
+    @synchronized (firestoreListeners) {
+        int id = [self generateId];
+        NSNumber* key = [NSNumber numberWithInt:id];
+        [firestoreListeners setObject:firestoreListener forKey:key];
+        return key;
+    }
 }
 
 - (void) removeFirestoreListener:(CDVInvokedUrlCommand*)command {
@@ -1883,14 +1885,16 @@ static NSMutableDictionary* firestoreListeners;
 }
 
 - (bool) _removeFirestoreListener: (NSNumber*) key {
-    bool removed = false;
-    if([firestoreListeners objectForKey:key] != nil){
-        id<FIRListenerRegistration> firestoreListener = [firestoreListeners objectForKey:key];
-        [firestoreListener remove];
-        [firestoreListeners removeObjectForKey:key];
-        removed = true;
+    @synchronized (firestoreListeners) {
+        bool removed = false;
+        if([firestoreListeners objectForKey:key] != nil){
+            id<FIRListenerRegistration> firestoreListener = [firestoreListeners objectForKey:key];
+            [firestoreListener remove];
+            [firestoreListeners removeObjectForKey:key];
+            removed = true;
+        }
+        return removed;
     }
-    return removed;
 }
 
 /********************************/
