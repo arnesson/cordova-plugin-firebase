@@ -84,6 +84,7 @@ static NSMutableDictionary* firestoreListeners;
 
         authCredentials = [[NSMutableDictionary alloc] init];
         firestoreListeners = [[NSMutableDictionary alloc] init];
+        self.traces = [NSMutableDictionary new];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
@@ -1443,16 +1444,11 @@ static NSMutableDictionary* firestoreListeners;
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* traceName = [command.arguments objectAtIndex:0];
-            FIRTrace *trace = [self.traces objectForKey:traceName];
-
-            if ( self.traces == nil) {
-                self.traces = [NSMutableDictionary new];
-            }
+            FIRTrace* trace = [self.traces objectForKey:traceName];
 
             if (trace == nil) {
                 trace = [FIRPerformance startTraceWithName:traceName];
                 [self.traces setObject:trace forKey:traceName ];
-
             }
 
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
