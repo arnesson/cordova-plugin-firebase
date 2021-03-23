@@ -181,7 +181,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();
+                    firestore = FirebaseFirestore.getInstance();                  
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -1174,6 +1174,14 @@ public class FirebasePlugin extends CordovaPlugin {
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
+            }
+
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Something went wrong getting ID token so return other user data
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                handleExceptionWithoutContext(e);
             }
         });
     }
