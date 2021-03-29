@@ -10,6 +10,7 @@
 @import FirebaseRemoteConfig;
 @import FirebasePerformance;
 @import FirebaseAuth;
+@import FirebaseFunctions;
 @import UserNotifications;
 @import CommonCrypto;
 @import AuthenticationServices;
@@ -39,6 +40,7 @@ static FIRFirestore* firestore;
 static NSUserDefaults* preferences;
 static NSDictionary* googlePlist;
 static NSMutableDictionary* firestoreListeners;
+static NSString* currentInstallationId;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -140,7 +142,6 @@ static NSMutableDictionary* firestoreListeners;
                             object:nil
                              queue:nil
                         usingBlock:^(NSNotification * _Nonnull notification) {
-            
             [weakSelf sendNewInstallationId];
         }];
     }@catch (NSException *exception) {
@@ -1913,6 +1914,29 @@ static NSMutableDictionary* firestoreListeners;
 }
 
 /*
+ * Functions
+ */
+- (void)functionsHttpsCallable:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            __weak __auto_type weakSelf = self;
+            NSString* name = [command.arguments objectAtIndex:0];
+            NSDictionary* arguments = [command.arguments objectAtIndex:1];
+            [[[FIRFunctions functions] HTTPSCallableWithName:name] callWithObject:arguments
+                                                                  completion:^(FIRHTTPSCallableResult* _Nullable result, NSError* _Nullable error) {
+                if (error != nil) {
+                    [weakSelf sendPluginErrorWithError:error command:command];
+                } else {
+                    [weakSelf sendPluginDictionaryResult:result.data command:command callbackId:command.callbackId];
+                }
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+/*
  * Installations
  */
 - (void) getInstallationId:(CDVInvokedUrlCommand*)command {
@@ -1962,8 +1986,9 @@ static NSMutableDictionary* firestoreListeners;
             [[FIRInstallations installations] installationIDWithCompletion:^(NSString *identifier, NSError *error) {
                 if(error != nil){
                     [self handlePluginErrorWithoutContext:error];
-                }else{
+                }else if(currentInstallationId != identifier){
                     [FirebasePlugin.firebasePlugin executeGlobalJavascript:[NSString stringWithFormat:@"FirebasePlugin._onInstallationIdChangeCallback('%@')", identifier]];
+                    currentInstallationId = identifier;
                 }
             }];
         }@catch (NSException *exception) {

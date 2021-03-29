@@ -101,6 +101,9 @@
 - (void)listenToFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)removeFirestoreListener:(CDVInvokedUrlCommand*)command;
 
+// Functions
+- (void)functionsHttpsCallable:(CDVInvokedUrlCommand*)command;
+
 // Installations
 - (void) getInstallationId:(CDVInvokedUrlCommand*)command;
 - (void) getInstallationToken:(CDVInvokedUrlCommand*)command;

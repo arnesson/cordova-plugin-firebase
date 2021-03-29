@@ -3492,8 +3492,6 @@ Exposes API methods of the [Firebase Functions SDK](https://firebase.google.com/
 ### functionsHttpsCallable
 Call a firebase [Https Callable function](https://firebase.google.com/docs/functions/callable)
 
-Android only.
-
 **Parameters**:
 - {string} name - the name of the function
 - {object} args - arguments to send to the function
