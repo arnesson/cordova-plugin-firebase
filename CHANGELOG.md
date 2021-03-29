@@ -1,3 +1,9 @@
+# Version 12.1.0
+* (iOS & Android) feature: Add support for Firebase Installations SDK.
+    * Resolves [#603](https://github.com/dpa99c/cordova-plugin-firebasex/issues/603)
+* (iOS) feature: Implement [Firebase Functions](https://firebase.google.com/docs/functions/callable)
+    * Relates to PR [#509](https://github.com/dpa99c/cordova-plugin-firebasex/pull/509).
+
 # Version 12.0.0
 * (iOS) BREAKING CHANGE: Major version update to Firebase iOS SDK from v6 to v7 ([v7.8.1 - 12 March 2021](https://firebase.google.com/support/release-notes/ios#version_781_-_march_12_2021))
     * Requires `cocoapods@1.10` (previously `cocoapods@1.9`)
