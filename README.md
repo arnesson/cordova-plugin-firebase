@@ -185,6 +185,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [getInstallationId](#getinstallationid)
     - [getInstallationToken](#getinstallationtoken)
     - [getInstallationId](#getinstallationid-1)
+    - [registerInstallationIdChangeListener](#registerinstallationidchangelistener)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -3563,6 +3564,22 @@ FirebasePlugin.deleteInstallationId(function(){
     });
 ```
 
+### registerInstallationIdChangeListener
+Registers a Javascript function to invoke when [Firebase Installation ID changes](https://firebase.google.com/docs/projects/manage-installations#monitor-id-lifecycle).
+
+iOS only.
+
+**Parameters**:
+- {function} fn - callback function to invoke when installation ID changes.
+    - Will be a passed a single {string} argument which is the new installation ID.
+
+Example usage:
+
+```javascript
+    FirebasePlugin.registerInstallationIdChangeListener(function(installationId){
+        console.log("New installation ID: "+installationId);
+    });
+```
 
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.

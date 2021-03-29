@@ -16,12 +16,17 @@ var ensureBoolean = function(value){
 };
 
 var onAuthStateChangeCallback = function(){};
+var onInstallationIdChangeCallback = function(){};
 
 /***********************
  * Protected internals
  ***********************/
 exports._onAuthStateChange = function(userSignedIn){
     onAuthStateChangeCallback(userSignedIn);
+};
+
+exports._onInstallationIdChangeCallback = function(installationId){
+    onInstallationIdChangeCallback(installationId);
 };
 
 /**************
@@ -444,4 +449,9 @@ exports.getInstallationToken = function (success, error) {
 
 exports.deleteInstallationId = function (success, error) {
     exec(success, error, "FirebasePlugin", "deleteInstallationId", []);
+};
+
+exports.registerInstallationIdChangeListener = function(fn){
+    if(typeof fn !== "function") throw "The specified argument must be a function";
+    onInstallationIdChangeCallback = fn;
 };

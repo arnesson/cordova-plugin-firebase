@@ -147,6 +147,8 @@
 				<pod name="Firebase/InAppMessaging" spec="7.8.1"/>
 				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="7.8.1"/>
 				<pod name="Firebase/Crashlytics" spec="7.8.1"/>
+				<pod name="Firebase/Functions" spec="7.8.1"/>
+				<pod name="Firebase/Installations" spec="7.8.1"/>
 				<pod name="GoogleSignIn" spec="5.0.2"/>
 				<pod name="GoogleTagManager" spec="7.2.0"/>
 			</pods>

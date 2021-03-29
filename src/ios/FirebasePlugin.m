@@ -132,6 +132,17 @@ static NSMutableDictionary* firestoreListeners;
 
         // Initialize categories
         [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:categories];
+        
+        // Initialize installation ID change listner
+        __weak __auto_type weakSelf = self;
+        self.installationIDObserver = [[NSNotificationCenter defaultCenter]
+                addObserverForName: FIRInstallationIDDidChangeNotification
+                            object:nil
+                             queue:nil
+                        usingBlock:^(NSNotification * _Nonnull notification) {
+            
+            [weakSelf sendNewInstallationId];
+        }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
@@ -143,6 +154,9 @@ static NSMutableDictionary* firestoreListeners;
     [[GIDSignIn sharedInstance] handleURL:url];
 }
 
+/*************************************************/
+#pragma mark - plugin API
+/*************************************************/
 - (void)setAutoInitEnabled:(CDVInvokedUrlCommand *)command {
     @try {
         bool enabled = [[command.arguments objectAtIndex:0] boolValue];
@@ -1898,11 +1912,76 @@ static NSMutableDictionary* firestoreListeners;
     }
 }
 
-/********************************/
+/*
+ * Installations
+ */
+- (void) getInstallationId:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            [[FIRInstallations installations] installationIDWithCompletion:^(NSString *identifier, NSError *error) {
+                [self handleStringResultWithPotentialError:error command:command result:identifier];
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void) getInstallationToken:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {            
+            [[FIRInstallations installations] authTokenForcingRefresh:true
+                                                           completion:^(FIRInstallationsAuthTokenResult *result, NSError *error) {
+              if (error != nil) {
+                  [self sendPluginErrorWithError:error command:command];
+              }else{
+                  [self sendPluginStringResult:[result authToken] command:command callbackId:command.callbackId];
+              }
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void) deleteInstallationId:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            [[FIRInstallations installations] deleteWithCompletion:^(NSError *error) {
+                [self handleEmptyResultWithPotentialError:error command:command];
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
+- (void) sendNewInstallationId {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            [[FIRInstallations installations] installationIDWithCompletion:^(NSString *identifier, NSError *error) {
+                if(error != nil){
+                    [self handlePluginErrorWithoutContext:error];
+                }else{
+                    [FirebasePlugin.firebasePlugin executeGlobalJavascript:[NSString stringWithFormat:@"FirebasePlugin._onInstallationIdChangeCallback('%@')", identifier]];
+                }
+            }];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithoutContext:exception];
+        }
+    }];
+}
+
+/*************************************************/
 #pragma mark - utility functions
-/********************************/
+/*************************************************/
 - (void) sendPluginSuccess:(CDVInvokedUrlCommand*)command{
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
+
+- (void) sendPluginNoResult:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
 - (void) sendPluginNoResultAndKeepCallback:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
@@ -1911,9 +1990,30 @@ static NSMutableDictionary* firestoreListeners;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
+- (void) sendPluginStringResult:(NSString*)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
 - (void) sendPluginStringResultAndKeepCallback:(NSString*)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result];
     [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void) sendPluginBoolResult:(BOOL)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:result];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void) sendPluginBoolResultAndKeepCallback:(BOOL)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:result];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+}
+
+- (void) sendPluginDictionaryResult:(NSDictionary*)result command:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
 }
 
@@ -1950,7 +2050,7 @@ static NSMutableDictionary* firestoreListeners;
      if (error) {
          [self sendPluginErrorWithError:error command:command];
      }else{
-         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:result] callbackId:command.callbackId];
+         [self sendPluginStringResult:result command:command callbackId:command.callbackId];
      }
 }
 
@@ -1958,7 +2058,7 @@ static NSMutableDictionary* firestoreListeners;
      if (error) {
          [self sendPluginErrorWithError:error command:command];
      }else{
-         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:result] callbackId:command.callbackId];
+         [self sendPluginBoolResult:result command:command callbackId:command.callbackId];
      }
 }
 
@@ -1972,6 +2072,11 @@ static NSMutableDictionary* firestoreListeners;
 - (void) handlePluginExceptionWithoutContext: (NSException*) exception
 {
     [self _logError:[NSString stringWithFormat:@"EXCEPTION: %@", exception.reason]];
+}
+
+- (void) handlePluginErrorWithoutContext: (NSError*) error
+{
+    [self _logError:[NSString stringWithFormat:@"ERROR: %@", error.description]];
 }
 
 - (void)executeGlobalJavascript: (NSString*)jsString
