@@ -181,6 +181,10 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [removeFirestoreListener](#removefirestorelistener)
   - [Functions](#functions)
     - [functionsHttpsCallable](#functionshttpscallable)
+  - [Installations](#installations)
+    - [getInstallationId](#getinstallationid)
+    - [getInstallationToken](#getinstallationtoken)
+    - [getInstallationId](#getinstallationid-1)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -216,6 +220,8 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_AUTH_VERSION`
 - `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION`
+- `ANDROID_FIREBASE_FUNCTIONS_VERSION`
+- `ANDROID_FIREBASE_INSTALLATIONS_VERSION`
 - `ANDROID_FIREBASE_CRASHLYTICS_VERSION`
 - `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION`
 - `ANDROID_GSON_VERSION`
@@ -400,6 +406,8 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
+- `$ANDROID_FIREBASE_FUNCTIONS_VERSION` => `com.google.firebase:firebase-functions`
+- `$ANDROID_FIREBASE_INSTALLATIONS_VERSION` => `com.google.firebase:firebase-installations`
 - `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION` => `com.google.firebase:firebase-inappmessaging-display`
 - `ANDROID_FIREBASE_CRASHLYTICS_VERSION` => `com.google.firebase:firebase-crashlytics`
 - `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION` => `com.google.firebase:firebase-crashlytics-ndk`
@@ -3461,12 +3469,29 @@ For example:
   "id": 12345
 }
 ```
+This can be used to subsequently remove the listener using this function.
+You should remove listeners when you're not using them as while active they maintain a continual HTTP connection to the Firebase servers costing memory, bandwith and money: see [best practices for realtime updates](https://firebase.google.com/docs/firestore/best-practices#realtime_updates) and [billing for realtime updates](https://firebase.google.com/docs/firestore/pricing#listens).
+
+**Parameters**:
+- {function} success - callback function to call on successfully removing the listener.
+- {function} error - callback function which will be passed a {string} error message as an argument.
+- {string|number} listenerId - ID of the listener to remove
+
+```javascript
+FirebasePlugin.removeFirestoreListener(function(){
+    console.log("Successfully removed listener");
+}, function(error){
+    console.error("Error removing listener: "+error);
+}, listenerId);
+```
 
 ## Functions
-(Android only)
+Exposes API methods of the [Firebase Functions SDK](https://firebase.google.com/docs/functions/callable).
 
 ### functionsHttpsCallable
 Call a firebase [Https Callable function](https://firebase.google.com/docs/functions/callable)
+
+Android only.
 
 **Parameters**:
 - {string} name - the name of the function
@@ -3488,23 +3513,56 @@ FirebasePlugin.functionsHttpsCallable(functionName, args, function(result){
 });
 ```
 
-This can be used to subsequently remove the listener using this function.
+## Installations
+Exposes API methods of the [Firebase Installations SDK](https://firebase.google.com/docs/projects/manage-installations).
 
-You should remove listeners when you're not using them as while active they maintain a continual HTTP connection to the Firebase servers costing memory, bandwith and money: see [best practices for realtime updates](https://firebase.google.com/docs/firestore/best-practices#realtime_updates) and [billing for realtime updates](https://firebase.google.com/docs/firestore/pricing#listens).
-
+### getInstallationId
+[Returns the current Firebase installation ID (FID)](https://firebase.google.com/docs/projects/manage-installations#retrieve_client_identifers).
 
 **Parameters**:
-- {function} success - callback function to call on successfully removing the listener.
-- {function} error - callback function which will be passed a {string} error message as an argument.
-- {string|number} listenerId - ID of the listener to remove
+- {function} success - callback function to call on successfully completed the function call.
+Will be passed the {string} Firebase installation ID.
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
 
 ```javascript
-FirebasePlugin.removeFirestoreListener(function(){
-    console.log("Successfully removed listener");
-}, function(error){
-    console.error("Error removing listener: "+error);
-}, listenerId);
+FirebasePlugin.getInstallationId(function(id){
+        console.log("Got installation ID: " + id);
+    }, function(error) {
+        console.error("Failed to get installation ID", error);
+    });
 ```
+
+### getInstallationToken
+[Returns the JWT auth token](https://firebase.google.com/docs/projects/manage-installations#retrieve-fis-token) for the current Firebase installation ID (FID).
+
+**Parameters**:
+- {function} success - callback function to call on successfully completed the function call.
+Will be passed the {string} Firebase installation token.
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+FirebasePlugin.getInstallationToken(function(token){
+        console.log("Got installation token: " + token);
+    }, function(error) {
+        console.error("Failed to get installation token", error);
+    });
+```
+
+### getInstallationId
+[Deletes the current Firebase installation ID (FID)](https://firebase.google.com/docs/projects/manage-installations#delete-fid).
+
+**Parameters**:
+- {function} success - callback function to call on successfully completed the function call.
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+FirebasePlugin.deleteInstallationId(function(){
+        console.log("Deleted installation ID");
+    }, function(error) {
+        console.error("Failed to delete installation ID", error);
+    });
+```
+
 
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.

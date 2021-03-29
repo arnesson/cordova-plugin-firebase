@@ -433,3 +433,15 @@ exports.functionsHttpsCallable = function (name, args, success, error) {
   if(typeof name !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
   exec(success, error, "FirebasePlugin", "functionsHttpsCallable", [name, args]);
 };
+
+exports.getInstallationId = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getInstallationId", []);
+};
+
+exports.getInstallationToken = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getInstallationToken", []);
+};
+
+exports.deleteInstallationId = function (success, error) {
+    exec(success, error, "FirebasePlugin", "deleteInstallationId", []);
+};

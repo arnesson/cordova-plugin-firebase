@@ -66,6 +66,8 @@ import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.functions.HttpsCallableResult;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.installations.FirebaseInstallations;
+import com.google.firebase.installations.InstallationTokenResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigInfo;
@@ -383,7 +385,13 @@ public class FirebasePlugin extends CordovaPlugin {
                     ) {
                 // Stubs for other platform methods
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, true));
-            }else{
+            } else if (action.equals("deleteInstallationId")) {
+                this.deleteInstallationId(args, callbackContext);
+            } else if (action.equals("getInstallationId")) {
+                this.getInstallationId(args, callbackContext);
+            } else if (action.equals("getInstallationToken")) {
+                this.getInstallationToken(args, callbackContext);
+            } else{
                 callbackContext.error("Invalid action: " + action);
                 return false;
             }
@@ -901,7 +909,7 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    handleBooleanTaskOutcome(FirebaseRemoteConfig.getInstance().activate(), callbackContext);
+                    handleTaskOutcomeWithBooleanResult(FirebaseRemoteConfig.getInstance().activate(), callbackContext);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -913,7 +921,7 @@ public class FirebasePlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    handleBooleanTaskOutcome(FirebaseRemoteConfig.getInstance().fetchAndActivate(), callbackContext);
+                    handleTaskOutcomeWithBooleanResult(FirebaseRemoteConfig.getInstance().fetchAndActivate(), callbackContext);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -2569,6 +2577,9 @@ public class FirebasePlugin extends CordovaPlugin {
         return removed;
     }
 
+    //
+    // Functions
+    //
     private void functionsHttpsCallable(JSONArray args, CallbackContext callbackContext) throws JSONException {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -2629,6 +2640,56 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    //
+    // Installations
+    //
+    private void deleteInstallationId(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    handleTaskOutcome(FirebaseInstallations.getInstance().delete(), callbackContext);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void getInstallationId(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    handleTaskOutcomeWithStringResult(FirebaseInstallations.getInstance().getId(), callbackContext);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void getInstallationToken(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseInstallations.getInstance().getToken(/* forceRefresh */true)
+                            .addOnCompleteListener(new OnCompleteListener<InstallationTokenResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<InstallationTokenResult> task) {
+                                    if (task.isSuccessful() || task.getException() == null) {
+                                        callbackContext.success(task.getResult().getToken());
+                                    }else if(task.getException() != null){
+                                        callbackContext.error(task.getException().getMessage());
+                                    }else{
+                                        callbackContext.error("Task failed for unknown reason");
+                                    }
+                                }
+                            });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
 
 
     /*
@@ -2759,7 +2820,7 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
-    private void handleBooleanTaskOutcome(@NonNull Task<Boolean> task, CallbackContext callbackContext) {
+    private void handleTaskOutcomeWithBooleanResult(@NonNull Task<Boolean> task, CallbackContext callbackContext) {
         try {
             task.addOnCompleteListener(new OnCompleteListener<Boolean>() {
                 @Override
@@ -2767,6 +2828,29 @@ public class FirebasePlugin extends CordovaPlugin {
                     try {
                         if (task.isSuccessful() || task.getException() == null) {
                             callbackContext.success(conformBooleanForPluginResult(task.getResult()));
+                        }else if(task.getException() != null){
+                            callbackContext.error(task.getException().getMessage());
+                        }else{
+                            callbackContext.error("Task failed for unknown reason");
+                        }
+                    } catch (Exception e) {
+                        handleExceptionWithContext(e, callbackContext);
+                    }
+                };
+            });
+        } catch (Exception e) {
+            handleExceptionWithContext(e, callbackContext);
+        }
+    }
+
+    private void handleTaskOutcomeWithStringResult(@NonNull Task<String> task, CallbackContext callbackContext) {
+        try {
+            task.addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(@NonNull Task<String> task) {
+                    try {
+                        if (task.isSuccessful() || task.getException() == null) {
+                            callbackContext.success(task.getResult());
                         }else if(task.getException() != null){
                             callbackContext.error(task.getException().getMessage());
                         }else{
