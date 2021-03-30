@@ -1765,6 +1765,8 @@ A default channel is created by the plugin at app startup; the properties of thi
 
 Calling on Android 7 or below or another platform will have no effect.
 
+Note: Each time you want to play a different sound, you need to create a new channel with a new unique ID - do not re-use the same channel ID even if you have called `deleteChannel()` ([see this comment](https://github.com/dpa99c/cordova-plugin-firebasex/issues/560#issuecomment-798407467)).
+
 **Parameters**:
 - {object} - channel configuration object (see below for object keys/values)
 - {function} success - callback function which will be call on successful channel creation
