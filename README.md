@@ -2645,6 +2645,7 @@ Authenticates the user with a Google account to obtain a credential that can be 
 - {string} clientId - your OAuth 2.0 client ID - [see here](https://developers.google.com/identity/sign-in/android/start-integrating#get_your_backend_servers_oauth_20_client_id) how to obtain it.
 - {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
     - {string} id - the identifier of a native credential object which can be used for signing in the user.
+    - {string} idToken - the identiy token from Google account. Could be useful if you want to sign-in with on JS layer.
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 Example usage:
