@@ -1,3 +1,25 @@
+# Version 13.0.0
+* (iOS) BREAKING CHANGE: Major version update to Firebase iOS SDK from v7 to v8 ([Version 8.1.1 - June 11, 2021](https://firebase.google.com/support/release-notes/ios#version_811_-_june_11_2021))
+    * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK v2 with Firebase Installations SDK
+* (Android) BREAKING CHANGE: Major version update to Firebase Android BOM from v26 to v28 ([v28.1.0 - June 03, 2021](https://firebase.google.com/support/release-notes/android#2021-06-03))
+    * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK v2 with Firebase Installations SDK
+    * Add explicit dependency on deprecated `firebase-iid` because latest version `firebase-functions:20.0.0` [depends on an older version](https://mvnrepository.com/artifact/com.google.firebase/firebase-functions/20.0.0) and so causes duplicate class conflicts with latest `firebase-messaging:22.0.0`
+* (Android) doc: Add note regarding creating new notification channels for each new sound.
+    * Relates to [#560](https://github.com/dpa99c/cordova-plugin-firebasex/issues/560).
+* doc: Add note regarding allowed values for `logEvent`
+    * Merged from PR [#619](https://github.com/dpa99c/cordova-plugin-firebasex/pull/619).
+* (Android) bugfix: Fix sound configuration per channel
+    * Merged from PR [#625](https://github.com/dpa99c/cordova-plugin-firebasex/pull/625).
+* (iOS & Android) feature(auth): add idToken on signIn w/ Google response
+    * Merged from PR [#633](https://github.com/dpa99c/cordova-plugin-firebasex/pull/633).
+* (iOS) feature: support for `AppNotificationSettingsButton`
+    * Merged from PR [#577](https://github.com/dpa99c/cordova-plugin-firebasex/pull/577).
+* (iOS) bugfix: Check `content-available` key is present before casting it.
+    * Resolves [#624](https://github.com/dpa99c/cordova-plugin-firebasex/issues/624)
+* (iOS & Android) bugfix: Convert references to their path strings when fetching data from Firestore to avoid crashes due to circular references.
+    * Resolves [#617](https://github.com/dpa99c/cordova-plugin-firebasex/issues/617)
+
+
 # Version 12.1.0
 * (iOS & Android) feature: Add support for Firebase Installations SDK.
     * Resolves [#603](https://github.com/dpa99c/cordova-plugin-firebasex/issues/603)
