@@ -2051,7 +2051,8 @@ Log an event using Analytics:
 
 **Parameters**:
 - {string} eventName - name of event to log to Firebase Analytics
-    - [Limit](https://support.google.com/firebase/answer/9237506?hl=en) of 40 characters
+    - [Limit](https://support.google.com/firebase/answer/9237506?hl=en) of 40 characters.
+    - Dots are not allowed in eventName.
 - {object} eventProperties - key/value object of custom event properties.
     - This must be a flat (non-nested) object.
     - The value must be a primitive type such as string/number/etc. (not a complex object such as array or nested object).
