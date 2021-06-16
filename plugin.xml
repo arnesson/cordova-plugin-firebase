@@ -69,6 +69,7 @@
 		<preference name="ANDROID_FIREBASE_INAPPMESSAGING_VERSION" default="20.0.0" />
 		<preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="23.0.1" />
 		<preference name="ANDROID_FIREBASE_FUNCTIONS_VERSION" default="20.0.0" />
+			<preference name="ANDROID_FIREBASE_IID_VERSION" default="21.1.0" />
 		<preference name="ANDROID_FIREBASE_INSTALLATIONS_VERSION" default="17.0.0" />
 		<preference name="ANDROID_FIREBASE_CRASHLYTICS_VERSION" default="18.0.1" />
 		<preference name="ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" default="18.0.1" />
@@ -86,6 +87,7 @@
 		<framework src="com.google.firebase:firebase-inappmessaging-display:$ANDROID_FIREBASE_INAPPMESSAGING_VERSION" />
 		<framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION" />
 		<framework src="com.google.firebase:firebase-functions:$ANDROID_FIREBASE_FUNCTIONS_VERSION" />
+			<framework src="com.google.firebase:firebase-iid:$ANDROID_FIREBASE_IID_VERSION" />
 		<framework src="com.google.firebase:firebase-installations:$ANDROID_FIREBASE_INSTALLATIONS_VERSION" />
 		<framework src="com.google.firebase:firebase-crashlytics:$ANDROID_FIREBASE_CRASHLYTICS_VERSION" />
 		<framework src="com.google.firebase:firebase-crashlytics-ndk:$ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" />
