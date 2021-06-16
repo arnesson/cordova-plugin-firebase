@@ -134,9 +134,11 @@ didSignInForUser:(GIDGoogleUser *)user
                                            accessToken:authentication.accessToken];
             
             NSNumber* key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+            NSString *idToken = user.authentication.idToken;
             NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
             [result setValue:@"true" forKey:@"instantVerification"];
             [result setValue:key forKey:@"id"];
+            [result setValue:idToken forKey:@"idToken"];
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
         } else {
           pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
