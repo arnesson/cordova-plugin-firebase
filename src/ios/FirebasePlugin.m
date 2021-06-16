@@ -4,7 +4,6 @@
 #import <Cordova/CDV.h>
 #import "AppDelegate.h"
 #import <GoogleSignIn/GoogleSignIn.h>
-@import FirebaseInstanceID;
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
 @import FirebaseRemoteConfig;
@@ -201,36 +200,17 @@ static NSString* currentInstallationId;
  */
 
 - (void)getId:(CDVInvokedUrlCommand *)command {
-    __block CDVPluginResult *pluginResult;
-
-    FIRInstanceIDHandler handler = ^(NSString *_Nullable instID, NSError *_Nullable error) {
-        @try {
-            [self handleStringResultWithPotentialError:error command:command result:instID];
-        }@catch (NSException *exception) {
-            [self handlePluginExceptionWithContext:exception :command];
-        }
-    };
-
-    @try {
-        [[FIRInstanceID instanceID] getIDWithHandler:handler];
-    }@catch (NSException *exception) {
-        [self handlePluginExceptionWithContext:exception :command];
-    }
+    [self getInstallationId:command];
 }
 
 - (void)getToken:(CDVInvokedUrlCommand *)command {
-    @try {
-        [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
-                                                            NSError * _Nullable error) {
-        	NSString* token = nil;
-            if (error == nil && result != nil && result.token != nil) {
-                token = result.token;
-            }
+    [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
+        @try {
             [self handleStringResultWithPotentialError:error command:command result:token];
-        }];
-    }@catch (NSException *exception) {
-        [self handlePluginExceptionWithContext:exception :command];
-    }
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
 }
 
 - (void)getAPNSToken:(CDVInvokedUrlCommand *)command {
@@ -417,13 +397,7 @@ static NSString* currentInstallationId;
 }
 
 - (void)unregister:(CDVInvokedUrlCommand *)command {
-    @try {
-        [[FIRInstanceID instanceID] deleteIDWithHandler:^void(NSError *_Nullable error) {
-            [self handleEmptyResultWithPotentialError:error command:command];
-        }];
-    }@catch (NSException *exception) {
-        [self handlePluginExceptionWithContext:exception :command];
-    }
+    [self deleteInstallationId:command];
 }
 
 - (void) onOpenSettings:(CDVInvokedUrlCommand *)command {
@@ -457,14 +431,14 @@ static NSString* currentInstallationId;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand *)command {
     self.tokenRefreshCallbackId = command.callbackId;
     @try {
-        [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
-                                                            NSError * _Nullable error) {
+        [[FIRInstallations installations] authTokenForcingRefresh:true
+                                                       completion:^(FIRInstallationsAuthTokenResult *result, NSError *error) {
             @try {
-                if (result.token != nil && error == nil) {
-                    [self sendToken:result.token];
-                }else{
-                    [self handleStringResultWithPotentialError:error command:command result:result.token];
-                }
+              if (error != nil) {
+                  [self sendPluginErrorWithError:error command:command];
+              }else{
+                  [self sendPluginStringResult:[result authToken] command:command callbackId:command.callbackId];
+              }
             }@catch (NSException *exception) {
                 [self handlePluginExceptionWithContext:exception :command];
             }
@@ -487,7 +461,6 @@ static NSString* currentInstallationId;
 }
 
 - (void) sendOpenNotificationSettings {
-    NSLog(@"TESTTEST %@", openSettingsEmitted);
     @try {
         if(self.openSettingsCallbackId != nil) {
             [self sendPluginSuccessAndKeepCallback:self.openSettingsCallbackId];
@@ -1099,8 +1072,7 @@ static NSString* currentInstallationId;
 - (void)setScreenName:(CDVInvokedUrlCommand *)command {
     @try {
         NSString* name = [command.arguments objectAtIndex:0];
-
-        [FIRAnalytics setScreenName:name screenClass:NULL];
+        [FIRAnalytics logEventWithName:kFIREventScreenView parameters: @{kFIRParameterScreenName: name}];
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }@catch (NSException *exception) {
