@@ -1958,14 +1958,17 @@ public class FirebasePlugin extends CordovaPlugin {
             if ("ringtone".equals(sound)) {
                 channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE), audioAttributes);
                 Log.d(TAG, "Channel "+id+" - sound=ringtone");
-            } else if (sound != null && !sound.contentEquals("default")) {
-                Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/" + sound);
-                channel.setSound(soundUri, audioAttributes);
-                Log.d(TAG, "Channel "+id+" - sound="+sound);
-            } else if (sound != "false"){
-                channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes);
-                Log.d(TAG, "Channel "+id+" - sound=default");
-            }else{
+            } else if (!sound.contentEquals("false")) {
+                if(!sound.contentEquals("default")){
+                    Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/" + sound);
+                    channel.setSound(soundUri, audioAttributes);
+                    Log.d(TAG, "Channel "+id+" - sound="+sound);
+                } else {
+                    channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes);
+                    Log.d(TAG, "Channel "+id+" - sound=default");
+                }
+            } else {
+                channel.setSound(null, null);
                 Log.d(TAG, "Channel "+id+" - sound=none");
             }
 
