@@ -189,7 +189,11 @@ didDisconnectWithUser:(GIDGoogleUser *)user
         NSDictionary* aps = [mutableUserInfo objectForKey:@"aps"];
         bool isContentAvailable = false;
         if([aps objectForKey:@"alert"] != nil){
-            isContentAvailable = [[aps objectForKey:@"content-available"] isEqualToNumber:[NSNumber numberWithInt:1]];
+            
+            if([aps objectForKey:@"content-available"] != nil){
+                NSNumber* contentAvailable = (NSNumber*) [aps objectForKey:@"content-available"];
+                isContentAvailable = [contentAvailable isEqualToNumber:[NSNumber numberWithInt:1]];
+            }
             [mutableUserInfo setValue:@"notification" forKey:@"messageType"];
             NSString* tap;
             if([self.applicationInBackground isEqual:[NSNumber numberWithBool:YES]] && !isContentAvailable){
