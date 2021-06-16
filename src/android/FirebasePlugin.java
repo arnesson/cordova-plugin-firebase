@@ -2292,7 +2292,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                         if (task.isSuccessful()) {
                                             DocumentSnapshot document = task.getResult();
                                             if (document != null && document.getData() != null) {
-                                                JSONObject jsonDoc = mapToJsonObject(document.getData());
+                                                JSONObject jsonDoc = mapFirestoreDataToJsonObject(document.getData());
                                                 callbackContext.success(jsonDoc);
                                             } else {
                                                 callbackContext.error("No document found in collection");
@@ -2345,7 +2345,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                     document.put("fromCache", snapshot.getMetadata().isFromCache());
 
                                     if (snapshot != null && snapshot.exists()) {
-                                        JSONObject jsonDoc = mapToJsonObject(snapshot.getData());
+                                        JSONObject jsonDoc = mapFirestoreDataToJsonObject(snapshot.getData());
                                         document.put("snapshot", jsonDoc);
                                     }
                                     sendPluginResultAndKeepCallback(document, callbackContext);
@@ -2390,7 +2390,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                         if (task.isSuccessful()) {
                                             JSONObject jsonDocs = new JSONObject();
                                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                                jsonDocs.put(document.getId(), mapToJsonObject(document.getData()));
+                                                jsonDocs.put(document.getId(), mapFirestoreDataToJsonObject(document.getData()));
                                             }
                                             callbackContext.success(jsonDocs);
                                         } else {
@@ -2456,7 +2456,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                                 }
 
                                                 QueryDocumentSnapshot documentSnapshot = dc.getDocument();
-                                                document.put("snapshot", mapToJsonObject(documentSnapshot.getData()));
+                                                document.put("snapshot", mapFirestoreDataToJsonObject(documentSnapshot.getData()));
                                                 document.put("source", documentSnapshot.getMetadata().hasPendingWrites() ? "local" : "remote");
                                                 document.put("fromCache", documentSnapshot.getMetadata().isFromCache());
 
@@ -2982,6 +2982,23 @@ public class FirebasePlugin extends CordovaPlugin {
         return gson.fromJson(jsonString, type);
     }
 
+    private JSONObject mapFirestoreDataToJsonObject(Map<String, Object> map) throws JSONException {
+        map = sanitiseFirestoreHashMap(map);
+        return mapToJsonObject(map);
+    }
+
+    private Map<String, Object> sanitiseFirestoreHashMap(Map<String, Object> map){
+        Set<String> keys = map.keySet();
+        for (String key : keys) {
+            Object value = map.get(key);
+            if(value instanceof DocumentReference){
+                map.put(key, ((DocumentReference) value).getPath());
+            }else if(value instanceof HashMap){
+                map.put(key, sanitiseFirestoreHashMap((Map<String, Object>) value));
+            }
+        }
+        return map;
+    }
 
     private JSONObject mapToJsonObject(Map<String, Object> map) throws JSONException {
         String jsonString = gson.toJson(map);
