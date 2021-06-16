@@ -17,6 +17,7 @@
 
 @implementation FirebasePlugin
 
+@synthesize openSettingsCallbackId;
 @synthesize notificationCallbackId;
 @synthesize tokenRefreshCallbackId;
 @synthesize apnsTokenRefreshCallbackId;
@@ -34,6 +35,7 @@ static NSString*const FIREBASE_PERFORMANCE_COLLECTION_ENABLED = @"FIREBASE_PERFO
 
 static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
+static BOOL openSettingsEmitted = NO;
 static NSMutableDictionary* authCredentials;
 static NSString* currentNonce; // used for Apple Sign In
 static FIRFirestore* firestore;
@@ -307,7 +309,14 @@ static NSString* currentInstallationId;
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }else{
                     [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate> _Nullable) self;
+                    BOOL requestWithProvidesAppNotificationSettings = [[command argumentAtIndex:0] boolValue];
                     UNAuthorizationOptions authOptions = UNAuthorizationOptionAlert|UNAuthorizationOptionSound|UNAuthorizationOptionBadge;
+                    if (@available(iOS 12.0, *)) {
+                        if(requestWithProvidesAppNotificationSettings) {
+                            authOptions = authOptions|UNAuthorizationOptionProvidesAppNotificationSettings;
+                        }
+                    }
+                
                     [[UNUserNotificationCenter currentNotificationCenter]
                      requestAuthorizationWithOptions:authOptions
                      completionHandler:^(BOOL granted, NSError * _Nullable error) {
@@ -417,7 +426,18 @@ static NSString* currentInstallationId;
     }
 }
 
+- (void) onOpenSettings:(CDVInvokedUrlCommand *)command {
+    @try {
+        self.openSettingsCallbackId = command.callbackId;
 
+        if(openSettingsEmitted == YES) {
+            [self sendPluginSuccessAndKeepCallback:self.openSettingsCallbackId];
+            openSettingsEmitted = NO;
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
 
 - (void)onMessageReceived:(CDVInvokedUrlCommand *)command {
     @try {
@@ -463,6 +483,19 @@ static NSString* currentInstallationId;
         }
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void) sendOpenNotificationSettings {
+    NSLog(@"TESTTEST %@", openSettingsEmitted);
+    @try {
+        if(self.openSettingsCallbackId != nil) {
+            [self sendPluginSuccessAndKeepCallback:self.openSettingsCallbackId];
+        } else if(openSettingsEmitted != YES) {
+            openSettingsEmitted = YES;
+        }
+    } @catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :self.commandDelegate];
     }
 }
 
@@ -2002,6 +2035,11 @@ static NSString* currentInstallationId;
 /*************************************************/
 - (void) sendPluginSuccess:(CDVInvokedUrlCommand*)command{
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+}
+
+- (void) sendPluginSuccessAndKeepCallback:(NSString*)callbackId{
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [pluginResult setKeepCallbackAsBool:YES];
 }
 
 - (void) sendPluginNoResult:(CDVInvokedUrlCommand*)command callbackId:(NSString*)callbackId {

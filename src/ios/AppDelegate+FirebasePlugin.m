@@ -325,6 +325,16 @@ didDisconnectWithUser:(GIDGoogleUser *)user
     [FirebasePlugin.firebasePlugin _logError:[NSString stringWithFormat:@"didFailToRegisterForRemoteNotificationsWithError: %@", error.description]];
 }
 
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center openSettingsForNotification:(UNNotification *)notification
+{
+    @try {
+        [FirebasePlugin.firebasePlugin sendOpenNotificationSettings];
+    } @catch (NSException *exception) {
+        [FirebasePlugin.firebasePlugin handlePluginExceptionWithoutContext:exception];
+    }
+}
+
+
 // Asks the delegate how to handle a notification that arrived while the app was running in the foreground
 // Called when an APS notification arrives when app is in foreground
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center

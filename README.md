@@ -1278,6 +1278,15 @@ Notes:
 - If your app is in the background/not running when the notification message arrives and a system notification is displayed, if the user chooses an action (instead of tapping the notification dialog body), your app will not be launched/foregrounded but [`onMessageReceived()`](#onmessagereceived) will be invoked, enabling your app code to handle the user's action selection silently in the background.
 - You can test out actionable notifications by building and running [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) app and sending the [ios_notification_actionable.json](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/messages/ios_notification_actionable.json) FCM message using the [built-in FCM v1 HTTP API client](https://github.com/dpa99c/cordova-plugin-firebasex-test#messaging-client) which contains a category defined in the example [pn-actions.json](https://github.com/dpa99c/cordova-plugin-firebasex-test/blob/master/res/ios/pn-actions.json).
 
+### iOS notification settings button
+
+<img width="300" src="https://i.stack.imgur.com/84LDU.jpg">
+
+Adding such a Button is possible with this Plugin.
+To enable this Feature, you need to pass `true` for **requestWithProvidesAppNotificationSettings** when you [request the Permission](#grantpermission).
+
+You then need to subscribe to `onOpenSettings` and open your apps notification settings page.
+
 ## Data messages
 FCM data messages are sent as an arbitrary k/v structure and by default are passed to the app for it to handle them.
 
@@ -1550,6 +1559,22 @@ FirebasePlugin.onApnsTokenReceived(function(apnsToken) {
 });
 ```
 
+### onOpenSettings
+iOS only
+Registers a callback function to invoke when the AppNotificationSettingsButton is tapped by the user
+
+**Parameters**:
+- {function} success - callback function which will be invoked without any argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.onOpenSettings(function() {
+    console.log("Redirect to App Notification Settings Page here");
+}, function(error) {
+    console.error(error);
+});
+```
+
 ### onMessageReceived
 Registers a callback function to invoke when:
 - a notification or data message is received by the app
@@ -1606,6 +1631,7 @@ iOS only (Android will always return true).
 **Parameters**:
 - {function} success - callback function which will be passed the {boolean} permission result as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
+- {boolean} requestWithProvidesAppNotificationSettings - boolean which indicates if app provides AppNotificationSettingsButton (**iOS12+ only**)
 
 ```javascript
 FirebasePlugin.grantPermission(function(hasPermission){
