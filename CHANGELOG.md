@@ -1,8 +1,8 @@
 # Version 13.0.0
 * (iOS) BREAKING CHANGE: Major version update to Firebase iOS SDK from v7 to v8 ([Version 8.1.1 - June 11, 2021](https://firebase.google.com/support/release-notes/ios#version_811_-_june_11_2021))
-    * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK v2 with Firebase Installations SDK
+    * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK v8 with Firebase Installations SDK
 * (Android) BREAKING CHANGE: Major version update to Firebase Android BOM from v26 to v28 ([v28.1.0 - June 03, 2021](https://firebase.google.com/support/release-notes/android#2021-06-03))
-    * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK v2 with Firebase Installations SDK
+    * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK BOM v28 with Firebase Installations SDK
     * Add explicit dependency on deprecated `firebase-iid` because latest version `firebase-functions:20.0.0` [depends on an older version](https://mvnrepository.com/artifact/com.google.firebase/firebase-functions/20.0.0) and so causes duplicate class conflicts with latest `firebase-messaging:22.0.0`
 * (Android) doc: Add note regarding creating new notification channels for each new sound.
     * Relates to [#560](https://github.com/dpa99c/cordova-plugin-firebasex/issues/560).
