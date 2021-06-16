@@ -103,6 +103,13 @@
 - (void)listenToFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)removeFirestoreListener:(CDVInvokedUrlCommand*)command;
 
+// Functions
+- (void)functionsHttpsCallable:(CDVInvokedUrlCommand*)command;
+
+// Installations
+- (void) getInstallationId:(CDVInvokedUrlCommand*)command;
+- (void) getInstallationToken:(CDVInvokedUrlCommand*)command;
+- (void) deleteInstallationId:(CDVInvokedUrlCommand*)command;
 
 // Internals
 + (FirebasePlugin *) firebasePlugin;
@@ -131,5 +138,6 @@
 
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
+@property(nonatomic, nullable) id<NSObject> installationIDObserver;
 
 @end

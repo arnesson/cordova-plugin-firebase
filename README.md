@@ -179,6 +179,13 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [listenToDocumentInFirestoreCollection](#listentodocumentinfirestorecollection)
     - [listenToFirestoreCollection](#listentofirestorecollection)
     - [removeFirestoreListener](#removefirestorelistener)
+  - [Functions](#functions)
+    - [functionsHttpsCallable](#functionshttpscallable)
+  - [Installations](#installations)
+    - [getInstallationId](#getinstallationid)
+    - [getInstallationToken](#getinstallationtoken)
+    - [getInstallationId](#getinstallationid-1)
+    - [registerInstallationIdChangeListener](#registerinstallationidchangelistener)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -214,6 +221,8 @@ The following plugin variables are used to specify the Firebase SDK versions as 
 - `ANDROID_FIREBASE_AUTH_VERSION`
 - `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION`
+- `ANDROID_FIREBASE_FUNCTIONS_VERSION`
+- `ANDROID_FIREBASE_INSTALLATIONS_VERSION`
 - `ANDROID_FIREBASE_CRASHLYTICS_VERSION`
 - `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION`
 - `ANDROID_GSON_VERSION`
@@ -398,6 +407,8 @@ The following plugin variables are used to specify the following Gradle dependen
 - `ANDROID_FIREBASE_PERF_VERSION` => `com.google.firebase:firebase-perf`
 - `ANDROID_FIREBASE_AUTH_VERSION` => `com.google.firebase:firebase-auth`
 - `ANDROID_FIREBASE_FIRESTORE_VERSION` => `com.google.firebase:firebase-firestore`
+- `$ANDROID_FIREBASE_FUNCTIONS_VERSION` => `com.google.firebase:firebase-functions`
+- `$ANDROID_FIREBASE_INSTALLATIONS_VERSION` => `com.google.firebase:firebase-installations`
 - `$ANDROID_FIREBASE_INAPPMESSAGING_VERSION` => `com.google.firebase:firebase-inappmessaging-display`
 - `ANDROID_FIREBASE_CRASHLYTICS_VERSION` => `com.google.firebase:firebase-crashlytics`
 - `ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION` => `com.google.firebase:firebase-crashlytics-ndk`
@@ -459,7 +470,7 @@ Therefore if you need to change the specified versions, you'll currently need to
 ### Cocoapods
 This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
-Therefore please make sure you have `cocoapods@>=1.9` installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
+Please make sure you have `cocoapods@>=1.10` installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
 
 If building your project in Xcode, you need to open `YourProject.xcworkspace` (not `YourProject.xcodeproj`) so both your Cordova app project and the Pods project will be loaded into Xcode.
 
@@ -1779,6 +1790,8 @@ Channels should be created as soon as possible (on program start) so notificatio
 A default channel is created by the plugin at app startup; the properties of this can be overridden see [setDefaultChannel](#setdefaultchannel)
 
 Calling on Android 7 or below or another platform will have no effect.
+
+Note: Each time you want to play a different sound, you need to create a new channel with a new unique ID - do not re-use the same channel ID even if you have called `deleteChannel()` ([see this comment](https://github.com/dpa99c/cordova-plugin-firebasex/issues/560#issuecomment-798407467)).
 
 **Parameters**:
 - {object} - channel configuration object (see below for object keys/values)
@@ -3485,11 +3498,8 @@ For example:
   "id": 12345
 }
 ```
-
 This can be used to subsequently remove the listener using this function.
-
 You should remove listeners when you're not using them as while active they maintain a continual HTTP connection to the Firebase servers costing memory, bandwith and money: see [best practices for realtime updates](https://firebase.google.com/docs/firestore/best-practices#realtime_updates) and [billing for realtime updates](https://firebase.google.com/docs/firestore/pricing#listens).
-
 
 **Parameters**:
 - {function} success - callback function to call on successfully removing the listener.
@@ -3502,6 +3512,99 @@ FirebasePlugin.removeFirestoreListener(function(){
 }, function(error){
     console.error("Error removing listener: "+error);
 }, listenerId);
+```
+
+## Functions
+Exposes API methods of the [Firebase Functions SDK](https://firebase.google.com/docs/functions/callable).
+
+### functionsHttpsCallable
+Call a firebase [Https Callable function](https://firebase.google.com/docs/functions/callable)
+
+**Parameters**:
+- {string} name - the name of the function
+- {object} args - arguments to send to the function
+- {function} success - callback function to call on successfully completed the function call.
+Will be passed an {object/array/string} containing the data returned by the function
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+var functionName = "myBackendFunction";
+var args = {
+    arg1: 'First argument',
+    arg2: 'second argument'
+};
+FirebasePlugin.functionsHttpsCallable(functionName, args, function(result){
+    console.log("Successfully called function: "+JSON.stringify(result));
+}, function(error){
+    console.error("Error calling function: "+JSON.stringify(error));
+});
+```
+
+## Installations
+Exposes API methods of the [Firebase Installations SDK](https://firebase.google.com/docs/projects/manage-installations).
+
+### getInstallationId
+[Returns the current Firebase installation ID (FID)](https://firebase.google.com/docs/projects/manage-installations#retrieve_client_identifers).
+
+**Parameters**:
+- {function} success - callback function to call on successfully completed the function call.
+Will be passed the {string} Firebase installation ID.
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+FirebasePlugin.getInstallationId(function(id){
+        console.log("Got installation ID: " + id);
+    }, function(error) {
+        console.error("Failed to get installation ID", error);
+    });
+```
+
+### getInstallationToken
+[Returns the JWT auth token](https://firebase.google.com/docs/projects/manage-installations#retrieve-fis-token) for the current Firebase installation ID (FID).
+
+**Parameters**:
+- {function} success - callback function to call on successfully completed the function call.
+Will be passed the {string} Firebase installation token.
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+FirebasePlugin.getInstallationToken(function(token){
+        console.log("Got installation token: " + token);
+    }, function(error) {
+        console.error("Failed to get installation token", error);
+    });
+```
+
+### getInstallationId
+[Deletes the current Firebase installation ID (FID)](https://firebase.google.com/docs/projects/manage-installations#delete-fid).
+
+**Parameters**:
+- {function} success - callback function to call on successfully completed the function call.
+- {function} error - callback function which will be passed a {string/object} error message as an argument.
+
+```javascript
+FirebasePlugin.deleteInstallationId(function(){
+        console.log("Deleted installation ID");
+    }, function(error) {
+        console.error("Failed to delete installation ID", error);
+    });
+```
+
+### registerInstallationIdChangeListener
+Registers a Javascript function to invoke when [Firebase Installation ID changes](https://firebase.google.com/docs/projects/manage-installations#monitor-id-lifecycle).
+
+iOS only.
+
+**Parameters**:
+- {function} fn - callback function to invoke when installation ID changes.
+    - Will be a passed a single {string} argument which is the new installation ID.
+
+Example usage:
+
+```javascript
+    FirebasePlugin.registerInstallationIdChangeListener(function(installationId){
+        console.log("New installation ID: "+installationId);
+    });
 ```
 
 # Credits

@@ -16,12 +16,17 @@ var ensureBoolean = function(value){
 };
 
 var onAuthStateChangeCallback = function(){};
+var onInstallationIdChangeCallback = function(){};
 
 /***********************
  * Protected internals
  ***********************/
 exports._onAuthStateChange = function(userSignedIn){
     onAuthStateChangeCallback(userSignedIn);
+};
+
+exports._onInstallationIdChangeCallback = function(installationId){
+    onInstallationIdChangeCallback(installationId);
 };
 
 /**************
@@ -431,4 +436,26 @@ exports.removeFirestoreListener = function (success, error, listenerId) {
     if(typeof listenerId === 'undefined') return error("'listenerId' must be specified");
 
     exec(success, error, "FirebasePlugin", "removeFirestoreListener", [listenerId.toString()]);
+};
+
+exports.functionsHttpsCallable = function (name, args, success, error) {
+  if(typeof name !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
+  exec(success, error, "FirebasePlugin", "functionsHttpsCallable", [name, args]);
+};
+
+exports.getInstallationId = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getInstallationId", []);
+};
+
+exports.getInstallationToken = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getInstallationToken", []);
+};
+
+exports.deleteInstallationId = function (success, error) {
+    exec(success, error, "FirebasePlugin", "deleteInstallationId", []);
+};
+
+exports.registerInstallationIdChangeListener = function(fn){
+    if(typeof fn !== "function") throw "The specified argument must be a function";
+    onInstallationIdChangeCallback = fn;
 };
