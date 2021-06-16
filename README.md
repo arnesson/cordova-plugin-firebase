@@ -3234,7 +3234,9 @@ FirebasePlugin.documentExistsInFirestoreCollection(documentId, collection, funct
 ### fetchDocumentInFirestoreCollection
 Fetches an existing document with the given ID from a Firestore collection.
 
-Note: If the no document with the specified ID exists in the collection, the error callback will be invoked.
+Notes:
+- If no document with the specified ID exists in the collection, the error callback will be invoked.
+- If the document contains references to another document, they will be converted to the document path string to avoid circular reference issues.
 
 **Parameters**:
 - {string} documentId - document ID of the document to fetch.
@@ -3255,6 +3257,10 @@ FirebasePlugin.fetchDocumentInFirestoreCollection(documentId, collection, functi
 
 ### fetchFirestoreCollection
 Fetches all the documents in the specific collection.
+
+Notes:
+- If no collection with the specified name exists, the error callback will be invoked.
+- If the documents in the collection contain references to another document, they will be converted to the document path string to avoid circular reference issues.
 
 **Parameters**:
 - {string} collection - name of top-level collection to fetch.
@@ -3308,6 +3314,8 @@ FirebasePlugin.fetchFirestoreCollection(collection, filters, function(documents)
 
 ### listenToDocumentInFirestoreCollection
 Adds a listener to detect real-time changes to the specified document.
+
+Note: If the document contains references to another document, they will be converted to the document path string to avoid circular reference issues.
 
 Upon adding a listener using this function, the success callback function will be invoked with an `id` event which specifies the native ID of the added listener.
 This can be used to subsequently remove the listener using [`removeFirestoreListener()`](#removefirestorelistener).
@@ -3384,6 +3392,8 @@ FirebasePlugin.listenToDocumentInFirestoreCollection(function(event){
 
 ### listenToFirestoreCollection
 Adds a listener to detect real-time changes to documents in a Firestore collection.
+
+Note: If the documents in the collection contain references to another document, they will be converted to the document path string to avoid circular reference issues.
 
 Upon adding a listener using this function, the success callback function will be invoked with an `id` event which specifies the native ID of the added listener.
 This can be used to subsequently remove the listener using [`removeFirestoreListener()`](#removefirestorelistener).
