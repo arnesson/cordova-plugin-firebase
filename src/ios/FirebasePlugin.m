@@ -1633,7 +1633,7 @@ static NSString* currentInstallationId;
                     if (error != nil) {
                         [self sendPluginErrorWithMessage:error.localizedDescription:command];
                     } else if(snapshot.data != nil) {
-                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:snapshot.data] callbackId:command.callbackId];
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[self sanitiseFirestoreDataDictionary:snapshot.data]] callbackId:command.callbackId];
                     }else{
                         [self sendPluginErrorWithMessage:@"Document not found in collection":command];
                     }
@@ -1668,7 +1668,7 @@ static NSString* currentInstallationId;
                             [document setObject:[NSNumber numberWithBool:snapshot.metadata.fromCache] forKey:@"fromCache"];
                             [document setObject:snapshot.metadata.hasPendingWrites ? @"local" : @"remote" forKey:@"source"];
                         }
-                        [self sendPluginDictionaryResultAndKeepCallback:document command:command callbackId:command.callbackId];
+                        [self sendPluginDictionaryResultAndKeepCallback:[self sanitiseFirestoreDataDictionary:document] command:command callbackId:command.callbackId];
                     }else{
                         [self sendPluginErrorWithError:error command:command];
                     }
@@ -1708,7 +1708,7 @@ static NSString* currentInstallationId;
                 } else {
                     NSMutableDictionary* documents = [[NSMutableDictionary alloc] init];;
                     for (FIRDocumentSnapshot *document in snapshot.documents) {
-                        [documents setObject:document.data forKey:document.documentID];
+                        [documents setObject:[self sanitiseFirestoreDataDictionary:document.data] forKey:document.documentID];
                     }
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:documents] callbackId:command.callbackId];
                 }
@@ -1757,7 +1757,7 @@ static NSString* currentInstallationId;
                                     [document setObject:@"metadata" forKey:@"type"];
                                 }
                                 if(dc.document.data != nil){
-                                    [document setObject:dc.document.data forKey:@"snapshot"];
+                                    [document setObject:[self sanitiseFirestoreDataDictionary:dc.document.data] forKey:@"snapshot"];
                                 }
                                 if(dc.document.metadata != nil){
                                     [document setObject:[NSNumber numberWithBool:dc.document.metadata.fromCache] forKey:@"fromCache"];
@@ -1916,6 +1916,23 @@ static NSString* currentInstallationId;
         }
         return removed;
     }
+}
+
+- (NSMutableDictionary*) sanitiseFirestoreDataDictionary:(NSDictionary*) data {
+    NSMutableDictionary* sanitisedData = [[NSMutableDictionary alloc] init];
+    for(id key in data){
+        id value = [data objectForKey:key];
+        if([value isKindOfClass:[FIRDocumentReference class]]){
+            FIRDocumentReference* reference = (FIRDocumentReference*) value;
+            NSString* path = reference.path;
+            [sanitisedData setValue:path forKey:key];
+        }else if([value isKindOfClass:[NSDictionary class]]){
+            [sanitisedData setValue:[self sanitiseFirestoreDataDictionary:value] forKey:key];
+        }else{
+            [sanitisedData setValue:value forKey:key];
+        }
+    }
+    return sanitisedData;
 }
 
 /*
