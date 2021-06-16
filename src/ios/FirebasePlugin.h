@@ -137,7 +137,6 @@
 @property (nonatomic, copy) NSString *appleSignInCallbackId;
 
 @property (nonatomic, retain) NSMutableArray *notificationStack;
-@property (nonatomic, readwrite) NSMutableDictionary* traces;
 @property(nonatomic, nullable) id<NSObject> installationIDObserver;
 
 @end

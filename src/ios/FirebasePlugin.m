@@ -23,7 +23,6 @@
 @synthesize googleSignInCallbackId;
 @synthesize appleSignInCallbackId;
 @synthesize notificationStack;
-@synthesize traces;
 
 static NSString*const LOG_TAG = @"FirebasePlugin[native]";
 static NSInteger const kNotificationStackSize = 10;
@@ -42,6 +41,7 @@ static NSUserDefaults* preferences;
 static NSDictionary* googlePlist;
 static NSMutableDictionary* firestoreListeners;
 static NSString* currentInstallationId;
+static NSMutableDictionary* traces;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -87,7 +87,7 @@ static NSString* currentInstallationId;
 
         authCredentials = [[NSMutableDictionary alloc] init];
         firestoreListeners = [[NSMutableDictionary alloc] init];
-        self.traces = [NSMutableDictionary new];
+        traces = [[NSMutableDictionary alloc] init];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
@@ -1469,13 +1469,16 @@ static NSString* currentInstallationId;
     [self.commandDelegate runInBackground:^{
         @try {
             NSString* traceName = [command.arguments objectAtIndex:0];
-            FIRTrace* trace = [self.traces objectForKey:traceName];
+            
+            @synchronized (traces) {
+                FIRTrace* trace = [traces objectForKey:traceName];
 
-            if (trace == nil) {
-                trace = [FIRPerformance startTraceWithName:traceName];
-                [self.traces setObject:trace forKey:traceName ];
+                if (trace == nil) {
+                    trace = [FIRPerformance startTraceWithName:traceName];
+                    [traces setObject:trace forKey:traceName ];
+                }
             }
-
+            
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }@catch (NSException *exception) {
@@ -1490,13 +1493,15 @@ static NSString* currentInstallationId;
             NSString* traceName = [command.arguments objectAtIndex:0];
             NSString* counterNamed = [command.arguments objectAtIndex:1];
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-            FIRTrace *trace = (FIRTrace*)[self.traces objectForKey:traceName];
+            @synchronized (traces) {
+                FIRTrace *trace = (FIRTrace*)[traces objectForKey:traceName];
 
-            if (trace != nil) {
-                [trace incrementMetric:counterNamed byInt:1];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-            } else {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Trace not found"];
+                if (trace != nil) {
+                    [trace incrementMetric:counterNamed byInt:1];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                } else {
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Trace not found"];
+                }
             }
 
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -1511,14 +1516,16 @@ static NSString* currentInstallationId;
         @try {
             NSString* traceName = [command.arguments objectAtIndex:0];
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-            FIRTrace *trace = [self.traces objectForKey:traceName];
+            @synchronized (traces) {
+                FIRTrace *trace = [traces objectForKey:traceName];
 
-            if (trace != nil) {
-                [trace stop];
-                [self.traces removeObjectForKey:traceName];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-            } else {
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Trace not found"];
+                if (trace != nil) {
+                    [trace stop];
+                    [traces removeObjectForKey:traceName];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                } else {
+                    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Trace not found"];
+                }
             }
 
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
