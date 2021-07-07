@@ -2086,8 +2086,8 @@ FirebasePlugin.setUserId("user_id");
 Set a user property for use in Analytics:
 
 **Parameters**:
-- {string} userName - name of user property to set in Firebase Analytics
-- {string} userName - value of user property to set in Firebase Analytics
+- {string} name - name of user property to set in Firebase Analytics
+- {string} value - value of user property to set in Firebase Analytics
 
 ```javascript
 FirebasePlugin.setUserProperty("name", "value");
