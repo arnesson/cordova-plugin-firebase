@@ -1,3 +1,13 @@
+# Version 13.0.1
+* (iOS) Fix `onTokenRefresh` to return FCM token (not installation auth token).
+    * Resolves [#637](https://github.com/dpa99c/cordova-plugin-firebasex/issues/637)
+* (Android): Increment pinned version of Crashlytics Gradle plugin to [v2.7.1](https://firebase.google.com/support/release-notes/android#crashlytics_gradle_plugin_v2-7-1) to resolve build issues with Gradle v7.
+    * This resolves build issues with `cordova-android@10.0.0` which defaults to Gradle v7.1.1
+    * Resolves [#643](https://github.com/dpa99c/cordova-plugin-firebasex/issues/643)
+* (iOS) Bump pinned Firebase SDK components to [v8.4.0 - July 20, 2021](https://firebase.google.com/support/release-notes/ios#version_840_-_july_20_2021)
+* (Android): Update pinned Firebase Android SDK versions from BoM v28.1.0 to ([v28.2.1 - July 09, 2021](https://firebase.google.com/support/release-notes/android#bom_v28-2-1))
+
+
 # Version 13.0.0
 * (iOS) BREAKING CHANGE: Major version update to Firebase iOS SDK from v7 to v8 ([Version 8.1.1 - June 11, 2021](https://firebase.google.com/support/release-notes/ios#version_811_-_june_11_2021))
     * Remove/replace references to previously-deprecated Firebase IID SDK component which is removed in SDK v8 with Firebase Installations SDK
