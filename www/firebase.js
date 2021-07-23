@@ -34,10 +34,6 @@ exports._onInstallationIdChangeCallback = function(installationId){
  **************/
 
 // Notifications
-exports.getId = function (success, error) {
-  exec(success, error, "FirebasePlugin", "getId", []);
-};
-
 exports.getToken = function (success, error) {
   exec(success, error, "FirebasePlugin", "getToken", []);
 };
@@ -441,6 +437,11 @@ exports.removeFirestoreListener = function (success, error, listenerId) {
 exports.functionsHttpsCallable = function (name, args, success, error) {
   if(typeof name !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
   exec(success, error, "FirebasePlugin", "functionsHttpsCallable", [name, args]);
+};
+
+// Installations
+exports.getId = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getId", []);
 };
 
 exports.getInstallationId = function (success, error) {

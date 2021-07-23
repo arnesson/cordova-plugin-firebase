@@ -204,13 +204,23 @@ static NSMutableDictionary* traces;
 }
 
 - (void)getToken:(CDVInvokedUrlCommand *)command {
-    [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
-        @try {
-            [self handleStringResultWithPotentialError:error command:command result:token];
-        }@catch (NSException *exception) {
-            [self handlePluginExceptionWithContext:exception :command];
-        }
+    [self _getToken:^(NSString *token, NSError *error) {
+        [self handleStringResultWithPotentialError:error command:command result:token];
     }];
+}
+
+-(void)_getToken:(void (^)(NSString *token, NSError *error))completeBlock {
+    @try {
+        [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
+            @try {
+                completeBlock(token, error);
+            }@catch (NSException *exception) {
+                [self handlePluginExceptionWithoutContext:exception];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithoutContext:exception];
+    }
 }
 
 - (void)getAPNSToken:(CDVInvokedUrlCommand *)command {
@@ -430,22 +440,11 @@ static NSMutableDictionary* traces;
 
 - (void)onTokenRefresh:(CDVInvokedUrlCommand *)command {
     self.tokenRefreshCallbackId = command.callbackId;
-    @try {
-        [[FIRInstallations installations] authTokenForcingRefresh:true
-                                                       completion:^(FIRInstallationsAuthTokenResult *result, NSError *error) {
-            @try {
-              if (error != nil) {
-                  [self sendPluginErrorWithError:error command:command];
-              }else{
-                  [self sendPluginStringResult:[result authToken] command:command callbackId:command.callbackId];
-              }
-            }@catch (NSException *exception) {
-                [self handlePluginExceptionWithContext:exception :command];
-            }
-        }];
-    }@catch (NSException *exception) {
-        [self handlePluginExceptionWithContext:exception :command];
-    }
+    [self _getToken:^(NSString *token, NSError *error) {
+        if(error == nil && token != nil){
+            [self sendToken:token];
+        }
+    }];
 }
 
 - (void)onApnsTokenReceived:(CDVInvokedUrlCommand *)command {
