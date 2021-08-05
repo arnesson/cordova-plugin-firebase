@@ -2220,6 +2220,7 @@ In a Cordova app, you may use this to log unhandled Javascript exceptions, for e
 
 The event will appear under `Event type = "Non-fatals"` in the Crashlytics console.
 The error message will appear in the `Logs` section of the non-fatal error event.
+Note that logged errors will only be sent to the Crashlytics server on the next full app restart.
 Also logs the error message to the native device console.
 
 **Parameters**:
