@@ -1928,17 +1928,41 @@ static NSMutableDictionary* traces;
     NSMutableDictionary* sanitisedData = [[NSMutableDictionary alloc] init];
     for(id key in data){
         id value = [data objectForKey:key];
-        if([value isKindOfClass:[FIRDocumentReference class]]){
-            FIRDocumentReference* reference = (FIRDocumentReference*) value;
-            NSString* path = reference.path;
-            [sanitisedData setValue:path forKey:key];
-        }else if([value isKindOfClass:[NSDictionary class]]){
-            [sanitisedData setValue:[self sanitiseFirestoreDataDictionary:value] forKey:key];
-        }else{
-            [sanitisedData setValue:value forKey:key];
-        }
+        value = [self sanitizeFirestoreData:(id)value];
+        [sanitisedData setValue:value forKey:key];
     }
     return sanitisedData;
+}
+
+- (id)sanitizeFirestoreData:(id) value {
+    if([value isKindOfClass:[FIRDocumentReference class]]){
+        FIRDocumentReference* reference = (FIRDocumentReference*) value;
+        NSString* path = reference.path;
+        return path;
+    }else if([value isKindOfClass:[NSDictionary class]]){
+        return [self sanitiseFirestoreDataDictionary:value];
+    }else if([value isKindOfClass:[NSArray class]]){
+        NSMutableArray* array = [[NSMutableArray alloc] init];;
+        for (id element in value) {
+            id sanitizedValue = (id)[self sanitizeFirestoreData:element];
+            [array addObject:(id)sanitizedValue];
+        }
+        return array;
+    }else if([value isKindOfClass:[FIRTimestamp class]]){
+        FIRTimestamp* dateTimestamp = (FIRTimestamp*) value;
+        NSDictionary *dateDictionary = @{
+            @"nanoseconds" : [NSNumber numberWithInt:dateTimestamp.nanoseconds],
+            @"seconds" : [NSNumber numberWithLong:dateTimestamp.seconds]
+        };
+
+        return dateDictionary;
+    } else if([value isKindOfClass:[NSNumber class]]){
+        double number = [value doubleValue];
+        if (isnan(number) || isinf(number)) {
+            return nil;
+        }
+    }
+    return value;
 }
 
 /*
