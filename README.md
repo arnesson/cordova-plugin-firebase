@@ -1324,6 +1324,8 @@ The following Android-specific keys are supported and should be placed inside th
 - `notification_android_id` - Identifier used to replace existing notifications in the notification drawer
     - If not specified, each request creates a new notification.
     - If specified and a notification with the same tag is already being shown, the new notification replaces the existing one in the notification drawer.
+- `notification_android_body_html` - If is passed, the body of a notification is processed as if it were html, you can use <b>, <i> or <s>  
+    - If not specified, the body of the notification will be processed as plain text.
 - `notification_android_icon` - name of a [custom notification icon](#android-custom-notification-icons) in the drawable resources
     - if not specified, the plugin will use the default `notification_icon` if it exists; otherwise the default app icon will be displayed
     - if a [large icon](#android-large-notification-icon) has been defined, it will also be displayed in the system notification.
