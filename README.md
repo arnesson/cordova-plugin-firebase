@@ -1326,6 +1326,14 @@ The following Android-specific keys are supported and should be placed inside th
     - if a [large icon](#android-large-notification-icon) has been defined, it will also be displayed in the system notification.
 - `notification_android_color` - the [color accent](#android-notification-color) to use for the small notification icon
     - if not specified, the default color accent will be used
+- `notification_android_image` - Specifies the image notification
+    - if not specified, the notification will not show any image
+- `notification_android_image_type` - Specifies the image notification type
+    - Possible values:
+        - `square` - The image is displayed in the default format.
+        - `circle` - This notification displays the image in circular format.
+        - `big_picture` - Displays the image like `square` type, but the notification can be expanded and show the image in a big picture, example: https://developer.android.com/training/notify-user/expanded#image-style
+    - Defaults to `square` if not specified.
 - `notification_android_channel_id` - ID of the [notification channel](#android-notification-channels) to use to display the notification
     - Only applies to Android 8.0 and above
     - If not specified, the [default notification channel](#default-android-channel-properties) will be used.
@@ -1379,6 +1387,8 @@ Example data message with Android notification keys:
     "notification_android_visibility": "1",
     "notification_android_color": "#ff0000",
     "notification_android_icon": "coffee",
+    "notification_android_image": "https://example.com/avatar.jpg",
+    "notification_android_image_type": "circle",
     "notification_android_sound": "my_sound",
     "notification_android_vibrate": "500, 200, 500",
     "notification_android_lights": "#ffff0000, 250, 250"
