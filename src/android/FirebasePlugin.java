@@ -1433,6 +1433,15 @@ public class FirebasePlugin extends CordovaPlugin {
                         return;
                     }
 
+                    OAuthProvider authProvider = FirebasePlugin.instance.obtainAuthProvider(jsonCredential);
+                    if(authProvider != null){
+                        FirebasePlugin.instance.authResultCallbackContext = callbackContext;
+                        FirebaseAuth.getInstance().getCurrentUser().startActivityForLinkWithProvider(FirebasePlugin.cordovaActivity, authProvider)
+                                .addOnSuccessListener(new AuthResultOnSuccessListener())
+                                .addOnFailureListener(new AuthResultOnFailureListener());
+                        return;
+                    }
+
                     //ELSE
                     callbackContext.error("Specified native auth credential id does not exist");
 
