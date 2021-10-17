@@ -356,15 +356,15 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             if (image != null) {
                 Log.d(TAG, "Large icon: image="+image);
                 Bitmap bitmap = getBitmapFromURL(image);
-
-                if(imageTypeCircle.equalsIgnoreCase(imageType)) {
-                    bitmap = getCircleBitmap(bitmap);
+                if(bitmap != null) {
+                    if(imageTypeCircle.equalsIgnoreCase(imageType)) {
+                        bitmap = getCircleBitmap(bitmap);
+                    }
+                    else if(imageTypeBigPicture.equalsIgnoreCase(imageType)) {
+                        notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null));
+                    }
+                    notificationBuilder.setLargeIcon(bitmap);
                 }
-                else if(imageTypeBigPicture.equalsIgnoreCase(imageType)) {
-                    notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null));
-                }
-
-                notificationBuilder.setLargeIcon(bitmap);
             }
 
             // Color
