@@ -240,6 +240,12 @@ export interface FirebasePlugin {
     registerAuthStateChangeListener(
         fn: (userSignedIn: boolean) => void,
     ): void
+    useAuthEmulator(
+        host: string,
+        port: number,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
     fetch(
         cacheExpirationSeconds: number,
         success: () => void,

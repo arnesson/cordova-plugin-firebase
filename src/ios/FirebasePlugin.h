@@ -31,6 +31,7 @@
 - (void)updateUserPassword:(CDVInvokedUrlCommand*)command;
 - (void)sendUserPasswordResetEmail:(CDVInvokedUrlCommand*)command;
 - (void)deleteUser:(CDVInvokedUrlCommand*)command;
+- (void)useAuthEmulator:(CDVInvokedUrlCommand*)command;
 
 // Remote notifications
 - (void)getId:(CDVInvokedUrlCommand*)command;

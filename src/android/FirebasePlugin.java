@@ -182,7 +182,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();                  
+                    firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -322,6 +322,8 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.sendUserPasswordResetEmail(callbackContext, args);
             } else if (action.equals("deleteUser")) {
                 this.deleteUser(callbackContext, args);
+            } else if (action.equals("useAuthEmulator")) {
+                this.useAuthEmulator(callbackContext, args);
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
             } else if (action.equals("incrementCounter")) {
@@ -1716,6 +1718,31 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     FirebaseAuth.getInstance().signInAnonymously().addOnCompleteListener(cordova.getActivity(), new AuthResultOnCompleteListener(callbackContext));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void useAuthEmulator(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String host = args.getString(0);
+                    Integer port = args.getInt(1);
+
+                    if(host == null || host.equals("")){
+                        callbackContext.error("host must be specified");
+                        return;
+                    }
+
+                    if(port == null){
+                        callbackContext.error("port must be specified");
+                        return;
+                    }
+
+                    FirebaseAuth.getInstance().useEmulator(host, port);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
