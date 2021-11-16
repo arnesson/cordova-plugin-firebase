@@ -1027,6 +1027,7 @@ static NSMutableDictionary* traces;
     NSInteger port = [[command.arguments objectAtIndex:1] integerValue];
     @try {
         [[FIRAuth auth] useEmulatorWithHost:host port:port];
+        [self sendPluginSuccess:command];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }

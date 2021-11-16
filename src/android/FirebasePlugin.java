@@ -1743,6 +1743,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     }
 
                     FirebaseAuth.getInstance().useEmulator(host, port);
+                    callbackContext.success();
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
