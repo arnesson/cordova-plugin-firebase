@@ -116,7 +116,7 @@ export interface FirebasePlugin {
     didCrashOnPreviousExecution(
         success?: (didCrashOnPreviousExecution: boolean) => void,
         error?: (err: string) => void
-    )
+    ): void
     setCrashlyticsUserId(
         userId: string
     ): void
