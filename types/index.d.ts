@@ -48,6 +48,14 @@ export interface FirebasePlugin {
         success: (value: boolean) => void,
         error: (err: string) => void
     ): void
+    grantCriticalPermission(
+        success: (value: boolean) => void,
+        error: (err: string) => void
+    ): void
+    hasCriticalPermission(
+        success: (value: boolean) => void,
+        error: (err: string) => void
+    ): void
     unregister(): void
     setBadgeNumber(
         badgeNumber: number

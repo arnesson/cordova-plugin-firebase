@@ -68,6 +68,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - [iOS notifications](#ios-notifications)
     - [iOS background notifications](#ios-background-notifications)
     - [iOS notification sound](#ios-notification-sound)
+    - [iOS critical notifications](#ios-critical-notifications)
     - [iOS badge number](#ios-badge-number)
     - [iOS actionable notifications](#ios-actionable-notifications)
   - [Data messages](#data-messages)
@@ -93,6 +94,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [onApnsTokenReceived](#onapnstokenreceived)
     - [onMessageReceived](#onmessagereceived)
     - [grantPermission](#grantpermission)
+    - [grantCriticalPermission](#grantcriticalpermission)
     - [hasPermission](#haspermission)
     - [unregister](#unregister)
     - [isAutoInitEnabled](#isautoinitenabled)
@@ -255,6 +257,10 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - `IOS_ENABLE_APPLE_SIGNIN` - enables the Sign In with Apple capability in Xcode.
     - `--variable IOS_ENABLE_APPLE_SIGNIN=true`
     - Ensure the associated app provisioning profile also has this capability enabled.
+- `IOS_ENABLE_CRITICAL_ALERTS_ENABLED` - enables the critical alerts capability
+  - `--variable IOS_ENABLE_CRITICAL_ALERTS_ENABLED=true`
+  - See [iOS critical notifications](#ios-critical-notifications)
+  - Ensure the associated app provisioning profile also has this capability enabled.
 
 ## Supported Cordova Versions
 - cordova: `>= 9`
@@ -1154,6 +1160,11 @@ In a data message, specify the `notification_ios_sound` key in the `data` sectio
 }
 ```
 
+### iOS critical notifications
+iOS offers the option to send critical push notifications. These kind of notifications appear even when your iPhone or iPad is in Do Not Disturb mode or silenced. Sending critical notifications requires a special entitlement that needs to be issued by Apple.
+Use the pugin setting `IOS_ENABLE_CRITICAL_ALERTS_ENABLED=true` to enable the critical push notifications capability.
+A user also needs to explicitly [grant permission](#grantcriticalpermission) to receive critical alerts.
+
 ### iOS badge number
 In a notification message, specify the `badge` key in the `apns.payload.aps` section, for example:
 
@@ -1633,10 +1644,21 @@ iOS only (Android will always return true).
 - {function} error - callback function which will be passed a {string} error message as an argument
 - {boolean} requestWithProvidesAppNotificationSettings - boolean which indicates if app provides AppNotificationSettingsButton (**iOS12+ only**)
 
+### grantCriticalPermission
+Grant critical permission to receive critical push notifications (will trigger additional prompt) and return `hasPermission: true`.
+iOS 12.0+ only (Android will always return true).
+
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} permission result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+**Critical push notifications require a special entitlement that needs to be issued by Apple.**
+
 ```javascript
 FirebasePlugin.grantPermission(function(hasPermission){
     console.log("Permission was " + (hasPermission ? "granted" : "denied"));
 });
+
 ```
 ### hasPermission
 Check permission to receive push notifications and return the result to a callback function as boolean.
@@ -1650,6 +1672,22 @@ On Android, returns true if remote notifications are enabled.
 ```javascript
 FirebasePlugin.hasPermission(function(hasPermission){
     console.log("Permission is " + (hasPermission ? "granted" : "denied"));
+});
+```
+
+### hasCriticalPermission
+Check permission to receive critical push notifications and return the result to a callback function as boolean.
+iOS 12.0+ only (Android will always return true).
+
+**Critical push notifications require a special entitlement that needs to be issued by Apple.**
+
+**Parameters**:
+- {function} success - callback function which will be passed the {boolean} permission result as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.hasCriticalPermission(function(hasPermission){
+    console.log("Permission to send critical push notificaitons is " + (hasPermission ? "granted" : "denied"));
 });
 ```
 

@@ -182,7 +182,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();                  
+                    firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -379,6 +379,8 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("functionsHttpsCallable")) {
                 this.functionsHttpsCallable(args, callbackContext);
             } else if (action.equals("grantPermission")
+                    || action.equals("grantCriticalPermission")
+                    || action.equals("hasCriticalPermission")
                     || action.equals("setBadgeNumber")
                     || action.equals("getBadgeNumber")
                     ) {

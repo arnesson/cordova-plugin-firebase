@@ -39,6 +39,8 @@
 - (NSString *)hexadecimalStringFromData:(NSData *)data;
 - (void)grantPermission:(CDVInvokedUrlCommand*)command;
 - (void)hasPermission:(CDVInvokedUrlCommand*)command;
+- (void)grantCriticalPermission:(CDVInvokedUrlCommand*)command;
+- (void)hasCriticalPermission:(CDVInvokedUrlCommand*)command;
 - (void)setBadgeNumber:(CDVInvokedUrlCommand*)command;
 - (void)getBadgeNumber:(CDVInvokedUrlCommand*)command;
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
