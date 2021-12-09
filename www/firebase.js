@@ -91,8 +91,16 @@ exports.grantPermission = function (success, error, requestWithProvidesAppNotifi
     exec(ensureBooleanFn(success), error, "FirebasePlugin", "grantPermission", [ensureBoolean(requestWithProvidesAppNotificationSettings)]);
 };
 
+exports.grantCriticalPermission = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "grantCriticalPermission", []);
+};
+
 exports.hasPermission = function (success, error) {
     exec(ensureBooleanFn(success), error, "FirebasePlugin", "hasPermission", []);
+};
+
+exports.hasCriticalPermission = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "hasCriticalPermission", []);
 };
 
 // Notifications - Android-only
