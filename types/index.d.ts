@@ -9,6 +9,8 @@ export interface IChannelOptions {
     importance?: 0 | 1 | 2 | 3 | 4
     badge?: boolean
     visibility?: -1 | 0 | 1
+    usage?: number
+    streamType?: number
 }
 
 export interface FirebasePlugin {

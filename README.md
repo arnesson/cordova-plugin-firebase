@@ -1884,7 +1884,15 @@ var channel  = {
     //-1 - secret - Do not reveal any part of the notification on a secure lockscreen.
     //0 - private - Show the notification on all lockscreens, but conceal sensitive or private information on secure lockscreens.
     //1 - public - Show the notification in its entirety on all lockscreens.
-    visibility: 1
+    visibility: 1,
+
+    // Optionally specify the usage type of the notification. Defaults to USAGE_NOTIFICATION_RINGTONE ( =6)
+    // For a list of all possible usages, see https://developer.android.com/reference/android/media/AudioAttributes.Builder#setUsage(int)
+
+    usage: 6,
+    // Optionally specify the stream type of the notification channel.
+    // For a list of all possible values, see https://developer.android.com/reference/android/media/AudioAttributes.Builder#setLegacyStreamType(int)
+    streamType: 5,
 };
 
 // Create the channel
