@@ -362,6 +362,10 @@ exports.registerAuthStateChangeListener = function(fn){
     onAuthStateChangeCallback = fn;
 };
 
+exports.useAuthEmulator = function (host, port, success, error) {
+    exec(success, error, "FirebasePlugin", "useAuthEmulator", [host, port]);
+};
+
 // Firestore
 exports.addDocumentToFirestoreCollection = function (document, collection, success, error) {
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");

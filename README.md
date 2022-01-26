@@ -2855,6 +2855,26 @@ Example usage:
     });
 ```
 
+### useAuthEmulator
+Instruments your app to talk to the [Firebase Authentication emulator](https://firebase.google.com/docs/emulator-suite/connect_auth).
+
+
+**Parameters**:
+- {string} host - hostname or IP address of the Authentication emulator.
+- {integer} port - port of the Authentication emulator.
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+FirebasePlugin.useAuthEmulator('localhost', 9099, function() {
+    console.log("Using Firebase Authentication emulator");
+}, function(error) {
+    console.error("Failed to enable the Firebase Authentication emulator", error);
+});
+```
+
 ## Remote Config
 
 ### fetch
