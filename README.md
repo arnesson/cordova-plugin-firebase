@@ -237,6 +237,7 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
     - e.g.  `--variable ANDROID_FIREBASE_PERFORMANCE_MONITORING=true`
     - Defaults to `false` if not specified.
 - `ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION` - overrides the default version of the [Firebase Performance Monitoring Gradle plugin for Android](https://firebase.google.com/docs/perf-mon/get-started-android?authuser=0#add-perfmon-plugin)
+- `ANDROID_GRPC_OKHTTP` - sets version of GRPC OKHTTP library.
 
 ### iOS only
 - `IOS_STRIP_DEBUG` - prevents symbolification of all libraries included via Cocoapods. See [Strip debug symbols](#strip-debug-symbols) for more info.

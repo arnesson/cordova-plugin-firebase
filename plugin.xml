@@ -69,12 +69,13 @@
 		<preference name="ANDROID_FIREBASE_INAPPMESSAGING_VERSION" default="20.0.0" />
 		<preference name="ANDROID_FIREBASE_FIRESTORE_VERSION" default="23.0.2" />
 		<preference name="ANDROID_FIREBASE_FUNCTIONS_VERSION" default="20.0.0" />
-			<preference name="ANDROID_FIREBASE_IID_VERSION" default="21.1.0" />
+		<preference name="ANDROID_FIREBASE_IID_VERSION" default="21.1.0" />
 		<preference name="ANDROID_FIREBASE_INSTALLATIONS_VERSION" default="17.0.0" />
 		<preference name="ANDROID_FIREBASE_CRASHLYTICS_VERSION" default="18.1.0" />
 		<preference name="ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" default="18.1.0" />
 		<preference name="ANDROID_GSON_VERSION" default="2.8.7" />
 		<preference name="ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION" default="1.4.0" />
+		<preference name="ANDROID_GRPC_OKHTTP" default="1.32.2" />
 
 		<framework src="com.google.android.gms:play-services-tagmanager:$ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" />
 		<framework src="com.google.android.gms:play-services-auth:$ANDROID_PLAY_SERVICES_AUTH_VERSION" />
@@ -87,11 +88,12 @@
 		<framework src="com.google.firebase:firebase-inappmessaging-display:$ANDROID_FIREBASE_INAPPMESSAGING_VERSION" />
 		<framework src="com.google.firebase:firebase-firestore:$ANDROID_FIREBASE_FIRESTORE_VERSION" />
 		<framework src="com.google.firebase:firebase-functions:$ANDROID_FIREBASE_FUNCTIONS_VERSION" />
-			<framework src="com.google.firebase:firebase-iid:$ANDROID_FIREBASE_IID_VERSION" />
+		<framework src="com.google.firebase:firebase-iid:$ANDROID_FIREBASE_IID_VERSION" />
 		<framework src="com.google.firebase:firebase-installations:$ANDROID_FIREBASE_INSTALLATIONS_VERSION" />
 		<framework src="com.google.firebase:firebase-crashlytics:$ANDROID_FIREBASE_CRASHLYTICS_VERSION" />
 		<framework src="com.google.firebase:firebase-crashlytics-ndk:$ANDROID_FIREBASE_CRASHLYTICS_NDK_VERSION" />
 		<framework src="com.google.code.gson:gson:$ANDROID_GSON_VERSION" />
+		<framework src="io.grpc:grpc-okhttp:$ANDROID_GRPC_OKHTTP" />
 	</platform>
 
 	<platform name="ios">
