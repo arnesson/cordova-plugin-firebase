@@ -332,6 +332,78 @@ static NSMutableDictionary* traces;
     }
 }
 
+- (void)hasCriticalPermission:(CDVInvokedUrlCommand *)command {
+    @try {
+        [self _hasCriticalPermission:^(BOOL enabled) {
+            CDVPluginResult *commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:enabled];
+            [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)_hasCriticalPermission:(void (^)(BOOL result))completeBlock {
+    @try {
+        if (@available(iOS 12.0, *)) {
+            [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+                @try {
+                    BOOL enabled = NO;
+                    if (settings.criticalAlertSetting == UNNotificationSettingEnabled) {
+                        enabled = YES;
+                        [self registerForRemoteNotifications];
+                    }
+                    NSLog(@"_hasCriticalPermission: %@", enabled ? @"YES" : @"NO");
+                    completeBlock(enabled);
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithoutContext:exception];
+                }
+            }];
+        }else{
+            completeBlock(NO);
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithoutContext:exception];
+    }
+}
+
+- (void)grantCriticalPermission:(CDVInvokedUrlCommand *)command {
+    NSLog(@"grantCriticalPermission");
+    @try {
+        if (@available(iOS 12.0, *)) {
+            [self _hasCriticalPermission:^(BOOL enabled) {
+                @try {
+                    if(enabled){
+                        NSString* message = @"Critical permission is already granted - call hasCriticalPermission() to check before calling grantCriticalPermission()";
+                        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:message];
+                        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                    }else{
+                        [UNUserNotificationCenter currentNotificationCenter].delegate = (id<UNUserNotificationCenterDelegate> _Nullable) self;
+                        UNAuthorizationOptions authOptions = UNAuthorizationOptionCriticalAlert;
+
+                        [[UNUserNotificationCenter currentNotificationCenter]
+                         requestAuthorizationWithOptions:authOptions
+                         completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                            @try {
+                                NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
+                                [self handleBoolResultWithPotentialError:error command:command result:granted];
+                            }@catch (NSException *exception) {
+                                [self handlePluginExceptionWithContext:exception :command];
+                            }
+                        }];
+                    }
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithContext:exception :command];
+                }
+            }];
+        } else {
+            [self handleBoolResultWithPotentialError:nil command:command result:false];
+        }
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)registerForRemoteNotifications {
     NSLog(@"registerForRemoteNotifications");
     if(registeredForRemoteNotifications) return;

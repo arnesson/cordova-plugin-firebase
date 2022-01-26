@@ -381,6 +381,8 @@ public class FirebasePlugin extends CordovaPlugin {
             } else if (action.equals("functionsHttpsCallable")) {
                 this.functionsHttpsCallable(args, callbackContext);
             } else if (action.equals("grantPermission")
+                    || action.equals("grantCriticalPermission")
+                    || action.equals("hasCriticalPermission")
                     || action.equals("setBadgeNumber")
                     || action.equals("getBadgeNumber")
                     ) {
@@ -2008,11 +2010,23 @@ public class FirebasePlugin extends CordovaPlugin {
             Log.d(TAG, "Channel "+id+" - badge="+badge);
             channel.setShowBadge(badge);
 
+            int usage = options.optInt("usage", AudioAttributes.USAGE_NOTIFICATION_RINGTONE);
+            Log.d(TAG, "Channel "+id+" - usage="+usage);
+
+            int streamType = options.optInt("streamType", -1);
+            Log.d(TAG, "Channel "+id+" - streamType="+streamType);
+
             // Sound
             String sound = options.optString("sound", "default");
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+            AudioAttributes.Builder audioAttributesBuilder = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build();
+                    .setUsage(usage);
+
+            if(streamType != -1) {
+                audioAttributesBuilder.setLegacyStreamType(streamType);
+            }
+
+            AudioAttributes audioAttributes = audioAttributesBuilder.build();
             if ("ringtone".equals(sound)) {
                 channel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE), audioAttributes);
                 Log.d(TAG, "Channel "+id+" - sound=ringtone");

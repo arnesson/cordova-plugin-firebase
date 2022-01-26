@@ -9,6 +9,8 @@ export interface IChannelOptions {
     importance?: 0 | 1 | 2 | 3 | 4
     badge?: boolean
     visibility?: -1 | 0 | 1
+    usage?: number
+    streamType?: number
 }
 
 export interface FirebasePlugin {
@@ -45,6 +47,14 @@ export interface FirebasePlugin {
         requestWithProvidesAppNotificationSettings?: boolean
     ): void
     hasPermission(
+        success: (value: boolean) => void,
+        error: (err: string) => void
+    ): void
+    grantCriticalPermission(
+        success: (value: boolean) => void,
+        error: (err: string) => void
+    ): void
+    hasCriticalPermission(
         success: (value: boolean) => void,
         error: (err: string) => void
     ): void
