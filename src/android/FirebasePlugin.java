@@ -1194,7 +1194,6 @@ public class FirebasePlugin extends CordovaPlugin {
         returnResults.put("phoneNumber", user.getPhoneNumber());
         returnResults.put("photoUrl", user.getPhotoUrl() == null ? null : user.getPhotoUrl().toString());
         returnResults.put("uid", user.getUid());
-        returnResults.put("providerId", user.getIdToken(false).getResult().getSignInProvider());
         returnResults.put("isAnonymous", user.isAnonymous());
 
         user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
@@ -1203,6 +1202,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     String idToken = result.getToken();
                     returnResults.put("idToken", idToken);
+                    returnResults.put("providerId", result.getSignInProvider());
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
@@ -1212,9 +1212,9 @@ public class FirebasePlugin extends CordovaPlugin {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                // Something went wrong getting ID token so return other user data
+                // Something went wrong getting ID and provider ID token so return other user data
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
-                handleExceptionWithoutContext(e);
+                handleExceptionWithoutContext(e);`
             }
         });
     }
