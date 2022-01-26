@@ -160,6 +160,12 @@ export interface FirebasePlugin {
         success?: () => void,
         error?: (err: string) => void
     ): void
+    authenticateUserWithEmailAndPassword(
+        email: string,
+        password: string,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
     signInUserWithCustomToken(
         customToken: string,
         success?: () => void,
