@@ -1214,7 +1214,7 @@ public class FirebasePlugin extends CordovaPlugin {
             public void onFailure(@NonNull Exception e) {
                 // Something went wrong getting ID and provider ID token so return other user data
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
-                handleExceptionWithoutContext(e);`
+                handleExceptionWithoutContext(e);
             }
         });
     }
