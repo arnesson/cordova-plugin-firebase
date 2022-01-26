@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
+
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -16,11 +18,21 @@ import android.app.Notification;
 import android.text.TextUtils;
 import android.content.ContentResolver;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Paint;
+import android.graphics.Canvas;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Map;
 import java.util.Random;
 
@@ -31,6 +43,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
     static final String defaultSmallIconName = "notification_icon";
     static final String defaultLargeIconName = "notification_icon_large";
 
+    static final String imageTypeCircle = "circle";
+    static final String imageTypeBigPicture = "big_picture";
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of
@@ -48,6 +62,20 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         }
     }
 
+    public Bitmap getBitmapFromURL(String strURL) {
+        try {
+            URL url = new URL(strURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(15000);
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            return BitmapFactory.decodeStream(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /**
      * Called when message is received.
@@ -98,6 +126,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             String channelId = null;
             String visibility = null;
             String priority = null;
+            String image = null;
+            String imageType = null;
             boolean foregroundNotification = false;
 
             Map<String, String> data = remoteMessage.getData();
@@ -116,6 +146,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 sound = notification.getSound();
                 color = notification.getColor();
                 icon = notification.getIcon();
+                image = notification.getImageUrl().toString();
             }else{
                 Log.i(TAG, "Received message: data");
                 messageType = "data";
@@ -137,6 +168,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 if(data.containsKey("notification_android_icon")) icon = data.get("notification_android_icon");
                 if(data.containsKey("notification_android_visibility")) visibility = data.get("notification_android_visibility");
                 if(data.containsKey("notification_android_priority")) priority = data.get("notification_android_priority");
+                if(data.containsKey("notification_android_image")) image = data.get("notification_android_image");
+                if(data.containsKey("notification_android_image_type")) imageType = data.get("notification_android_image_type");
             }
 
             if (TextUtils.isEmpty(id)) {
@@ -157,18 +190,20 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Channel Id: " + channelId);
             Log.d(TAG, "Visibility: " + visibility);
             Log.d(TAG, "Priority: " + priority);
+            Log.d(TAG, "Image: " + image);
+            Log.d(TAG, "image Type: " + imageType);
 
 
             if (!TextUtils.isEmpty(body) || !TextUtils.isEmpty(title) || (data != null && !data.isEmpty())) {
                 boolean showNotification = (FirebasePlugin.inBackground() || !FirebasePlugin.hasNotificationsCallback() || foregroundNotification) && (!TextUtils.isEmpty(body) || !TextUtils.isEmpty(title));
-                sendMessage(remoteMessage, data, messageType, id, title, body, showNotification, sound, vibrate, light, color, icon, channelId, priority, visibility);
+                sendMessage(remoteMessage, data, messageType, id, title, body, showNotification, sound, vibrate, light, color, icon, channelId, priority, visibility, image, imageType);
             }
         }catch (Exception e){
             FirebasePlugin.handleExceptionWithoutContext(e);
         }
     }
 
-    private void sendMessage(RemoteMessage remoteMessage, Map<String, String> data, String messageType, String id, String title, String body, boolean showNotification, String sound, String vibrate, String light, String color, String icon, String channelId, String priority, String visibility) {
+    private void sendMessage(RemoteMessage remoteMessage, Map<String, String> data, String messageType, String id, String title, String body, boolean showNotification, String sound, String vibrate, String light, String color, String icon, String channelId, String priority, String visibility, String image, String imageType) {
         Log.d(TAG, "sendMessage(): messageType="+messageType+"; showNotification="+showNotification+"; id="+id+"; title="+title+"; body="+body+"; sound="+sound+"; vibrate="+vibrate+"; light="+light+"; color="+color+"; icon="+icon+"; channel="+channelId+"; data="+data.toString());
         Bundle bundle = new Bundle();
         for (String key : data.keySet()) {
@@ -186,6 +221,8 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         this.putKVInBundle("channel_id", channelId, bundle);
         this.putKVInBundle("priority", priority, bundle);
         this.putKVInBundle("visibility", visibility, bundle);
+        this.putKVInBundle("image", image, bundle);
+        this.putKVInBundle("image_type", imageType, bundle);
         this.putKVInBundle("show_notification", String.valueOf(showNotification), bundle);
         this.putKVInBundle("from", remoteMessage.getFrom(), bundle);
         this.putKVInBundle("collapse_key", remoteMessage.getCollapseKey(), bundle);
@@ -299,6 +336,21 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 }
             }
 
+            // Image
+            if (image != null) {
+                Log.d(TAG, "Large icon: image="+image);
+                Bitmap bitmap = getBitmapFromURL(image);
+
+                if(imageTypeCircle.equalsIgnoreCase(imageType)) {
+                    bitmap = getCircleBitmap(bitmap);
+                }
+                else if(imageTypeBigPicture.equalsIgnoreCase(imageType)) {
+                    notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null));
+                }
+
+                notificationBuilder.setLargeIcon(bitmap);
+            }
+
             // Color
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 int defaultColor = getResources().getColor(getResources().getIdentifier("accent", "color", getPackageName()), null);
@@ -338,6 +390,35 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         }
         // Send to plugin
         FirebasePlugin.sendMessage(bundle, this.getApplicationContext());
+    }
+
+    private Bitmap getCircleBitmap(Bitmap bitmap) {
+
+        if (bitmap == null) {
+            return null;
+        }
+
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
+        final int color = Color.RED;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        float cx = bitmap.getWidth() / 2;
+        float cy = bitmap.getHeight() / 2;
+        float radius = cx < cy ? cx : cy;
+        canvas.drawCircle(cx, cy, radius, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        bitmap.recycle();
+
+        return output;
     }
 
     private void putKVInBundle(String k, String v, Bundle b){
