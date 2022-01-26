@@ -2398,15 +2398,31 @@ Sends a verification email to the currently configured email address of the curr
 When the user opens the contained link, their email address will have been verified.
 
 **Parameters**:
+- {object} actionCodeSettings - action code settings based on [Passing State in Email Actions Parameters](https://firebase.google.com/docs/auth/web/passing-state-in-email-actions#passing_statecontinue_url_in_email_actions) :
+    - {boolean} handleCodeInApp - Whether the email action link will be opened in a mobile app or a web link first
+    - {string} url - Continue URL after email has been verified
+    - {string} dynamicLinkDomain - Sets the dynamic link domain to use for the current link if it is to be opened using Firebase Dynamic Links
+    - {string} iosBundleId - Sets the iOS bundle ID. This will try to open the link in an iOS app if it is installed
+    - {string} androidPackageName - Sets the Android package name. This will try to open the link in an android app if it is installed
+    - {boolean} installIfNotAvailable - Install if the provided app package name is not already installed on the users device (Android only)
+    - {string} minimumVersion - minimum app version required (Android Only)
 - {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 ```javascript
-    FirebasePlugin.sendUserEmailVerification(function() {
-        console.log("User verification email successfully sent");
-    }, function(error) {
-        console.error("Failed to send user verification email: " + error);
-    });
+    FirebasePlugin.sendUserEmailVerification({
+    handleCodeInApp: true,
+    url: "http://www.example.com",
+    dynamicLinkDomain: "example.page.link",
+    iosBundleId: "com.example.ios",
+    androidPackageName: "com.example.android",
+    installIfNotAvailable: true,
+    minimumVersion: "12",
+}, function() {
+    console.log("User verification email successfully sent");
+}, function(error) {
+    console.error("Failed to send user verification email: " + error);
+});
 ```
 
 ### updateUserPassword

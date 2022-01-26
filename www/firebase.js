@@ -339,8 +339,8 @@ exports.updateUserEmail = function (email, success, error) {
     exec(success, error, "FirebasePlugin", "updateUserEmail", [email]);
 };
 
-exports.sendUserEmailVerification = function (success, error) {
-    exec(success, error, "FirebasePlugin", "sendUserEmailVerification", []);
+exports.sendUserEmailVerification = function (actionCodeSettings, success, error) {
+    exec(success, error, "FirebasePlugin", "sendUserEmailVerification", [actionCodeSettings]);
 };
 
 exports.updateUserPassword = function (password, success, error) {

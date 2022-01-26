@@ -22,6 +22,7 @@ import androidx.core.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -182,7 +183,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
-                    firestore = FirebaseFirestore.getInstance();                  
+                    firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
 
                     gson = new GsonBuilder()
@@ -1277,12 +1278,28 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
                     if(user == null){
                         callbackContext.error("No user is currently signed");
                         return;
                     }
 
-                    handleTaskOutcome(user.sendEmailVerification(), callbackContext);
+                    if(!args.isNull(0)) {
+                        JSONObject actionCodeSettingsParams = args.getJSONObject(0);
+                        ActionCodeSettings actionCodeSettings = ActionCodeSettings.newBuilder()
+                            .setUrl(actionCodeSettingsParams.getString("url"))
+                            .setDynamicLinkDomain(actionCodeSettingsParams.optString("dynamicLinkDomain"))
+                            .setHandleCodeInApp(actionCodeSettingsParams.optBoolean("handleCodeInApp"))
+                            .setIOSBundleId(actionCodeSettingsParams.optString("iosBundleId"))
+                            .setAndroidPackageName(actionCodeSettingsParams.optString("androidPackageName"),
+                                actionCodeSettingsParams.optBoolean("installIfNotAvailable"),
+                                actionCodeSettingsParams.optString("minimumVersion"))
+                            .build();
+                        handleTaskOutcome(user.sendEmailVerification(actionCodeSettings), callbackContext);
+                    } else {
+                        handleTaskOutcome(user.sendEmailVerification(), callbackContext);
+                    }
+
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
