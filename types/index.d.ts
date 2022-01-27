@@ -236,6 +236,15 @@ export interface FirebasePlugin {
         error?: (err: string) => void
     ): void
     sendUserEmailVerification(
+        actionCodeSettings?: {
+            handleCodeInApp?: boolean,
+            url: string,
+            dynamicLinkDomain?: string,
+            iosBundleId?: string,
+            androidPackageName?: string,
+            installIfNotAvailable?: boolean,
+            minimumVersion?: string,
+        },
         success?: () => void,
         error?: (err: string) => void
     ): void

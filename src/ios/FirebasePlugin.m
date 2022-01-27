@@ -961,18 +961,53 @@ static NSMutableDictionary* traces;
 - (void)sendUserEmailVerification:(CDVInvokedUrlCommand*)command{
     @try {
         FIRUser* user = [FIRAuth auth].currentUser;
+        NSDictionary* actionCodeSettingsParams = [command.arguments objectAtIndex:0];
+
         if(!user){
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
             return;
         }
 
-        [user sendEmailVerificationWithCompletion:^(NSError *_Nullable error) {
-          @try {
-              [self handleEmptyResultWithPotentialError:error command:command];
-          }@catch (NSException *exception) {
-              [self handlePluginExceptionWithContext:exception :command];
-          }
-        }];
+        if(![actionCodeSettingsParams isEqual:[NSNull null]]) {
+            FIRActionCodeSettings *actionCodeSettings = [[FIRActionCodeSettings alloc] init];
+            if([actionCodeSettingsParams objectForKey:@"handleCodeInApp"] != nil){
+                actionCodeSettings.handleCodeInApp = [[actionCodeSettingsParams objectForKey:@"handleCodeInApp"] boolValue];
+            }
+            if([actionCodeSettingsParams objectForKey:@"url"] != nil){
+                actionCodeSettings.URL = [NSURL URLWithString: [actionCodeSettingsParams objectForKey:@"url"]];
+            }
+            if([actionCodeSettingsParams objectForKey:@"dynamicLinkDomain"] != nil){
+                actionCodeSettings.dynamicLinkDomain = [NSString stringWithString: [actionCodeSettingsParams objectForKey:@"dynamicLinkDomain"]];
+            }
+            if([actionCodeSettingsParams objectForKey:@"iosBundleId"] != nil){
+                actionCodeSettings.iOSBundleID = [NSString stringWithString: [actionCodeSettingsParams objectForKey:@"iosBundleId"]];
+            }
+            if([actionCodeSettingsParams objectForKey:@"androidPackageName"] != nil){
+                NSString* minimumVersion;
+                if ([actionCodeSettingsParams objectForKey:@"minimumVersion"] != nil) {
+                   minimumVersion = [NSString stringWithString:[actionCodeSettingsParams objectForKey:@"minimumVersion"]];
+                }
+                [actionCodeSettings setAndroidPackageName:[NSString stringWithString:[actionCodeSettingsParams objectForKey:@"androidPackageName"]]
+                                    installIfNotAvailable:[[actionCodeSettingsParams objectForKey:@"installIfNotAvailable"] boolValue]
+                                           minimumVersion:minimumVersion];
+            }
+            [user sendEmailVerificationWithActionCodeSettings:actionCodeSettings completion:^(NSError * _Nullable error) {
+                @try {
+                    [self handleEmptyResultWithPotentialError:error command:command];
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithContext:exception :command];
+                }
+            }];
+        } else {
+            [user sendEmailVerificationWithCompletion:^(NSError * _Nullable error) {
+                @try {
+                    [self handleEmptyResultWithPotentialError:error command:command];
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithContext:exception :command];
+                }
+            }];
+        }
+
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
