@@ -133,7 +133,6 @@
 @property (nonatomic, copy) NSString *openSettingsCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, copy) NSString *apnsTokenRefreshCallbackId;
-@property (nonatomic, copy) NSString *googleSignInCallbackId;
 @property (nonatomic, copy) NSString *appleSignInCallbackId;
 
 @property (nonatomic, retain) NSMutableArray *notificationStack;
