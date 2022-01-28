@@ -2,6 +2,8 @@
 * (iOS) chore: Minor version update to Firebase iOS SDK to latest ([Version 8.11.0 - January 18, 2022](https://firebase.google.com/support/release-notes/ios#version_8110_-_january_18_2022))
     * BREAKING CHANGE: Requires Cocoapods v1.11.2+
 * (Android) chore: Update pinned Firebase Android SDK dependencies to latest ((January 25, 2022)[https://developers.google.com/android/guides/releases#january_25_2022])
+* (iOS) bugfix: Update to GoogleSignIn v6 and update plugin for breaking API changes.
+    * Resolves [#678](https://github.com/dpa99c/cordova-plugin-firebasex/issues/678)
 * (Android) bugfix: Fix an error getting the providerId that could cause `getCurrentUser()` to fail.
     * Merged from PR [#706](https://github.com/dpa99c/cordova-plugin-firebasex/pull/706)
 * (iOS & Android) feat: Include actionCodeSettings in the `sendUserEmailVerification()` function
