@@ -149,7 +149,9 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 sound = notification.getSound();
                 color = notification.getColor();
                 icon = notification.getIcon();
-                image = notification.getImageUrl().toString();
+                if (notification.getImageUrl() != null) {
+                    image = notification.getImageUrl().toString();
+                }
             }else{
                 Log.i(TAG, "Received message: data");
                 messageType = "data";
