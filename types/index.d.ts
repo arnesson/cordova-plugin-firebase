@@ -390,4 +390,7 @@ export interface FirebasePlugin {
         listenerId: string
     ): void
 }
-declare var FirebasePlugin: FirebasePlugin;
+
+declare global {
+    const FirebasePlugin: FirebasePlugin;
+}
