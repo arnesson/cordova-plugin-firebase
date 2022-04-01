@@ -1787,6 +1787,11 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+                    if(user == null){
+                        callbackContext.error("No user is currently signed");
+                        return;
+                    }
+
                     user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
                         @Override
                         public void onSuccess(GetTokenResult result) {
