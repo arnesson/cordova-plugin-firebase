@@ -55,6 +55,12 @@ static NSMutableDictionary* traces;
     firestore = firestoreInstance;
 }
 
+- (void)applicationLaunchedWithUrl:(NSNotification*)notification
+{
+    NSURL* url = [notification object];
+    [[GIDSignIn sharedInstance] handleURL:url];
+}
+
 // @override abstract
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
@@ -64,6 +70,8 @@ static NSMutableDictionary* traces;
         preferences = [NSUserDefaults standardUserDefaults];
         googlePlist = [NSMutableDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"]];
 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationLaunchedWithUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
+        
         if([self getGooglePlistFlagWithDefaultValue:FirebaseCrashlyticsCollectionEnabled defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:YES];
         }
