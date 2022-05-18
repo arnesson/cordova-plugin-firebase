@@ -325,6 +325,8 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.deleteUser(callbackContext, args);
             } else if (action.equals("useAuthEmulator")) {
                 this.useAuthEmulator(callbackContext, args);
+            } else if (action.equals("getClaims")) {
+                this.getClaims(callbackContext, args);
             } else if (action.equals("startTrace")) {
                 this.startTrace(callbackContext, args.getString(0));
             } else if (action.equals("incrementCounter")) {
@@ -1772,6 +1774,41 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     FirebaseAuth.getInstance().useEmulator(host, port);
                     callbackContext.success();
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void getClaims(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                    if(user == null){
+                        callbackContext.error("No user is currently signed");
+                        return;
+                    }
+
+                    user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
+                        @Override
+                        public void onSuccess(GetTokenResult result) {
+                            try {
+                                Map<String, Object> claims = result.getClaims();
+                                JSONObject returnResults = new JSONObject(claims);
+                                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                            } catch (Exception e) {
+                                handleExceptionWithContext(e, callbackContext);
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            handleExceptionWithContext(e, callbackContext);
+                        }
+                    });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
