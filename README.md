@@ -212,6 +212,7 @@ Note that these must be set at plugin installation time. If you wish to change p
 - `FIREBASE_ANALYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Analytics data collection on app startup
 - `FIREBASE_PERFORMANCE_COLLECTION_ENABLED` - whether to automatically enable Firebase Performance data collection on app startup
 - `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Crashlytics data collection on app startup
+- `FIREBASE_FCM_AUTOINIT_ENABLED` - whether to automatically enable FCM registration on app startup
 See [Disable data collection on startup](#disable-data-collection-on-startup) for more info.
 
 ### Android only
@@ -1710,11 +1711,15 @@ FirebasePlugin.hasCriticalPermission(function(hasPermission){
 ```
 
 ### unregister
-Unregisters from Firebase by deleting the current device token.
+Unregisters from Firebase Cloud Messaging by deleting the current FCM device token.
 Use this to stop receiving push notifications associated with the current token.
 e.g. call this when you logout user from your app.
 By default, a new token will be generated as soon as the old one is removed.
-To prevent a new token being generated, by sure to disable autoinit using [`setAutoInitEnabled()`](#setautoinitenabled) before calling [`unregister()`](#unregister).
+To prevent a new token being generated, be sure to disable autoinit using [`setAutoInitEnabled()`](#setautoinitenabled) before calling [`unregister()`](#unregister).
+
+You can disable autoinit on first run and therefore prevent an FCM token being allocated by default (allowing user opt-in) by setting the `FIREBASE_FCM_AUTOINIT_ENABLED` plugin variable at plugin installation time:
+
+    cordova plugin add cordova-plugin-firebasex --variable FIREBASE_FCM_AUTOINIT_ENABLED=false
 
 **Parameters**: None
 

@@ -246,6 +246,11 @@ module.exports = {
             entitlementsPlistsModified = true;
         }
 
+        if(typeof pluginVariables['FIREBASE_FCM_AUTOINIT_ENABLED'] !== 'undefined'){
+            appPlist["FirebaseMessagingAutoInitEnabled"] = (pluginVariables['FIREBASE_FCM_AUTOINIT_ENABLED'] === "true") ;
+            appPlistModified = true;
+        }
+
         if(googlePlistModified) fs.writeFileSync(path.resolve(iosPlatform.dest), plist.build(googlePlist));
         if(appPlistModified) fs.writeFileSync(path.resolve(iosPlatform.appPlist), plist.build(appPlist));
         if(entitlementsPlistsModified){
