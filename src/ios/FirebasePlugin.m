@@ -485,7 +485,22 @@ static NSMutableDictionary* traces;
 }
 
 - (void)unregister:(CDVInvokedUrlCommand *)command {
-    [self deleteInstallationId:command];
+    @try {
+        __block NSError* error = nil;
+        [[FIRMessaging messaging] deleteTokenWithCompletion:^(NSError * _Nullable deleteTokenError) {
+            if(error == nil && deleteTokenError != nil) error = deleteTokenError;
+            if([FIRMessaging messaging].isAutoInitEnabled){
+                [self _getToken:^(NSString* token, NSError* getError) {
+                    if(error == nil && getError != nil) error = getError;
+                    [self handleEmptyResultWithPotentialError:error command:command];
+                }];
+            }else{
+                [self handleEmptyResultWithPotentialError:error command:command];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
 }
 
 - (void) onOpenSettings:(CDVInvokedUrlCommand *)command {
