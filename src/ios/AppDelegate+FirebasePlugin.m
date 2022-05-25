@@ -465,6 +465,14 @@ static bool authStateChangeListenerInitialized = false;
                     NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
                     [result setValue:@"true" forKey:@"instantVerification"];
                     [result setValue:key forKey:@"id"];
+                    if(appleIDCredential.fullName != nil){
+                        if(appleIDCredential.fullName.givenName != nil){
+                            [result setValue:appleIDCredential.fullName.givenName forKey:@"givenName"];
+                        }
+                        if(appleIDCredential.fullName.familyName != nil){
+                            [result setValue:appleIDCredential.fullName.familyName forKey:@"familyName"];
+                        }
+                    }
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
                 }
             }

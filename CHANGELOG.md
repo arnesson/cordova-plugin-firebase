@@ -1,3 +1,37 @@
+# Version 14.0.0
+* (iOS) chore: Minor version update to Firebase iOS SDK to latest ([Version 8.11.0 - January 18, 2022](https://firebase.google.com/support/release-notes/ios#version_8110_-_january_18_2022))
+    * BREAKING CHANGE: Requires Cocoapods v1.11.2+
+* (Android) chore: Update pinned Firebase Android SDK dependencies to latest ((January 25, 2022)[https://developers.google.com/android/guides/releases#january_25_2022])
+* (iOS) bugfix: Update to GoogleSignIn v6 and update plugin for breaking API changes.
+    * Resolves [#678](https://github.com/dpa99c/cordova-plugin-firebasex/issues/678)
+* (Android) bugfix: Fix an error getting the providerId that could cause `getCurrentUser()` to fail.
+    * Merged from PR [#706](https://github.com/dpa99c/cordova-plugin-firebasex/pull/706)
+* (iOS & Android) feat: Include actionCodeSettings in the `sendUserEmailVerification()` function
+* (iOS) feat: Implement authorization request for critical alerts
+    * Merged from PR [#693](https://github.com/dpa99c/cordova-plugin-firebasex/pull/693)
+    * Resolves [#572](https://github.com/dpa99c/cordova-plugin-firebasex/issues/572)
+* (Types) bugfix: Fix return type for `didCrashOnPreviousExecution`
+    * Merged from PR [#692](https://github.com/dpa99c/cordova-plugin-firebasex/pull/692)
+* (Android) bugfix: Use OAuthProvider when available during `linkUserWithCredential()`
+    * Merged from PR [#687](https://github.com/dpa99c/cordova-plugin-firebasex/pull/687)
+* (Types) bugfix: Add missing type for `authenticateUserWithEmailAndPassword()`
+    * Merged from PR [#686](https://github.com/dpa99c/cordova-plugin-firebasex/pull/686)
+* (iOS & Android) feat: Support Firebase Authentication emulator
+    * Merged from PR [#685](https://github.com/dpa99c/cordova-plugin-firebasex/pull/685)
+* (Android) feat: Support html attributes in body notifications
+    * Merged from PR [#668](https://github.com/dpa99c/cordova-plugin-firebasex/pull/668)
+* (Android) feat: Improved notification image support
+    * Merged from PR [#667](https://github.com/dpa99c/cordova-plugin-firebasex/pull/667)
+* (Doc) bugfix: Fix `setUserProperty` parameters in `README.md`
+    * Merged from PR [#638](https://github.com/dpa99c/cordova-plugin-firebasex/pull/638)
+* (Android) bugfix: Specify version of GRPC OKHTTP and enable version override via plugin variable and bump Android Gradle build tool versions.
+    * Based on PR [#696](https://github.com/dpa99c/cordova-plugin-firebasex/pull/696)
+    * Resolves [#695](https://github.com/dpa99c/cordova-plugin-firebasex/issues/695)
+* (Android) bugfix: add `android:exported` element
+    * Merged from PR [#702](https://github.com/dpa99c/cordova-plugin-firebasex/pull/702)
+* (iOS) bugfix: Return user's full name if present in Apple sign in response.
+    * Resolves [#479](https://github.com/dpa99c/cordova-plugin-firebasex/issues/479)
+
 # Version 13.0.1
 * (iOS) Fix `onTokenRefresh` to return FCM token (not installation auth token).
     * Resolves [#637](https://github.com/dpa99c/cordova-plugin-firebasex/issues/637)

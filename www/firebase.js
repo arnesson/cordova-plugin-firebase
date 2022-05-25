@@ -91,8 +91,16 @@ exports.grantPermission = function (success, error, requestWithProvidesAppNotifi
     exec(ensureBooleanFn(success), error, "FirebasePlugin", "grantPermission", [ensureBoolean(requestWithProvidesAppNotificationSettings)]);
 };
 
+exports.grantCriticalPermission = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "grantCriticalPermission", []);
+};
+
 exports.hasPermission = function (success, error) {
     exec(ensureBooleanFn(success), error, "FirebasePlugin", "hasPermission", []);
+};
+
+exports.hasCriticalPermission = function (success, error) {
+    exec(ensureBooleanFn(success), error, "FirebasePlugin", "hasCriticalPermission", []);
 };
 
 // Notifications - Android-only
@@ -339,8 +347,8 @@ exports.updateUserEmail = function (email, success, error) {
     exec(success, error, "FirebasePlugin", "updateUserEmail", [email]);
 };
 
-exports.sendUserEmailVerification = function (success, error) {
-    exec(success, error, "FirebasePlugin", "sendUserEmailVerification", []);
+exports.sendUserEmailVerification = function (actionCodeSettings, success, error) {
+    exec(success, error, "FirebasePlugin", "sendUserEmailVerification", [actionCodeSettings]);
 };
 
 exports.updateUserPassword = function (password, success, error) {
@@ -360,6 +368,14 @@ exports.deleteUser = function (success, error) {
 exports.registerAuthStateChangeListener = function(fn){
     if(typeof fn !== "function") throw "The specified argument must be a function";
     onAuthStateChangeCallback = fn;
+};
+
+exports.useAuthEmulator = function (host, port, success, error) {
+    exec(success, error, "FirebasePlugin", "useAuthEmulator", [host, port]);
+};
+
+exports.getClaims = function (success, error) {
+    exec(success, error, "FirebasePlugin", "getClaims", []);
 };
 
 // Firestore

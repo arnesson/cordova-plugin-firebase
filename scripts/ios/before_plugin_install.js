@@ -1,7 +1,7 @@
 var execSync = require('child_process').execSync;
 var semver = require('semver');
 
-var minCocoapodsVersion = "^1.9.1";
+var minCocoapodsVersion = "^1.11.2";
 
 module.exports = function(context) {
     checkCocoapodsVersion();
