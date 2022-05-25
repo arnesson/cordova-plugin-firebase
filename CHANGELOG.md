@@ -1,3 +1,23 @@
+# Version 14.1.0
+* (Doc) bugfix: Fix markdown issue caused by unescaped HTML tags.
+    * Resolves [#707](https://github.com/dpa99c/cordova-plugin-firebasex/issues/707)
+* (Android) bugfix: Fix null pointer exception when missing notification image
+    * Merged from PR [#709](https://github.com/dpa99c/cordova-plugin-firebasex/pull/709)
+* (iOS) bugfix: Cordova-compliant external URL handling
+    * Merged from PR [#731](https://github.com/dpa99c/cordova-plugin-firebasex/pull/731)
+* (iOS & Android) feat: Add support for getClaims
+    * Merged from PR [#723](https://github.com/dpa99c/cordova-plugin-firebasex/pull/723)
+* (Types) bugfix: Correctly declare FirebasePlugin as global
+    * Resolves [#715](https://github.com/dpa99c/cordova-plugin-firebasex/issues/715)
+    * Merged from PR [#716](https://github.com/dpa99c/cordova-plugin-firebasex/pull/716)
+* (Android) chore: bump pinned Firebase SDK component versions to [BOM 30.0.2 (May 19, 2022)](https://firebase.google.com/support/release-notes/android#2022-05-19)
+* (iOS) chore: Update Firebase Apple SDK to [Version 9.1.0 - May 24, 2022](https://firebase.google.com/support/release-notes/ios#version_910_-_may_24_2022)
+    * Major version increase from v8.1.0 but no breaking changes directly affect this plugin
+* (iOS) bugfix: Ensure new FCM token is issued after calling unregister() when autoinit is enabled.
+    * Resolves [#732](https://github.com/dpa99c/cordova-plugin-firebasex/issues/732)
+* (iOS & Android) feat: Add support for FIREBASE_FCM_AUTOINIT_ENABLED plugin variable to set FCM autoinit on app startup at configuration time
+
+
 # Version 14.0.0
 * (iOS) chore: Minor version update to Firebase iOS SDK to latest ([Version 8.11.0 - January 18, 2022](https://firebase.google.com/support/release-notes/ios#version_8110_-_january_18_2022))
     * BREAKING CHANGE: Requires Cocoapods v1.11.2+
