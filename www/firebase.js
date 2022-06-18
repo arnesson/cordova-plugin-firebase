@@ -379,27 +379,30 @@ exports.getClaims = function (success, error) {
 };
 
 // Firestore
-exports.addDocumentToFirestoreCollection = function (document, collection, success, error) {
+exports.addDocumentToFirestoreCollection = function (document, collection, timestamp, success, error) {
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
     if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
+    if (timestamp && typeof timestamp !== "boolean") return error("'timestamp' must be a boolean");
 
-    exec(success, error, "FirebasePlugin", "addDocumentToFirestoreCollection", [document, collection]);
+    exec(success, error, "FirebasePlugin", "addDocumentToFirestoreCollection", [document, collection, timestamp || false]);
 };
 
-exports.setDocumentInFirestoreCollection = function (documentId, document, collection, success, error) {
+exports.setDocumentInFirestoreCollection = function (documentId, document, collection, timestamp, success, error) {
     if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
     if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
+    if (timestamp && typeof timestamp !== "boolean") return error("'timestamp' must be a boolean");
 
-    exec(success, error, "FirebasePlugin", "setDocumentInFirestoreCollection", [documentId.toString(), document, collection]);
+    exec(success, error, "FirebasePlugin", "setDocumentInFirestoreCollection", [documentId.toString(), document, collection, timestamp || false]);
 };
 
-exports.updateDocumentInFirestoreCollection = function (documentId, document, collection, success, error) {
+exports.updateDocumentInFirestoreCollection = function (documentId, document, timestamp, collection, success, error) {
     if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
     if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
+    if (timestamp && typeof timestamp !== "boolean") return error("'timestamp' must be a boolean");
 
-    exec(success, error, "FirebasePlugin", "updateDocumentInFirestoreCollection", [documentId.toString(), document, collection]);
+    exec(success, error, "FirebasePlugin", "updateDocumentInFirestoreCollection", [documentId.toString(), document, collection, timestamp || false]);
 };
 
 exports.deleteDocumentFromFirestoreCollection = function (documentId, collection, success, error) {
