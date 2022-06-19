@@ -1766,6 +1766,7 @@ static NSMutableDictionary* traces;
         @try {
             NSString* documentId = [command.arguments objectAtIndex:0];
             NSDictionary* document = [command.arguments objectAtIndex:1];
+            NSString* collection = [command.arguments objectAtIndex:2];
             bool  timestamp = [command.arguments objectAtIndex:3];
 
             NSMutableDictionary *document_mutable = [document mutableCopy];
