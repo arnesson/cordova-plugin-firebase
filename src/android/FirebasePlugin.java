@@ -2238,13 +2238,11 @@ public class FirebasePlugin extends CordovaPlugin {
                     boolean timestamp = args.getBoolean(2);
 
                     Map<String, Object> docData = jsonStringToMap(jsonDoc);
-
-                    if(timestamp != null){
-                        if(timestamp){
-                            docData.put("created", new Timestamp(new Date()));
-                            docData.put("lastUpdate", new Timestamp(new Date()));    
-                        }                    
-                    }
+                    
+                    if(timestamp){
+                        docData.put("created", new Timestamp(new Date()));
+                        docData.put("lastUpdate", new Timestamp(new Date()));    
+                    }  
 
                     firestore.collection(collection)
                             .add(docData)
@@ -2278,11 +2276,9 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     Map<String, Object> docData = jsonStringToMap(jsonDoc);
 
-                    if(timestamp != null){
-                        if(timestamp){
-                            docData.put("lastUpdate", new Timestamp(new Date()));    
-                        }                    
-                    }
+                    if(timestamp){
+                        docData.put("lastUpdate", new Timestamp(new Date()));    
+                    }          
 
                     firestore.collection(collection).document(documentId)
                             .set(docData)
@@ -2316,11 +2312,9 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     Map<String, Object> docData = jsonStringToMap(jsonDoc);
 
-                    if(timestamp != null){
-                        if(timestamp){
-                            docData.put("lastUpdate", new Timestamp(new Date()));    
-                        }                    
-                    }
+                    if(timestamp){
+                        docData.put("lastUpdate", new Timestamp(new Date()));    
+                    }  
 
                     firestore.collection(collection).document(documentId)
                             .update(docData)
