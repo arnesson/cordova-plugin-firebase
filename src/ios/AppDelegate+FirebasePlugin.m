@@ -499,9 +499,14 @@ didDisconnectWithUser:(GIDGoogleUser *)user
                         rawNonce:rawNonce];
                     
                     NSNumber* key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+                    NSString *authorizationCode = [[NSString alloc] initWithData:appleIDCredential.authorizationCode
+                                                                        encoding:NSUTF8StringEncoding];
                     NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
                     [result setValue:@"true" forKey:@"instantVerification"];
                     [result setValue:key forKey:@"id"];
+                    if(authorizationCode != nil){
+                        [result setValue:authorizationCode forKey:@"authorizationCode"];
+                    }
                     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
                 }
             }
