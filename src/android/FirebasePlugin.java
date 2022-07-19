@@ -41,6 +41,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -94,6 +95,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.List;
+import java.util.Date;
 
 // Firebase PhoneAuth
 import java.util.concurrent.TimeUnit;
@@ -2233,9 +2235,17 @@ public class FirebasePlugin extends CordovaPlugin {
                 try {
                     String jsonDoc = args.getString(0);
                     String collection = args.getString(1);
+                    boolean timestamp = args.getBoolean(2);
+
+                    Map<String, Object> docData = jsonStringToMap(jsonDoc);
+                    
+                    if(timestamp){
+                        docData.put("created", new Timestamp(new Date()));
+                        docData.put("lastUpdate", new Timestamp(new Date()));    
+                    }  
 
                     firestore.collection(collection)
-                            .add(jsonStringToMap(jsonDoc))
+                            .add(docData)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
@@ -2262,9 +2272,16 @@ public class FirebasePlugin extends CordovaPlugin {
                     String documentId = args.getString(0);
                     String jsonDoc = args.getString(1);
                     String collection = args.getString(2);
+                    boolean timestamp = args.getBoolean(3);
+
+                    Map<String, Object> docData = jsonStringToMap(jsonDoc);
+
+                    if(timestamp){
+                        docData.put("lastUpdate", new Timestamp(new Date()));    
+                    }          
 
                     firestore.collection(collection).document(documentId)
-                            .set(jsonStringToMap(jsonDoc))
+                            .set(docData)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -2291,9 +2308,16 @@ public class FirebasePlugin extends CordovaPlugin {
                     String documentId = args.getString(0);
                     String jsonDoc = args.getString(1);
                     String collection = args.getString(2);
+                    boolean timestamp = args.getBoolean(3);
+
+                    Map<String, Object> docData = jsonStringToMap(jsonDoc);
+
+                    if(timestamp){
+                        docData.put("lastUpdate", new Timestamp(new Date()));    
+                    }  
 
                     firestore.collection(collection).document(documentId)
-                            .update(jsonStringToMap(jsonDoc))
+                            .update(docData)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
