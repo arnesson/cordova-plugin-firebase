@@ -10,14 +10,16 @@ var plist = require('plist');
  */
 var comment = "\"Crashlytics\"";
 
+var standardFirestorePodRegEx = /pod 'Firebase\/Firestore', '([\d.]{5})'/,
+    prebuiltFirestorePodTemplate = "pod 'FirebaseFirestore', :tag => '{version}', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git'";
+
 module.exports = {
 
     /**
      * Used to get the path to the XCode project's .pbxproj file.
      */
     getXcodeProjectPath: function () {
-        var appName = utilities.getAppName();
-        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
+        var appName = utilities.getAppName();        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
     },
 
     /**
@@ -257,5 +259,20 @@ module.exports = {
             fs.writeFileSync(path.resolve(iosPlatform.entitlementsDebugPlist), plist.build(entitlementsDebugPlist));
             fs.writeFileSync(path.resolve(iosPlatform.entitlementsReleasePlist), plist.build(entitlementsReleasePlist));
         }
+    },
+    applyPluginVarsToPodfile: function(pluginVariables, iosPlatform){
+        var podFileContents = fs.readFileSync(path.resolve(iosPlatform.podFile), 'utf8'),
+            podFileModified = false;
+
+        if(pluginVariables['IOS_USE_PRECOMPILED_FIRESTORE_POD'] === 'true'){
+            var standardFirestorePodMatches = podFileContents.match(standardFirestorePodRegEx);
+            if(standardFirestorePodMatches){
+                podFileContents = podFileContents.replace(standardFirestorePodMatches[0], prebuiltFirestorePodTemplate.replace('{version}', standardFirestorePodMatches[1]));
+                podFileModified = true;
+                console.log("Configured Podfile for pre-built Firestore pod");
+            }
+        }
+
+        if(podFileModified) fs.writeFileSync(path.resolve(iosPlatform.podFile), podFileContents);
     }
 };

@@ -245,6 +245,10 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - `ANDROID_GRPC_OKHTTP` - sets version of GRPC OKHTTP library.
 
 ### iOS only
+- `IOS_USE_PRECOMPILED_FIRESTORE_POD` - if `true`, switches Podfile to use a [pre-compiled version of the Firestore pod](https://github.com/invertase/firestore-ios-sdk-frameworks.git) to reduce build time
+  - Since some users experienced long build times due to the Firestore pod (see [#407](https://github.com/dpa99c/cordova-plugin-firebasex/issues/407))
+  - However other users have experienced build issues with the pre-compiled version (see [#735](https://github.com/dpa99c/cordova-plugin-firebasex/issues/735))
+  - Defaults to `false` if not specified.
 - `IOS_STRIP_DEBUG` - prevents symbolification of all libraries included via Cocoapods. See [Strip debug symbols](#strip-debug-symbols) for more info.
     - e.g.  `--variable IOS_STRIP_DEBUG=true`
     - Defaults to `false` if not specified.

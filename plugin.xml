@@ -103,6 +103,8 @@
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
+		<preference name="IOS_USE_PRECOMPILED_FIRESTORE_POD" default="false" />
+
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
@@ -151,7 +153,7 @@
 				<pod name="Firebase/Performance" spec="9.1.0"/>
 				<pod name="Firebase/RemoteConfig" spec="9.1.0"/>
 				<pod name="Firebase/InAppMessaging" spec="9.1.0"/>
-				<pod name="FirebaseFirestore" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" tag="9.1.0"/>
+				<pod name="Firebase/Firestore" spec="9.1.0"/>
 				<pod name="Firebase/Crashlytics" spec="9.1.0"/>
 				<pod name="Firebase/Functions" spec="9.1.0"/>
 				<pod name="Firebase/Installations" spec="9.1.0"/>
