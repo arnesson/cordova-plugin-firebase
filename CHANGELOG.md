@@ -1,3 +1,13 @@
+# Version 14.2.0
+* (Android) bugfix: Fix no notifications on Android 12 and above
+    * Merged from PR [#747](https://github.com/dpa99c/cordova-plugin-firebasex/pull/747)
+    * Resolves [#746](https://github.com/dpa99c/cordova-plugin-firebasex/issues/746)
+* (iOS & Android) feat: Add support to optionally specify timestamp when updating documents in a Firestore collection
+    * Merged from PR [#743](https://github.com/dpa99c/cordova-plugin-firebasex/pull/743)
+* (iOS) bugfix: Use standard pod for Firestore by default but add `IOS_USE_PRECOMPILED_FIRESTORE_POD` plugin variable to switch to using pre-built version.
+    * Resolves [#735](https://github.com/dpa99c/cordova-plugin-firebasex/issues/735)
+* (iOS) feat: add support for `IOS_FIREBASE_SDK_VERSION` plugin variable to override the Firebase iOS SDK versions specified in `plugin.xml`
+
 # Version 14.1.0
 * (Doc) bugfix: Fix markdown issue caused by unescaped HTML tags.
     * Resolves [#707](https://github.com/dpa99c/cordova-plugin-firebasex/issues/707)
