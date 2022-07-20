@@ -245,6 +245,8 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - `ANDROID_GRPC_OKHTTP` - sets version of GRPC OKHTTP library.
 
 ### iOS only
+- `IOS_FIREBASE_SDK_VERSION` - a specific version of the Firebase iOS SDK to set in the Podfile
+  -  If not specified, the default version defined in `<pod>` elements in the `plugin.xml` will be used.
 - `IOS_USE_PRECOMPILED_FIRESTORE_POD` - if `true`, switches Podfile to use a [pre-compiled version of the Firestore pod](https://github.com/invertase/firestore-ios-sdk-frameworks.git) to reduce build time
   - Since some users experienced long build times due to the Firestore pod (see [#407](https://github.com/dpa99c/cordova-plugin-firebasex/issues/407))
   - However other users have experienced build issues with the pre-compiled version (see [#735](https://github.com/dpa99c/cordova-plugin-firebasex/issues/735))
@@ -296,9 +298,9 @@ Therefore you can no longer directly substitute `cordova-plugin-firebasex` in pl
 
 You should be aware of the following breaking changes compared with `cordova-plugin-firebase`:
 * Minimum supported Cordova versions
-    * `cordova@9` (CLI)
-    * `cordova-android@8` (Android platform)
-    * `cordova-ios@5` (iOS platform)
+    * `cordova@10` (CLI)
+    * `cordova-android@10` (Android platform)
+    * `cordova-ios@6` (iOS platform)
 * Migrated to AndroidX from legacy Android Support Library
 * Migrated to Cocoapods to satisfy Firebase SDK dependencies on iOS
 * `onNotificationOpen()` renamed to `onMessageReceived()`
@@ -478,11 +480,14 @@ This plugin pins specific versions of these in [its `plugin.xml`](https://github
 
     <pod name="Firebase/Core" spec="6.3.0"/>
 
-**It is currently not possible to override these at plugin installation time** because `cordova@9`/`cordova-ios@5` does not support the use of plugin variables in the `<pod>`'s `spec` attribute.
-Therefore if you need to change the specified versions, you'll currently need to do this by forking the plugin and editing the `plugin.xml` to change the specified `spec` values.
+Cordova does not natively support the use of plugin variables in the `<pod>`'s `spec` attribute, however this plugin uses a hook script to enable this behaviour by overriding the version specified in `plugin.xml` directly within the `Podfile`.
+Therefore to override the version of the Firebase iOS SDK components set in the `plugin.xml`, you should define it using the `IOS_FIREBASE_SDK_VERSION` plugin variable when installing the plugin into your project.
+For example:
+
+    cordova plugin add cordova-plugin-firebasex --variable IOS_FIREBASE_SDK_VERSION=9.1.0
 
 ### Cocoapods
-This plugin relies on `cordova@9`/`cordova-ios@5` support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
+This plugin relies on Cordova support for the [CocoaPods dependency manager]( https://cocoapods.org/) in order to satisfy the iOS Firebase SDK library dependencies.
 
 Please make sure you have `cocoapods@>=1.11.2` installed in your iOS build environment - setup instructions can be found [here](https://cocoapods.org/).
 

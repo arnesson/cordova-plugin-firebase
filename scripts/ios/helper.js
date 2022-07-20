@@ -10,7 +10,9 @@ var plist = require('plist');
  */
 var comment = "\"Crashlytics\"";
 
-var standardFirestorePodRegEx = /pod 'Firebase\/Firestore', '([\d.]{5})'/,
+var versionRegex = /\d+\.\d+\.\d+/,
+    firebasePodRegex = /pod 'Firebase\/([^']+)', '(\d+\.\d+\.\d+)'/g,
+    standardFirestorePodRegEx = /pod 'Firebase\/Firestore', '(\d+\.\d+\.\d+)'/,
     prebuiltFirestorePodTemplate = "pod 'FirebaseFirestore', :tag => '{version}', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git'";
 
 module.exports = {
@@ -263,6 +265,22 @@ module.exports = {
     applyPluginVarsToPodfile: function(pluginVariables, iosPlatform){
         var podFileContents = fs.readFileSync(path.resolve(iosPlatform.podFile), 'utf8'),
             podFileModified = false;
+
+        if(pluginVariables['IOS_FIREBASE_SDK_VERSION']){
+            if(pluginVariables['IOS_FIREBASE_SDK_VERSION'].match(versionRegex)){
+                var firebasePodsMatches = podFileContents.match(firebasePodRegex);
+                if(firebasePodsMatches){
+                    var currentVersion = firebasePodsMatches[0].match(versionRegex)[0];
+                    firebasePodsMatches.forEach((match) => {
+                        podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_FIREBASE_SDK_VERSION']));
+                    });
+                    console.log("Firebase iOS SDK version set to v"+pluginVariables['IOS_FIREBASE_SDK_VERSION']+" in Podfile");
+                    podFileModified = true;
+                }
+            }else{
+                throw new Error("The value \""+pluginVariables['IOS_FIREBASE_SDK_VERSION']+"\" for IOS_FIREBASE_SDK_VERSION is not a valid version in the format 'X.Y.Z'")
+            }
+        }
 
         if(pluginVariables['IOS_USE_PRECOMPILED_FIRESTORE_POD'] === 'true'){
             var standardFirestorePodMatches = podFileContents.match(standardFirestorePodRegEx);
