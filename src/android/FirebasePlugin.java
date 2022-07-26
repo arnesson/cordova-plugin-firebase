@@ -45,6 +45,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.OAuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -115,6 +116,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
+
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -297,7 +299,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.authenticateUserWithGoogle(callbackContext, args);
             } else if (action.equals("authenticateUserWithApple")) {
                 this.authenticateUserWithApple(callbackContext, args);
-            } else if (action.equals("createUserWithEmailAndPassword")) {
+            } else if (action.equals("authenticateUserWithMicrosoft")) {
+                this.authenticateUserWithMicrosoft(callbackContext, args);
+            }else if (action.equals("createUserWithEmailAndPassword")) {
                 this.createUserWithEmailAndPassword(callbackContext, args);
             } else if (action.equals("signInUserWithEmailAndPassword")) {
                 this.signInUserWithEmailAndPassword(callbackContext, args);
@@ -1759,6 +1763,36 @@ public class FirebasePlugin extends CordovaPlugin {
             }
         });
     }
+
+    public void authenticateUserWithMicrosoft(final CallbackContext callbackContext, final JSONArray args){
+      cordova.getThreadPool().execute(new Runnable() {
+          public void run() {
+              try {
+                  String locale = args.getString(0);
+                  OAuthProvider.Builder provider = OAuthProvider.newBuilder("microsoft.com");
+                  if(locale != null){
+                      provider.addCustomParameter("locale", locale);
+                      provider.addCustomParameter("prompt", "consent");
+                  }
+                  Task<AuthResult> pending = FirebaseAuth.getInstance().getPendingAuthResult();
+                  if (pending != null) {
+                      callbackContext.error("Auth result is already pending");
+                      pending
+                              .addOnSuccessListener(new AuthResultOnSuccessListener())
+                              .addOnFailureListener(new AuthResultOnFailureListener());
+                  } else {
+                      String id = FirebasePlugin.instance.saveAuthProvider(provider.build());;
+                      JSONObject returnResults = new JSONObject();
+                      returnResults.put("instantVerification", true);
+                      returnResults.put("id", id);
+                      callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                  }
+              } catch (Exception e) {
+                  handleExceptionWithContext(e, callbackContext);
+              }
+          }
+      });
+  }
 
     public void signInUserWithCustomToken(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {

@@ -299,6 +299,10 @@ exports.authenticateUserWithApple = function (success, error, locale) {
     exec(success, error, "FirebasePlugin", "authenticateUserWithApple", [locale]);
 };
 
+exports.authenticateUserWithMicrosoft = function (success, error, locale) {
+  exec(success, error, "FirebasePlugin", "authenticateUserWithMicrosoft", [locale]);
+};
+
 exports.signInWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
     exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);

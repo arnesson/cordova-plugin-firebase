@@ -8,6 +8,7 @@
 @import FirebaseAnalytics;
 @import FirebaseRemoteConfig;
 @import FirebasePerformance;
+@import FirebaseCore;
 @import FirebaseAuth;
 @import FirebaseFunctions;
 @import UserNotifications;
@@ -41,6 +42,7 @@ static NSDictionary* googlePlist;
 static NSMutableDictionary* firestoreListeners;
 static NSString* currentInstallationId;
 static NSMutableDictionary* traces;
+static FIROAuthProvider* oauthProvider;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -711,7 +713,6 @@ static NSMutableDictionary* traces;
         NSString* password = [command.arguments objectAtIndex:1];
         FIRAuthCredential* authCredential = [FIREmailAuthProvider credentialWithEmail:email password:password];
         NSNumber* key = [self saveAuthCredential:authCredential];
-
         NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
         [result setValue:@"true" forKey:@"instantVerification"];
         [result setValue:key forKey:@"id"];
@@ -806,6 +807,30 @@ static NSMutableDictionary* traces;
         }
 
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)authenticateUserWithMicrosoft:(CDVInvokedUrlCommand*)command{
+    @try {
+        oauthProvider = [FIROAuthProvider providerWithProviderID:@"microsoft.com"];
+        [oauthProvider setCustomParameters:@{@"prompt": @"consent"}];
+        [oauthProvider getCredentialWithUIDelegate:nil
+                            completion:^(FIRAuthCredential *_Nullable credential, NSError *_Nullable error) {
+            if (error) {
+                NSLog(@"Error: %@ %@", error, [error userInfo]);
+                @throw([NSException exceptionWithName:@"Error" reason:error.localizedDescription userInfo:nil]);
+            }
+            if (credential) {
+                NSNumber* key = [self saveAuthCredential:credential];
+                NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                [result setValue:@"true" forKey:@"instantVerification"];
+                [result setValue:key forKey:@"id"];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }
+        }];
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }

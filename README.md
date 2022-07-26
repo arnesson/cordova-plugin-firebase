@@ -55,15 +55,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Android background notifications](#android-background-notifications)
     - [Android foreground notifications](#android-foreground-notifications)
     - [Android Notification Channels](#android-notification-channels)
-      - [Android 7 and below](#android-7-and-below)
     - [Android Notification Icons](#android-notification-icons)
-      - [Android Default Notification Icon](#android-default-notification-icon)
-      - [Android Large Notification Icon](#android-large-notification-icon)
-      - [Android Custom Notification Icons](#android-custom-notification-icons)
     - [Android Notification Color](#android-notification-color)
     - [Android Notification Sound](#android-notification-sound)
-      - [Android 8.0 and above](#android-80-and-above)
-      - [On Android 7 and below](#on-android-7-and-below)
     - [Android cloud message types](#android-cloud-message-types)
   - [iOS notifications](#ios-notifications)
     - [iOS background notifications](#ios-background-notifications)
@@ -71,10 +65,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [iOS critical notifications](#ios-critical-notifications)
     - [iOS badge number](#ios-badge-number)
     - [iOS actionable notifications](#ios-actionable-notifications)
+    - [iOS notification settings button](#ios-notification-settings-button)
   - [Data messages](#data-messages)
     - [Data message notifications](#data-message-notifications)
-      - [Android data message notifications](#android-data-message-notifications)
-      - [iOS data message notifications](#ios-data-message-notifications)
   - [Custom FCM message handling](#custom-fcm-message-handling)
     - [Android](#android)
     - [iOS](#ios)
@@ -92,10 +85,12 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [onTokenRefresh](#ontokenrefresh)
     - [getAPNSToken](#getapnstoken)
     - [onApnsTokenReceived](#onapnstokenreceived)
+    - [onOpenSettings](#onopensettings)
     - [onMessageReceived](#onmessagereceived)
     - [grantPermission](#grantpermission)
     - [grantCriticalPermission](#grantcriticalpermission)
     - [hasPermission](#haspermission)
+    - [hasCriticalPermission](#hascriticalpermission)
     - [unregister](#unregister)
     - [isAutoInitEnabled](#isautoinitenabled)
     - [setAutoInitEnabled](#setautoinitenabled)
@@ -141,21 +136,17 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [signInUserWithCustomToken](#signinuserwithcustomtoken)
     - [signInUserAnonymously](#signinuseranonymously)
     - [verifyPhoneNumber](#verifyphonenumber)
-      - [Android](#android-2)
-      - [iOS](#ios-2)
     - [setLanguageCode](#setlanguagecode)
     - [authenticateUserWithEmailAndPassword](#authenticateuserwithemailandpassword)
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
-      - [Android](#android-3)
     - [authenticateUserWithApple](#authenticateuserwithapple)
-      - [iOS](#ios-3)
-      - [Android](#android-4)
+    - [authenticateUserWithMicrosoft](#authenticateuserwithmicrosoft)
     - [signInWithCredential](#signinwithcredential)
     - [linkUserWithCredential](#linkuserwithcredential)
     - [reauthenticateWithCredential](#reauthenticatewithcredential)
     - [registerAuthStateChangeListener](#registerauthstatechangelistener)
-    - [useAuthEmulator](#useAuthEmulator)
-    - [getClaims](#getClaims)
+    - [useAuthEmulator](#useauthemulator)
+    - [getClaims](#getclaims)
   - [Remote Config](#remote-config)
     - [fetch](#fetch)
     - [activateFetched](#activatefetched)
@@ -2849,6 +2840,30 @@ To use Sign In with Apple in your iOS app you need to do the following:
 #### Android
 To use Sign In with Apple in your Android app you need to do the following:
 - Configure your app for Sign In with Apple as outlined in the [Firebase documentation's "Before you begin" section](https://firebase.google.com/docs/auth/android/apple#before-you-begin)
+
+### authenticateUserWithMicrosoft
+Authenticates the user with a Microsoft account using Sign In with Oauth to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+- Follow [Firebase documentation's "Authenticate Using Microsoft" section](https://firebase.google.com/docs/auth/web/microsoft-oauth)
+
+**Parameters**:
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+
+FirebasePlugin.authenticateUserWithMicrosoft(function(credential) {
+    FirebasePlugin.signInWithCredential(credential, function() {
+            console.log("Successfully signed in");
+        }, function(error) {
+            console.error("Failed to sign in", error);
+        });
+}, function(error) {
+    console.error("Failed to authenticate with Microsoft: " + error);
+});
+```
 
 ### signInWithCredential
 Signs the user into Firebase with credentials obtained via an authentication method such as `verifyPhoneNumber()` or `authenticateUserWithGoogle()`.
