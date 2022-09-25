@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
 import android.app.Notification;
 import android.text.TextUtils;
@@ -237,12 +238,21 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
         this.putKVInBundle("ttl", String.valueOf(remoteMessage.getTtl()), bundle);
 
         if (showNotification) {
-            Intent intent = new Intent(this, OnNotificationOpenReceiver.class);
-            intent.putExtras(bundle);
 
-            // Only add on platform levels that support FLAG_IMMUTABLE
-            final int flag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent, flag);
+            Intent intent;
+            PendingIntent pendingIntent;
+            final int flag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;  // Only add on platform levels that support FLAG_MUTABLE
+
+            if(getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.S && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                intent = new Intent(this, OnNotificationReceiverActivity.class);
+                intent.putExtras(bundle);
+                pendingIntent = PendingIntent.getActivity(this, id.hashCode(), intent, flag);
+            }else{
+                intent = new Intent(this, OnNotificationOpenReceiver.class);
+                intent.putExtras(bundle);
+                pendingIntent = PendingIntent.getBroadcast(this, id.hashCode(), intent, flag);
+            }
+
 
             // Channel
             if(channelId == null || !FirebasePlugin.channelExists(channelId)){
@@ -345,14 +355,14 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
 
                 int largeIconResID;
                 if (customLargeIconResID != 0 || defaultLargeIconResID != 0) {
-					if (customLargeIconResID != 0) {
-	                    largeIconResID = customLargeIconResID;
-	                    Log.d(TAG, "Large icon: custom="+icon);
-	                }else{
-	                    Log.d(TAG, "Large icon: default="+defaultLargeIconName);
-	                    largeIconResID = defaultLargeIconResID;
-	                }
-	                notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), largeIconResID));
+                    if (customLargeIconResID != 0) {
+                        largeIconResID = customLargeIconResID;
+                        Log.d(TAG, "Large icon: custom="+icon);
+                    }else{
+                        Log.d(TAG, "Large icon: default="+defaultLargeIconName);
+                        largeIconResID = defaultLargeIconResID;
+                    }
+                    notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), largeIconResID));
                 }
             }
 
@@ -398,7 +408,6 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             }
             Log.d(TAG, "Priority: " + iPriority);
             notificationBuilder.setPriority(iPriority);
-
 
             // Build notification
             Notification notification = notificationBuilder.build();
