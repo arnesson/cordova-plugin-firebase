@@ -34,6 +34,7 @@ var setupEnv = function(){
             appPlist: IOS_DIR + '/' + appName + '/' + appName + '-Info.plist',
             entitlementsDebugPlist: IOS_DIR + '/' + appName + '/Entitlements-Debug.plist',
             entitlementsReleasePlist: IOS_DIR + '/' + appName + '/Entitlements-Release.plist',
+            podFile: IOS_DIR + '/Podfile'
         },
         ANDROID: {
             dest: ANDROID_DIR + '/app/google-services.json',
@@ -143,5 +144,6 @@ module.exports = function(context){
             helper.stripDebugSymbols();
         }
         helper.applyPluginVarsToPlists(pluginVariables, PLATFORM.IOS);
+        helper.applyPluginVarsToPodfile(pluginVariables, PLATFORM.IOS);
     }
 };
