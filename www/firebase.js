@@ -258,13 +258,19 @@ exports.didCrashOnPreviousExecution = function (success, error) {
 
 
 // Authentication
-exports.verifyPhoneNumber = function (success, error, number, timeOutDuration, fakeVerificationCode) {
+exports.verifyPhoneNumber = function (success, error, number, opts) {
+    if(typeof opts !== 'object') opts = {};
     exec(function(credential){
         if(typeof credential === 'object'){
             credential.instantVerification = ensureBoolean(credential.instantVerification);
         }
         success(credential);
-    }, error, "FirebasePlugin", "verifyPhoneNumber", [number, timeOutDuration, fakeVerificationCode]);
+    }, error, "FirebasePlugin", "verifyPhoneNumber", [number, opts]);
+};
+
+exports.enrollSecondAuthFactor = function (success, error, number, opts) {
+    if(typeof opts !== 'object') opts = {};
+    exec(success, error, "FirebasePlugin", "enrollSecondAuthFactor", [number, opts]);
 };
 
 exports.setLanguageCode = function (lang, success, error) {
@@ -382,7 +388,7 @@ exports.getClaims = function (success, error) {
 exports.addDocumentToFirestoreCollection = function (document, collection, timestamp, success, error) {
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
     if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
-    
+
     if (typeof timestamp !== "boolean" && typeof error === "undefined") {
         error = success;
         success = timestamp;
@@ -396,7 +402,7 @@ exports.setDocumentInFirestoreCollection = function (documentId, document, colle
     if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
     if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
-    
+
     if (typeof timestamp !== "boolean" && typeof error === "undefined") {
         error = success;
         success = timestamp;
@@ -410,7 +416,7 @@ exports.updateDocumentInFirestoreCollection = function (documentId, document, co
     if(typeof documentId !== 'string' && typeof documentId !== 'number') return error("'documentId' must be a string or number specifying the Firestore document identifier");
     if(typeof collection !== 'string') return error("'collection' must be a string specifying the Firestore collection name");
     if(typeof document !== 'object' || typeof document.length === 'number') return error("'document' must be an object specifying record data");
-    
+
     if (typeof timestamp !== "boolean" && typeof error === "undefined") {
         error = success;
         success = timestamp;

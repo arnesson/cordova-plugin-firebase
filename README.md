@@ -2649,9 +2649,11 @@ There are 3 verification scenarios:
 - {function} success - callback function to pass {object} credentials to as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
 - {string} phoneNumber - phone number to verify
-- {integer} timeOutDuration - (optional) time to wait in seconds before timing out
-- {string} fakeVerificationCode - (optional) to test instant verification on Android ,specify a fake verification code to return for whitelisted phone numbers.
-    - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
+- {object} opts - (optional) parameters
+    - {integer} timeOutDuration - time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
+    - {boolean} requireSmsValidation - whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {string} fakeVerificationCode - to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
+        - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
 The success callback will be passed a credential object with the following possible properties:
 - {boolean} instantVerification - `true` if the Android device used instant verification to instantly verify the user without sending an SMS
@@ -2693,7 +2695,11 @@ FirebasePlugin.verifyPhoneNumber(function(credential) {
     }
 }, function(error) {
     console.error("Failed to verify phone number: " + JSON.stringify(error));
-}, number, timeOutDuration, fakeVerificationCode);
+}, number, {
+    timeOutDuration: timeOutDuration,
+    requireSmsValidation: false,
+    fakeVerificationCode: fakeVerificationCode
+});
 
 function signInWithCredential(credential){
     FirebasePlugin.signInWithCredential(credential, function() {
@@ -2721,6 +2727,64 @@ You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs
     cordova plugin add cordova-plugin-firebasex --variable SETUP_RECAPTCHA_VERIFICATION=true
 
 This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
+
+### enrollSecondAuthFactor
+Enrolls a phone number as a second factor for multi-factor authentication (MFA).
+- This involves a similar verification flow to [verifyPhoneNumber](#verifyphonenumber) and therefore has the same pre-requisites and requirements.
+- See the Firebase MFA documentation for [Android](https://cloud.google.com/identity-platform/docs/android/mfa) and [iOS](https://cloud.google.com/identity-platform/docs/ios/mfa) for more information on MFA-specific setup requirements.
+
+A user-specified phone number is verified then enrolled for use if MFA during the sign in flow.
+
+As with [verifyPhoneNumber](#verifyphonenumber), this may require the user to manually input the verification code received in an SMS message. In this case, once the user has entered the code, `enrollSecondAuthFactor` will need to be called again with the `credential` option used to specified the `code` and verification `id`.
+
+**Parameters**:
+- {function} success - callback function to invoke either upon
+    - successful enrollment: will be passed `true` as an argument
+    - user-entered verification code required: will be passed a `credential` object with a verification `id`.
+- {function} error - callback function which will be passed a {string} error message as an argument
+- {string} phoneNumber - phone number to enroll
+- {object} opts - (optional) parameters
+    - {string} displayName - display name for second factor. Used when a user has multiple second factor phone numbers enrolled and asking them which to use since the full phone number is masked.
+    - {object} credential - if manual entry of the verification code in an SMS is required, the `credential` object will be passed to the `success` function. The user-entered code should be appended to this object as the `code` property then this function re-invoked with the `credential` specified in the `opts` argument.
+    - {integer} timeOutDuration - time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
+    - {boolean} requireSmsValidation - whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {string} fakeVerificationCode - to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
+        - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
+
+Example usage:
+
+```javascript
+var number = '+441234567890';
+var timeOutDuration = 60;
+var fakeVerificationCode = '123456';
+var displayName = "Work phone";
+var credential;
+
+function enrollSecondAuthFactor(){
+    FirebasePlugin.enrollSecondAuthFactor(function(result) {
+        if(typeof result === "object"){
+            // User must enter SMS verification code manually
+            credential = result;
+            promptUserToInputCode() // you need to implement this
+                .then(function(userEnteredCode){
+                    credential.code = userEnteredCode; // set the user-entered verification code on the credential object
+                    enrollSecondAuthFactor(); // re-invoke the function with the credential
+                });
+        }else{
+            console.log("Second factor successfully enrolled");
+        }
+    }, function(error) {
+        console.error("Failed to enroll second factor: " + JSON.stringify(error));
+    }, number, {
+        displayName: displayName,
+        credential: credential,
+        timeOutDuration: timeOutDuration,
+        requireSmsValidation: false,
+        fakeVerificationCode: fakeVerificationCode
+    });
+}
+enrollSecondAuthFactor();
+```
 
 ### setLanguageCode
 Sets the user-facing language code for auth operations that can be internationalized, such as sendEmailVerification() or verifyPhoneNumber(). This language code should follow the conventions defined by the IETF in BCP47.
