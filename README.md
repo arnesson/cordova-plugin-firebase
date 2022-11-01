@@ -2650,9 +2650,9 @@ There are 3 verification scenarios:
 - {function} error - callback function which will be passed a {string} error message as an argument
 - {string} phoneNumber - phone number to verify
 - {object} opts - (optional) parameters
-    - {integer} timeOutDuration - time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
-    - {boolean} requireSmsValidation - whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
-    - {string} fakeVerificationCode - to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
+    - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
+    - {boolean} requireSmsValidation - (Android only) whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {string} fakeVerificationCode - (Android only) to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
         - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
 The success callback will be passed a credential object with the following possible properties:
@@ -2746,9 +2746,9 @@ As with [verifyPhoneNumber](#verifyphonenumber), this may require the user to ma
 - {object} opts - (optional) parameters
     - {string} displayName - display name for second factor. Used when a user has multiple second factor phone numbers enrolled and asking them which to use since the full phone number is masked.
     - {object} credential - if manual entry of the verification code in an SMS is required, the `credential` object will be passed to the `success` function. The user-entered code should be appended to this object as the `code` property then this function re-invoked with the `credential` specified in the `opts` argument.
-    - {integer} timeOutDuration - time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
-    - {boolean} requireSmsValidation - whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
-    - {string} fakeVerificationCode - to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
+    - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
+    - {boolean} requireSmsValidation - (Android only) whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {string} fakeVerificationCode - (Android only) to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
         - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
 Example usage:

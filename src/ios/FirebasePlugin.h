@@ -33,6 +33,7 @@
 - (void)deleteUser:(CDVInvokedUrlCommand*)command;
 - (void)useAuthEmulator:(CDVInvokedUrlCommand*)command;
 - (void)getClaims:(CDVInvokedUrlCommand*)command;
+- (void)enrollSecondAuthFactor:(CDVInvokedUrlCommand*)command;
 
 // Remote notifications
 - (void)getId:(CDVInvokedUrlCommand*)command;

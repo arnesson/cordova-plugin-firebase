@@ -657,6 +657,85 @@ static NSMutableDictionary* traces;
     }
 }
 
+- (void)enrollSecondAuthFactor:(CDVInvokedUrlCommand*)command {
+    @try {
+        if([self userNotSignedInError:command]) return;
+        FIRUser* user = [FIRAuth auth].currentUser;
+        
+        NSString* number = [command.arguments objectAtIndex:0];
+        NSDictionary* opts = [command.arguments objectAtIndex:1];
+        
+        NSString* displayName = nil;
+        if([opts objectForKey:@"displayName"] != nil){
+            displayName = [opts objectForKey:@"displayName"];
+        }
+        
+        NSString* verificationId = nil;
+        NSString* verificationCode = nil;
+        if([opts objectForKey:@"credential"] != nil){
+            NSDictionary* credential = [opts objectForKey:@"credential"];
+            if([credential objectForKey:@"verificationId"] != nil && [credential objectForKey:@"code"] != nil){
+                verificationId = [credential objectForKey:@"verificationId"];
+                verificationCode = [credential objectForKey:@"code"];
+            }else{
+                [self sendPluginErrorWithMessage:@"'verificationId' and/or 'code' properties not found on 'credential' object" :command];
+                return;
+            }
+        }
+        
+        [user.multiFactor getSessionWithCompletion:^(FIRMultiFactorSession* _Nullable session,
+                                                      NSError* _Nullable error) {
+            @try {
+                if(error != nil) return [self sendPluginErrorWithError:error command:command];
+                
+                // If credential specifying verification ID and code has been provided
+                if(verificationId != nil && verificationCode != nil){
+                    // Use them to enroll
+                    FIRPhoneAuthCredential* credential =
+                        [FIRPhoneAuthProvider.provider credentialWithVerificationID:verificationId
+                                                                    verificationCode:verificationCode];
+                    FIRMultiFactorAssertion* assertion =
+                        [FIRPhoneMultiFactorGenerator assertionWithCredential:credential];
+
+                    // Complete enrollment. This will update the underlying tokens
+                    // and trigger ID token change listener.
+                    [user.multiFactor enrollWithAssertion:assertion
+                                              displayName:displayName
+                                                completion:^(NSError* _Nullable error) {
+                        @try {
+                            if(error != nil) return [self sendPluginErrorWithError:error command:command];
+                            [self sendPluginBoolResult:true command:command callbackId:command.callbackId];
+                        }@catch (NSException *exception) {
+                            [self handlePluginExceptionWithContext:exception :command];
+                        }
+                    }];
+                }else{
+                    // Send SMS verification code.
+                    [FIRPhoneAuthProvider.provider
+                      verifyPhoneNumber:number
+                      UIDelegate:nil
+                      multiFactorSession:session
+                      completion:^(NSString* _Nullable verificationID, NSError* _Nullable error) {
+                        @try {
+                            if(error != nil) return [self sendPluginErrorWithError:error command:command];
+                            
+                            NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                            [result setValue:verificationID forKey:@"verificationId"];
+                            [self sendPluginDictionaryResult:result command:command callbackId:command.callbackId];
+                        }@catch (NSException *exception) {
+                            [self handlePluginExceptionWithContext:exception :command];
+                        }
+                    }];
+                }
+            }@catch (NSException *exception) {
+                [self handlePluginExceptionWithContext:exception :command];
+            }
+        }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)setLanguageCode:(CDVInvokedUrlCommand *)command {
     NSString* lang = [command.arguments objectAtIndex:0];
     @try {
@@ -828,11 +907,8 @@ static NSMutableDictionary* traces;
 
 - (void)reauthenticateWithCredential:(CDVInvokedUrlCommand*)command{
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
 
         FIRAuthCredential* credential = [self obtainAuthCredential:[command.arguments objectAtIndex:0] command:command];
         if(credential == nil) return;
@@ -863,7 +939,7 @@ static NSMutableDictionary* traces;
 
 - (void)isUserSignedIn:(CDVInvokedUrlCommand*)command {
     @try {
-        bool isSignedIn = [FIRAuth auth].currentUser ? true : false;
+        bool isSignedIn = [self isSignedIn];
         [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isSignedIn] callbackId:command.callbackId];
 
     }@catch (NSException *exception) {
@@ -873,11 +949,7 @@ static NSMutableDictionary* traces;
 
 - (void)signOutUser:(CDVInvokedUrlCommand*)command {
     @try {
-        bool isSignedIn = [FIRAuth auth].currentUser ? true : false;
-        if(!isSignedIn){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
+        if([self userNotSignedInError:command]) return;
 
         // If signed in with Google
         if([GIDSignIn.sharedInstance currentUser] != nil){
@@ -910,11 +982,7 @@ static NSMutableDictionary* traces;
 - (void)getCurrentUser:(CDVInvokedUrlCommand *)command {
 
     @try {
-        FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
+        if([self userNotSignedInError:command]) return;
         [self extractAndReturnUserInfo:command];
 
     }@catch (NSException *exception) {
@@ -925,11 +993,8 @@ static NSMutableDictionary* traces;
 - (void)reloadCurrentUser:(CDVInvokedUrlCommand *)command {
 
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
         [user reloadWithCompletion:^(NSError * _Nullable error) {
             if (error != nil) {
                 [self handleEmptyResultWithPotentialError:error command:command];
@@ -967,11 +1032,8 @@ static NSMutableDictionary* traces;
 
 - (void)updateUserProfile:(CDVInvokedUrlCommand*)command {
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
 
         NSDictionary* profile = [command.arguments objectAtIndex:0];
 
@@ -997,11 +1059,8 @@ static NSMutableDictionary* traces;
 
 - (void)updateUserEmail:(CDVInvokedUrlCommand*)command {
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
 
         NSString* email = [command.arguments objectAtIndex:0];
         [user updateEmail:email completion:^(NSError *_Nullable error) {
@@ -1018,14 +1077,10 @@ static NSMutableDictionary* traces;
 
 - (void)sendUserEmailVerification:(CDVInvokedUrlCommand*)command{
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
+
         NSDictionary* actionCodeSettingsParams = [command.arguments objectAtIndex:0];
-
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
-
         if(![actionCodeSettingsParams isEqual:[NSNull null]]) {
             FIRActionCodeSettings *actionCodeSettings = [[FIRActionCodeSettings alloc] init];
             if([actionCodeSettingsParams objectForKey:@"handleCodeInApp"] != nil){
@@ -1073,11 +1128,8 @@ static NSMutableDictionary* traces;
 
 - (void)updateUserPassword:(CDVInvokedUrlCommand*)command{
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
 
         NSString* password = [command.arguments objectAtIndex:0];
         [user updatePassword:password completion:^(NSError *_Nullable error) {
@@ -1109,11 +1161,8 @@ static NSMutableDictionary* traces;
 
 - (void)deleteUser:(CDVInvokedUrlCommand*)command{
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
 
         [user deleteWithCompletion:^(NSError *_Nullable error) {
           @try {
@@ -1200,13 +1249,9 @@ static NSMutableDictionary* traces;
 
 - (void)getClaims:(CDVInvokedUrlCommand *)command {
     @try {
+        if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
-
-        if(!user){
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];
-            return;
-        }
-
+        
         [user getIDTokenResultWithCompletion:^(FIRAuthTokenResult * _Nullable tokenResult, NSError * _Nullable error) {
             if(error != nil){
                 [self sendPluginErrorWithError:error command:command];
@@ -2487,6 +2532,17 @@ static NSMutableDictionary* traces;
     NSNumber* key = [NSNumber numberWithInt:id];
     [authCredentials setObject:authCredential forKey:key];
     return key;
+}
+
+- (bool) isSignedIn {
+    return [FIRAuth auth].currentUser ? true : false;
+}
+
+- (bool) userNotSignedInError:(CDVInvokedUrlCommand *)command {
+    bool isError = ![self isSignedIn];
+    if(isError){
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No user is currently signed"] callbackId:command.callbackId];    }
+    return isError;
 }
 
 - (int) generateId {
