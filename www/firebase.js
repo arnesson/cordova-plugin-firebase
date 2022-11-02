@@ -15,6 +15,19 @@ var ensureBoolean = function(value){
     return !!value;
 };
 
+var handleAuthErrorResult = function(errorCallback){
+    return function(result){
+        var errorMessage, secondFactors;
+        if(typeof result === 'object'){
+            errorMessage = result.errorMessage;
+            secondFactors = result.secondFactors;
+        }else{
+            errorMessage = result;
+        }
+        errorCallback(errorMessage, secondFactors);
+    }
+};
+
 var onAuthStateChangeCallback = function(){};
 var onInstallationIdChangeCallback = function(){};
 
@@ -273,24 +286,30 @@ exports.enrollSecondAuthFactor = function (success, error, number, opts) {
     exec(success, error, "FirebasePlugin", "enrollSecondAuthFactor", [number, opts]);
 };
 
+exports.verifySecondAuthFactor = function (success, error, params, opts) {
+    if(typeof params !== 'object') return error("'params' object must be specified");
+    if(typeof opts !== 'object') opts = {};
+    exec(success, error, "FirebasePlugin", "verifySecondAuthFactor", [params, opts]);
+};
+
 exports.setLanguageCode = function (lang, success, error) {
     exec(success, error, "FirebasePlugin", "setLanguageCode", [lang]);
 };
 
 exports.createUserWithEmailAndPassword = function (email, password, success, error) {
-    exec(success, error, "FirebasePlugin", "createUserWithEmailAndPassword", [email, password]);
+    exec(success, handleAuthErrorResult(error), "FirebasePlugin", "createUserWithEmailAndPassword", [email, password]);
 };
 
 exports.signInUserWithEmailAndPassword = function (email, password, success, error) {
-    exec(success, error, "FirebasePlugin", "signInUserWithEmailAndPassword", [email, password]);
+    exec(success, handleAuthErrorResult(error), "FirebasePlugin", "signInUserWithEmailAndPassword", [email, password]);
 };
 
 exports.authenticateUserWithEmailAndPassword = function (email, password, success, error) {
-    exec(success, error, "FirebasePlugin", "authenticateUserWithEmailAndPassword", [email, password]);
+    exec(success, handleAuthErrorResult(error), "FirebasePlugin", "authenticateUserWithEmailAndPassword", [email, password]);
 };
 
 exports.signInUserWithCustomToken = function (customToken, success, error) {
-  exec(success, error, "FirebasePlugin", "signInUserWithCustomToken", [customToken]);
+  exec(success, handleAuthErrorResult(error), "FirebasePlugin", "signInUserWithCustomToken", [customToken]);
 };
 
 exports.signInUserAnonymously = function (success, error) {
@@ -307,17 +326,17 @@ exports.authenticateUserWithApple = function (success, error, locale) {
 
 exports.signInWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
-    exec(success, error, "FirebasePlugin", "signInWithCredential", [credential]);
+    exec(success, handleAuthErrorResult(error), "FirebasePlugin", "signInWithCredential", [credential]);
 };
 
 exports.linkUserWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
-    exec(success, error, "FirebasePlugin", "linkUserWithCredential", [credential]);
+    exec(success, handleAuthErrorResult(error), "FirebasePlugin", "linkUserWithCredential", [credential]);
 };
 
 exports.reauthenticateWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
-    exec(success, error, "FirebasePlugin", "reauthenticateWithCredential", [credential]);
+    exec(success, handleAuthErrorResult(error), "FirebasePlugin", "reauthenticateWithCredential", [credential]);
 };
 
 exports.isUserSignedIn = function (success, error) {

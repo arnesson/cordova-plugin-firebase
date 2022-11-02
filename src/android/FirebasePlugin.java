@@ -22,24 +22,24 @@ import androidx.core.app.NotificationManagerCompat;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.ActionCodeSettings;
-import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuthMultiFactorException;
 import com.google.firebase.auth.MultiFactorAssertion;
+import com.google.firebase.auth.MultiFactorResolver;
 import com.google.firebase.auth.MultiFactorSession;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneMultiFactorGenerator;
+import com.google.firebase.auth.PhoneMultiFactorInfo;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,7 +55,6 @@ import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.OAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -135,7 +134,6 @@ public class FirebasePlugin extends CordovaPlugin {
 
     protected static final String TAG = "FirebasePlugin";
     protected static final String JS_GLOBAL_NAMESPACE = "FirebasePlugin.";
-    protected static final String KEY = "badge";
     protected static final int GOOGLE_SIGN_IN = 0x1;
     protected static final String SETTINGS_NAME = "settings";
     private static final String CRASHLYTICS_COLLECTION_ENABLED = "firebase_crashlytics_collection_enabled";
@@ -157,6 +155,8 @@ public class FirebasePlugin extends CordovaPlugin {
     private Map<String, OAuthProvider> authProviders = new HashMap<String, OAuthProvider>();
 
     private Map<String, ListenerRegistration> firestoreListeners = new HashMap<String, ListenerRegistration>();
+
+    private MultiFactorResolver multiFactorResolver = null;
 
     @Override
     protected void pluginInitialize() {
@@ -286,7 +286,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.verifyPhoneNumber(callbackContext, args);
             } else if (action.equals("enrollSecondAuthFactor")) {
                 this.enrollSecondAuthFactor(callbackContext, args);
-            } else if (action.equals("setLanguageCode")) {
+            } else if (action.equals("verifySecondAuthFactor")) {
+                this.verifySecondAuthFactor(callbackContext, args);
+            }else if (action.equals("setLanguageCode")) {
                 this.setLanguageCode(callbackContext, args);
             } else if (action.equals("authenticateUserWithGoogle")) {
                 this.authenticateUserWithGoogle(callbackContext, args);
@@ -1355,7 +1357,7 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     AuthCredential authCredential = FirebasePlugin.instance.obtainAuthCredential(jsonCredential);
                     if(authCredential != null){
-                        handleTaskOutcome(user.reauthenticate(authCredential), callbackContext);
+                        handleAuthTaskOutcome(user.reauthenticateAndRetrieveData(authCredential), callbackContext);
                         return;
                     }
 
@@ -1571,7 +1573,7 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
-    interface CredentialForEnrollSecondAuthFactor{
+    interface OnReceivePhoneAuthCredential{
         public void onCredential(PhoneAuthCredential credential);
     }
 
@@ -1586,7 +1588,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     if(!userNotSignedInError(callbackContext)) return;
 
                     // Extract plugin inputs
-                    String number = args.getString(0);
+                    String phoneNumber = args.getString(0);
                     JSONObject opts = args.getJSONObject(1);
 
                     int timeOutDuration = 30;
@@ -1622,11 +1624,10 @@ public class FirebasePlugin extends CordovaPlugin {
                     }
 
                     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    assert user != null;
 
                     // Handler for credential enrollment
                     String finalDisplayName = displayName;
-                    CredentialForEnrollSecondAuthFactor credentialReceiver = (PhoneAuthCredential credential) -> {
+                    OnReceivePhoneAuthCredential credentialReceiver = (PhoneAuthCredential credential) -> {
                         try {
                             // Complete enrollment. This will update the underlying tokens
                             // and trigger ID token change listener.
@@ -1657,7 +1658,6 @@ public class FirebasePlugin extends CordovaPlugin {
                     /*
                      * Phone verification flow
                      */
-
                     // Create phone verification callbacks
                     phoneAuthVerificationCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                         @Override
@@ -1736,12 +1736,12 @@ public class FirebasePlugin extends CordovaPlugin {
 
                                     if(finalFakeVerificationCode != null && !finalFakeVerificationCode.equals("null")){
                                         Log.d(TAG, "enrollSecondAuthFactor: using mock instant verification for test phone number");
-                                        FirebaseAuth.getInstance().getFirebaseAuthSettings().setAutoRetrievedSmsCodeForPhoneNumber(number, finalFakeVerificationCode);
+                                        FirebaseAuth.getInstance().getFirebaseAuthSettings().setAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, finalFakeVerificationCode);
                                     }
 
                                     PhoneAuthOptions phoneAuthOptions =
                                             PhoneAuthOptions.newBuilder()
-                                                    .setPhoneNumber(number)
+                                                    .setPhoneNumber(phoneNumber)
                                                     .setTimeout((long) finalTimeOutDuration, TimeUnit.SECONDS)
                                                     .setCallbacks(phoneAuthVerificationCallbacks)
                                                     .setActivity(cordovaActivity)
@@ -1757,6 +1757,205 @@ public class FirebasePlugin extends CordovaPlugin {
                             }
                         }
                     );
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void verifySecondAuthFactor(
+            final CallbackContext callbackContext,
+            final JSONArray args
+    ) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    if(multiFactorResolver == null){
+                        callbackContext.error("No multi-factor challenge exists to resolve");
+                        return;
+                    }
+                    // Required params
+                    JSONObject params = args.getJSONObject(0);
+                    int selectedIndex = -1;
+                    if(params.has("selectedIndex")){
+                        selectedIndex = params.getInt("selectedIndex");
+                        if(selectedIndex < 0){
+                            callbackContext.error("Selected index value ("+selectedIndex+") must be a positive integer");
+                            return;
+                        }else if(selectedIndex+1 > multiFactorResolver.getHints().size()){
+                            callbackContext.error("Selected index value ("+selectedIndex+") exceeds the number of enrolled factors ("+multiFactorResolver.getHints().size()+")");
+                            return;
+                        }
+                    }
+
+                    String verificationId = null;
+                    String verificationCode = null;
+                    if(params.has("credential")){
+                        JSONObject jsonCredential = params.getJSONObject("credential");
+                        if(jsonCredential.has("verificationId") && jsonCredential.has("code")){
+                            verificationId = jsonCredential.getString("verificationId");
+                            verificationCode = jsonCredential.getString("code");
+                        }else{
+                            callbackContext.error("'verificationId' and/or 'code' properties not found on 'credential' object");
+                            return;
+                        }
+                    }
+
+                    if(selectedIndex == -1 && verificationId == null){
+                        callbackContext.error("Neither 'selectedIndex' or 'credential' properties found on 'params' object - either one must be specified");
+                        return;
+                    }
+
+                    // Extract optional params
+                    JSONObject opts = args.getJSONObject(1);
+
+                    int timeOutDuration = 30;
+                    if(opts.has("timeOutDuration")){
+                        timeOutDuration = opts.getInt("timeOutDuration");
+                    }
+
+                    String fakeVerificationCode = null;
+                    String phoneNumber = null;
+                    if(opts.has("fakeVerificationCode")){
+                        fakeVerificationCode = opts.getString("fakeVerificationCode");
+                        if(opts.has("phoneNumber")){
+                            phoneNumber = opts.getString("phoneNumber");
+                        }else{
+                            callbackContext.error("'phoneNumber' property must also be specified on 'opts' object when 'fakeVerificationCode' is specified");
+                            return;
+                        }
+                    }
+
+                    boolean requireSmsValidation = false;
+                    if(opts.has("requireSmsValidation")){
+                        requireSmsValidation = opts.getBoolean("requireSmsValidation");
+                    }
+
+                    // Handler for credential enrollment
+                    OnReceivePhoneAuthCredential credentialReceiver = (PhoneAuthCredential credential) -> {
+                        try {
+                            // Complete enrollment. This will update the underlying tokens
+                            // and trigger ID token change listener.
+                            MultiFactorAssertion multiFactorAssertion = PhoneMultiFactorGenerator.getAssertion(credential);
+                            // Complete sign-in.
+                            multiFactorResolver
+                                .resolveSignIn(multiFactorAssertion)
+                                .addOnCompleteListener(
+                                    task -> {
+                                        try {
+                                            TaskCompletionSource<String> taskCompletionSource = new TaskCompletionSource<>();
+                                            taskCompletionSource.getTask().addOnCompleteListener(additionalTask -> {
+                                                if(additionalTask.getResult().equals("success")){
+                                                    multiFactorResolver = null;
+                                                }
+                                            });
+                                            handleTaskOutcomeWithAdditionalTask(task, callbackContext, taskCompletionSource);
+                                        } catch(Exception e){
+                                            handleExceptionWithContext(e, callbackContext);
+                                        }
+                                    }
+                                );
+                        } catch(Exception e){
+                            handleExceptionWithContext(e, callbackContext);
+                        }
+                    };
+
+                    // Arguments contain ID & code from manual SMS verification, so use this for enrollment
+                    if(verificationId != null){
+                        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, verificationCode);
+                        credentialReceiver.onCredential(credential);
+                        return;
+                    }
+
+                    /*
+                     * Phone verification flow
+                     */
+                    // Create phone verification callbacks
+                    phoneAuthVerificationCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                        @Override
+                        public void onVerificationCompleted(PhoneAuthCredential credential) {
+                            try {
+                                // This callback will be invoked in two situations:
+                                // 1 - Instant verification. In some cases the phone number can be instantly
+                                //     verified without needing to send or enter a verification code.
+                                // 2 - Auto-retrieval. On some devices Google Play services can automatically
+                                //     detect the incoming verification SMS and perform verificaiton without
+                                //     user action.
+                                Log.d(TAG, "success: verifySecondAuthFactor.onVerificationCompleted");
+                                credentialReceiver.onCredential(credential);
+
+                            } catch(Exception e){
+                                handleExceptionWithContext(e, callbackContext);
+                            }
+                        }
+
+                        @Override
+                        public void onVerificationFailed(FirebaseException e) {
+                            try {
+                                // This callback is invoked in an invalid request for verification is made,
+                                // for instance if the the phone number format is not valid.
+                                Log.w(TAG, "failed: verifySecondAuthFactor.onVerificationFailed ", e);
+
+                                String errorMsg;
+                               if (e instanceof FirebaseTooManyRequestsException) {
+                                    // The SMS quota for the project has been exceeded
+                                    errorMsg = "The SMS quota for the project has been exceeded";
+                                }else{
+                                    errorMsg = e.getMessage();
+                                }
+                                callbackContext.error(errorMsg);
+                            } catch(Exception ex){
+                                handleExceptionWithContext(ex, callbackContext);
+                            }
+                        }
+
+                        @Override
+                        public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token) {
+                            try {
+                                // The SMS verification code has been sent to the provided phone number, we
+                                // now need to ask the user to enter the code and then construct a credential
+                                // by combining the code with a verification ID [(in app)].
+                                Log.d(TAG, "success: verifySecondAuthFactor.onCodeSent");
+
+                                JSONObject returnResults = new JSONObject();
+                                try {
+                                    returnResults.put("verificationId", verificationId);
+                                } catch (JSONException e) {
+                                    handleExceptionWithContext(e, callbackContext);
+                                    return;
+                                }
+                                sendPluginResultAndKeepCallback(returnResults, callbackContext);
+                            } catch(Exception ex){
+                                handleExceptionWithContext(ex, callbackContext);
+                            }
+                        }
+                    };
+
+                    // Rescope variables locally to lambda
+                    int finalSelectedIndex = selectedIndex;
+                    String finalFakeVerificationCode = fakeVerificationCode;
+                    String finalPhoneNumber = phoneNumber;
+                    int finalTimeOutDuration = timeOutDuration;
+                    boolean finalRequireSmsValidation = requireSmsValidation;
+
+                    if(finalFakeVerificationCode != null && !finalFakeVerificationCode.equals("null")){
+                        Log.d(TAG, "verifySecondAuthFactor: using mock instant verification for test phone number");
+                        FirebaseAuth.getInstance().getFirebaseAuthSettings().setAutoRetrievedSmsCodeForPhoneNumber(finalPhoneNumber, finalFakeVerificationCode);
+                    }
+
+                    PhoneMultiFactorInfo selectedHint = (PhoneMultiFactorInfo) multiFactorResolver.getHints().get(finalSelectedIndex);
+
+                    PhoneAuthOptions phoneAuthOptions =
+                            PhoneAuthOptions.newBuilder()
+                                    .setMultiFactorSession(multiFactorResolver.getSession())
+                                    .setMultiFactorHint(selectedHint)
+                                    .setTimeout((long) finalTimeOutDuration, TimeUnit.SECONDS)
+                                    .setCallbacks(phoneAuthVerificationCallbacks)
+                                    .setActivity(cordovaActivity)
+                                    .requireSmsValidation(finalRequireSmsValidation)
+                                    .build();
+                    PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions); // invokes phoneAuthVerificationCallbacks
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -3168,6 +3367,32 @@ public class FirebasePlugin extends CordovaPlugin {
         }
     }
 
+
+    private void handleTaskOutcomeWithAdditionalTask(@NonNull Task task, CallbackContext callbackContext, @NonNull TaskCompletionSource taskCompletionSource) {
+        try {
+            task.addOnCompleteListener((OnCompleteListener<Void>) task1 -> {
+                try {
+                    if (task1.isSuccessful() || task1.getException() == null) {
+                        callbackContext.success();
+                        taskCompletionSource.setResult("success");
+                    }else if(task1.getException() != null){
+                        String errorMessage = task1.getException().getMessage();
+                        callbackContext.error(errorMessage);
+                        taskCompletionSource.setResult(errorMessage);
+                    }else{
+                        String errorMessage = "Task failed for unknown reason";
+                        callbackContext.error(errorMessage);
+                        taskCompletionSource.setResult(errorMessage);
+                    }
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            });
+        } catch (Exception e) {
+            handleExceptionWithContext(e, callbackContext);
+        }
+    }
+
     private void handleTaskOutcomeWithBooleanResult(@NonNull Task<Boolean> task, CallbackContext callbackContext) {
         try {
             task.addOnCompleteListener(new OnCompleteListener<Boolean>() {
@@ -3219,11 +3444,36 @@ public class FirebasePlugin extends CordovaPlugin {
             if (task.isSuccessful() || task.getException() == null) {
                 callbackContext.success();
             }else{
-                String errMessage = task.getException().getMessage();
                 if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                    errMessage = "Invalid verification code";
+                    callbackContext.error("Invalid verification code");
+                }else if (task.getException() instanceof FirebaseAuthMultiFactorException) {
+                    // The user is a multi-factor user. Second factor challenge is required.
+                    multiFactorResolver = ((FirebaseAuthMultiFactorException) task.getException()).getResolver();
+                    String errMessage = "Second factor required";
+                    JSONArray secondFactors = new JSONArray();
+                    for(int i=0; i<multiFactorResolver.getHints().size(); i++){
+                        JSONObject secondFactor = new JSONObject();
+                        secondFactor.put("index", i);
+
+                        PhoneMultiFactorInfo info = (PhoneMultiFactorInfo) multiFactorResolver.getHints().get(i);
+                        secondFactor.put("phoneNumber", info.getPhoneNumber());
+
+                        String displayName = info.getDisplayName();
+                        if(displayName != null){
+                            secondFactor.put("displayName", displayName);
+                        }
+                        secondFactors.put(secondFactor);
+                    }
+
+                    // Invoke error callback with second factors
+                    // App should ask user to choose if more than one
+                    JSONObject result = new JSONObject();
+                    result.put("errorMessage", errMessage);
+                    result.put("secondFactors", secondFactors);
+                    callbackContext.error(result);
+                }else{
+                    callbackContext.error(task.getException().getMessage());
                 }
-                callbackContext.error(errMessage);
             }
         } catch (Exception e) {
             handleExceptionWithContext(e, callbackContext);
@@ -3238,6 +3488,7 @@ public class FirebasePlugin extends CordovaPlugin {
         }else if(jsonCredential.has("id") && FirebasePlugin.instance.authCredentials.containsKey(jsonCredential.getString("id"))){
             Log.d(TAG, "Using native auth credential to authenticate");
             authCredential = FirebasePlugin.instance.authCredentials.get(jsonCredential.getString("id"));
+            FirebasePlugin.instance.authCredentials.remove(jsonCredential.getString("id")); // remove from persistent list
         }
         return authCredential;
     }

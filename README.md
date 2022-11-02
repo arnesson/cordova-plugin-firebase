@@ -2559,7 +2559,9 @@ If account creation is successful, user will be automatically signed in.
 - {string} email - user email address. It is the responsibility of the app to ensure this is a valid email address.
 - {string} password - user password. It is the responsibility of the app to ensure the password is suitable.
 - {function} success - callback function to call on success
-- {function} error - callback function which will be passed a {string} error message as an argument
+- {function} error - callback function which will be passed a {string} error message as an argument.
+    - If the error is due to the user account requiring multi-factor authentication, a second {array} argument will be passed containing a list of enrolled factors.
+        - A factor should be selected and used for second factor verification - see [verifySecondAuthFactor](#verifysecondauthfactor) for more on this.
 
 Example usage:
 
@@ -2567,8 +2569,12 @@ Example usage:
     FirebasePlugin.createUserWithEmailAndPassword(email, password, function() {
         console.log("Successfully created email/password-based user account");
         // User is now signed in
-    }, function(error) {
-        console.error("Failed to create email/password-based user account", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to create email/password-based user account", error);
+        }
     });
 ```
 
@@ -2580,6 +2586,8 @@ Signs in to an email/password-based user account.
 - {string} password - user password
 - {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
+    - If the error is due to the user account requiring multi-factor authentication, a second {array} argument will be passed containing a list of enrolled factors.
+            - A factor should be selected and used for second factor verification - see [verifySecondAuthFactor](#verifysecondauthfactor) for more on this.
 
 Example usage:
 
@@ -2587,8 +2595,12 @@ Example usage:
     FirebasePlugin.signInUserWithEmailAndPassword(email, password, function() {
         console.log("Successfully signed in");
         // User is now signed in
-    }, function(error) {
-        console.error("Failed to sign in", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to sign in", error);
+        }
     });
 ```
 
@@ -2599,6 +2611,8 @@ Signs in user with custom token.
 - {string} customToken - the custom token
 - {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
+    - If the error is due to the user account requiring multi-factor authentication, a second {array} argument will be passed containing a list of enrolled factors.
+            - A factor should be selected and used for second factor verification - see [verifySecondAuthFactor](#verifysecondauthfactor) for more on this.
 
 Example usage:
 
@@ -2606,8 +2620,12 @@ Example usage:
     FirebasePlugin.signInUserWithCustomToken(customToken, function() {
         console.log("Successfully signed in");
         // User is now signed in
-    }, function(error) {
-        console.error("Failed to sign in", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to sign in", error);
+        }
     });
 ```
 
@@ -2651,7 +2669,7 @@ There are 3 verification scenarios:
 - {string} phoneNumber - phone number to verify
 - {object} opts - (optional) parameters
     - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
-    - {boolean} requireSmsValidation - (Android only) whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {boolean} requireSmsValidation - (Android only) whether to always require SMS validation on Android even if instant verification is available. Defaults to false if not specified.
     - {string} fakeVerificationCode - (Android only) to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
         - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
@@ -2729,16 +2747,15 @@ You can [set up reCAPTCHA verification for iOS](https://firebase.google.com/docs
 This adds the `REVERSED_CLIENT_ID` from the `GoogleService-Info.plist` to the list of custom URL schemes in your Xcode project, so you don't need to do this manually.
 
 ### enrollSecondAuthFactor
-Enrolls a phone number as a second factor for multi-factor authentication (MFA).
-- This involves a similar verification flow to [verifyPhoneNumber](#verifyphonenumber) and therefore has the same pre-requisites and requirements.
+Enrolls a user-specified phone number as a second factor for multi-factor authentication (MFA).
+
+- As with [verifyPhoneNumber](#verifyphonenumber), this may require the user to manually input the verification code received in an SMS message.
+    - In this case, once the user has entered the code, `enrollSecondAuthFactor` will need to be called again with the `credential` option used to specified the `code` and verification `id`.
+- This function involves a similar verification flow to [verifyPhoneNumber](#verifyphonenumber) and therefore has the same pre-requisites and requirements.
 - See the Firebase MFA documentation for [Android](https://cloud.google.com/identity-platform/docs/android/mfa) and [iOS](https://cloud.google.com/identity-platform/docs/ios/mfa) for more information on MFA-specific setup requirements.
 
-A user-specified phone number is verified then enrolled for use if MFA during the sign in flow.
-
-As with [verifyPhoneNumber](#verifyphonenumber), this may require the user to manually input the verification code received in an SMS message. In this case, once the user has entered the code, `enrollSecondAuthFactor` will need to be called again with the `credential` option used to specified the `code` and verification `id`.
-
 **Parameters**:
-- {function} success - callback function to invoke either upon
+- {function} success - callback function to invoke either upon:
     - successful enrollment: will be passed `true` as an argument
     - user-entered verification code required: will be passed a `credential` object with a verification `id`.
 - {function} error - callback function which will be passed a {string} error message as an argument
@@ -2747,7 +2764,7 @@ As with [verifyPhoneNumber](#verifyphonenumber), this may require the user to ma
     - {string} displayName - display name for second factor. Used when a user has multiple second factor phone numbers enrolled and asking them which to use since the full phone number is masked.
     - {object} credential - if manual entry of the verification code in an SMS is required, the `credential` object will be passed to the `success` function. The user-entered code should be appended to this object as the `code` property then this function re-invoked with the `credential` specified in the `opts` argument.
     - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
-    - {boolean} requireSmsValidation - (Android only) whether to always required SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {boolean} requireSmsValidation - (Android only) whether to always require SMS validation on Android even if instant verification is available. Defaults to false if not specified.
     - {string} fakeVerificationCode - (Android only) to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
         - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
 
@@ -2786,6 +2803,80 @@ function enrollSecondAuthFactor(){
 enrollSecondAuthFactor();
 ```
 
+### verifySecondAuthFactor
+Verifies a second factor phone number for multi-factor authentication (MFA).
+
+- If a user has MFA enrolled on their account, when they try to perform an authentication operation, such as sign-in using one of the first factor methods (e.g. [signInUserWithEmailAndPassword](#signinuserwithemailandpassword)), the error callback of that function will be invoked.
+    - The first argument passed to the error callback will be the error message: "Second factor required"
+    - A second argument will be passed containing the list of (one or more) enrolled second factors for that user; each factor in the list will be an object with the following properties:
+        - {integer} index - index of the factor in the list - specify this as `selectedIndex` to select this factor.
+        - {string} phoneNumber - masked version of the phone number for this factor.
+        - {string} displayName - (optional) name of factor specified by the user when this factor was enrolled.
+- The app should then call this function, specifying the `selectedIndex` of the second factor in the `params` argument.
+    - If there is more than one second factor enrolled, the app should ask the user to select which one to use and specify the index of this as the `selectedIndex`
+    - If there is only one, the `selectedIndex` should be specified as `0`.
+- As with [verifyPhoneNumber](#verifyphonenumber), this may require the user to manually input the verification code received in an SMS message.
+    - In this case, once the user has entered the code, `enrollSecondAuthFactor` will need to be called again with the `credential` option used to specified the `code` and verification `id`.
+- This function involves a similar verification flow to [verifyPhoneNumber](#verifyphonenumber) and therefore has the same pre-requisites and requirements.
+- See the Firebase MFA documentation for [Android](https://cloud.google.com/identity-platform/docs/android/mfa) and [iOS](https://cloud.google.com/identity-platform/docs/ios/mfa) for more information on MFA-specific setup requirements.
+
+**Parameters**:
+- {function} success - callback function to invoke either upon:
+    - successful verification : will be passed `true` as an argument
+    - user-entered verification code required: will be passed a `credential` object with a verification `id`.
+- {function} error - callback function which will be passed a {string} error message as an argument
+- {object} params - conditionally required parameters - either:
+    - {integer} selectedIndex - index of selected second factor phone number to use for verification.
+    - {object} credential - if manual entry of the verification code in an SMS is required, the `credential` object will be passed to the `success` function. The user-entered code should be appended to this object as the `code` property then this function
+- {object} opts - (optional) parameters
+     re-invoked with the `credential` specified in the `opts` argument.
+    - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
+    - {boolean} requireSmsValidation - (Android only) whether to always require SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {string} fakeVerificationCode - (Android only) to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
+        - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
+    - {string} phoneNumber - phone number to use for fake instant verification - required if `fakeVerificationCode` is specified
+
+Example usage:
+
+```javascript
+var selectedIndex, credential;
+
+function verifySecondAuthFactor(){
+    FirebasePlugin.verifySecondAuthFactor(function(result) {
+        if(typeof result === "object"){
+            // User must enter SMS verification code manually
+            credential = result;
+            promptUserToInputCode() // you need to implement this
+                .then(function(userEnteredCode){
+                    credential.code = userEnteredCode; // set the user-entered verification code on the credential object
+                    verifySecondAuthFactor(); // re-invoke the function with the credential
+                });
+        }else{
+            console.log("Second factor successfully enrolled");
+        }
+    }, function(error) {
+        console.error("Failed to enroll second factor: " + JSON.stringify(error));
+    }, {
+        selectedIndex: selectedIndex,
+        credential: credential
+    });
+}
+
+FirebasePlugin.signInWithCredential(credential, function() {
+        console.log("Successfully signed in");
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            promptUserToSelectFactor(secondFactors) // you need to implement this
+                .then(function(_selectedIndex){
+                    selectedIndex = _selectedIndex;
+                    verifySecondAuthFactor();
+                });
+        }else{
+            console.error("Failed to sign in", error);
+        }
+    });
+```
+
 ### setLanguageCode
 Sets the user-facing language code for auth operations that can be internationalized, such as sendEmailVerification() or verifyPhoneNumber(). This language code should follow the conventions defined by the IETF in BCP47.
 
@@ -2807,6 +2898,8 @@ Authenticates the user with email/password-based user account to obtain a creden
 - {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
     - {string} id - the identifier of a native credential object which can be used for signing in the user.
 - {function} error - callback function which will be passed a {string} error message as an argument
+    - If the error is due to the user account requiring multi-factor authentication, a second {array} argument will be passed containing a list of enrolled factors.
+        - A factor should be selected and used for second factor verification - see [verifySecondAuthFactor](#verifysecondauthfactor) for more on this.
 
 Example usage:
 
@@ -2819,8 +2912,12 @@ Example usage:
             console.error("Failed to re-authenticate", error);
         });
         // User is now signed in
-    }, function(error) {
-        console.error("Failed to authenticate with email/password", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to authenticate with email/password", error)
+        }
     });
 ```
 
@@ -2912,6 +3009,8 @@ See the [Android-](https://firebase.google.com/docs/auth/android/phone-auth#sign
     - {string} code - if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message.
 - {function} success - callback function to call on successful sign-in using credentials
 - {function} error - callback function which will be passed a {string} error message as an argument
+    - If the error is due to the user account requiring multi-factor authentication, a second {array} argument will be passed containing a list of enrolled factors.
+        - A factor should be selected and used for second factor verification - see [verifySecondAuthFactor](#verifysecondauthfactor) for more on this.
 
 Example usage:
 
@@ -2919,8 +3018,12 @@ Example usage:
 function signInWithCredential(credential){
     FirebasePlugin.signInWithCredential(credential, function() {
         console.log("Successfully signed in");
-    }, function(error) {
-        console.error("Failed to sign in", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to sign in", error);
+        }
     });
 }
 
@@ -2942,6 +3045,8 @@ See the [Android-](https://firebase.google.com/docs/auth/android/account-linking
     - {string} code - if the credential was obtained via `verifyPhoneNumber()` and `instantVerification` is `false`, you must set this to the activation code value as entered by the user from the received SMS message.
 - {function} success - callback function to call on successful linking using credentials
 - {function} error - callback function which will be passed a {string} error message as an argument
+    - If the error is due to the user account requiring multi-factor authentication, a second {array} argument will be passed containing a list of enrolled factors.
+        - A factor should be selected and used for second factor verification - see [verifySecondAuthFactor](#verifysecondauthfactor) for more on this.
 
 Example usage:
 
@@ -2949,11 +3054,14 @@ Example usage:
 function linkUserWithCredential(credential){
     FirebasePlugin.linkUserWithCredential(credential, function() {
         console.log("Successfully linked");
-    }, function(error) {
-        console.error("Failed to link", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to link", error);
+        }
     });
 }
-
 ```
 
 ### reauthenticateWithCredential
@@ -2977,8 +3085,12 @@ Example usage:
 ```javascript
     FirebasePlugin.reauthenticateWithCredential(credential, function() {
         console.log("Successfully reauthenticated");
-    }, function(error) {
-        console.error("Failed to reauthenticate", error);
+    }, function(error, secondFactors) {
+        if(error === "Second factor required" && typeof secondFactors !== "undefined"){
+            handleSecondFactorAuthentation(secondFactors); // you need to implement this
+        }else{
+            console.error("Failed to reauthenticate", error);
+        }
     });
 ```
 
