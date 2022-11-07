@@ -2820,13 +2820,13 @@ Verifies a second factor phone number for multi-factor authentication (MFA).
 - {object} params - conditionally required parameters - either:
     - {integer} selectedIndex - index of selected second factor phone number to use for verification.
     - {object} credential - if manual entry of the verification code in an SMS is required, the `credential` object will be passed to the `success` function. The user-entered code should be appended to this object as the `code` property then this function
-- {object} opts - (optional) parameters
+- {object} opts - (optional Android only) parameters
      re-invoked with the `credential` specified in the `opts` argument.
-    - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
-    - {boolean} requireSmsValidation - (Android only) whether to always require SMS validation on Android even if instant verification is available. Defaults to false if not specified.
-    - {string} fakeVerificationCode - (Android only) to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
+    - {integer} timeOutDuration - time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
+    - {boolean} requireSmsValidation - whether to always require SMS validation on Android even if instant verification is available. Defaults to false if not specified.
+    - {string} fakeVerificationCode - to test instant verification on Android, specify a fake verification code to return for whitelisted phone numbers.
         - See [Firebase SDK Phone Auth Android Integration Testing](https://firebase.google.com/docs/auth/android/phone-auth#integration-testing) for more info.
-    - {string} phoneNumber - phone number to use for fake instant verification - required if `fakeVerificationCode` is specified
+    - {string} phoneNumber -  phone number to use for fake instant verification - required if `fakeVerificationCode` is specified
 
 Example usage:
 
@@ -2858,11 +2858,18 @@ FirebasePlugin.signInWithCredential(credential, function() {
         console.log("Successfully signed in");
     }, function(error, secondFactors) {
         if(error === "Second factor required" && typeof secondFactors !== "undefined"){
-            promptUserToSelectFactor(secondFactors) // you need to implement this
-                .then(function(_selectedIndex){
-                    selectedIndex = _selectedIndex;
-                    verifySecondAuthFactor();
-                });
+            if(secondFactors.length === 1){
+                // Only 1 enrolled second factor so select and use it
+                selectedIndex = 0;
+                verifySecondAuthFactor();
+            }else{
+                // Multiple second factors enrolled so ask user to choose which to use
+                promptUserToSelectFactor(secondFactors) // you need to implement this
+                    .then(function(_selectedIndex){
+                        selectedIndex = _selectedIndex;
+                        verifySecondAuthFactor();
+                    });
+            }
         }else{
             console.error("Failed to sign in", error);
         }

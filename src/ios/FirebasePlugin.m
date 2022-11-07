@@ -41,6 +41,7 @@ static NSDictionary* googlePlist;
 static NSMutableDictionary* firestoreListeners;
 static NSString* currentInstallationId;
 static NSMutableDictionary* traces;
+static FIRMultiFactorResolver* multiFactorResolver;
 
 
 + (FirebasePlugin*) firebasePlugin {
@@ -662,7 +663,7 @@ static NSMutableDictionary* traces;
         if([self userNotSignedInError:command]) return;
         FIRUser* user = [FIRAuth auth].currentUser;
         
-        NSString* number = [command.arguments objectAtIndex:0];
+        NSString* phoneNumber = [command.arguments objectAtIndex:0];
         NSDictionary* opts = [command.arguments objectAtIndex:1];
         
         NSString* displayName = nil;
@@ -712,7 +713,7 @@ static NSMutableDictionary* traces;
                 }else{
                     // Send SMS verification code.
                     [FIRPhoneAuthProvider.provider
-                      verifyPhoneNumber:number
+                      verifyPhoneNumber:phoneNumber
                       UIDelegate:nil
                       multiFactorSession:session
                       completion:^(NSString* _Nullable verificationID, NSError* _Nullable error) {
@@ -731,6 +732,87 @@ static NSMutableDictionary* traces;
                 [self handlePluginExceptionWithContext:exception :command];
             }
         }];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
+- (void)verifySecondAuthFactor:(CDVInvokedUrlCommand*)command {
+    @try {
+        if(multiFactorResolver == nil){
+            [self sendPluginErrorWithMessage:@"No multi-factor challenge exists to resolve" :command];
+            return;
+        }
+        
+        NSDictionary* params = [command.arguments objectAtIndex:0];
+        
+        int selectedIndex = -1;
+        if([params objectForKey:@"selectedIndex"] != nil){
+            selectedIndex = [[params objectForKey:@"selectedIndex"] intValue];
+            if(selectedIndex < 0){
+                [self sendPluginErrorWithMessage:[NSString stringWithFormat:@"Selected index value (%d) must be a positive integer", selectedIndex]:command];
+                return;
+            }
+            if(selectedIndex+1 > multiFactorResolver.hints.count){
+                [self sendPluginErrorWithMessage:[NSString stringWithFormat:@"Selected index value (%d) exceeds the number of enrolled factors (%d)", selectedIndex, (int)multiFactorResolver.hints.count]:command];
+                return;
+            }
+        }
+        
+        NSString* verificationId = nil;
+        NSString* verificationCode = nil;
+        if([params objectForKey:@"credential"] != nil){
+            NSDictionary* credential = [params objectForKey:@"credential"];
+            if([credential objectForKey:@"verificationId"] != nil && [credential objectForKey:@"code"] != nil){
+                verificationId = [credential objectForKey:@"verificationId"];
+                verificationCode = [credential objectForKey:@"code"];
+            }else{
+                [self sendPluginErrorWithMessage:@"'verificationId' and/or 'code' properties not found on 'credential' object" :command];
+                return;
+            }
+        }
+        
+        if(selectedIndex == -1 && verificationId == nil){
+            [self sendPluginErrorWithMessage:@"Neither 'selectedIndex' or 'credential' properties found on 'params' object - either one must be specified" :command];
+            return;
+        }
+        
+        // Arguments contain ID & code from manual SMS verification, so use this for verification
+        if(verificationId != nil && verificationCode != nil){
+            FIRPhoneAuthCredential* credential =
+                [FIRPhoneAuthProvider.provider credentialWithVerificationID:verificationId
+                                                            verificationCode:verificationCode];
+            FIRMultiFactorAssertion* assertion =
+                [FIRPhoneMultiFactorGenerator assertionWithCredential:credential];
+
+            [multiFactorResolver resolveSignInWithAssertion:assertion completion:^(FIRAuthDataResult * _Nullable authResult, NSError * _Nullable error) {
+                @try {
+                    [self handleAuthResult:authResult error:error command:command];
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithContext:exception :command];
+                }
+            }];
+        }else{
+            // Send SMS verification code.
+            FIRPhoneMultiFactorInfo* hint = (FIRPhoneMultiFactorInfo*) multiFactorResolver.hints[selectedIndex];
+            
+            [FIRPhoneAuthProvider.provider
+             verifyPhoneNumberWithMultiFactorInfo:hint
+             UIDelegate:nil
+             multiFactorSession:multiFactorResolver.session
+             completion:^(NSString * _Nullable verificationID, NSError * _Nullable error) {
+                @try {
+                    if(error != nil) return [self sendPluginErrorWithError:error command:command];
+                    
+                    NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                    [result setValue:verificationID forKey:@"verificationId"];
+                    [self sendPluginDictionaryResult:result command:command callbackId:command.callbackId];
+                }@catch (NSException *exception) {
+                    [self handlePluginExceptionWithContext:exception :command];
+                }
+            }];
+        }
+        
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithContext:exception :command];
     }
@@ -2515,11 +2597,36 @@ static NSMutableDictionary* traces;
     @try {
            CDVPluginResult* pluginResult;
          if (error) {
-           pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+             if(error.code == FIRAuthErrorCodeSecondFactorRequired){
+                 // The user is a multi-factor user. Second factor challenge is required.
+                 multiFactorResolver = (FIRMultiFactorResolver*) error.userInfo[FIRAuthErrorUserInfoMultiFactorResolverKey];
+                 NSMutableArray* secondFactors  = [NSMutableArray new];
+                 int index = 0;
+                 for (FIRMultiFactorInfo* hint in multiFactorResolver.hints) {
+                     NSMutableDictionary* secondFactor = [[NSMutableDictionary alloc] init];
+                     [secondFactor setValue:[NSNumber numberWithInt:index] forKey:@"index"];
+                     if(hint.displayName != nil){
+                         [secondFactor setValue:hint.displayName forKey:@"displayName"];
+                     }
+                     FIRPhoneMultiFactorInfo* phoneHint = (FIRPhoneMultiFactorInfo*) hint;
+                     [secondFactor setValue:phoneHint.phoneNumber forKey:@"phoneNumber"];
+                     [secondFactors addObject:secondFactor];
+                     index++;
+                 }
+                 NSString* errMessage = @"Second factor required";
+                 
+                 NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+                 [result setValue:errMessage forKey:@"errorMessage"];
+                 [result setValue:secondFactors forKey:@"secondFactors"];
+                 
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:result];
+             }else{
+                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.description];
+             }
          }else if (authResult == nil) {
              pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"User not signed in"];
          }else{
-             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:true];
          }
          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
      }@catch (NSException *exception) {
