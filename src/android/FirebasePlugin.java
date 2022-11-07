@@ -1472,7 +1472,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                 // 1 - Instant verification. In some cases the phone number can be instantly
                                 //     verified without needing to send or enter a verification code.
                                 // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                                //     detect the incoming verification SMS and perform verificaiton without
+                                //     detect the incoming verification SMS and perform verification without
                                 //     user action.
                                 Log.d(TAG, "success: verifyPhoneNumber.onVerificationCompleted");
 
@@ -1667,7 +1667,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                 // 1 - Instant verification. In some cases the phone number can be instantly
                                 //     verified without needing to send or enter a verification code.
                                 // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                                //     detect the incoming verification SMS and perform verificaiton without
+                                //     detect the incoming verification SMS and perform verification without
                                 //     user action.
                                 Log.d(TAG, "success: enrollSecondAuthFactor.onVerificationCompleted");
                                 credentialReceiver.onCredential(credential);
@@ -1861,7 +1861,7 @@ public class FirebasePlugin extends CordovaPlugin {
                         }
                     };
 
-                    // Arguments contain ID & code from manual SMS verification, so use this for enrollment
+                    // Arguments contain ID & code from manual SMS verification, so use this for verification
                     if(verificationId != null){
                         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, verificationCode);
                         credentialReceiver.onCredential(credential);
@@ -1880,7 +1880,7 @@ public class FirebasePlugin extends CordovaPlugin {
                                 // 1 - Instant verification. In some cases the phone number can be instantly
                                 //     verified without needing to send or enter a verification code.
                                 // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                                //     detect the incoming verification SMS and perform verificaiton without
+                                //     detect the incoming verification SMS and perform verification without
                                 //     user action.
                                 Log.d(TAG, "success: verifySecondAuthFactor.onVerificationCompleted");
                                 credentialReceiver.onCredential(credential);
@@ -2625,11 +2625,11 @@ public class FirebasePlugin extends CordovaPlugin {
                     boolean timestamp = args.getBoolean(2);
 
                     Map<String, Object> docData = jsonStringToMap(jsonDoc);
-                    
+
                     if(timestamp){
                         docData.put("created", new Timestamp(new Date()));
-                        docData.put("lastUpdate", new Timestamp(new Date()));    
-                    }  
+                        docData.put("lastUpdate", new Timestamp(new Date()));
+                    }
 
                     firestore.collection(collection)
                             .add(docData)
@@ -2664,8 +2664,8 @@ public class FirebasePlugin extends CordovaPlugin {
                     Map<String, Object> docData = jsonStringToMap(jsonDoc);
 
                     if(timestamp){
-                        docData.put("lastUpdate", new Timestamp(new Date()));    
-                    }          
+                        docData.put("lastUpdate", new Timestamp(new Date()));
+                    }
 
                     firestore.collection(collection).document(documentId)
                             .set(docData)
@@ -2700,8 +2700,8 @@ public class FirebasePlugin extends CordovaPlugin {
                     Map<String, Object> docData = jsonStringToMap(jsonDoc);
 
                     if(timestamp){
-                        docData.put("lastUpdate", new Timestamp(new Date()));    
-                    }  
+                        docData.put("lastUpdate", new Timestamp(new Date()));
+                    }
 
                     firestore.collection(collection).document(documentId)
                             .update(docData)
