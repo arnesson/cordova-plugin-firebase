@@ -158,11 +158,46 @@ export interface FirebasePlugin {
         error?: (err: string) => void
     ): void
     verifyPhoneNumber(
-        success: (value: object) => void,
+        success: (value: object | boolean) => void,
         error: (err: string) => void,
         phoneNumber: string,
-        timeOutDuration: number,
-        fakeVerificationCode?: string
+        opts?: {
+            timeOutDuration: number,
+            fakeVerificationCode: string,
+            requireSmsValidation: boolean
+        },
+    ): void
+    enrollSecondAuthFactor(
+        success: (value: object | boolean) => void,
+        error: (err: string) => void,
+        phoneNumber: string,
+        opts?: {
+            displayName: string,
+            credential: {
+                verificationId: string,
+                code: string
+            },
+            timeOutDuration: number,
+            fakeVerificationCode: string,
+            requireSmsValidation: boolean
+        },
+    ): void
+    verifySecondAuthFactor(
+        success: (value: object | boolean) => void,
+        error: (err: string) => void,
+        params: {
+            selectedIndex?: number,
+            credential?: {
+                verificationId: string,
+                code: string
+            },
+        },
+        opts?: {
+            timeOutDuration: number,
+            fakeVerificationCode: string,
+            phoneNumber: string,
+            requireSmsValidation: boolean
+        },
     ): void
     setLanguageCode(
         lang: string,

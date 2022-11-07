@@ -271,14 +271,14 @@ exports.didCrashOnPreviousExecution = function (success, error) {
 
 
 // Authentication
-exports.verifyPhoneNumber = function (success, error, number, opts) {
+exports.verifyPhoneNumber = function (success, error, phoneNumber, opts) {
     if(typeof opts !== 'object') opts = {};
     exec(function(credential){
         if(typeof credential === 'object'){
             credential.instantVerification = ensureBoolean(credential.instantVerification);
         }
         success(credential);
-    }, error, "FirebasePlugin", "verifyPhoneNumber", [number, opts]);
+    }, error, "FirebasePlugin", "verifyPhoneNumber", [phoneNumber, opts]);
 };
 
 exports.enrollSecondAuthFactor = function (success, error, number, opts) {
