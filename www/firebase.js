@@ -292,6 +292,14 @@ exports.verifySecondAuthFactor = function (success, error, params, opts) {
     exec(success, error, "FirebasePlugin", "verifySecondAuthFactor", [params, opts]);
 };
 
+exports.listEnrolledSecondAuthFactors = function (success, error) {
+    exec(success, error, "FirebasePlugin", "listEnrolledSecondAuthFactors", []);
+};
+
+exports.unenrollSecondAuthFactor = function (success, error, selectedIndex) {
+    exec(success, error, "FirebasePlugin", "unenrollSecondAuthFactor", [selectedIndex]);
+};
+
 exports.setLanguageCode = function (lang, success, error) {
     exec(success, error, "FirebasePlugin", "setLanguageCode", [lang]);
 };
@@ -374,6 +382,11 @@ exports.updateUserEmail = function (email, success, error) {
 
 exports.sendUserEmailVerification = function (actionCodeSettings, success, error) {
     exec(success, error, "FirebasePlugin", "sendUserEmailVerification", [actionCodeSettings]);
+};
+
+exports.verifyBeforeUpdateEmail = function (email, success, error) {
+    if(typeof email !== 'string' || !email) return error("'email' must be a valid email address");
+    exec(success, error, "FirebasePlugin", "verifyBeforeUpdateEmail", [email]);
 };
 
 exports.updateUserPassword = function (password, success, error) {

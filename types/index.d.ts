@@ -199,6 +199,15 @@ export interface FirebasePlugin {
             requireSmsValidation: boolean
         },
     ): void
+    unenrollSecondAuthFactor(
+        success: () => void,
+        error: (err: string) => void,
+        selectedIndex: number
+    ): void
+    listEnrolledSecondAuthFactors(
+        success: (secondFactors: [object]) => void,
+        error: (err: string) => void
+    ): void
     setLanguageCode(
         lang: string,
         success?: () => void,
@@ -281,6 +290,11 @@ export interface FirebasePlugin {
         error?: (err: string) => void
     ): void
     updateUserEmail(
+        email: string,
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
+    verifyBeforeUpdateEmail(
         email: string,
         success?: () => void,
         error?: (err: string) => void

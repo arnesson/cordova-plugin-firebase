@@ -27,6 +27,7 @@ import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuthMultiFactorException;
 import com.google.firebase.auth.MultiFactorAssertion;
+import com.google.firebase.auth.MultiFactorInfo;
 import com.google.firebase.auth.MultiFactorResolver;
 import com.google.firebase.auth.MultiFactorSession;
 import com.google.firebase.auth.PhoneAuthOptions;
@@ -288,7 +289,11 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.enrollSecondAuthFactor(callbackContext, args);
             } else if (action.equals("verifySecondAuthFactor")) {
                 this.verifySecondAuthFactor(callbackContext, args);
-            }else if (action.equals("setLanguageCode")) {
+            } else if (action.equals("listEnrolledSecondAuthFactors")) {
+                this.listEnrolledSecondAuthFactors(callbackContext, args);
+            }  else if (action.equals("unenrollSecondAuthFactor")) {
+                this.unenrollSecondAuthFactor(callbackContext, args);
+            } else if (action.equals("setLanguageCode")) {
                 this.setLanguageCode(callbackContext, args);
             } else if (action.equals("authenticateUserWithGoogle")) {
                 this.authenticateUserWithGoogle(callbackContext, args);
@@ -324,6 +329,8 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.updateUserEmail(callbackContext, args);
             } else if (action.equals("sendUserEmailVerification")) {
                 this.sendUserEmailVerification(callbackContext, args);
+            }  else if (action.equals("verifyBeforeUpdateEmail")) {
+                this.verifyBeforeUpdateEmail(callbackContext, args);
             } else if (action.equals("updateUserPassword")) {
                 this.updateUserPassword(callbackContext, args);
             } else if (action.equals("sendUserPasswordResetEmail")) {
@@ -1299,6 +1306,22 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    public void verifyBeforeUpdateEmail(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    if(!userNotSignedInError(callbackContext)) return;
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                    String email = args.getString(0);
+                    handleTaskOutcome(user.verifyBeforeUpdateEmail(email), callbackContext);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
     public void updateUserPassword(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -1956,6 +1979,81 @@ public class FirebasePlugin extends CordovaPlugin {
                                     .requireSmsValidation(finalRequireSmsValidation)
                                     .build();
                     PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions); // invokes phoneAuthVerificationCallbacks
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void listEnrolledSecondAuthFactors(
+            final CallbackContext callbackContext,
+            final JSONArray args
+    ) {
+
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    if(!userNotSignedInError(callbackContext)) return;
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                    JSONArray secondFactors = parseEnrolledSecondFactorsToJson(user.getMultiFactor().getEnrolledFactors());
+                    callbackContext.success(secondFactors);
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private JSONArray parseEnrolledSecondFactorsToJson(List<MultiFactorInfo> multiFactorInfoList) throws JSONException {
+        JSONArray secondFactors = new JSONArray();
+        for(int i=0; i<multiFactorInfoList.size(); i++){
+            JSONObject secondFactor = new JSONObject();
+            secondFactor.put("index", i);
+
+            PhoneMultiFactorInfo phoneMultiFactorInfo = (PhoneMultiFactorInfo) multiFactorInfoList.get(i);
+            secondFactor.put("phoneNumber", phoneMultiFactorInfo.getPhoneNumber());
+
+            String displayName = phoneMultiFactorInfo.getDisplayName();
+            if(displayName != null){
+                secondFactor.put("displayName", displayName);
+            }
+            secondFactors.put(secondFactor);
+        }
+        return secondFactors;
+    }
+
+    public void unenrollSecondAuthFactor(
+            final CallbackContext callbackContext,
+            final JSONArray args
+    ) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    if(!userNotSignedInError(callbackContext)) return;
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                    int selectedIndex = args.getInt(0);
+
+                    if(selectedIndex < 0){
+                        callbackContext.error("Selected index value ("+selectedIndex+") must be a positive integer");
+                        return;
+                    }
+
+                    List<MultiFactorInfo> multiFactorInfos = user.getMultiFactor().getEnrolledFactors();
+                    if(selectedIndex+1 > multiFactorInfos.size()){
+                        callbackContext.error("Selected index value ("+selectedIndex+") exceeds the number of enrolled factors ("+multiFactorInfos.size()+")");
+                        return;
+                    }
+
+                    user.getMultiFactor().unenroll(multiFactorInfos.get(selectedIndex)).addOnCompleteListener(task -> {
+                        try {
+                            handleTaskOutcome(task, callbackContext);
+                        } catch(Exception e){
+                            handleExceptionWithContext(e, callbackContext);
+                        }
+                    });
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -3450,20 +3548,7 @@ public class FirebasePlugin extends CordovaPlugin {
                     // The user is a multi-factor user. Second factor challenge is required.
                     multiFactorResolver = ((FirebaseAuthMultiFactorException) task.getException()).getResolver();
                     String errMessage = "Second factor required";
-                    JSONArray secondFactors = new JSONArray();
-                    for(int i=0; i<multiFactorResolver.getHints().size(); i++){
-                        JSONObject secondFactor = new JSONObject();
-                        secondFactor.put("index", i);
-
-                        PhoneMultiFactorInfo info = (PhoneMultiFactorInfo) multiFactorResolver.getHints().get(i);
-                        secondFactor.put("phoneNumber", info.getPhoneNumber());
-
-                        String displayName = info.getDisplayName();
-                        if(displayName != null){
-                            secondFactor.put("displayName", displayName);
-                        }
-                        secondFactors.put(secondFactor);
-                    }
+                    JSONArray secondFactors = parseEnrolledSecondFactorsToJson(multiFactorResolver.getHints());
 
                     // Invoke error callback with second factors
                     // App should ask user to choose if more than one

@@ -1,7 +1,7 @@
 # Version 15.0.0
 * (iOS & Android) BREAKING CHANGE: Changed signature of `verifyPhoneNumber()` to pass optional arguments as an object.
 * (iOS & Android) feat: Add support for multi-factor authentication
-     * See `enrollSecondAuthFactor()`, `verifySecondAuthFactor()`
+     * Added `enrollSecondAuthFactor()`, `verifySecondAuthFactor()`, `listEnrolledSecondAuthFactors()`, `unenrollSecondAuthFactor()`, `verifyBeforeUpdateEmail()`
 
 # Version 14.2.1
 * (iOS) bugfix: remove openURL delegate that was erroneously re-added by merge error.

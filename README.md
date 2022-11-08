@@ -128,6 +128,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [updateUserProfile](#updateuserprofile)
     - [updateUserEmail](#updateuseremail)
     - [sendUserEmailVerification](#senduseremailverification)
+    - [verifyBeforeUpdateEmail](#verifybeforeupdateemail)
     - [updateUserPassword](#updateuserpassword)
     - [sendUserPasswordResetEmail](#senduserpasswordresetemail)
     - [deleteUser](#deleteuser)
@@ -2448,10 +2449,10 @@ Updates the display name and/or photo URL of the current Firebase user signed in
 ```
 
 ### updateUserEmail
-Updates/sets the email address of the current Firebase user signed into the app.
+Updates/sets the email address of the current Firebase user signed in to the app.
 
 **Parameters**:
-- {string} email - email address of user
+- {string} email - email address of user to set as current
 - {function} success - callback function to call on success
 - {function} error - callback function which will be passed a {string} error message as an argument
 
@@ -2493,6 +2494,25 @@ When the user opens the contained link, their email address will have been verif
 }, function(error) {
     console.error("Failed to send user verification email: " + error);
 });
+```
+
+### verifyBeforeUpdateEmail
+First verifies the user's identity, then set/supdates the email address of the current Firebase user signed in to the app.
+- This is required when a user with multi-factor authentication enabled on their account wishes to change their registered email address.
+    - [updateUserEmail](#updateuseremail) cannot be used and will result in an error.
+- See [the Firebase documentation](https://cloud.google.com/identity-platform/docs/work-with-mfa-users#updating_a_users_email) regarding updating the email address of a user with multi-factor authentication enabled.
+
+**Parameters**:
+- {string} email - email address of user to set as current
+- {function} success - callback function to call on success
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+```javascript
+    FirebasePlugin.verifyBeforeUpdateEmail("user@somewhere.com",function() {
+        console.log("User verified and email successfully updated");
+    }, function(error) {
+        console.error("Failed to verify user/update user email: " + error);
+    });
 ```
 
 ### updateUserPassword
@@ -2745,6 +2765,7 @@ Enrolls a user-specified phone number as a second factor for multi-factor authen
     - In this case, once the user has entered the code, `enrollSecondAuthFactor` will need to be called again with the `credential` option used to specified the `code` and verification `id`.
 - This function involves a similar verification flow to [verifyPhoneNumber](#verifyphonenumber) and therefore has the same pre-requisites and requirements.
 - See the Firebase MFA documentation for [Android](https://cloud.google.com/identity-platform/docs/android/mfa) and [iOS](https://cloud.google.com/identity-platform/docs/ios/mfa) for more information on MFA-specific setup requirements.
+- Calling when no user is signed in will result in error callback being invoked.
 
 **Parameters**:
 - {function} success - callback function to invoke either upon:
@@ -2874,6 +2895,69 @@ FirebasePlugin.signInWithCredential(credential, function() {
             console.error("Failed to sign in", error);
         }
     });
+```
+
+### listEnrolledSecondAuthFactors
+Lists the second factors the current user has enrolled for multi-factor authentication (MFA).
+- Calling when no user is signed in will result in error callback being invoked.
+
+**Parameters**:
+- {function} success - callback function to invoke upon successfully retrieving second factors. Will be passed an {array} of second factor {object} with properties:
+    - {integer} index - index of the factor in the list
+    - {string} phoneNumber - masked version of the phone number for this factor.
+    - {string} displayName - (optional) name of factor specified by the user when this factor was enrolled.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+FirebasePlugin.listEnrolledSecondAuthFactors(
+    function(secondFactors) {
+        if(secondFactors.length > 0){
+            for(var secondFactor of secondFactors){
+                console.log(`${secondFactor.index}: ${secondFactor.phoneNumber}${secondFactor.displayName ? ' ('+secondFactor.displayName+')' : ''}`)
+            }
+        }else{
+            console.log("No second factors are enrolled");
+        }
+    }, function(error) {
+        console.error("Failed to list second factors: " + JSON.stringify(error));
+    }
+)
+```
+
+### unenrollSecondAuthFactor
+Unenrolls (removes) an enrolled second factor that the current user has enrolled for multi-factor authentication (MFA).
+- Calling when no user is signed in will result in error callback being invoked.
+
+**Parameters**:
+- {function} success - callback function to invoke upon success
+- {function} error - callback function which will be passed a {string} error message as an argument
+- {number} selectedIndex - Index of the second factor to unenroll (obtained using [listEnrolledSecondAuthFactors](#listenrolledsecondauthfactors))
+
+Example usage:
+
+```javascript
+function unenrollSecondAuthFactor(){
+    FirebasePlugin.listEnrolledSecondAuthFactors(
+        function(secondFactors) {
+            askUserToSelectSecondFactorToUnenroll(secondFactors) // you implement this
+                .then(function(selectedIndex){
+                    FirebasePlugin.unenrollSecondAuthFactor(
+                        function() {
+                            console.log("Successfully unenrolled selected second factor");
+                        }, function(error) {
+                            console.error("Failed to unenroll second factor: " + JSON.stringify(error));
+                        },
+                        selectedIndex
+                    )
+                }
+            );
+        }, function(error) {
+            console.error("Failed to list second factors: " + JSON.stringify(error));
+        }
+    )
+}
 ```
 
 ### setLanguageCode
