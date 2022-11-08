@@ -139,6 +139,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [verifyPhoneNumber](#verifyphonenumber)
     - [enrollSecondAuthFactor](#enrollsecondauthfactor)
     - [verifySecondAuthFactor](#verifysecondauthfactor)
+    - [listEnrolledSecondAuthFactors](#listenrolledsecondauthfactors)
+    - [unenrollSecondAuthFactor](#unenrollsecondauthfactor)
     - [setLanguageCode](#setlanguagecode)
     - [authenticateUserWithEmailAndPassword](#authenticateuserwithemailandpassword)
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
