@@ -1628,10 +1628,7 @@ public class FirebasePlugin extends CordovaPlugin {
                         requireSmsValidation = opts.getBoolean("requireSmsValidation");
                     }
 
-                    String displayName = null;
-                    if(opts.has("displayName")){
-                        displayName = opts.getString("displayName");
-                    }
+                    String displayName = opts.getString("displayName");
 
                     String verificationId = null;
                     String verificationCode = null;

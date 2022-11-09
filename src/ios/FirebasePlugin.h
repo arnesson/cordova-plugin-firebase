@@ -27,6 +27,7 @@
 - (void)reloadCurrentUser:(CDVInvokedUrlCommand*)command;
 - (void)updateUserProfile:(CDVInvokedUrlCommand*)command;
 - (void)updateUserEmail:(CDVInvokedUrlCommand*)command;
+- (void)verifyBeforeUpdateEmail:(CDVInvokedUrlCommand*)command;
 - (void)sendUserEmailVerification:(CDVInvokedUrlCommand*)command;
 - (void)updateUserPassword:(CDVInvokedUrlCommand*)command;
 - (void)sendUserPasswordResetEmail:(CDVInvokedUrlCommand*)command;
@@ -35,6 +36,8 @@
 - (void)getClaims:(CDVInvokedUrlCommand*)command;
 - (void)enrollSecondAuthFactor:(CDVInvokedUrlCommand*)command;
 - (void)verifySecondAuthFactor:(CDVInvokedUrlCommand*)command;
+- (void)listEnrolledSecondAuthFactors:(CDVInvokedUrlCommand*)command;
+- (void)unenrollSecondAuthFactor:(CDVInvokedUrlCommand*)command;
 
 // Remote notifications
 - (void)getId:(CDVInvokedUrlCommand*)command;

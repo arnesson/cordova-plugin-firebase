@@ -283,6 +283,13 @@ exports.verifyPhoneNumber = function (success, error, phoneNumber, opts) {
 
 exports.enrollSecondAuthFactor = function (success, error, number, opts) {
     if(typeof opts !== 'object') opts = {};
+    if(!opts.displayName){
+        // Use masked version of phone number as display name
+        var s_number = number+'',
+            last4Digits = s_number.slice(-4),
+            firstDigits = s_number.slice(0, -4);
+        opts.displayName = firstDigits.replace(/[0-9]/g, '*') + last4Digits;
+    }
     exec(success, error, "FirebasePlugin", "enrollSecondAuthFactor", [number, opts]);
 };
 

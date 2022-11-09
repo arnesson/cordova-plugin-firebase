@@ -2776,7 +2776,9 @@ Enrolls a user-specified phone number as a second factor for multi-factor authen
 - {function} error - callback function which will be passed a {string} error message as an argument
 - {string} phoneNumber - phone number to enroll
 - {object} opts - (optional) parameters
-    - {string} displayName - display name for second factor. Used when a user has multiple second factor phone numbers enrolled and asking them which to use since the full phone number is masked.
+    - {string} displayName - display name for second factor.
+      - Used when a user has multiple second factor phone numbers enrolled and asking them which to use since the full phone number is masked.
+      - If not specified, defaults to the masked phone number.
     - {object} credential - if manual entry of the verification code in an SMS is required, the `credential` object will be passed to the `success` function. The user-entered code should be appended to this object as the `code` property then this function re-invoked with the `credential` specified in the `opts` argument.
     - {integer} timeOutDuration - (Android only) time to wait in seconds before timing out. Defaults to 30 seconds if not specified.
     - {boolean} requireSmsValidation - (Android only) whether to always require SMS validation on Android even if instant verification is available. Defaults to false if not specified.
@@ -2786,7 +2788,7 @@ Enrolls a user-specified phone number as a second factor for multi-factor authen
 Example usage:
 
 ```javascript
-var number = '+441234567890';
+var phoneNumber = '+441234567890';
 var timeOutDuration = 60;
 var fakeVerificationCode = '123456';
 var displayName = "Work phone";
@@ -2807,7 +2809,7 @@ function enrollSecondAuthFactor(){
         }
     }, function(error) {
         console.error("Failed to enroll second factor: " + JSON.stringify(error));
-    }, number, {
+    }, phoneNumber, {
         displayName: displayName,
         credential: credential,
         timeOutDuration: timeOutDuration,
@@ -2825,8 +2827,9 @@ Verifies a second factor phone number for multi-factor authentication (MFA).
     - The first argument passed to the error callback will be the error message: "Second factor required"
     - A second argument will be passed containing the list of (one or more) enrolled second factors for that user; each factor in the list will be an object with the following properties:
         - {integer} index - index of the factor in the list - specify this as `selectedIndex` to select this factor.
-        - {string} phoneNumber - masked version of the phone number for this factor.
-        - {string} displayName - (optional) name of factor specified by the user when this factor was enrolled.
+        - {string} displayName - name of factor specified by the user when this factor was enrolled.
+          - If no name was specified during enrollment, defaults to the masked phone number.
+        - {string} phoneNumber - phone number for this factor.
 - The app should then call this function, specifying the `selectedIndex` of the second factor in the `params` argument.
     - If there is more than one second factor enrolled, the app should ask the user to select which one to use and specify the index of this as the `selectedIndex`
     - If there is only one, the `selectedIndex` should be specified as `0`.
@@ -2906,8 +2909,11 @@ Lists the second factors the current user has enrolled for multi-factor authenti
 **Parameters**:
 - {function} success - callback function to invoke upon successfully retrieving second factors. Will be passed an {array} of second factor {object} with properties:
     - {integer} index - index of the factor in the list
-    - {string} phoneNumber - masked version of the phone number for this factor.
-    - {string} displayName - (optional) name of factor specified by the user when this factor was enrolled.
+    - {string} displayName - name of factor specified by the user when this factor was enrolled.
+      - If no name was specified during enrollment, defaults to the masked phone number.
+    - {string} phoneNumber - (Android only) enrolled phone number for this factor.
+      - On iOS, this is not available when listing enrolled factors.
+
 - {function} error - callback function which will be passed a {string} error message as an argument
 
 Example usage:
@@ -2917,7 +2923,7 @@ FirebasePlugin.listEnrolledSecondAuthFactors(
     function(secondFactors) {
         if(secondFactors.length > 0){
             for(var secondFactor of secondFactors){
-                console.log(`${secondFactor.index}: ${secondFactor.phoneNumber}${secondFactor.displayName ? ' ('+secondFactor.displayName+')' : ''}`)
+                console.log(`${secondFactor.index}: ${secondFactor.displayName}${secondFactor.phoneNumber ? ' ('+secondFactor.phoneNumber+')' : ''}`)
             }
         }else{
             console.log("No second factors are enrolled");
