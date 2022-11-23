@@ -149,18 +149,18 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="Firebase/Core" spec="9.1.0"/>
-				<pod name="Firebase/Auth" spec="9.1.0"/>
-				<pod name="Firebase/Messaging" spec="9.1.0"/>
-				<pod name="Firebase/Performance" spec="9.1.0"/>
-				<pod name="Firebase/RemoteConfig" spec="9.1.0"/>
-				<pod name="Firebase/InAppMessaging" spec="9.1.0"/>
-				<pod name="Firebase/Firestore" spec="9.1.0"/>
-				<pod name="Firebase/Crashlytics" spec="9.1.0"/>
-				<pod name="Firebase/Functions" spec="9.1.0"/>
-				<pod name="Firebase/Installations" spec="9.1.0"/>
-				<pod name="GoogleSignIn" spec="6.2.1"/>
-				<pod name="GoogleTagManager" spec="7.4.1"/>
+				<pod name="Firebase/Core" spec="10.2.0"/>
+				<pod name="Firebase/Auth" spec="10.2.0"/>
+				<pod name="Firebase/Messaging" spec="10.2.0"/>
+				<pod name="Firebase/Performance" spec="10.2.0"/>
+				<pod name="Firebase/RemoteConfig" spec="10.2.0"/>
+				<pod name="Firebase/InAppMessaging" spec="10.2.0"/>
+				<pod name="Firebase/Firestore" spec="10.2.0"/>
+				<pod name="Firebase/Crashlytics" spec="10.2.0"/>
+				<pod name="Firebase/Functions" spec="10.2.0"/>
+				<pod name="Firebase/Installations" spec="10.2.0"/>
+				<pod name="GoogleSignIn" spec="6.2.4"/>
+				<pod name="GoogleTagManager" spec="7.4.2"/>
 			</pods>
 		</podspec>
 
