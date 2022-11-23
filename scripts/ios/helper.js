@@ -13,7 +13,10 @@ var comment = "\"Crashlytics\"";
 var versionRegex = /\d+\.\d+\.\d+/,
     firebasePodRegex = /pod 'Firebase\/([^']+)', '(\d+\.\d+\.\d+)'/g,
     standardFirestorePodRegEx = /pod 'Firebase\/Firestore', '(\d+\.\d+\.\d+)'/,
-    prebuiltFirestorePodTemplate = "pod 'FirebaseFirestore', :tag => '{version}', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git'";
+    googleSignInPodRegEx = /pod 'GoogleSignIn', '(\d+\.\d+\.\d+)'/,
+    googleTagManagerPodRegEx = /pod 'GoogleTagManager', '(\d+\.\d+\.\d+)'/,
+    prebuiltFirestorePodTemplate = "pod 'FirebaseFirestore', :tag => '{version}', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git'",
+    iosDeploymentTargetPodRegEx = /platform :ios, '(\d+\.\d+)'/;
 
 module.exports = {
 
@@ -21,7 +24,8 @@ module.exports = {
      * Used to get the path to the XCode project's .pbxproj file.
      */
     getXcodeProjectPath: function () {
-        var appName = utilities.getAppName();        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
+        var appName = utilities.getAppName();
+        return path.join("platforms", "ios", appName + ".xcodeproj", "project.pbxproj");
     },
 
     /**
@@ -178,20 +182,32 @@ module.exports = {
         // Finally, write the .pbxproj back out to disk.
         fs.writeFileSync(path.resolve(xcodeProjectPath), xcodeProject.writeSync());
     },
-    stripDebugSymbols: function(){
-        var podFilePath = 'platforms/ios/Podfile',
-            podFile = fs.readFileSync(path.resolve(podFilePath)).toString();
-        if(!podFile.match('DEBUG_INFORMATION_FORMAT')){
-            podFile += "\npost_install do |installer|\n" +
-                "    installer.pods_project.targets.each do |target|\n" +
-                "        target.build_configurations.each do |config|\n" +
-                "            config.build_settings['DEBUG_INFORMATION_FORMAT'] = 'dwarf'\n" +
-                "        end\n" +
-                "    end\n" +
-                "end";
+    applyPodsPostInstall: function(pluginVariables, iosPlatform){
+        var podFileModified = false,
+            podFilePath = iosPlatform.podFile,
+            podFile = fs.readFileSync(path.resolve(podFilePath)).toString(),
+            DEBUG_INFORMATION_FORMAT = pluginVariables['IOS_STRIP_DEBUG'] && pluginVariables['IOS_STRIP_DEBUG'] === 'true' ? 'dwarf' : 'dwarf-with-dsym',
+            IPHONEOS_DEPLOYMENT_TARGET = podFile.match(iosDeploymentTargetPodRegEx)[1];
+
+        if(!podFile.match('post_install')){
+            podFile += `
+post_install do |installer|
+    installer.pods_project.targets.each do |target|
+        target.build_configurations.each do |config|
+            config.build_settings['DEBUG_INFORMATION_FORMAT'] = '${DEBUG_INFORMATION_FORMAT}'
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '${IPHONEOS_DEPLOYMENT_TARGET}'
+            if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+                config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+            end
+        end
+    end
+end
+                `;
             fs.writeFileSync(path.resolve(podFilePath), podFile);
-            console.log('cordova-plugin-firebasex: Applied IOS_STRIP_DEBUG to Podfile');
+            utilities.log('cordova-plugin-firebasex: Applied post install block to Podfile');
+            podFileModified = true;
         }
+        return podFileModified;
     },
     applyPluginVarsToPlists: function(pluginVariables, iosPlatform){
         var googlePlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.dest), 'utf8')),
@@ -268,17 +284,55 @@ module.exports = {
 
         if(pluginVariables['IOS_FIREBASE_SDK_VERSION']){
             if(pluginVariables['IOS_FIREBASE_SDK_VERSION'].match(versionRegex)){
-                var firebasePodsMatches = podFileContents.match(firebasePodRegex);
-                if(firebasePodsMatches){
-                    var currentVersion = firebasePodsMatches[0].match(versionRegex)[0];
-                    firebasePodsMatches.forEach((match) => {
-                        podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_FIREBASE_SDK_VERSION']));
+                var matches = podFileContents.match(firebasePodRegex);
+                if(matches){
+                    var currentVersion = matches[0].match(versionRegex)[0];
+                    matches.forEach((match) => {
+                        if(!match.match(pluginVariables['IOS_FIREBASE_SDK_VERSION'])){
+                            podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_FIREBASE_SDK_VERSION']));
+                            podFileModified = true;
+                        }
                     });
-                    console.log("Firebase iOS SDK version set to v"+pluginVariables['IOS_FIREBASE_SDK_VERSION']+" in Podfile");
-                    podFileModified = true;
+                    if(podFileModified) utilities.log("Firebase iOS SDK version set to v"+pluginVariables['IOS_FIREBASE_SDK_VERSION']+" in Podfile");
                 }
             }else{
                 throw new Error("The value \""+pluginVariables['IOS_FIREBASE_SDK_VERSION']+"\" for IOS_FIREBASE_SDK_VERSION is not a valid version in the format 'X.Y.Z'")
+            }
+        }
+
+        if(pluginVariables['IOS_GOOGLE_SIGIN_VERSION']){
+            if(pluginVariables['IOS_GOOGLE_SIGIN_VERSION'].match(versionRegex)){
+                var matches = podFileContents.match(googleSignInPodRegEx);
+                if(matches){
+                    var currentVersion = matches[0].match(versionRegex)[0];
+                    matches.forEach((match) => {
+                        if(!match.match(pluginVariables['IOS_GOOGLE_SIGIN_VERSION'])){
+                            podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_GOOGLE_SIGIN_VERSION']));
+                            podFileModified = true;
+                        }
+                    });
+                    if(podFileModified) utilities.log("Google Sign In version set to v"+pluginVariables['IOS_GOOGLE_SIGIN_VERSION']+" in Podfile");
+                }
+            }else{
+                throw new Error("The value \""+pluginVariables['IOS_GOOGLE_SIGIN_VERSION']+"\" for IOS_GOOGLE_SIGIN_VERSION is not a valid version in the format 'X.Y.Z'")
+            }
+        }
+
+        if(pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION']){
+            if(pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION'].match(versionRegex)){
+                var matches = podFileContents.match(googleTagManagerPodRegEx);
+                if(matches){
+                    var currentVersion = matches[0].match(versionRegex)[0];
+                    matches.forEach((match) => {
+                        if(!match.match(pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION'])){
+                            podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION']));
+                            podFileModified = true;
+                        }
+                    });
+                    if(podFileModified) utilities.log("Google Tag Manager version set to v"+pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION']+" in Podfile");
+                }
+            }else{
+                throw new Error("The value \""+pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION']+"\" for IOS_GOOGLE_TAG_MANAGER_VERSION is not a valid version in the format 'X.Y.Z'")
             }
         }
 
@@ -287,10 +341,13 @@ module.exports = {
             if(standardFirestorePodMatches){
                 podFileContents = podFileContents.replace(standardFirestorePodMatches[0], prebuiltFirestorePodTemplate.replace('{version}', standardFirestorePodMatches[1]));
                 podFileModified = true;
-                console.log("Configured Podfile for pre-built Firestore pod");
+                utilities.log("Configured Podfile for pre-built Firestore pod");
             }
         }
+        if(podFileModified) {
+            fs.writeFileSync(path.resolve(iosPlatform.podFile), podFileContents);
+        }
 
-        if(podFileModified) fs.writeFileSync(path.resolve(iosPlatform.podFile), podFileContents);
+        return podFileModified;
     }
 };

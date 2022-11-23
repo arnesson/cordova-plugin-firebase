@@ -246,7 +246,11 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 
 ### iOS only
 - `IOS_FIREBASE_SDK_VERSION` - a specific version of the Firebase iOS SDK to set in the Podfile
-  -  If not specified, the default version defined in `<pod>` elements in the `plugin.xml` will be used.
+  - If not specified, the default version defined in `<pod>` elements in the `plugin.xml` will be used.
+- `IOS_GOOGLE_SIGIN_VERSION` - a specific version of the Google Sign In library to set in the Podfile
+  - If not specified, the default version defined in the `<pod>` element in the `plugin.xml` will be used.
+- `IOS_GOOGLE_TAG_MANAGER_VERSION` - a specific version of the Google Tag Manager library to set in the Podfile
+  - If not specified, the default version defined in the `<pod>` element in the `plugin.xml` will be used.
 - `IOS_USE_PRECOMPILED_FIRESTORE_POD` - if `true`, switches Podfile to use a [pre-compiled version of the Firestore pod](https://github.com/invertase/firestore-ios-sdk-frameworks.git) to reduce build time
   - Since some users experienced long build times due to the Firestore pod (see [#407](https://github.com/dpa99c/cordova-plugin-firebasex/issues/407))
   - However other users have experienced build issues with the pre-compiled version (see [#735](https://github.com/dpa99c/cordova-plugin-firebasex/issues/735))
