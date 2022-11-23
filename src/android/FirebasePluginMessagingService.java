@@ -118,7 +118,11 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
             // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
             String messageType;
             String title = null;
+            String titleLocKey = null;
+            String[] titleLocArgs = null;
             String body = null;
+            String bodyLocKey = null;
+            String[] bodyLocArgs = null;
             String bodyHtml = null;
             String id = null;
             String sound = null;
@@ -142,7 +146,11 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 id = remoteMessage.getMessageId();
                 RemoteMessage.Notification notification = remoteMessage.getNotification();
                 title = notification.getTitle();
+                titleLocKey = notification.getTitleLocalizationKey();
+                titleLocArgs = notification.getTitleLocalizationArgs();
                 body = notification.getBody();
+                bodyLocKey = notification.getBodyLocalizationKey();
+                bodyLocArgs = notification.getBodyLocalizationArgs();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     channelId = notification.getChannelId();
                 }
@@ -151,6 +159,14 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                 icon = notification.getIcon();
                 if (notification.getImageUrl() != null) {
                     image = notification.getImageUrl().toString();
+                }
+                if (!TextUtils.isEmpty(titleLocKey)) {
+                    int titleId = getResources().getIdentifier(titleLocKey, "string", getPackageName());
+                    title = String.format(getResources().getString(titleId), (Object[])titleLocArgs);
+                }
+                if (!TextUtils.isEmpty(bodyLocKey)) {
+                    int bodyId = getResources().getIdentifier(bodyLocKey, "string", getPackageName());
+                    body = String.format(getResources().getString(bodyId), (Object[])bodyLocArgs);
                 }
             }else{
                 Log.i(TAG, "Received message: data");
