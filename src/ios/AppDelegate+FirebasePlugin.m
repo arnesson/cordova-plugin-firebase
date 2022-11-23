@@ -461,9 +461,14 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
                         rawNonce:rawNonce];
                     
                     NSNumber* key = [[FirebasePlugin firebasePlugin] saveAuthCredential:credential];
+                    NSString *authorizationCode = [[NSString alloc] initWithData:appleIDCredential.authorizationCode
+                                                                        encoding:NSUTF8StringEncoding];
                     NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
                     [result setValue:@"true" forKey:@"instantVerification"];
                     [result setValue:key forKey:@"id"];
+                    if(authorizationCode != nil){
+                        [result setValue:authorizationCode forKey:@"authorizationCode"];
+                    }
                     if(appleIDCredential.fullName != nil){
                         if(appleIDCredential.fullName.givenName != nil){
                             [result setValue:appleIDCredential.fullName.givenName forKey:@"givenName"];

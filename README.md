@@ -128,7 +128,6 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [updateUserProfile](#updateuserprofile)
     - [updateUserEmail](#updateuseremail)
     - [sendUserEmailVerification](#senduseremailverification)
-    - [verifyBeforeUpdateEmail](#verifybeforeupdateemail)
     - [updateUserPassword](#updateuserpassword)
     - [sendUserPasswordResetEmail](#senduserpasswordresetemail)
     - [deleteUser](#deleteuser)
@@ -145,6 +144,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [authenticateUserWithEmailAndPassword](#authenticateuserwithemailandpassword)
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
     - [authenticateUserWithApple](#authenticateuserwithapple)
+    - [authenticateUserWithMicrosoft](#authenticateuserwithmicrosoft)
     - [signInWithCredential](#signinwithcredential)
     - [linkUserWithCredential](#linkuserwithcredential)
     - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -241,7 +241,11 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 
 ### iOS only
 - `IOS_FIREBASE_SDK_VERSION` - a specific version of the Firebase iOS SDK to set in the Podfile
-  -  If not specified, the default version defined in `<pod>` elements in the `plugin.xml` will be used.
+  - If not specified, the default version defined in `<pod>` elements in the `plugin.xml` will be used.
+- `IOS_GOOGLE_SIGIN_VERSION` - a specific version of the Google Sign In library to set in the Podfile
+  - If not specified, the default version defined in the `<pod>` element in the `plugin.xml` will be used.
+- `IOS_GOOGLE_TAG_MANAGER_VERSION` - a specific version of the Google Tag Manager library to set in the Podfile
+  - If not specified, the default version defined in the `<pod>` element in the `plugin.xml` will be used.
 - `IOS_USE_PRECOMPILED_FIRESTORE_POD` - if `true`, switches Podfile to use a [pre-compiled version of the Firestore pod](https://github.com/invertase/firestore-ios-sdk-frameworks.git) to reduce build time
   - Since some users experienced long build times due to the Firestore pod (see [#407](https://github.com/dpa99c/cordova-plugin-firebasex/issues/407))
   - However other users have experienced build issues with the pre-compiled version (see [#735](https://github.com/dpa99c/cordova-plugin-firebasex/issues/735))
@@ -1659,16 +1663,30 @@ Data message flow:
     b. If the data message contains the [data message notification keys](#data-message-notifications), the plugin will display a system notification for the data message while in the background.
 
 ### grantPermission
-Grant permission to receive push notifications (will trigger prompt) and return `hasPermission: true`.
-iOS only (Android will always return true).
+Grant run-time permission to receive push notifications (will trigger user permission prompt).
+iOS & Android 13+ (Android <= 12 will always return true).
+
+On Android, the `POST_NOTIFICATIONS` permission must be added to the `AndroidManifest.xml` file by inserting the following into your `config.xml` file:
+
+```xml
+<config-file target="AndroidManifest.xml" parent="/*">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+</config-file>
+```
 
 **Parameters**:
 - {function} success - callback function which will be passed the {boolean} permission result as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
-- {boolean} requestWithProvidesAppNotificationSettings - boolean which indicates if app provides AppNotificationSettingsButton (**iOS12+ only**)
+- {boolean} requestWithProvidesAppNotificationSettings - (**iOS12+ only**) indicates if app provides AppNotificationSettingsButton
+
+```javascript
+FirebasePlugin.grantPermission(function(hasPermission){
+    console.log("Notifications permission was " + (hasPermission ? "granted" : "denied"));
+});
+```
 
 ### grantCriticalPermission
-Grant critical permission to receive critical push notifications (will trigger additional prompt) and return `hasPermission: true`.
+Grant critical permission to receive critical push notifications (will trigger additional prompt).
 iOS 12.0+ only (Android will always return true).
 
 **Parameters**:
@@ -1678,15 +1696,15 @@ iOS 12.0+ only (Android will always return true).
 **Critical push notifications require a special entitlement that needs to be issued by Apple.**
 
 ```javascript
-FirebasePlugin.grantPermission(function(hasPermission){
-    console.log("Permission was " + (hasPermission ? "granted" : "denied"));
+FirebasePlugin.grantCriticalPermission(function(hasPermission){
+    console.log("Critical notifications permission was " + (hasPermission ? "granted" : "denied"));
 });
-
 ```
+
 ### hasPermission
 Check permission to receive push notifications and return the result to a callback function as boolean.
-On iOS, returns true is runtime permission for remote notifications is granted and enabled in Settings.
-On Android, returns true if remote notifications are enabled.
+On iOS, returns true if runtime permission for remote notifications is granted and enabled in Settings.
+On Android, returns true if global remote notifications are enabled in the device settings and (on Android 13+) runtime permission for remote notifications is granted.
 
 **Parameters**:
 - {function} success - callback function which will be passed the {boolean} permission result as an argument
@@ -1710,7 +1728,7 @@ iOS 12.0+ only (Android will always return true).
 
 ```javascript
 FirebasePlugin.hasCriticalPermission(function(hasPermission){
-    console.log("Permission to send critical push notificaitons is " + (hasPermission ? "granted" : "denied"));
+    console.log("Permission to send critical push notifications is " + (hasPermission ? "granted" : "denied"));
 });
 ```
 
@@ -3083,6 +3101,30 @@ To use Sign In with Apple in your iOS app you need to do the following:
 #### Android
 To use Sign In with Apple in your Android app you need to do the following:
 - Configure your app for Sign In with Apple as outlined in the [Firebase documentation's "Before you begin" section](https://firebase.google.com/docs/auth/android/apple#before-you-begin)
+
+### authenticateUserWithMicrosoft
+Authenticates the user with a Microsoft account using Sign In with Oauth to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+- Follow [Firebase documentation's "Authenticate Using Microsoft" section](https://firebase.google.com/docs/auth/web/microsoft-oauth)
+
+**Parameters**:
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+
+FirebasePlugin.authenticateUserWithMicrosoft(function(credential) {
+    FirebasePlugin.signInWithCredential(credential, function() {
+            console.log("Successfully signed in");
+        }, function(error) {
+            console.error("Failed to sign in", error);
+        });
+}, function(error) {
+    console.error("Failed to authenticate with Microsoft: " + error);
+});
+```
 
 ### signInWithCredential
 Signs the user into Firebase with credentials obtained via an authentication method such as `verifyPhoneNumber()` or `authenticateUserWithGoogle()`.

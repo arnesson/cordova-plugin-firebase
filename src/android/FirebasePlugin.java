@@ -16,6 +16,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -24,6 +25,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.ActionCodeSettings;
+import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuthMultiFactorException;
 import com.google.firebase.auth.MultiFactorAssertion;
@@ -35,12 +37,15 @@ import com.google.firebase.auth.PhoneMultiFactorGenerator;
 import com.google.firebase.auth.PhoneMultiFactorInfo;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -49,6 +54,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.Timestamp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.OAuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -56,6 +62,7 @@ import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.OAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -85,11 +92,13 @@ import com.google.firebase.perf.metrics.Trace;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -117,6 +126,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class FirebasePlugin extends CordovaPlugin {
@@ -135,11 +145,14 @@ public class FirebasePlugin extends CordovaPlugin {
 
     protected static final String TAG = "FirebasePlugin";
     protected static final String JS_GLOBAL_NAMESPACE = "FirebasePlugin.";
+    protected static final String KEY = "badge";
     protected static final int GOOGLE_SIGN_IN = 0x1;
     protected static final String SETTINGS_NAME = "settings";
     private static final String CRASHLYTICS_COLLECTION_ENABLED = "firebase_crashlytics_collection_enabled";
     private static final String ANALYTICS_COLLECTION_ENABLED = "firebase_analytics_collection_enabled";
     private static final String PERFORMANCE_COLLECTION_ENABLED = "firebase_performance_collection_enabled";
+    protected static final String POST_NOTIFICATIONS = "POST_NOTIFICATIONS";
+    protected static final int POST_NOTIFICATIONS_PERMISSION_REQUEST_ID = 1;
 
     private static boolean inBackground = true;
     private static ArrayList<Bundle> notificationStack = null;
@@ -147,6 +160,7 @@ public class FirebasePlugin extends CordovaPlugin {
     private static CallbackContext tokenRefreshCallbackContext;
     private static CallbackContext activityResultCallbackContext;
     private static CallbackContext authResultCallbackContext;
+    private static CallbackContext postNotificationPermissionRequestCallbackContext;
 
     private static NotificationChannel defaultNotificationChannel = null;
     public static String defaultChannelId = null;
@@ -233,7 +247,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.getToken(args, callbackContext);
             } else if (action.equals("hasPermission")) {
                 this.hasPermission(callbackContext);
-            }else if (action.equals("subscribe")) {
+            } else if (action.equals("grantPermission")) {
+                this.grantPermission(callbackContext);
+            } else if (action.equals("subscribe")) {
                 this.subscribe(callbackContext, args.getString(0));
             } else if (action.equals("unsubscribe")) {
                 this.unsubscribe(callbackContext, args.getString(0));
@@ -279,10 +295,13 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.getAll(callbackContext);
             } else if (action.equals("didCrashOnPreviousExecution")) {
                 this.didCrashOnPreviousExecution(callbackContext);
+
             } else if (action.equals("setConfigSettings")) {
                 this.setConfigSettings(callbackContext, args);
+
             } else if (action.equals("setDefaults")) {
                 this.setDefaults(callbackContext, args.getJSONObject(0));
+
             } else if (action.equals("verifyPhoneNumber")) {
                 this.verifyPhoneNumber(callbackContext, args);
             } else if (action.equals("enrollSecondAuthFactor")) {
@@ -299,7 +318,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.authenticateUserWithGoogle(callbackContext, args);
             } else if (action.equals("authenticateUserWithApple")) {
                 this.authenticateUserWithApple(callbackContext, args);
-            } else if (action.equals("createUserWithEmailAndPassword")) {
+            } else if (action.equals("authenticateUserWithMicrosoft")) {
+                this.authenticateUserWithMicrosoft(callbackContext, args);
+            }else if (action.equals("createUserWithEmailAndPassword")) {
                 this.createUserWithEmailAndPassword(callbackContext, args);
             } else if (action.equals("signInUserWithEmailAndPassword")) {
                 this.signInUserWithEmailAndPassword(callbackContext, args);
@@ -397,8 +418,7 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.removeFirestoreListener(args, callbackContext);
             } else if (action.equals("functionsHttpsCallable")) {
                 this.functionsHttpsCallable(args, callbackContext);
-            } else if (action.equals("grantPermission")
-                    || action.equals("grantCriticalPermission")
+            } else if (action.equals("grantCriticalPermission")
                     || action.equals("hasCriticalPermission")
                     || action.equals("setBadgeNumber")
                     || action.equals("getBadgeNumber")
@@ -639,13 +659,40 @@ public class FirebasePlugin extends CordovaPlugin {
     }
 
     private void hasPermission(final CallbackContext callbackContext) {
-        if(cordovaActivity == null) return;
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
                     NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(cordovaActivity);
                     boolean areNotificationsEnabled = notificationManagerCompat.areNotificationsEnabled();
-                    callbackContext.success(conformBooleanForPluginResult(areNotificationsEnabled));
+
+                    boolean hasRuntimePermission = true;
+                    if(Build.VERSION.SDK_INT >= 33){ // Android 13+
+                        hasRuntimePermission = hasRuntimePermission(POST_NOTIFICATIONS);
+                    }
+
+                    callbackContext.success(conformBooleanForPluginResult(areNotificationsEnabled && hasRuntimePermission));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    private void grantPermission(final CallbackContext callbackContext) {
+        CordovaPlugin plugin = this;
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    if(Build.VERSION.SDK_INT >= 33){ // Android 13+
+                        boolean hasRuntimePermission = hasRuntimePermission(POST_NOTIFICATIONS);
+                        if(!hasRuntimePermission){
+                            String[] permissions = new String[]{qualifyPermission(POST_NOTIFICATIONS)};
+                            postNotificationPermissionRequestCallbackContext = callbackContext;
+                            requestPermissions(plugin, POST_NOTIFICATIONS_PERMISSION_REQUEST_ID, permissions);
+                            sendEmptyPluginResultAndKeepCallback(callbackContext);
+                        }
+                    }
+
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
@@ -2212,6 +2259,36 @@ public class FirebasePlugin extends CordovaPlugin {
         });
     }
 
+    public void authenticateUserWithMicrosoft(final CallbackContext callbackContext, final JSONArray args){
+      cordova.getThreadPool().execute(new Runnable() {
+          public void run() {
+              try {
+                  String locale = args.getString(0);
+                  OAuthProvider.Builder provider = OAuthProvider.newBuilder("microsoft.com");
+                  if(locale != null){
+                      provider.addCustomParameter("locale", locale);
+                      provider.addCustomParameter("prompt", "consent");
+                  }
+                  Task<AuthResult> pending = FirebaseAuth.getInstance().getPendingAuthResult();
+                  if (pending != null) {
+                      callbackContext.error("Auth result is already pending");
+                      pending
+                              .addOnSuccessListener(new AuthResultOnSuccessListener())
+                              .addOnFailureListener(new AuthResultOnFailureListener());
+                  } else {
+                      String id = FirebasePlugin.instance.saveAuthProvider(provider.build());;
+                      JSONObject returnResults = new JSONObject();
+                      returnResults.put("instantVerification", true);
+                      returnResults.put("id", id);
+                      callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                  }
+              } catch (Exception e) {
+                  handleExceptionWithContext(e, callbackContext);
+              }
+          }
+      });
+  }
+
     public void signInUserWithCustomToken(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
@@ -3373,6 +3450,12 @@ public class FirebasePlugin extends CordovaPlugin {
         sendPluginResultAndKeepCallback(pluginresult, callbackContext);
     }
 
+    protected void sendEmptyPluginResultAndKeepCallback(CallbackContext callbackContext){
+        PluginResult pluginresult = new PluginResult(PluginResult.Status.NO_RESULT);
+        pluginresult.setKeepCallback(true);
+        callbackContext.sendPluginResult(pluginresult);
+    }
+
     protected void sendPluginResultAndKeepCallback(PluginResult pluginresult, CallbackContext callbackContext){
         pluginresult.setKeepCallback(true);
         callbackContext.sendPluginResult(pluginresult);
@@ -3700,7 +3783,79 @@ public class FirebasePlugin extends CordovaPlugin {
         return result ? 1 : 0;
     }
 
-    private boolean isUserSignedIn(){
+    protected String qualifyPermission(String permission){
+        if(permission.startsWith("android.permission.")){
+            return permission;
+        }else{
+            return "android.permission."+permission;
+        }
+    }
+
+    protected boolean hasRuntimePermission(String permission) throws Exception{
+        boolean hasRuntimePermission = true;
+        String qualifiedPermission = qualifyPermission(permission);
+        Method method = null;
+        try {
+            method = cordova.getClass().getMethod("hasPermission", qualifiedPermission.getClass());
+            Boolean bool = (Boolean) method.invoke(cordova, qualifiedPermission);
+            hasRuntimePermission = bool.booleanValue();
+        } catch (NoSuchMethodException e) {
+            Log.w(TAG, "Cordova v" + CordovaWebView.CORDOVA_VERSION + " does not support runtime permissions so defaulting to GRANTED for " + permission);
+        }
+        return hasRuntimePermission;
+    }
+
+    protected void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions) throws Exception{
+        try {
+            java.lang.reflect.Method method = cordova.getClass().getMethod("requestPermissions", org.apache.cordova.CordovaPlugin.class ,int.class, java.lang.String[].class);
+            method.invoke(cordova, plugin, requestCode, permissions);
+        } catch (NoSuchMethodException e) {
+            throw new Exception("requestPermissions() method not found in CordovaInterface implementation of Cordova v" + CordovaWebView.CORDOVA_VERSION);
+        }
+    }
+
+    /************
+     * Overrides
+     ***********/
+
+    /**
+     * then updates the list of status based on the grantResults before passing the result back via the context.
+     *
+     * @param requestCode - ID that was used when requesting permissions
+     * @param permissions - list of permissions that were requested
+     * @param grantResults - list of flags indicating if above permissions were granted or denied
+     */
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+        String sRequestId = String.valueOf(requestCode);
+        Log.v(TAG, "Received result for permissions request id=" + sRequestId);
+        try {
+            if(postNotificationPermissionRequestCallbackContext == null){
+                Log.e(TAG, "No callback context found for permissions request id=" + sRequestId);
+                return;
+            }
+
+            boolean postNotificationPermissionGranted = false;
+            for (int i = 0, len = permissions.length; i < len; i++) {
+                String androidPermission = permissions[i];
+
+                if(androidPermission.equals(qualifyPermission(POST_NOTIFICATIONS))){
+                    postNotificationPermissionGranted = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                }
+            }
+
+            postNotificationPermissionRequestCallbackContext.success(postNotificationPermissionGranted ? 1 : 0);
+            postNotificationPermissionRequestCallbackContext = null;
+
+        }catch(Exception e ) {
+            if(postNotificationPermissionRequestCallbackContext != null){
+                handleExceptionWithContext(e, postNotificationPermissionRequestCallbackContext);
+            }else{
+                handleExceptionWithoutContext(e);
+            }
+        }
+    }
+	
+	private boolean isUserSignedIn(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         return user != null;
     }
