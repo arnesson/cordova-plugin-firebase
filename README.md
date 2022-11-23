@@ -1668,16 +1668,30 @@ Data message flow:
     b. If the data message contains the [data message notification keys](#data-message-notifications), the plugin will display a system notification for the data message while in the background.
 
 ### grantPermission
-Grant permission to receive push notifications (will trigger prompt) and return `hasPermission: true`.
-iOS only (Android will always return true).
+Grant run-time permission to receive push notifications (will trigger user permission prompt).
+iOS & Android 13+ (Android <= 12 will always return true).
+
+On Android, the `POST_NOTIFICATIONS` permission must be added to the `AndroidManifest.xml` file by inserting the following into your `config.xml` file:
+
+```xml
+<config-file target="AndroidManifest.xml" parent="/*">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+</config-file>
+```
 
 **Parameters**:
 - {function} success - callback function which will be passed the {boolean} permission result as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
-- {boolean} requestWithProvidesAppNotificationSettings - boolean which indicates if app provides AppNotificationSettingsButton (**iOS12+ only**)
+- {boolean} requestWithProvidesAppNotificationSettings - (**iOS12+ only**) indicates if app provides AppNotificationSettingsButton
+
+```javascript
+FirebasePlugin.grantPermission(function(hasPermission){
+    console.log("Notifications permission was " + (hasPermission ? "granted" : "denied"));
+});
+```
 
 ### grantCriticalPermission
-Grant critical permission to receive critical push notifications (will trigger additional prompt) and return `hasPermission: true`.
+Grant critical permission to receive critical push notifications (will trigger additional prompt).
 iOS 12.0+ only (Android will always return true).
 
 **Parameters**:
@@ -1687,15 +1701,15 @@ iOS 12.0+ only (Android will always return true).
 **Critical push notifications require a special entitlement that needs to be issued by Apple.**
 
 ```javascript
-FirebasePlugin.grantPermission(function(hasPermission){
-    console.log("Permission was " + (hasPermission ? "granted" : "denied"));
+FirebasePlugin.grantCriticalPermission(function(hasPermission){
+    console.log("Critical notifications permission was " + (hasPermission ? "granted" : "denied"));
 });
-
 ```
+
 ### hasPermission
 Check permission to receive push notifications and return the result to a callback function as boolean.
-On iOS, returns true is runtime permission for remote notifications is granted and enabled in Settings.
-On Android, returns true if remote notifications are enabled.
+On iOS, returns true if runtime permission for remote notifications is granted and enabled in Settings.
+On Android, returns true if global remote notifications are enabled in the device settings and (on Android 13+) runtime permission for remote notifications is granted.
 
 **Parameters**:
 - {function} success - callback function which will be passed the {boolean} permission result as an argument
@@ -1719,7 +1733,7 @@ iOS 12.0+ only (Android will always return true).
 
 ```javascript
 FirebasePlugin.hasCriticalPermission(function(hasPermission){
-    console.log("Permission to send critical push notificaitons is " + (hasPermission ? "granted" : "denied"));
+    console.log("Permission to send critical push notifications is " + (hasPermission ? "granted" : "denied"));
 });
 ```
 
