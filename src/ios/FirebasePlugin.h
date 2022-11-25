@@ -19,6 +19,7 @@
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithApple:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithMicrosoft:(CDVInvokedUrlCommand*)command;
+- (void)authenticateUserWithFacebook:(CDVInvokedUrlCommand*)command;
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)linkUserWithCredential:(CDVInvokedUrlCommand*)command;
 - (void)reauthenticateWithCredential:(CDVInvokedUrlCommand*)command;

@@ -1056,6 +1056,21 @@ static FIRMultiFactorResolver* multiFactorResolver;
     }
 }
 
+- (void)authenticateUserWithFacebook:(CDVInvokedUrlCommand*)command{
+    @try {
+        NSString* accessToken = [command.arguments objectAtIndex:0];
+        FIRAuthCredential* credential = [FIRFacebookAuthProvider credentialWithAccessToken:accessToken];
+        NSNumber* key = [self saveAuthCredential:credential];
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+        [result setValue:@"true" forKey:@"instantVerification"];
+        [result setValue:key forKey:@"id"];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }@catch (NSException *exception) {
+        [self handlePluginExceptionWithContext:exception :command];
+    }
+}
+
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command {
     @try {
         FIRAuthCredential* credential = [self obtainAuthCredential:[command.arguments objectAtIndex:0] command:command];

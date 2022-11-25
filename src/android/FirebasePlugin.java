@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuthMultiFactorException;
 import com.google.firebase.auth.MultiFactorAssertion;
 import com.google.firebase.auth.MultiFactorInfo;
@@ -320,7 +321,9 @@ public class FirebasePlugin extends CordovaPlugin {
                 this.authenticateUserWithApple(callbackContext, args);
             } else if (action.equals("authenticateUserWithMicrosoft")) {
                 this.authenticateUserWithMicrosoft(callbackContext, args);
-            }else if (action.equals("createUserWithEmailAndPassword")) {
+            } else if (action.equals("authenticateUserWithFacebook")) {
+                this.authenticateUserWithFacebook(callbackContext, args);
+            } else if (action.equals("createUserWithEmailAndPassword")) {
                 this.createUserWithEmailAndPassword(callbackContext, args);
             } else if (action.equals("signInUserWithEmailAndPassword")) {
                 this.signInUserWithEmailAndPassword(callbackContext, args);
@@ -2288,6 +2291,25 @@ public class FirebasePlugin extends CordovaPlugin {
           }
       });
   }
+
+    public void authenticateUserWithFacebook(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    String accessToken = args.getString(0);
+                    AuthCredential credential = FacebookAuthProvider.getCredential(accessToken);
+
+                    String id = FirebasePlugin.instance.saveAuthCredential(credential);
+                    JSONObject returnResults = new JSONObject();
+                    returnResults.put("instantVerification", true);
+                    returnResults.put("id", id);
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
 
     public void signInUserWithCustomToken(final CallbackContext callbackContext, final JSONArray args){
         cordova.getThreadPool().execute(new Runnable() {

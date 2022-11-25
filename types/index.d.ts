@@ -255,6 +255,11 @@ export interface FirebasePlugin {
         error?: (err: string) => void,
         locale?: string,
     ): void
+    authenticateUserWithFacebook(
+        accessToken: string,
+        success?: (credential:object) => void,
+        error?: (err: string) => void,
+    ): void
     signInWithCredential(
         credential: object,
         success?: () => void,

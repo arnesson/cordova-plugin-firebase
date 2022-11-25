@@ -129,6 +129,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [updateUserProfile](#updateuserprofile)
     - [updateUserEmail](#updateuseremail)
     - [sendUserEmailVerification](#senduseremailverification)
+    - [verifyBeforeUpdateEmail](#verifybeforeupdateemail)
     - [updateUserPassword](#updateuserpassword)
     - [sendUserPasswordResetEmail](#senduserpasswordresetemail)
     - [deleteUser](#deleteuser)
@@ -146,6 +147,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [authenticateUserWithGoogle](#authenticateuserwithgoogle)
     - [authenticateUserWithApple](#authenticateuserwithapple)
     - [authenticateUserWithMicrosoft](#authenticateuserwithmicrosoft)
+    - [authenticateUserWithFacebook](#authenticateuserwithfacebook)
     - [signInWithCredential](#signinwithcredential)
     - [linkUserWithCredential](#linkuserwithcredential)
     - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -3112,7 +3114,7 @@ To use Sign In with Apple in your Android app you need to do the following:
 
 ### authenticateUserWithMicrosoft
 Authenticates the user with a Microsoft account using Sign In with Oauth to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
-- Follow [Firebase documentation's "Authenticate Using Microsoft" section](https://firebase.google.com/docs/auth/web/microsoft-oauth)
+- See [Firebase documentation "Authenticate Using Microsoft" section](https://firebase.google.com/docs/auth/web/microsoft-oauth)
 
 **Parameters**:
 - {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
@@ -3132,6 +3134,40 @@ FirebasePlugin.authenticateUserWithMicrosoft(function(credential) {
 }, function(error) {
     console.error("Failed to authenticate with Microsoft: " + error);
 });
+```
+
+### authenticateUserWithFacebook
+Authenticates the user with a Facebook account using a Facebook access token to obtain a Firebase credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+- Requires a 3rd party plugin such as [cordova-plugin-facebook-connect](https://github.com/cordova-plugin-facebook-connect/cordova-plugin-facebook-connect) to obtain the access token via the Facebook SDK.
+- See the "Before you begin" sections for pre-requisites for using Facebook authentication in your app:
+    - [Android](https://firebase.google.com/docs/auth/android/facebook-login#before_you_begin)
+    - [iOS](https://firebase.google.com/docs/auth/ios/facebook-login#before_you_begin)
+
+**Parameters**:
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+facebookConnectPlugin.login(["public_profile"],
+    function(userData){
+        var accessToken = userData.authResponse.accessToken;
+        FirebasePlugin.authenticateUserWithFacebook(accessToken, function(credential) {
+            FirebasePlugin.signInWithCredential(credential, function() {
+                console.log("Successfully signed in with Facebook");
+            }, function(error) {
+                console.error("Failed to sign in with Facebook", error);
+            });
+        }, function(error) {
+            console.error("Failed to authenticate with Facebook", error);
+        });
+    },
+    function(error){
+        console.error("Failed to login to Facebook", error);
+    }
+);
 ```
 
 ### signInWithCredential
