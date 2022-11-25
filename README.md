@@ -31,7 +31,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Ionic 4+](#ionic-4)
     - [Ionic 3](#ionic-3)
 - [Build environment notes](#build-environment-notes)
-  - [PhoneGap Build](#phonegap-build)
+  - [Remote Cloud Build](#remote-cloud-build)
+  - [Capacitor support](#capacitor-support)
   - [Android-specific](#android-specific)
     - [Specifying Android library versions](#specifying-android-library-versions)
     - [AndroidX](#androidx)
@@ -387,8 +388,15 @@ See the [cordova-plugin-firebasex-ionic3-test](https://github.com/dpa99c/cordova
 
 # Build environment notes
 
-## PhoneGap Build
-This plugin will not work with Phonegap Build (and other remote cloud build envs) do not support Cordova hook scripts as they are used by this plugin to configure the native platform projects.
+## Remote Cloud Build
+This plugin **will not work** with remote cloud build services that do not support Cordova hook scripts (e.g. [Ionic Appflow](https://ionic.io/appflow)).
+
+The hook scripts used by this plugin are essential to configure the native platform projects for use with the Firebase SDK and therefore if they are not executed, the plugin will not work correctly: either the build will fail or the app containing the plugin will crash at runtime.
+
+## Capacitor support
+This plugin **does not currently support [Capacitor](https://capacitorjs.com/)**. If you want to use Firebase with Capacitor, you should use [Capacitor Firebase](https://github.com/capawesome-team/capacitor-firebase) or the [Firebase JS SDK](https://firebase.google.com/docs/web/setup) instead.
+
+This plugin is designed to work with Cordova therefore relies on Cordova features such as hook scripts, plugin variables and project structure in order to manipulate the native platform projects for use with the Firebase SDK.
 
 ## Android-specific
 
