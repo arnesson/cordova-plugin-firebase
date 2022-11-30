@@ -269,13 +269,15 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
   - Ensure the associated app provisioning profile also has this capability enabled.
 
 ## Supported Cordova Versions
-- cordova: `>= 9`
-- cordova-android: `>= 9`
+- cordova: `>= 10`
+- cordova-android: `>= 10`
 - cordova-ios: `>= 6`
 
 ## Supported Mobile Platform Versions
-- Android `>= 4.1`
-- iOS `>= 10.0`
+The supported versions of Android and iOS depend on the version of the Firebase SDK included in the build.
+
+See the Firebase [iOS](https://firebase.google.com/support/release-notes/ios) and [Android](https://firebase.google.com/support/release-notes/android) release notes to determine the minimum support OS versions for the SDK version included in your build.
+If you didn't explicity specify a version for the Firebase SDK using plugin variables at plugin installation time, you can find the current default version in the plugin's `plugin.xml`.
 
 ## Migrating from cordova-plugin-firebase
 This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been reworked to fix issues and add new functionality.
