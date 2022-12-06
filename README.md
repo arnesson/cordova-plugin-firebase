@@ -397,7 +397,12 @@ This plugin **will not work** with remote cloud build services that do not suppo
 The hook scripts used by this plugin are essential to configure the native platform projects for use with the Firebase SDK and therefore if they are not executed, the plugin will not work correctly: either the build will fail or the app containing the plugin will crash at runtime.
 
 Even if the remote build service supports Cordova hook scripts, it is hard to diagnose the cause of build issue because the environment is not under your direct control.
-Therefore support for using this plugin can only be offered when building projects in a **local build environment** (i.e. your own development machine) over which you have full control and the ability to update/upgrade any components in the OS.
+Therefore a **local build environment** is highly recommended since you have full control and the ability to update/upgrade any components in the OS.
+Support for using this plugin can only be offered when building projects in a local environment. (i.e. your own development machine).
+
+However if you are unable to build locally and therefore must use a remote build environment, then [VoltBuilder](https://volt.build/) is recommended for use with this plugin as it supports Cordova hook scripts and its developers have explicitly tested building with this plugin to ensure compatibility.
+
+
 
 ## Capacitor support
 This plugin **does not currently support [Capacitor](https://capacitorjs.com/)**. If you want to use Firebase with Capacitor, you should use [Capacitor Firebase](https://github.com/capawesome-team/capacitor-firebase) or the [Firebase JS SDK](https://firebase.google.com/docs/web/setup) instead.
