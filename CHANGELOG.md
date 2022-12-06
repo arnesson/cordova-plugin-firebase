@@ -2,6 +2,7 @@
 * (iOS & Android) **BREAKING CHANGE**: Changed signature of `verifyPhoneNumber()` to pass optional arguments as an object.
 * (iOS & Android) feat: Add support for multi-factor authentication
      * Added `enrollSecondAuthFactor()`, `verifySecondAuthFactor()`, `listEnrolledSecondAuthFactors()`, `unenrollSecondAuthFactor()`, `verifyBeforeUpdateEmail()`
+     * Resolves [#714](https://github.com/dpa99c/cordova-plugin-firebasex/issues/714)
 * (iOS & Android) feat: Add `authenticateUserWithFacebook()`
 	* Resolves [#526](https://github.com/dpa99c/cordova-plugin-firebasex/issues/526)
 
