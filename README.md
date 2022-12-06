@@ -275,13 +275,15 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
   - Ensure the associated app provisioning profile also has this capability enabled.
 
 ## Supported Cordova Versions
-- cordova: `>= 9`
-- cordova-android: `>= 9`
+- cordova: `>= 10`
+- cordova-android: `>= 10`
 - cordova-ios: `>= 6`
 
 ## Supported Mobile Platform Versions
-- Android `>= 4.1`
-- iOS `>= 10.0`
+The supported versions of Android and iOS depend on the version of the Firebase SDK included in the build.
+
+See the Firebase [iOS](https://firebase.google.com/support/release-notes/ios) and [Android](https://firebase.google.com/support/release-notes/android) release notes to determine the minimum support OS versions for the SDK version included in your build.
+If you didn't explicity specify a version for the Firebase SDK using plugin variables at plugin installation time, you can find the current default version in the plugin's `plugin.xml`.
 
 ## Migrating from cordova-plugin-firebase
 This plugin is a fork of [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) which has been reworked to fix issues and add new functionality.
@@ -392,8 +394,10 @@ See the [cordova-plugin-firebasex-ionic3-test](https://github.com/dpa99c/cordova
 
 ## Remote Cloud Build
 This plugin **will not work** with remote cloud build services that do not support Cordova hook scripts (e.g. [Ionic Appflow](https://ionic.io/appflow)).
-
 The hook scripts used by this plugin are essential to configure the native platform projects for use with the Firebase SDK and therefore if they are not executed, the plugin will not work correctly: either the build will fail or the app containing the plugin will crash at runtime.
+
+Even if the remote build service supports Cordova hook scripts, it is hard to diagnose the cause of build issue because the environment is not under your direct control.
+Therefore support for using this plugin can only be offered when building projects in a **local build environment** (i.e. your own development machine) over which you have full control and the ability to update/upgrade any components in the OS.
 
 ## Capacitor support
 This plugin **does not currently support [Capacitor](https://capacitorjs.com/)**. If you want to use Firebase with Capacitor, you should use [Capacitor Firebase](https://github.com/capawesome-team/capacitor-firebase) or the [Firebase JS SDK](https://firebase.google.com/docs/web/setup) instead.
@@ -645,6 +649,7 @@ Before [opening a bug issue](https://github.com/dpa99c/cordova-plugin-firebasex/
     - Please raise such issues/PRs against [Ionic Native](https://github.com/ionic-team/ionic-native/) instead.
 	- To verify an if an issue is caused by this plugin or its Typescript wrapper, please re-test using the vanilla Javascript plugin interface (without the Ionic Native wrapper).
 	- Any issue opened here which is obviously an Ionic Typescript wrapper issue will be closed immediately.
+- *DO NOT* open issues related to [Remote Cloud Build](#remote-cloud-build) environments such as [Ionic Appflow](https://ionic.io/appflow) as these are not supported
 - If you are migrating from [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) to `cordova-plugin-firebasex` please make sure you have read the [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase) section.
 - Read the above documentation thoroughly
     - For example, if you're having a build issue ensure you've read through the [build environment notes](#build-environment-notes)
@@ -656,10 +661,11 @@ Before [opening a bug issue](https://github.com/dpa99c/cordova-plugin-firebasex/
     - Choose the "Bug report" template
     - Fill out the relevant sections of the template and delete irrelevant sections
     - *WARNING:* Failure to complete the issue template will result in the issue being closed immediately.
-- Reproduce the issue using the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test)
+- **Reproduce the issue using the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test)**
 	- This will eliminate bugs in your code or conflicts with other code as possible causes of the issue
 	- This will also validate your development environment using a known working codebase
 	- If reproducing the issue using the example project is not possible, create an isolated test project that you are able to share
+  - **Support cannot be offered to help resolve build issues in your own project.**
 - Include full verbose console output when reporting build issues
     - If the full console output is too large to insert directly into the Github issue, then post it on an external site such as [Pastebin](https://pastebin.com/) and link to it from the issue
     - Often the details of an error causing a build failure is hidden away when building with the CLI
