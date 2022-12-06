@@ -345,6 +345,10 @@ export interface FirebasePlugin {
         success?: () => void,
         error?: (err: string) => void
     ): void
+    getClaims(
+        success: (claims: object) => void,
+        error?: (err: string) => void
+    ): void
     fetch(
         cacheExpirationSeconds: number,
         success: () => void,

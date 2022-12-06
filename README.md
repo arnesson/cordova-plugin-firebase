@@ -2434,6 +2434,17 @@ Note that some user properties will be empty is they are not defined in Firebase
         console.log("UID: "+user.uid);
         console.log("Provider ID: "+user.providerId);
         console.log("ID token: "+user.idToken);
+        console.log("creationTime", user.creationTimestamp);
+        console.log("lastSignInTime", user.lastSignInTimestamp);
+
+        for(var i = 0; i < user.providers.length; i++){
+            console.log("providerId", user.providers[i].providerId);
+            console.log("uid", user.providers[i].uid);
+            console.log("displayName", user.providers[i].displayName);
+            console.log("email", user.providers[i].email);
+            console.log("phoneNumber", user.providers[i].phoneNumber);
+            console.log("photoUrl", user.providers[i].photoUrl);
+        }
     }, function(error) {
         console.error("Failed to get current user data: " + error);
     });
@@ -3334,7 +3345,7 @@ FirebasePlugin.getClaims(function(claims) {
     console.log("exampleClaimA", claims.exampleClaimA);
     console.log("exampleClaimB", claims.exampleClaimB);
 }, function(error) {
-    console.error("Failed to enable the Firebase Authentication emulator", error);
+    console.error("Failed to fetch claims", error);
 });
 ```
 

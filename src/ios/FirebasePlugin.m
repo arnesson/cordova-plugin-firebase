@@ -74,7 +74,7 @@ static FIRMultiFactorResolver* multiFactorResolver;
         googlePlist = [NSMutableDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"]];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationLaunchedWithUrl:) name:CDVPluginHandleOpenURLNotification object:nil];
-        
+
         if([self getGooglePlistFlagWithDefaultValue:FirebaseCrashlyticsCollectionEnabled defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_CRASHLYTICS_COLLECTION_ENABLED flag:YES];
         }
@@ -1198,6 +1198,25 @@ static FIRMultiFactorResolver* multiFactorResolver;
     [userInfo setValue:user.photoURL ? user.photoURL.absoluteString : nil forKey:@"photoUrl"];
     [userInfo setValue:user.uid forKey:@"uid"];
     [userInfo setValue:@(user.isAnonymous ? true : false) forKey:@"isAnonymous"];
+
+    FIRUserMetadata* metadata = user.metadata;
+    userInfo[@"creationTimestamp"] = [self getTimestampFromDate:metadata.creationDate];
+    userInfo[@"lastSignInTimestamp"] = [self getTimestampFromDate:metadata.lastSignInDate];
+
+    NSMutableArray* providerData = [[NSMutableArray alloc] init];
+    for (id<FIRUserInfo> userInfo in user.providerData) {
+        // Create a dictionary, add the providerData properties to it and add it to the array
+        NSMutableDictionary *providerDataDict = [[NSMutableDictionary alloc] init];
+        providerDataDict[@"providerId"] = userInfo.providerID;
+        providerDataDict[@"uid"] = userInfo.uid;
+        providerDataDict[@"displayName"] = userInfo.displayName;
+        providerDataDict[@"email"] = userInfo.email;
+        providerDataDict[@"phoneNumber"] = userInfo.phoneNumber;
+        providerDataDict[@"photoUrl"] = [userInfo.photoURL absoluteString];
+        [providerData addObject:providerDataDict];
+    }
+    userInfo[@"providers"] = providerData;
+
     [user getIDTokenWithCompletion:^(NSString * _Nullable token, NSError * _Nullable error) {
         if(error == nil){
             [userInfo setValue:token forKey:@"idToken"];
@@ -1209,6 +1228,11 @@ static FIRMultiFactorResolver* multiFactorResolver;
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:userInfo] callbackId:command.callbackId];
         }];
     }];
+}
+
+- (NSNumber*) getTimestampFromDate:(NSDate*)date {
+    if(date == nil) return nil;
+    return @([date timeIntervalSince1970] * 1000);
 }
 
 - (void)updateUserProfile:(CDVInvokedUrlCommand*)command {
@@ -1463,6 +1487,7 @@ static FIRMultiFactorResolver* multiFactorResolver;
         [self handlePluginExceptionWithContext:exception :command];
     }
 }
+
 
 /*
  * Analytics

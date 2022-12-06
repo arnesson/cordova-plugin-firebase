@@ -29,6 +29,7 @@ import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuthMultiFactorException;
+import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.auth.MultiFactorAssertion;
 import com.google.firebase.auth.MultiFactorInfo;
 import com.google.firebase.auth.MultiFactorResolver;
@@ -36,6 +37,7 @@ import com.google.firebase.auth.MultiFactorSession;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneMultiFactorGenerator;
 import com.google.firebase.auth.PhoneMultiFactorInfo;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import com.google.android.gms.auth.api.Auth;
@@ -63,6 +65,7 @@ import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.OAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.crashlytics.internal.metadata.UserMetadata;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -1253,6 +1256,26 @@ public class FirebasePlugin extends CordovaPlugin {
         returnResults.put("uid", user.getUid());
         returnResults.put("isAnonymous", user.isAnonymous());
 
+        FirebaseUserMetadata metadata = user.getMetadata();
+        if(metadata != null){
+            returnResults.put("creationTimestamp", metadata.getCreationTimestamp());
+            returnResults.put("lastSignInTimestamp", metadata.getLastSignInTimestamp());
+        }
+
+        List<? extends UserInfo> providerData = user.getProviderData();
+        JSONArray providersJson = new JSONArray();
+        for(UserInfo userInfo : providerData){
+            JSONObject userInfoJson = new JSONObject();
+            userInfoJson.put("providerId", userInfo.getProviderId());
+            userInfoJson.put("uid", userInfo.getUid());
+            userInfoJson.put("displayName", userInfo.getDisplayName());
+            userInfoJson.put("email", userInfo.getEmail());
+            userInfoJson.put("phoneNumber", userInfo.getPhoneNumber());
+            userInfoJson.put("photoUrl", userInfo.getPhotoUrl());
+            providersJson.put(userInfoJson);
+        }
+        returnResults.put("providers", providersJson);
+
         user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
             @Override
             public void onSuccess(GetTokenResult result) {
@@ -2392,6 +2415,33 @@ public class FirebasePlugin extends CordovaPlugin {
                             handleExceptionWithContext(e, callbackContext);
                         }
                     });
+                } catch (Exception e) {
+                    handleExceptionWithContext(e, callbackContext);
+                }
+            }
+        });
+    }
+
+    public void getProviderData(final CallbackContext callbackContext, final JSONArray args){
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                try {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if(!userNotSignedInError(callbackContext)) return;
+
+                    List<? extends UserInfo> providerData = user.getProviderData();
+                    JSONArray returnResults = new JSONArray();
+                    for(UserInfo userInfo : providerData){
+                        JSONObject userInfoJson = new JSONObject();
+                        userInfoJson.put("providerId", userInfo.getProviderId());
+                        userInfoJson.put("uid", userInfo.getUid());
+                        userInfoJson.put("displayName", userInfo.getDisplayName());
+                        userInfoJson.put("email", userInfo.getEmail());
+                        userInfoJson.put("phoneNumber", userInfo.getPhoneNumber());
+                        userInfoJson.put("photoUrl", userInfo.getPhotoUrl());
+                        returnResults.put(userInfoJson);
+                    }
+                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
