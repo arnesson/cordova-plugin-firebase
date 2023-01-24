@@ -271,6 +271,16 @@ end
             appPlistModified = true;
         }
 
+        if(pluginVariables['IOS_FCM_ENABLED'] === 'false'){
+            // Use GoogleService-Info.plist to pass this to the native part reducing noise in Info.plist.
+            // A prefix should make it more clear that this is not the variable of the SDK.
+            googlePlist["FIREBASEX_IOS_FCM_ENABLED"] = false;
+            googlePlistModified = true;
+            // FCM auto-init must be disabled early via the Info.plist in this case.
+            appPlist["FirebaseMessagingAutoInitEnabled"] = false;
+            appPlistModified = true;
+        }
+
         if(googlePlistModified) fs.writeFileSync(path.resolve(iosPlatform.dest), plist.build(googlePlist));
         if(appPlistModified) fs.writeFileSync(path.resolve(iosPlatform.appPlist), plist.build(appPlist));
         if(entitlementsPlistsModified){

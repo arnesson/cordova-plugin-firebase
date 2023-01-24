@@ -30,6 +30,7 @@ static NSString*const FIREBASE_CRASHLYTICS_COLLECTION_ENABLED = @"FIREBASE_CRASH
 static NSString*const FirebaseCrashlyticsCollectionEnabled = @"FirebaseCrashlyticsCollectionEnabled"; //plist
 static NSString*const FIREBASE_ANALYTICS_COLLECTION_ENABLED = @"FIREBASE_ANALYTICS_COLLECTION_ENABLED";
 static NSString*const FIREBASE_PERFORMANCE_COLLECTION_ENABLED = @"FIREBASE_PERFORMANCE_COLLECTION_ENABLED";
+static NSString*const FIREBASEX_IOS_FCM_ENABLED = @"FIREBASEX_IOS_FCM_ENABLED";
 
 static FirebasePlugin* firebasePlugin;
 static BOOL registeredForRemoteNotifications = NO;
@@ -86,13 +87,20 @@ static FIRMultiFactorResolver* multiFactorResolver;
         if([self getGooglePlistFlagWithDefaultValue:FIREBASE_PERFORMANCE_COLLECTION_ENABLED defaultValue:YES]){
             [self setPreferenceFlag:FIREBASE_PERFORMANCE_COLLECTION_ENABLED flag:YES];
         }
+        
+        // We don't need `setPreferenceFlag` here as we don't allow to change this at runtime.
+        _isFCMEnabled = [self getGooglePlistFlagWithDefaultValue:FIREBASEX_IOS_FCM_ENABLED defaultValue:YES];
+        if (!self.isFCMEnabled) {
+            [self _logInfo:@"Firebase Cloud Messaging is disabled, see IOS_FCM_ENABLED variable of the plugin"];
+        }
 
         // Set actionable categories if pn-actions.json exist in bundle
         [self setActionableNotifications];
 
         // Check for permission and register for remote notifications if granted
-        [self _hasPermission:^(BOOL result) {}];
-
+        if (self.isFCMEnabled) {
+            [self _hasPermission:^(BOOL result) {}];
+        }
 
         authCredentials = [[NSMutableDictionary alloc] init];
         firestoreListeners = [[NSMutableDictionary alloc] init];
@@ -102,10 +110,27 @@ static FIRMultiFactorResolver* multiFactorResolver;
     }
 }
 
-
 // Dynamic actions from pn-actions.json
 - (void)setActionableNotifications {
+
     @try {
+
+        // Initialize installation ID change listener
+        __weak __auto_type weakSelf = self;
+        self.installationIDObserver = [[NSNotificationCenter defaultCenter]
+            addObserverForName: FIRInstallationIDDidChangeNotification
+            object:nil
+            queue:nil
+            usingBlock:^(NSNotification * _Nonnull notification) {
+                [weakSelf sendNewInstallationId];
+            }
+        ];
+
+        // The part related to installation ID is not specific to FCM, that's why it was moved above.
+        if (!self.isFCMEnabled) {
+            return;
+        }
+
         // Parse JSON
         NSString *path = [[NSBundle mainBundle] pathForResource:@"pn-actions" ofType:@"json"];
         NSData *data = [NSData dataWithContentsOfFile:path];
@@ -144,16 +169,7 @@ static FIRMultiFactorResolver* multiFactorResolver;
 
         // Initialize categories
         [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:categories];
-
-        // Initialize installation ID change listner
-        __weak __auto_type weakSelf = self;
-        self.installationIDObserver = [[NSNotificationCenter defaultCenter]
-                addObserverForName: FIRInstallationIDDidChangeNotification
-                            object:nil
-                             queue:nil
-                        usingBlock:^(NSNotification * _Nonnull notification) {
-            [weakSelf sendNewInstallationId];
-        }];
+        
     }@catch (NSException *exception) {
         [self handlePluginExceptionWithoutContext:exception];
     }
@@ -415,6 +431,7 @@ static FIRMultiFactorResolver* multiFactorResolver;
 
 - (void)registerForRemoteNotifications {
     NSLog(@"registerForRemoteNotifications");
+    
     if(registeredForRemoteNotifications) return;
 
     [self runOnMainThread:^{
@@ -2819,7 +2836,13 @@ static FIRMultiFactorResolver* multiFactorResolver;
     if([googlePlist objectForKey:name] == nil){
         return defaultValue;
     }
-    return [[googlePlist objectForKey:name] isEqualToString:@"true"];
+    id value = [googlePlist objectForKey:name];
+    if ([value isKindOfClass:[NSNumber class]]) {
+        return [value boolValue];
+    } else {
+        // Note that `isEqualToString` would crash if the value is not a string.
+        return [value isEqual:@"true"];
+    }
 }
 
 
@@ -2851,4 +2874,5 @@ static FIRMultiFactorResolver* multiFactorResolver;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
+
 @end

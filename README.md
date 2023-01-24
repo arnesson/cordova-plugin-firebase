@@ -273,6 +273,9 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
   - `--variable IOS_ENABLE_CRITICAL_ALERTS_ENABLED=true`
   - See [iOS critical notifications](#ios-critical-notifications)
   - Ensure the associated app provisioning profile also has this capability enabled.
+- `IOS_FCM_ENABLED` - allows to completely disable push notifications functionality of the plugin (not just the automatic initialization that is covered by `FIREBASE_FCM_AUTOINIT_ENABLED` variable).
+  - Defaults to `true`, if not specified; i.e. FCM is enabled by default.
+  - This can be handy if you are using this plugin for e.g. Crashlytics and handle push notifications using another plugin. Use `--variable IOS_FCM_ENABLED=false` in this case.
 
 ## Supported Cordova Versions
 - cordova: `>= 10`

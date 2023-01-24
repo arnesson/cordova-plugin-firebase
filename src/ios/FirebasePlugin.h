@@ -140,6 +140,8 @@
 - (void)deleteChannel:(CDVInvokedUrlCommand *)command;
 - (void)listChannels:(CDVInvokedUrlCommand *)command;
 
+@property (nonatomic, readonly) BOOL isFCMEnabled;
+
 @property (nonatomic, copy) NSString *notificationCallbackId;
 @property (nonatomic, copy) NSString *openSettingsCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
