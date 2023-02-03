@@ -413,6 +413,7 @@ export interface FirebasePlugin {
     addDocumentToFirestoreCollection(
         document: object,
         collection: string,
+        timestamp: boolean,
         success: () => void,
         error: (err: string) => void
     ): void
@@ -420,6 +421,7 @@ export interface FirebasePlugin {
         documentId: string,
         document: object,
         collection: string,
+        timestamp: boolean,
         success: () => void,
         error: (err: string) => void
     ): void
@@ -427,6 +429,7 @@ export interface FirebasePlugin {
         documentId: string,
         document: object,
         collection: string,
+        timestamp: boolean,
         success: () => void,
         error: (err: string) => void
     ): void
