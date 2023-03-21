@@ -467,6 +467,12 @@ export interface FirebasePlugin {
         error: (err: string) => void,
         listenerId: string
     ): void
+    registerApplicationDidBecomeActiveListener(
+        fn: () => void,
+    ): void
+    registerApplicationDidEnterBackgroundListener(
+        fn: () => void,
+    ): void
 }
 
 declare global {

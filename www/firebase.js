@@ -30,6 +30,8 @@ var handleAuthErrorResult = function(errorCallback){
 
 var onAuthStateChangeCallback = function(){};
 var onInstallationIdChangeCallback = function(){};
+var onApplicationDidBecomeActiveCallback = function(){};
+var onApplicationDidEnterBackgroundCallback = function(){};
 
 /***********************
  * Protected internals
@@ -40,6 +42,15 @@ exports._onAuthStateChange = function(userSignedIn){
 
 exports._onInstallationIdChangeCallback = function(installationId){
     onInstallationIdChangeCallback(installationId);
+};
+
+// iOS only
+exports._applicationDidBecomeActive = function(){
+    onApplicationDidBecomeActiveCallback();
+};
+
+exports._applicationDidEnterBackground = function(){
+    onApplicationDidEnterBackgroundCallback();
 };
 
 /**************
@@ -546,4 +557,15 @@ exports.deleteInstallationId = function (success, error) {
 exports.registerInstallationIdChangeListener = function(fn){
     if(typeof fn !== "function") throw "The specified argument must be a function";
     onInstallationIdChangeCallback = fn;
+};
+
+// iOS App Lifecycle
+exports.registerApplicationDidBecomeActiveListener = function(fn){
+    if(typeof fn !== "function") throw "The specified argument must be a function";
+    onApplicationDidBecomeActiveCallback = fn;
+};
+
+exports.registerApplicationDidEnterBackgroundListener = function(fn){
+    if(typeof fn !== "function") throw "The specified argument must be a function";
+    onApplicationDidEnterBackgroundCallback = fn;
 };

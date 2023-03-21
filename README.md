@@ -4165,6 +4165,41 @@ Example usage:
     });
 ```
 
+## Miscellaneous
+Functions unrelated to any specific Firebase SDK component.
+
+### registerApplicationDidBecomeActiveListener
+Registers a Javascript function to invoke when the iOS application becomes active after being in the background.
+
+- iOS only.
+
+**Parameters**:
+- {function} fn - callback function to invoke when application becomes active
+
+Example usage:
+
+```javascript
+    FirebasePlugin.registerApplicationDidBecomeActiveListener(function(){
+        console.log("Application became active");
+    });
+```
+
+### registerApplicationDidEnterBackgroundListener
+Registers a Javascript function to invoke when the iOS application is sent to the background.
+
+- iOS only.
+
+**Parameters**:
+- {function} fn - callback function to invoke when application is sent to the background
+
+Example usage:
+
+```javascript
+    FirebasePlugin.registerApplicationDidEnterBackgroundListener(function(){
+        console.log("Application send to background");
+    });
+```
+
 # Credits
 - [@robertarnesson](https://github.com/robertarnesson) for the original [cordova-plugin-firebase](https://github.com/arnesson/cordova-plugin-firebase) from which this plugin is forked.
 - [@sagrawal31](https://github.com/sagrawal31) and [Wiz Panda](https://github.com/wizpanda) for contributions via [cordova-plugin-firebase-lib](https://github.com/wizpanda/cordova-plugin-firebase-lib).
