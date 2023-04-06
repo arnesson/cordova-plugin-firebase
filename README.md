@@ -1457,6 +1457,9 @@ The following iOS-specific keys are supported and should be placed inside the `d
     - To play the default notification sound, set `"sound": "default"`.
     - To display a silent notification (no sound), omit the `sound` key from the message.
 - `notification_ios_badge` - Badge number to display on app icon on home screen.
+- `notification_ios_image_jpg` - Specifies the `jpg` image notification, to use this you need to have configured the `NotificationService` - [Tutorial to set it up](docs/IOS_NOTIFICATION_SERVICE.md)
+- `notification_ios_image_png` - Specifies the `png` image notification, to use this you need to have configured the `NotificationService` - [Tutorial to set it up](docs/IOS_NOTIFICATION_SERVICE.md)
+- `notification_ios_image_gif` - Specifies the `gif` image notification, to use this you need to have configured the `NotificationService` - [Tutorial to set it up](docs/IOS_NOTIFICATION_SERVICE.md)
 
 For example:
 ```json
@@ -1467,7 +1470,8 @@ For example:
     "notification_body" : "Notification body",
     "notification_title": "Notification title",
     "notification_ios_sound": "my_sound.caf",
-    "notification_ios_badge": 1
+    "notification_ios_badge": 1,
+    "notification_ios_image_png": "https://example.com/avatar.png"
   }
 }
 ```
