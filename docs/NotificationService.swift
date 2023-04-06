@@ -40,7 +40,7 @@ class NotificationService: UNNotificationServiceExtension {
     ///                       which should contain one of the available keys to create
     ///                       a rich push notification.
     private func attachmentsFor(_ userInfo: [AnyHashable: Any]) -> [UNNotificationAttachment] {
-        if let attachmentURLString = userInfo["notification_image_png"] as? String {
+        if let attachmentURLString = userInfo["notification_ios_image_png"] as? String {
             guard let attachmentURL = URL(string: attachmentURLString),
                 let imageData = try? Data(contentsOf: attachmentURL),
                 let attachment = self.save("image.png", data: imageData, options: nil) else {
@@ -50,7 +50,7 @@ class NotificationService: UNNotificationServiceExtension {
                     return []
             }
             return [attachment]
-        } else if let attachmentURLString = userInfo["notification_image_jpg"] as? String {
+        } else if let attachmentURLString = userInfo["notification_ios_image_jpg"] as? String {
             guard let attachmentURL = URL(string: attachmentURLString),
                 let imageData = try? Data(contentsOf: attachmentURL),
                 let attachment = self.save("image.jpg", data: imageData, options: nil) else {
@@ -60,7 +60,7 @@ class NotificationService: UNNotificationServiceExtension {
                     return []
             }
             return [attachment]
-        } else if let attachmentURLString = userInfo["notification_image_gif"] as? String {
+        } else if let attachmentURLString = userInfo["notification_ios_image_gif"] as? String {
             guard let attachmentURL = URL(string: attachmentURLString),
                 let imageData = try? Data(contentsOf: attachmentURL),
                 let attachment = self.save("image.gif", data: imageData, options: nil) else {

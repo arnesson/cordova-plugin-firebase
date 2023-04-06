@@ -4,14 +4,14 @@ In this tutorial we assume that you have already made the certificates to publis
 
 ## Step 1, create the `Notification Service Identifier`
 
- - Login to the [Apple Developer Program](https://developer.apple.com/account)  
+ - Login to the [Apple Developer Program](https://developer.apple.com/account)
  - Click in **Certificates, Identifiers & Profiles** > **Identifiers**
  - Now click on + to add new identifier
  - Select `App IDs` and continue
  - Select type `App` and continue
  - For the `Description` write `AppName Notification Service` or whatever you want
  - For the `Bundle ID` write `app.package.name.NotificationService` an set in `Explicit`
- - In `Capabilities` leave those selected by default, it is possible that if your main package uses `Associated Domains` you have to activate it here.
+ - In `Capabilities` leave those selected by default, it is possible that if your main package uses `Associated Domains` you have to activate it here
  - Click now in continue to save identifier
 
 ## Step 2, create the `Notification Service Profile`
@@ -26,9 +26,9 @@ In this tutorial we assume that you have already made the certificates to publis
 
 ## Step 3, configure Xcode
 
-- First. download the new Profile with **Xcode** > **Preferences...** > **Accounts** > **Download Manual Profiles**
+- First, download the new Profile with **Xcode** > **Preferences...** > **Accounts** > **Download Manual Profiles**
 - In you xCode project, select **File** > **New** > **Target** and select `Notification Service Extension`
-- For the `Product Name` write `NotificationContent`
+- For the `Product Name` write `NotificationService`
 - Select in `Language` the `Swift`
 
 ## Step 4
@@ -50,9 +50,9 @@ Now you can send notifications with images using the following payload:
   },
   "data": {
     "notification_foreground": "true",
-    "notification_image_jpg": "https://...",
-    "notification_image_png": "https://...",
-    "notification_image_gif": "https://...",
+    "notification_ios_image_jpg": "https://...",
+    "notification_ios_image_png": "https://...",
+    "notification_ios_image_gif": "https://...",
   }
 }
 ```
