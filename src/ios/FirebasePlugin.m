@@ -322,6 +322,7 @@ static FIRMultiFactorResolver* multiFactorResolver;
                         @try {
                             NSLog(@"requestAuthorizationWithOptions: granted=%@", granted ? @"YES" : @"NO");
                             if (error == nil && granted) {
+                                [UNUserNotificationCenter currentNotificationCenter].delegate = AppDelegate.instance;
                                 [self registerForRemoteNotifications];
                             }
                             [self handleBoolResultWithPotentialError:error command:command result:granted];
