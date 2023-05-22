@@ -3097,6 +3097,36 @@ To use Google Sign-in in your Android app you need to do the following:
 
 For details how to do the above, see the [Google Sign-In on Android page](https://firebase.google.com/docs/auth/android/google-signin) in the Firebase documentation.
 
+<br>
+
+**Server side verification**
+
+Once the id token has been obtained from `authenticateUserWithGoogle()` it can be sent to your server to get access to more information about the user's google account. However, it's recommended by Google that the id token be validated on your server before being used. You should generally not trust tokens supplied by clients without performing this validation. While you can write the code to perform this check yourself, it's strongly recommended that you use a library supplied by Google  such as [google-auth-library](https://www.npmjs.com/package/google-auth-library) for this purpose.
+
+The following is sample coded taken from [Google documentation](https://developers.google.com/identity/sign-in/web/backend-auth) for performing a server side verification of an id token:
+
+```javascript
+const {OAuth2Client} = require('google-auth-library');
+
+const client = new OAuth2Client(CLIENT_ID);
+
+async function verify() {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+        // Or, if multiple clients access the backend:
+        //[CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+    // If request specified a G Suite domain:
+    // const domain = payload['hd'];
+}
+verify().catch(console.error);
+```
+
+<br>
+
 ### authenticateUserWithApple
 Authenticates the user with an Apple account using Sign In with Apple to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
 
