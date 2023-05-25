@@ -1,3 +1,23 @@
+# Version 16.1.0
+* (iOS) feat: add support for IOS_FCM_ENABLED variable to allow disabling FCM functionality on iOS
+    * Merged from PR [#797](https://github.com/dpa99c/cordova-plugin-firebasex/pull/797)
+* (types) feat: add support for lastUpdate and created in Firestore operations
+    * Merged from PR [#793](https://github.com/dpa99c/cordova-plugin-firebasex/pull/793)
+* (iOS) doc: Tutorial to make the necessary configurations to send images in notifications    
+    * Merged from PR [#798](https://github.com/dpa99c/cordova-plugin-firebasex/pull/798)
+* (iOS) Fix foreground notifications not being displayed after calling grantPermission when permissions haven't been previously granted
+    * Merged from PR [#800](https://github.com/dpa99c/cordova-plugin-firebasex/pull/800)
+* doc: add server side verification documentation to authenticateUserWithGoogle()    
+    * Merged from PR [#805](https://github.com/dpa99c/cordova-plugin-firebasex/pull/805)
+* (iOS) build: Use precompiled FirebaseFirestore on first pod install    
+    * Merged from PR [#752](https://github.com/dpa99c/cordova-plugin-firebasex/pull/752)
+* (iOS) feat: Add registerApplicationDidBecomeActiveListener() and registerApplicationDidEnterBackgroundListener() methods to expose native iOS app delegate methods    
+* (Android) build: Add support for `cordova-android@12` - use cordova-android config variable version
+    * Merged from PR [#807](https://github.com/dpa99c/cordova-plugin-firebasex/pull/807)
+* (Android) update: Pin latest Firebase SDK component versions as of [01 May 2023](https://firebase.google.com/support/release-notes/android#2023-05-01)
+* (iOS) update: Pin latest Firebase SDK component version (v10.10.0) as of [23 May 2023](https://firebase.google.com/support/release-notes/ios#version_10100_-_may_23_2023)
+
+
 # Version 16.0.0
 * (iOS & Android) **BREAKING CHANGE**: Changed signature of `verifyPhoneNumber()` to pass optional arguments as an object.
 * (iOS & Android) feat: Add support for multi-factor authentication
