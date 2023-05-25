@@ -652,7 +652,7 @@ Before [opening a bug issue](https://github.com/dpa99c/cordova-plugin-firebasex/
     - Ask for help on StackOverflow, Ionic Forums, etc.
     - Use the [example project](https://github.com/dpa99c/cordova-plugin-firebasex-test) as a known working reference
     - Any issues requesting support will be closed immediately.
-- *DO NOT* open issues related to the  [Ionic Typescript wrapper for this plugin](https://github.com/ionic-team/ionic-native/blob/master/src/%40ionic-native/plugins/firebase-x/index.ts)
+- *DO NOT* open issues related to the  [Ionic Typescript wrapper for this plugin](https://github.com/ionic-team/ionic-native/blob/master/src/%40awesome-cordova-plugins/plugins/firebase-x/index.ts)
     - This is owned/maintained by [Ionic](https://github.com/ionic-team) and is not part of this plugin
     - Please raise such issues/PRs against [Ionic Native](https://github.com/ionic-team/ionic-native/) instead.
 	- To verify an if an issue is caused by this plugin or its Typescript wrapper, please re-test using the vanilla Javascript plugin interface (without the Ionic Native wrapper).
