@@ -257,7 +257,7 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
     - e.g.  `--variable IOS_STRIP_DEBUG=true`
     - Defaults to `false` if not specified.
 - `SETUP_RECAPTCHA_VERIFICATION` - automatically sets up reCAPTCHA verification for phone authentication on iOS. See [verifyPhoneNumber](#verifyphonenumber) for more info.
-    - e.g.  `--variable IOS_STRIP_DEBUG=true`
+    - e.g.  `--variable SETUP_RECAPTCHA_VERIFICATION=true`
     - Defaults to `false` if not specified.
 - `IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL` - If `true` Firebase Messaging will automatically establish a socket-based, direct channel to the FCM server.
    - e.g.  `--variable IOS_SHOULD_ESTABLISH_DIRECT_CHANNEL=true`
