@@ -20,7 +20,7 @@ module.exports = function(context) {
     if(platforms.includes('ios') && pluginVariables.IOS_USE_PRECOMPILED_FIRESTORE_POD==='true'){
         const pluginJSON=parsePluginXml();
         const iosPlatform = pluginJSON.plugin.platform.find((platform) => platform._attributes.name === 'ios');
-        const firestorePod = iosPlatform.podspec.pods.pod.find((pod) => pod._attributes.name === 'Firebase/Firestore');
+        const firestorePod = iosPlatform.podspec.pods.pod.find((pod) => pod._attributes.name === 'FirebaseFirestore');
         firestorePod._attributes.tag = firestorePod._attributes.spec;
         firestorePod._attributes.git = 'https://github.com/invertase/firestore-ios-sdk-frameworks.git';
         delete firestorePod._attributes.spec;
