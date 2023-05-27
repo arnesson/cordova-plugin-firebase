@@ -138,6 +138,7 @@
 		<source-file src="src/ios/AppDelegate+FirebasePlugin.m" />
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
+		<header-file src="src/ios/FirebaseWrapper.h" />
 		<header-file src="src/ios/FirebasePluginMessageReceiver.h" />
 		<source-file src="src/ios/FirebasePluginMessageReceiver.m" />
 		<header-file src="src/ios/FirebasePluginMessageReceiverManager.h" />
