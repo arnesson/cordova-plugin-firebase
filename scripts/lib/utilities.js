@@ -26,7 +26,15 @@ Utilities.setContext = function(context){
 };
 
 Utilities.parsePackageJson = function(){
-    return JSON.parse(fs.readFileSync(path.resolve('./package.json')));
+    try {
+        return JSON.parse(fs.readFileSync(path.resolve('./package.json')));
+    }
+    catch (error) {
+        if(error.code === "ENOENT") {
+            return {}
+        }
+        throw error;
+    }
 };
 
 Utilities.parseConfigXml = function(){
