@@ -390,7 +390,7 @@ public class FirebasePluginMessagingService extends FirebaseMessagingService {
                         bitmap = getCircleBitmap(bitmap);
                     }
                     else if(imageTypeBigPicture.equalsIgnoreCase(imageType)) {
-                        notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null));
+                        notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon((Bitmap) null));
                     }
                     notificationBuilder.setLargeIcon(bitmap);
                 }
