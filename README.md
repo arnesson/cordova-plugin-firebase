@@ -1702,6 +1702,8 @@ On Android, the `POST_NOTIFICATIONS` permission must be added to the `AndroidMan
 </config-file>
 ```
 
+Note, in addition to removing and re-adding the android platform, you may need to add the following attribute to `<widget>` in your `config.xml` file to avoid a parse error when building: `xmlns:android="http://schemas.android.com/apk/res/android"`
+
 **Parameters**:
 - {function} success - callback function which will be passed the {boolean} permission result as an argument
 - {function} error - callback function which will be passed a {string} error message as an argument
