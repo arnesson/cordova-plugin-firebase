@@ -339,6 +339,9 @@ export interface FirebasePlugin {
     registerAuthStateChangeListener(
         fn: (userSignedIn: boolean) => void,
     ): void
+    registerAuthIdTokenChangeListener(
+        fn: (result: undefined|{idToken: string, providerId: string}) => void,
+    ): void
     useAuthEmulator(
         host: string,
         port: number,

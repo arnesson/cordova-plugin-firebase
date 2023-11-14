@@ -142,7 +142,9 @@ public class FirebasePlugin extends CordovaPlugin {
     private FirebaseFunctions functions;
     private Gson gson;
     private FirebaseAuth.AuthStateListener authStateListener;
+    private FirebaseAuth.IdTokenListener idTokenListener;
     private boolean authStateChangeListenerInitialized = false;
+    private String currentIdToken;
     private static CordovaInterface cordovaInterface = null;
     protected static Context applicationContext = null;
     private static Activity cordovaActivity = null;
@@ -207,6 +209,9 @@ public class FirebasePlugin extends CordovaPlugin {
 
                     authStateListener = new AuthStateListener();
                     FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+
+                    idTokenListener = new IdTokenListener();
+                    FirebaseAuth.getInstance().addIdTokenListener(idTokenListener);
 
                     firestore = FirebaseFirestore.getInstance();
                     functions = FirebaseFunctions.getInstance();
@@ -3785,6 +3790,39 @@ public class FirebasePlugin extends CordovaPlugin {
                 }
             } catch (Exception e) {
                 handleExceptionWithoutContext(e);
+            }
+        }
+    }
+
+    private static class IdTokenListener implements FirebaseAuth.IdTokenListener {
+        @Override
+        public void onIdTokenChanged(@NonNull FirebaseAuth firebaseAuth) {
+            try {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                user.getIdToken(true).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
+                    @Override
+                    public void onSuccess(GetTokenResult result) {
+                        try {
+                            String idToken = result.getToken();
+                            if(idToken != null && idToken.equals(instance.currentIdToken)){
+                                return;
+                            }
+                            instance.currentIdToken = idToken;
+                            String providerId = result.getSignInProvider();
+                            FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthIdTokenChange({\"idToken\":\""+idToken+"\",\"providerId\":\""+providerId+"\"})");
+                        } catch (Exception e) {
+                            FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthIdTokenChange()");
+                        }
+                    }
+
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthIdTokenChange()");
+                    }
+                });
+            } catch (Exception e) {
+                FirebasePlugin.instance.executeGlobalJavascript(JS_GLOBAL_NAMESPACE+"_onAuthIdTokenChange()");
             }
         }
     }

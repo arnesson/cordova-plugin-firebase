@@ -152,6 +152,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [linkUserWithCredential](#linkuserwithcredential)
     - [reauthenticateWithCredential](#reauthenticatewithcredential)
     - [registerAuthStateChangeListener](#registerauthstatechangelistener)
+    - [registerAuthIdTokenChangeListener](#registerauthidtokenchangelistener)
     - [useAuthEmulator](#useauthemulator)
     - [getClaims](#getclaims)
   - [Remote Config](#remote-config)
@@ -188,6 +189,9 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [getInstallationToken](#getinstallationtoken)
     - [getInstallationId](#getinstallationid-1)
     - [registerInstallationIdChangeListener](#registerinstallationidchangelistener)
+  - [Miscellaneous](#miscellaneous)
+    - [registerApplicationDidBecomeActiveListener](#registerapplicationdidbecomeactivelistener)
+    - [registerApplicationDidEnterBackgroundListener](#registerapplicationdidenterbackgroundlistener)
 - [Credits](#credits)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -3342,6 +3346,32 @@ Example usage:
 ```javascript
     FirebasePlugin.registerAuthStateChangeListener(function(userSignedIn){
         console.log("Auth state changed: User signed " + (userSignedIn ? "in" : "out"));
+    });
+```
+
+### registerAuthIdTokenChangeListener
+Registers a Javascript function to invoke when Firebase Authentication ID token changes.
+
+This can be invoked in the following circumstances:
+- When a user signs in
+- When the current user signs out
+- When the current user changes
+- When there is a change in the current user's token
+
+**Parameters**:
+- {function} fn - callback function to invoke when ID token changes
+    - If token is present, will be a passed a single object argument with a `idToken` and `providerId` keys.
+    - If the token is not present, the function will be invoked with no arguments.
+
+Example usage:
+
+```javascript
+    FirebasePlugin.registerAuthIdTokenChangeListener(function(result){
+        if(result){
+            console.log("Auth ID token changed to: " + result.idToken + "; providerId: " + result.providerId);
+        }else{
+            console.log("Auth ID token not present");
+        }
     });
 ```
 
