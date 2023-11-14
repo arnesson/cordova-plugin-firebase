@@ -150,16 +150,16 @@
 				<source url="https://cdn.cocoapods.org/"/>
 			</config>
 			<pods use-frameworks="true">
-				<pod name="FirebaseCore" spec="10.10.0"/>
-				<pod name="FirebaseAuth" spec="10.10.0"/>
-				<pod name="FirebaseMessaging" spec="10.10.0"/>
-				<pod name="FirebasePerformance" spec="10.10.0"/>
-				<pod name="FirebaseRemoteConfig" spec="10.10.0"/>
-				<pod name="FirebaseInAppMessaging" spec="10.10.0-beta"/>
-				<pod name="FirebaseFirestore" spec="10.10.0"/>
-				<pod name="FirebaseCrashlytics" spec="10.10.0"/>
-				<pod name="FirebaseFunctions" spec="10.10.0"/>
-				<pod name="FirebaseInstallations" spec="10.10.0"/>
+				<pod name="FirebaseCore" spec="10.17.0"/>
+				<pod name="FirebaseAuth" spec="10.17.0"/>
+				<pod name="FirebaseMessaging" spec="10.17.0"/>
+				<pod name="FirebasePerformance" spec="10.17.0"/>
+				<pod name="FirebaseRemoteConfig" spec="10.17.0"/>
+				<pod name="FirebaseInAppMessaging" spec="10.17.0-beta"/>
+				<pod name="FirebaseFirestore" spec="10.17.0"/>
+				<pod name="FirebaseCrashlytics" spec="10.17.0"/>
+				<pod name="FirebaseFunctions" spec="10.17.0"/>
+				<pod name="FirebaseInstallations" spec="10.17.0"/>
 				<pod name="GoogleSignIn" spec="6.2.4"/>
 				<pod name="GoogleTagManager" spec="7.4.3"/>
 			</pods>
