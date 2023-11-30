@@ -30,6 +30,7 @@
   "scripts": {
     "version": "node ./bump-version.js && git add -A plugin.xml",
     "postversion": "git push && git push --tags && npm publish --verbose",
+    "postinstall": "node ./scripts/post_install.js",
     "test": "npm run test:ios && npm run test:android",
     "test:ios": "bash ./test/test-default.sh 9.0.0 ios 5.0.1",
     "test:android": "bash ./test/test-default.sh 9.0.0 android 8.1.0 && bash ./test/test-with-3-plugins.sh 9.0.0 android 8.1.0 cordova-plugin-request-location-accuracy cordova-android-play-services-gradle-release cordova-android-firebase-gradle-release"
