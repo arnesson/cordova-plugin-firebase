@@ -54,7 +54,8 @@ var setupEnv = function(){
             performanceGradlePlugin: {
                 classDef: 'com.google.firebase:perf-plugin',
                 pluginDef: 'com.google.firebase.firebase-perf'
-            }
+            },
+            manifestXml: ANDROID_DIR + '/app/src/main/AndroidManifest.xml',
         }
     };
 }
@@ -132,6 +133,16 @@ module.exports = function(context){
             // Add Performance Monitoring gradle plugin for Android network traffic
             androidHelper.addDependencyToRootGradle(PLATFORM.ANDROID.performanceGradlePlugin.classDef+":"+pluginVariables["ANDROID_FIREBASE_PERF_GRADLE_PLUGIN_VERSION"]);
             androidHelper.applyPluginToAppGradle(PLATFORM.ANDROID.performanceGradlePlugin.pluginDef);
+        }
+
+        // Add tools namespace to manifest
+        if(fs.existsSync(path.resolve(PLATFORM.ANDROID.manifestXml))){
+            const manifestContents = fs.readFileSync(path.resolve(PLATFORM.ANDROID.manifestXml)).toString();
+            if(!manifestContents.match(`xmlns:tools="http://schemas.android.com/tools"`)){
+                const manifestWithTools = manifestContents.replace(/<manifest/g, `<manifest xmlns:tools="http://schemas.android.com/tools"`);
+                fs.writeFileSync(path.resolve(PLATFORM.ANDROID.manifestXml), manifestWithTools);
+                utilities.log('Added tools namespace to AndroidManifest.xml');
+            }
         }
     }
 

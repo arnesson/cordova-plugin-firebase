@@ -49,17 +49,40 @@ variableApplicators.IOS_USE_PRECOMPILED_FIRESTORE_POD = function(){
 }
 
 variableApplicators.FIREBASE_ANALYTICS_WITHOUT_ADS = function(){
+    // iOS
     const firebaseAnalyticsWithAdsPodFragment = `<pod name="FirebaseAnalytics"`,
         firebaseAnalyticsWithoutAdsPodFragment = `<pod name="FirebaseAnalytics/WithoutAdIdSupport"`,
-        match = pluginXmlText.match(firebaseAnalyticsWithAdsPodFragment);
+        podMatch = pluginXmlText.match(firebaseAnalyticsWithAdsPodFragment);
 
-    if(!match){
+    if(podMatch){
+        pluginXmlText = pluginXmlText.replace(firebaseAnalyticsWithAdsPodFragment, firebaseAnalyticsWithoutAdsPodFragment);
+        pluginXmlModified = true;
+    }else{
         console.warn(`Failed to find <pod name="FirebaseAnalytics"> in ${PLUGIN_ID}/plugin.xml`);
-        return;
     }
 
-    pluginXmlText = pluginXmlText.replace(firebaseAnalyticsWithAdsPodFragment, firebaseAnalyticsWithoutAdsPodFragment);
-    pluginXmlModified = true;
+    // Android
+    const googleAnalyticsAdIdEnabled = `<meta-data android:name="google_analytics_adid_collection_enabled" android:value="true" />`,
+        googleAnalyticsAdIdDisabled = `<meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />`,
+        googleAnalyticsAdIdMatch = pluginXmlText.match(googleAnalyticsAdIdEnabled);
+
+    if(googleAnalyticsAdIdMatch){
+        pluginXmlText = pluginXmlText.replace(googleAnalyticsAdIdEnabled, googleAnalyticsAdIdDisabled);
+        pluginXmlModified = true;
+    }else{
+        console.warn(`Failed to find <meta-data android:name="google_analytics_adid_collection_enabled"> in ${PLUGIN_ID}/plugin.xml`);
+    }
+
+    const commentedOutAdIdRemoval = `<!--<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>-->`,
+        commentedInAdIdRemoval = `<uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>`,
+        commentedOutAdIdRemovalMatch = pluginXmlText.match(commentedOutAdIdRemoval);
+
+    if(commentedOutAdIdRemovalMatch){
+        pluginXmlText = pluginXmlText.replace(commentedOutAdIdRemoval, commentedInAdIdRemoval);
+        pluginXmlModified = true;
+    }else{
+        console.warn(`Failed to find commented-out <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/> in ${PLUGIN_ID}/plugin.xml`);
+    }
 }
 
 variableApplicators.IOS_ON_DEVICE_CONVERSION_ANALYTICS = function(){
