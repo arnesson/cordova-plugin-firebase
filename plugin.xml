@@ -16,6 +16,7 @@
 	<preference name="FIREBASE_PERFORMANCE_COLLECTION_ENABLED" default="true" />
 	<preference name="FIREBASE_CRASHLYTICS_COLLECTION_ENABLED" default="true" />
 	<preference name="FIREBASE_FCM_AUTOINIT_ENABLED" default="true" />
+	<preference name="FIREBASE_ANALYTICS_WITHOUT_ADS" default="false" />
 
 	<platform name="android">
 		<preference name="ANDROID_ICON_ACCENT" default="#FF00FFFF" />
@@ -154,6 +155,7 @@
 				<pod name="FirebaseCore" spec="10.17.0"/>
 				<pod name="FirebaseAuth" spec="10.17.0"/>
 				<pod name="FirebaseAnalytics" spec="10.17.0"/>
+				<!--<pod name="FirebaseAnalyticsOnDeviceConversion" spec="10.17.0"/>-->
 				<pod name="FirebaseMessaging" spec="10.17.0"/>
 				<pod name="FirebasePerformance" spec="10.17.0"/>
 				<pod name="FirebaseRemoteConfig" spec="10.17.0"/>

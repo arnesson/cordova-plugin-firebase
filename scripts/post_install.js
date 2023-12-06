@@ -7,7 +7,13 @@
 const PLUGIN_NAME = "FirebaseX plugin";
 const PLUGIN_ID = "cordova-plugin-firebasex";
 
-const VARIABLE_NAME = "IOS_USE_PRECOMPILED_FIRESTORE_POD";
+const VARIABLE_NAMES = [
+    "IOS_USE_PRECOMPILED_FIRESTORE_POD",
+    "FIREBASE_ANALYTICS_WITHOUT_ADS",
+    "IOS_ON_DEVICE_CONVERSION_ANALYTICS"
+];
+
+const variableApplicators = {};
 
 // Node dependencies
 let path, cwd, fs;
@@ -19,22 +25,16 @@ let parser;
 let projectPath, modulesPath, pluginNodePath,
     projectPackageJsonPath, projectPackageJsonData,
     configXmlPath, configXmlData,
-    pluginXmlPath, pluginXmlText, pluginXmlData;
+    pluginXmlPath, pluginXmlText, pluginXmlData,
+    pluginVariables;
 
+let pluginXmlModified = false;
 
 /*********************
  * Internal functions
  *********************/
 
-const run = function (){
-    const pluginVariables = parsePluginVariables();
-    const shouldEnable = resolveBoolean(pluginVariables[VARIABLE_NAME]);
-    if(!shouldEnable) {
-        console.log(`${VARIABLE_NAME} is not set to true. Skipping ${PLUGIN_ID}`);
-        return;
-    }
-
-    console.log(`Apply ${VARIABLE_NAME}=true to ${PLUGIN_ID}/plugin.xml`);
+variableApplicators.IOS_USE_PRECOMPILED_FIRESTORE_POD = function(){
     const firestorePodsRegExp = /<pod name="FirebaseFirestore" spec="(\d+\.\d+\.\d+)"\/>/,
         precompiledPodReplacementPattern = `<pod name="FirebaseFirestore" tag="$version$" git="https://github.com/invertase/firestore-ios-sdk-frameworks.git" />`,
         match = pluginXmlText.match(firestorePodsRegExp);
@@ -45,11 +45,57 @@ const run = function (){
 
     const precompiledPodReplacement = precompiledPodReplacementPattern.replace("$version$", match[1]);
     pluginXmlText = pluginXmlText.replace(firestorePodsRegExp, precompiledPodReplacement);
+    pluginXmlModified = true;
+}
 
-    writePluginXmlText();
-    console.log(`Applied ${VARIABLE_NAME}=true to ${PLUGIN_ID}/plugin.xml`);
+variableApplicators.FIREBASE_ANALYTICS_WITHOUT_ADS = function(){
+    const firebaseAnalyticsWithAdsPodFragment = `<pod name="FirebaseAnalytics"`,
+        firebaseAnalyticsWithoutAdsPodFragment = `<pod name="FirebaseAnalytics/WithoutAdIdSupport"`,
+        match = pluginXmlText.match(firebaseAnalyticsWithAdsPodFragment);
+
+    if(!match){
+        console.warn(`Failed to find <pod name="FirebaseAnalytics"> in ${PLUGIN_ID}/plugin.xml`);
+        return;
+    }
+
+    pluginXmlText = pluginXmlText.replace(firebaseAnalyticsWithAdsPodFragment, firebaseAnalyticsWithoutAdsPodFragment);
+    pluginXmlModified = true;
+}
+
+variableApplicators.IOS_ON_DEVICE_CONVERSION_ANALYTICS = function(){
+    const commentedOutPodRegExp = /<!--<pod name="FirebaseAnalyticsOnDeviceConversion" spec="(\d+\.\d+\.\d+)"\/>-->/,
+        commentedInPattern = `<pod name="FirebaseAnalyticsOnDeviceConversion" spec="$version$"/>`,
+        match = pluginXmlText.match(commentedOutPodRegExp);
+
+    if(!match){
+        console.warn(`Failed to find commented-out <pod name="FirebaseAnalyticsOnDeviceConversion"> in ${PLUGIN_ID}/plugin.xml`);
+        return;
+    }
+    const replacement = commentedInPattern.replace("$version$", match[1]);
+    pluginXmlText = pluginXmlText.replace(commentedOutPodRegExp, replacement);
+    pluginXmlModified = true;
+}
+
+const run = function (){
+    pluginVariables = parsePluginVariables();
+
+    for(const variableName of VARIABLE_NAMES){
+        applyPluginVariable(variableName);
+    }
+
+    if(pluginXmlModified) writePluginXmlText();
 };
 
+const applyPluginVariable = function(variableName){
+    const shouldEnable = resolveBoolean(pluginVariables[variableName]);
+    if(!shouldEnable) {
+        console.log(`Skipping application of ${variableName} as not set to true.`);
+        return;
+    }
+    console.log(`Applying ${variableName}=true to ${PLUGIN_ID}/plugin.xml`);
+    variableApplicators[variableName]();
+    console.log(`Applied ${variableName}=true to ${PLUGIN_ID}/plugin.xml`);
+}
 
 const handleError = function (errorMsg, errorObj) {
     errorMsg = PLUGIN_NAME + " - ERROR: " + errorMsg;
@@ -152,6 +198,7 @@ const parseXmlFileToJson = function(filepath, parseOpts){
 
 const writePluginXmlText = function(){
     fs.writeFileSync(pluginXmlPath, pluginXmlText, 'utf-8');
+    console.log(`Wrote modified ${PLUGIN_ID}/plugin.xml`);
 };
 
 /**********

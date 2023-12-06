@@ -211,10 +211,11 @@ The following Cordova plugin variables are supported by the plugin.
 Note that these must be set at plugin installation time. If you wish to change plugin variables, you'll need to uninstall the plugin and reinstall it with the new variable values.
 
 ### Android & iOS
-- `FIREBASE_ANALYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Analytics data collection on app startup
-- `FIREBASE_PERFORMANCE_COLLECTION_ENABLED` - whether to automatically enable Firebase Performance data collection on app startup
-- `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Crashlytics data collection on app startup
-- `FIREBASE_FCM_AUTOINIT_ENABLED` - whether to automatically enable FCM registration on app startup
+- `FIREBASE_ANALYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Analytics data collection on app startup. Defaults to true.
+- `FIREBASE_PERFORMANCE_COLLECTION_ENABLED` - whether to automatically enable Firebase Performance data collection on app startup. Defaults to true.
+- `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Crashlytics data collection on app startup. Defaults to true.
+- `FIREBASE_FCM_AUTOINIT_ENABLED` - whether to automatically enable FCM registration on app startup. Defaults to true.
+- `FIREBASE_ANALYTICS_WITHOUT_ADS` - whether to disable advertising ID collection in Analytics. Defaults to false.
 See [Disable data collection on startup](#disable-data-collection-on-startup) for more info.
 
 ### Android only
@@ -280,6 +281,9 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - `IOS_FCM_ENABLED` - allows to completely disable push notifications functionality of the plugin (not just the automatic initialization that is covered by `FIREBASE_FCM_AUTOINIT_ENABLED` variable).
   - Defaults to `true`, if not specified; i.e. FCM is enabled by default.
   - This can be handy if you are using this plugin for e.g. Crashlytics and handle push notifications using another plugin. Use `--variable IOS_FCM_ENABLED=false` in this case.
+- `IOS_ON_DEVICE_CONVERSION_ANALYTICS` - whether to include the On-Device Conversion component of the Firebase SDK.
+  - Defaults to `false` if not specified.
+  - If `true`, the component will be included and [initiateOnDeviceConversionMeasurement](#initiateondeviceconversionmeasurement) can be called at run-time to enable it.
 
 ## Supported Cordova Versions
 - cordova: `>= 10`
