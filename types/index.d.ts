@@ -133,6 +133,11 @@ export interface FirebasePlugin {
         userName: string,
         userValue: string
     ): void
+    initiateOnDeviceConversionMeasurement(
+        userIdentifier: { emailAddress?:string, phoneNumber?: string },
+        success?: () => void,
+        error?: (err: string) => void
+    ): void
     setCrashlyticsCollectionEnabled(): void
     didCrashOnPreviousExecution(
         success?: (didCrashOnPreviousExecution: boolean) => void,
