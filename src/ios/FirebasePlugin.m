@@ -1595,6 +1595,23 @@ static FIRMultiFactorResolver* multiFactorResolver;
     }];
 }
 
+- (void) initiateOnDeviceConversionMeasurement:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        @try {
+            NSDictionary* userIdentifier = [command.arguments objectAtIndex:0];
+            if([userIdentifier objectForKey:@"emailAddress"] != nil){
+                [FIRAnalytics initiateOnDeviceConversionMeasurementWithEmailAddress:[userIdentifier objectForKey:@"emailAddress"]];
+            }else if([userIdentifier objectForKey:@"phoneNumber"] != nil){
+                [FIRAnalytics initiateOnDeviceConversionMeasurementWithPhoneNumber:[userIdentifier objectForKey:@"phoneNumber"]];
+            }
+            
+            [self sendPluginSuccess:command];
+        }@catch (NSException *exception) {
+            [self handlePluginExceptionWithContext:exception :command];
+        }
+    }];
+}
+
 /*
  * Crashlytics
  */
@@ -2556,6 +2573,7 @@ static FIRMultiFactorResolver* multiFactorResolver;
         }
     }];
 }
+
 
 /*************************************************/
 #pragma mark - utility functions

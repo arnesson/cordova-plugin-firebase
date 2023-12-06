@@ -112,6 +112,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [setScreenName](#setscreenname)
     - [setUserId](#setuserid)
     - [setUserProperty](#setuserproperty)
+    - [initiateOnDeviceConversionMeasurement](#initiateondeviceconversionmeasurement)
   - [Crashlytics](#crashlytics)
     - [setCrashlyticsCollectionEnabled](#setcrashlyticscollectionenabled)
     - [didCrashOnPreviousExecution](#didcrashonpreviousexecution)
@@ -2218,6 +2219,25 @@ Set a user property for use in Analytics:
 
 ```javascript
 FirebasePlugin.setUserProperty("name", "value");
+```
+
+### initiateOnDeviceConversionMeasurement
+Initiates [on-device conversion measurement](https://firebase.google.com/docs/tutorials/ads-ios-on-device-measurement) using either user's email address or phone number.
+iOS only.
+
+**Parameters**:
+- {object} userIdentifier - user identifier as either `emailAddress` or `phoneNumber` key
+- {function} success - callback function which will be invoked on success.
+  Will be passed a {boolean} indicating if the setting is enabled.
+- {function} error - (optional) callback function which will be passed a {string} error message as an argument
+
+```javascript
+FirebasePlugin.initiateOnDeviceConversionMeasurement({emailAddress: "me@here.com"},
+function(){
+    console.log("On device conversion measurement initiated");
+}, function(error){
+    console.error("Error initiating on device conversion measurement: "+error);
+});
 ```
 
 ## Crashlytics
