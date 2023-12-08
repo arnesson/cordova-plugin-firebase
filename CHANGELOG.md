@@ -1,3 +1,13 @@
+# Version 16.3.0
+* (Android) apply FIREBASE_ANALYTICS_WITHOUT_ADS plugin variable to disable AD ID data collection and remove AD ID permission from manifest
+* (iOS) build: apply FIREBASE_ANALYTICS_WITHOUT_ADS and IOS_ON_DEVICE_CONVERSION_ANALYTICS plugin variables to plugin.xml using npm post_install script
+* (doc) Explain additional step required for post-install plugin variables
+* (iOS) feat: Add `initiateOnDeviceConversionMeasurement()` to support on-device conversion measurement
+    * Implements [#843](https://github.com/dpa99c/cordova-plugin-firebasex/pull/843)
+* (iOS) fix: add FirebaseAnalytics pod
+  * Merged from PR [#848](https://github.com/dpa99c/cordova-plugin-firebasex/pull/848)
+
+
 # Version 16.2.0
 * (iOS) add npm post_install script to apply IOS_USE_PRECOMPILED_FIRESTORE_POD plugin variable to plugin.xml before the plugin config is loaded by Cordova
 * (iOS) use product pods for firebase packages
