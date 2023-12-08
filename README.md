@@ -24,6 +24,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Android & iOS](#android--ios)
     - [Android only](#android-only)
     - [iOS only](#ios-only)
+    - [Post-install plugin variables](#post-install-plugin-variables)
   - [Supported Cordova Versions](#supported-cordova-versions)
   - [Supported Mobile Platform Versions](#supported-mobile-platform-versions)
   - [Migrating from cordova-plugin-firebase](#migrating-from-cordova-plugin-firebase)
@@ -217,6 +218,7 @@ Note that these must be set at plugin installation time. If you wish to change p
 - `FIREBASE_CRASHLYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Crashlytics data collection on app startup. Defaults to true.
 - `FIREBASE_FCM_AUTOINIT_ENABLED` - whether to automatically enable FCM registration on app startup. Defaults to true.
 - `FIREBASE_ANALYTICS_WITHOUT_ADS` - whether to disable advertising ID collection in Analytics. Defaults to false.
+  - Note that this is a [post-install plugin variable](#post-install-plugin-variables) so an additional step is required to activate the plugin variable the first time it is specified.
 See [Disable data collection on startup](#disable-data-collection-on-startup) for more info.
 
 ### Android only
@@ -259,6 +261,7 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
   - Since some users experienced long build times due to the Firestore pod (see [#407](https://github.com/dpa99c/cordova-plugin-firebasex/issues/407))
   - However other users have experienced build issues with the pre-compiled version (see [#735](https://github.com/dpa99c/cordova-plugin-firebasex/issues/735))
   - Defaults to `false` if not specified.
+  - Note that this is a [post-install plugin variable](#post-install-plugin-variables) so an additional step is required to activate the plugin variable the first time it is specified.
 - `IOS_STRIP_DEBUG` - prevents symbolification of all libraries included via Cocoapods. See [Strip debug symbols](#strip-debug-symbols) for more info.
     - e.g.  `--variable IOS_STRIP_DEBUG=true`
     - Defaults to `false` if not specified.
@@ -285,6 +288,17 @@ See [Specifying Android library versions](#specifying-android-library-versions) 
 - `IOS_ON_DEVICE_CONVERSION_ANALYTICS` - whether to include the On-Device Conversion component of the Firebase SDK.
   - Defaults to `false` if not specified.
   - If `true`, the component will be included and [initiateOnDeviceConversionMeasurement](#initiateondeviceconversionmeasurement) can be called at run-time to enable it.
+  - Note that this is a [post-install plugin variable](#post-install-plugin-variables) so an additional step is required to activate the plugin variable the first time it is specified.
+
+### Post-install plugin variables
+- Some of the plugin variables above are used to optionally include additional components of the Firebase SDKs.
+- Since Cordova does not support using plugin variables to optionally include plugin dependencies, this plugin implements a [custom npm post-install script](scripts/post_install.js) to enable this behaviour.
+- This script is executed automatically after the plugin is installed and will apply the plugin variables defined in your project's `package.json` to the plugin's `plugin.xml` file **before** Cordova parses the `plugin.xml` file.
+- However, the **first time** you specify a new plugin variable, the post-install script will be executed **before** Cordova has added the plugin variable to the `package.json` file so the plugin variable will not be applied to the `plugin.xml` file.
+- **IMPORTANT**: Therefore if you specify a plugin variable for the first time, you must **reinstall** the plugin for the plugin variable to be applied to the `plugin.xml` file:
+  - e.g. `cordova plugin rm cordova-plugin-firebasex --nosave && cordova plugin add cordova-plugin-firebasex --nosave`
+  - Note: you do not have to specify the plugin variable(s) again when reinstalling the plugin as they will be read from the `package.json` file.
+
 
 ## Supported Cordova Versions
 - cordova: `>= 10`
