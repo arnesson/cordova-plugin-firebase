@@ -702,6 +702,9 @@ public class FirebasePlugin extends CordovaPlugin {
                             requestPermissions(plugin, POST_NOTIFICATIONS_PERMISSION_REQUEST_ID, permissions);
                             sendEmptyPluginResultAndKeepCallback(callbackContext);
                         }
+                    }else{
+                        // No runtime permission required on Android 12 and below
+                        callbackContext.success(1);
                     }
 
                 } catch (Exception e) {
