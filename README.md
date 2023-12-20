@@ -212,6 +212,15 @@ cordova plugin add cordova-plugin-firebasex
 The following Cordova plugin variables are supported by the plugin.
 Note that these must be set at plugin installation time. If you wish to change plugin variables, you'll need to uninstall the plugin and reinstall it with the new variable values.
 
+Plugin variables are initially set by specifying them during plugin installation, for example:
+`cordova plugin add cordova-plugin-firebasex --variable FIREBASE_ANALYTICS_WITHOUT_ADS=true`
+
+Once the plugin is installed, you can change the plugin variable values either by fully uninstalling/reinstalling the plugin, for example:
+`cordova plugin rm cordova-plugin-firebasex && cordova plugin add cordova-plugin-firebasex --variable FIREBASE_ANALYTICS_WITHOUT_ADS=false`
+
+Or you can manually edit the values in your project's `package.json` under `cordova.plugins.cordova-plugin-firebasex` and reinstall the plugin:
+`cordova plugin rm cordova-plugin-firebasex --nosave && cordova plugin add cordova-plugin-firebasex --nosave`
+
 ### Android & iOS
 - `FIREBASE_ANALYTICS_COLLECTION_ENABLED` - whether to automatically enable Firebase Analytics data collection on app startup. Defaults to true.
 - `FIREBASE_PERFORMANCE_COLLECTION_ENABLED` - whether to automatically enable Firebase Performance data collection on app startup. Defaults to true.
