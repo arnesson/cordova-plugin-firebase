@@ -10,11 +10,11 @@ var plist = require('plist');
  */
 var comment = "\"Crashlytics\"";
 
-var versionRegex = /\d+\.\d+\.\d+/,
-    firebasePodRegex = /pod 'Firebase\/([^']+)', '(\d+\.\d+\.\d+)'/g,
-    standardFirestorePodRegEx = /pod 'FirebaseFirestore', '(\d+\.\d+\.\d+)'/,
-    googleSignInPodRegEx = /pod 'GoogleSignIn', '(\d+\.\d+\.\d+)'/,
-    googleTagManagerPodRegEx = /pod 'GoogleTagManager', '(\d+\.\d+\.\d+)'/,
+var versionRegex = /\d+\.\d+\.\d+[^'"]*/,
+    firebasePodRegex = /pod 'Firebase([^']+)', '(\d+\.\d+\.\d+[^'"]*)'/g,
+    standardFirestorePodRegEx = /pod 'FirebaseFirestore', '(\d+\.\d+\.\d+[^'"]*)'/,
+    googleSignInPodRegEx = /pod 'GoogleSignIn', '(\d+\.\d+\.\d+[^'"]*)'/,
+    googleTagManagerPodRegEx = /pod 'GoogleTagManager', '(\d+\.\d+\.\d+[^'"]*)'/,
     prebuiltFirestorePodTemplate = "pod 'FirebaseFirestore', :tag => '{version}', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git'",
     iosDeploymentTargetPodRegEx = /platform :ios, '(\d+\.\d+)'/;
 
@@ -296,8 +296,8 @@ end
             if(pluginVariables['IOS_FIREBASE_SDK_VERSION'].match(versionRegex)){
                 var matches = podFileContents.match(firebasePodRegex);
                 if(matches){
-                    var currentVersion = matches[0].match(versionRegex)[0];
                     matches.forEach((match) => {
+                        var currentVersion = match.match(versionRegex)[0];
                         if(!match.match(pluginVariables['IOS_FIREBASE_SDK_VERSION'])){
                             podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_FIREBASE_SDK_VERSION']));
                             podFileModified = true;
@@ -314,8 +314,8 @@ end
             if(pluginVariables['IOS_GOOGLE_SIGIN_VERSION'].match(versionRegex)){
                 var matches = podFileContents.match(googleSignInPodRegEx);
                 if(matches){
-                    var currentVersion = matches[0].match(versionRegex)[0];
                     matches.forEach((match) => {
+                        var currentVersion = match.match(versionRegex)[0];
                         if(!match.match(pluginVariables['IOS_GOOGLE_SIGIN_VERSION'])){
                             podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_GOOGLE_SIGIN_VERSION']));
                             podFileModified = true;
@@ -332,8 +332,8 @@ end
             if(pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION'].match(versionRegex)){
                 var matches = podFileContents.match(googleTagManagerPodRegEx);
                 if(matches){
-                    var currentVersion = matches[0].match(versionRegex)[0];
                     matches.forEach((match) => {
+                        var currentVersion = match.match(versionRegex)[0];
                         if(!match.match(pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION'])){
                             podFileContents = podFileContents.replace(match, match.replace(currentVersion, pluginVariables['IOS_GOOGLE_TAG_MANAGER_VERSION']));
                             podFileModified = true;
