@@ -373,6 +373,11 @@ exports.authenticateUserWithFacebook = function (accessToken, success, error,) {
     exec(success, error, "FirebasePlugin", "authenticateUserWithFacebook", [accessToken]);
 };
 
+exports.authenticateUserWithOAuth = function (success, error, providerId, customParameters, scopes) {
+    if(typeof providerId !== 'string') return error("'providerId' must be a string");
+    exec(success, error, "FirebasePlugin", "authenticateUserWithOAuth", [providerId, customParameters, scopes]);
+};
+
 exports.signInWithCredential = function (credential, success, error) {
     if(typeof credential !== 'object') return error("'credential' must be an object");
     exec(success, handleAuthErrorResult(error), "FirebasePlugin", "signInWithCredential", [credential]);
