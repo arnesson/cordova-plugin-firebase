@@ -156,6 +156,7 @@ module.exports = function(context){
         helper.ensureRunpathSearchPath(context, xcodeProjectPath);
         podFileModified = helper.applyPodsPostInstall(pluginVariables, PLATFORM.IOS);
         helper.applyPluginVarsToPlists(pluginVariables, PLATFORM.IOS);
+        helper.ensureEncodedAppIdInUrlSchemes(PLATFORM.IOS)
         podFileModified = helper.applyPluginVarsToPodfile(pluginVariables, PLATFORM.IOS) || podFileModified;
 
         if(podFileModified){

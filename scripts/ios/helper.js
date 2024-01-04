@@ -18,6 +18,42 @@ var versionRegex = /\d+\.\d+\.\d+[^'"]*/,
     prebuiltFirestorePodTemplate = "pod 'FirebaseFirestore', :tag => '{version}', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git'",
     iosDeploymentTargetPodRegEx = /platform :ios, '(\d+\.\d+\.?\d*)'/;
 
+// Internal functions
+function ensureUrlSchemeInPlist(urlScheme, appPlist){
+    var appPlistModified = false;
+    if(!appPlist['CFBundleURLTypes']) appPlist['CFBundleURLTypes'] = [];
+    var entry, entryIndex, i, j, alreadyExists = false;
+
+    for(i=0; i<appPlist['CFBundleURLTypes'].length; i++){
+        var thisEntry = appPlist['CFBundleURLTypes'][i];
+        if(thisEntry['CFBundleURLSchemes']){
+            for(j=0; j<thisEntry['CFBundleURLSchemes'].length; j++){
+                if(thisEntry['CFBundleURLSchemes'][j] === urlScheme){
+                    alreadyExists = true;
+                    break;
+                }
+            }
+        }
+        if(thisEntry['CFBundleTypeRole'] === 'Editor'){
+            entry = thisEntry;
+            entryIndex = i;
+        }
+    }
+    if(!alreadyExists){
+        if(!entry) entry = {};
+        if(!entry['CFBundleTypeRole']) entry['CFBundleTypeRole'] = 'Editor';
+        if(!entry['CFBundleURLSchemes']) entry['CFBundleURLSchemes'] = [];
+        entry['CFBundleURLSchemes'].push(urlScheme)
+        if(typeof entryIndex === "undefined") entryIndex = i;
+        appPlist['CFBundleURLTypes'][entryIndex] = entry;
+        appPlistModified = true;
+        utilities.log('cordova-plugin-firebasex: Added URL scheme "'+urlScheme+'"');
+    }
+
+    return {plist: appPlist, modified: appPlistModified}
+}
+
+// Public functions
 module.exports = {
 
     /**
@@ -236,23 +272,11 @@ end
         }
         if(pluginVariables['SETUP_RECAPTCHA_VERIFICATION'] === 'true'){
             var reversedClientId = googlePlist['REVERSED_CLIENT_ID'];
-
-            if(!appPlist['CFBundleURLTypes']) appPlist['CFBundleURLTypes'] = [];
-            var entry, i;
-            for(i=0; i<appPlist['CFBundleURLTypes'].length; i++){
-                if(typeof appPlist['CFBundleURLTypes'][i] === 'object' && appPlist['CFBundleURLTypes'][i]['CFBundleURLSchemes']){
-                    entry = appPlist['CFBundleURLTypes'][i];
-                    break;
-                }
+            var result = ensureUrlSchemeInPlist(reversedClientId, appPlist);
+            if(result.modified){
+                appPlist = result.plist;
+                appPlistModified = true;
             }
-            if(!entry) entry = {};
-            if(!entry['CFBundleTypeRole']) entry['CFBundleTypeRole'] = 'Editor';
-            if(!entry['CFBundleURLSchemes']) entry['CFBundleURLSchemes'] = [];
-            if(entry['CFBundleURLSchemes'].indexOf(reversedClientId) === -1){
-                entry['CFBundleURLSchemes'].push(reversedClientId)
-            }
-            appPlist['CFBundleURLTypes'][i] = entry;
-            appPlistModified = true;
         }
         if(pluginVariables['IOS_ENABLE_APPLE_SIGNIN'] === 'true'){
             entitlementsDebugPlist["com.apple.developer.applesignin"] = ["Default"];
@@ -359,5 +383,16 @@ end
         }
 
         return podFileModified;
+    },
+    ensureEncodedAppIdInUrlSchemes: function (iosPlatform){
+        var googlePlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.dest), 'utf8')),
+            appPlist = plist.parse(fs.readFileSync(path.resolve(iosPlatform.appPlist), 'utf8')),
+            googleAppId = googlePlist["GOOGLE_APP_ID"],
+            encodedAppId = 'app-'+googleAppId.replace(/:/g,'-');
+
+        var result = ensureUrlSchemeInPlist(encodedAppId, appPlist);
+        if(result.modified){
+            fs.writeFileSync(path.resolve(iosPlatform.appPlist), plist.build(result.plist));
+        }
     }
 };
