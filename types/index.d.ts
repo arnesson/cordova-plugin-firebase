@@ -265,6 +265,13 @@ export interface FirebasePlugin {
         success?: (credential:object) => void,
         error?: (err: string) => void,
     ): void
+    authenticateUserWithOAuth(
+        success: (credential:object) => void,
+        error: (err: string) => void,
+        providerId: string,
+        customParameters?: object,
+        scopes?: [string],
+    ): void
     signInWithCredential(
         credential: object,
         success?: () => void,

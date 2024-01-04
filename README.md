@@ -150,6 +150,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [authenticateUserWithApple](#authenticateuserwithapple)
     - [authenticateUserWithMicrosoft](#authenticateuserwithmicrosoft)
     - [authenticateUserWithFacebook](#authenticateuserwithfacebook)
+    - [authenticateUserWithOAuth](#authenticateuserwithoauth)
     - [signInWithCredential](#signinwithcredential)
     - [linkUserWithCredential](#linkuserwithcredential)
     - [reauthenticateWithCredential](#reauthenticatewithcredential)
@@ -3232,11 +3233,14 @@ Authenticates the user with a Microsoft account using Sign In with Oauth to obta
 - {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
     - {string} id - the identifier of a native credential object which can be used for signing in the user.
 - {function} error - callback function which will be passed a {string} error message as an argument
+- {string} locale - (Android only) the language to display Microsoft's Sign-in screen in.
+    - Defaults to "en" (English) if not specified.
+    - See [the Microsoft documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-localization#supported-languages) for a list of supported locales.
+    - The value is ignored on iOS which uses the locale of the device to determine the display language.
 
 Example usage:
 
 ```javascript
-
 FirebasePlugin.authenticateUserWithMicrosoft(function(credential) {
     FirebasePlugin.signInWithCredential(credential, function() {
             console.log("Successfully signed in");
@@ -3245,7 +3249,7 @@ FirebasePlugin.authenticateUserWithMicrosoft(function(credential) {
         });
 }, function(error) {
     console.error("Failed to authenticate with Microsoft: " + error);
-});
+}, 'en_GB');
 ```
 
 ### authenticateUserWithFacebook
@@ -3280,6 +3284,39 @@ facebookConnectPlugin.login(["public_profile"],
         console.error("Failed to login to Facebook", error);
     }
 );
+```
+
+### authenticateUserWithOAuth
+Authenticates the user with an OpenID Connect (OIDC) compliant provider to obtain a credential that can be used to sign the user in/link to an existing user account/reauthenticate the user.
+- You must configure your OIDC provider in the Firebase console before using this method as outlined in the [Firebase documentation](https://firebase.google.com/docs/auth/web/openid-connect);
+- See Firebase documentation "Authenticate Using OpenID Connect" sections for [Android](https://firebase.google.com/docs/auth/android/openid-connect) and [iOS](https://firebase.google.com/docs/auth/ios/openid-connect) for more info.
+
+**Parameters**:
+- {function} success - callback function to pass {object} credentials to as an argument. The credential object has the following properties:
+    - {string} id - the identifier of a native credential object which can be used for signing in the user.
+- {function} error - callback function which will be passed a {string} error message as an argument
+
+Example usage:
+
+```javascript
+var providerId = 'oidc.provider';
+var customParameters = {
+    login_hint: 'user@domain.com'
+};
+var scopes = ['openid', 'profile', 'email'];
+
+FirebasePlugin.authenticateUserWithOAuth(function(credential) {
+    console.log("Successfully authenticated with oAuth provider");
+    FirebasePlugin.signInWithCredential(credential,
+        function() {
+            console.log("Successfully signed in");
+        }, function(error) {
+            console.error("Failed to sign in", error);
+        }
+    );
+}, function(error) {
+    console.error("Failed to authenticate with oAuth provider: " + error);
+}, providerId, customParameters, scopes);
 ```
 
 ### signInWithCredential
