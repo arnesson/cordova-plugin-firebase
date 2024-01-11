@@ -2274,24 +2274,11 @@ public class FirebasePlugin extends CordovaPlugin {
             public void run() {
                 try {
                     String locale = args.getString(0);
-                    OAuthProvider.Builder provider = OAuthProvider.newBuilder("apple.com");
+                    Map<String, String> customParameters = new HashMap<>();
                     if (locale != null) {
-                        provider.addCustomParameter("locale", locale);
+                        customParameters.put("locale", locale);
                     }
-                    Task<AuthResult> pending = FirebaseAuth.getInstance().getPendingAuthResult();
-                    if (pending != null) {
-                        callbackContext.error("Auth result is already pending");
-                        pending
-                                .addOnSuccessListener(new AuthResultOnSuccessListener())
-                                .addOnFailureListener(new AuthResultOnFailureListener());
-                    } else {
-                        String id = FirebasePlugin.instance.saveAuthProvider(provider.build());
-                        ;
-                        JSONObject returnResults = new JSONObject();
-                        returnResults.put("instantVerification", true);
-                        returnResults.put("id", id);
-                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, returnResults));
-                    }
+                    authenticateUserWithOAuth(callbackContext, "apple.com", customParameters, null);
                 } catch (Exception e) {
                     handleExceptionWithContext(e, callbackContext);
                 }
