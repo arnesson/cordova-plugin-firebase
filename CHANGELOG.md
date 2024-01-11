@@ -1,3 +1,18 @@
+# Version 16.4.0
+* (doc) Add note about xmlns:android attribute for config.xml
+  Merged from PR [#840](https://github.com/dpa99c/cordova-plugin-firebasex/pull/840)
+* (doc) Clarify how to set plugin variables
+* (iOS) fix matching of pod versions so IOS_FIREBASE_SDK_VERSION variable is applied to Podfile.
+  * Resolves [#838](https://github.com/dpa99c/cordova-plugin-firebasex/issues/838)
+* (iOS) Support optional patch version when specifying iOS deployment target version.
+  * Resolves [#822](https://github.com/dpa99c/cordova-plugin-firebasex/issues/822)
+* (Android) bugfix: when grantPermission is called on Android 12 or below, ensure success callback is invoked.
+  * Resolves [#819](https://github.com/dpa99c/cordova-plugin-firebasex/issues/819)
+* (iOS & Android) feat: Implement authenticateUserWithOAuth() to authenticate with OAuth providers
+* (ios) Return idToken in credential result when authentication with Apple is successful.
+  * Partially resolves [#857](https://github.com/dpa99c/cordova-plugin-firebasex/issues/857)
+
+
 # Version 16.3.0
 * (Android) apply FIREBASE_ANALYTICS_WITHOUT_ADS plugin variable to disable AD ID data collection and remove AD ID permission from manifest
 * (iOS) build: apply FIREBASE_ANALYTICS_WITHOUT_ADS and IOS_ON_DEVICE_CONVERSION_ANALYTICS plugin variables to plugin.xml using npm post_install script
