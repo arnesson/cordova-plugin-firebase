@@ -523,6 +523,7 @@ static __weak id <UNUserNotificationCenterDelegate> _prevUserNotificationCenterD
                     NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
                     [result setValue:@"true" forKey:@"instantVerification"];
                     [result setValue:key forKey:@"id"];
+                    [result setValue:idToken forKey:@"idToken"];
                     if(appleIDCredential.fullName != nil){
                         if(appleIDCredential.fullName.givenName != nil){
                             [result setValue:appleIDCredential.fullName.givenName forKey:@"givenName"];
