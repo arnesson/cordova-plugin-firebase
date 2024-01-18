@@ -56,3 +56,7 @@ Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification
 ## API
 
 See the full [API](docs/API.md) available for this plugin.
+
+## Supporters
+
+[PassportReader](https://passportreader.app) identity verification service - Start for free, then $0.1 per verification
