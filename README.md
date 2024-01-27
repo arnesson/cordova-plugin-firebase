@@ -59,4 +59,4 @@ See the full [API](docs/API.md) available for this plugin.
 
 ## Supporters
 
-[PassportReader](https://passportreader.app) identity verification service - Start for free, then $0.1 per verification
+[PassportReader](https://passportreader.app) identity verification API - Get started for free - $0.01 per verification
