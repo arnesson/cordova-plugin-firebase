@@ -300,6 +300,11 @@ static FirebasePlugin *firebasePlugin;
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+- (void)crashTest: (CDVInvokedUrlCommand *)command {
+    [[Crashlytics sharedInstance] crash];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)setScreenName:(CDVInvokedUrlCommand *)command {
     NSString* name = [command.arguments objectAtIndex:0];
 
