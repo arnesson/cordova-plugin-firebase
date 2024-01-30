@@ -20,6 +20,10 @@ exports.onNotificationOpen = function (success, error) {
   exec(success, error, "FirebasePlugin", "onNotificationOpen", []);
 };
 
+exports.enableForegroundNotifications = function (success, error) {
+  exec(success, error, "FirebasePlugin", "enableForegroundNotifications", []);
+}
+
 exports.onTokenRefresh = function (success, error) {
   exec(success, error, "FirebasePlugin", "onTokenRefresh", []);
 };

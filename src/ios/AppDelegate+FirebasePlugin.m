@@ -49,17 +49,17 @@
 
     // get GoogleService-Info.plist file path
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
-    
+
     // if file is successfully found, use it
     if(filePath){
         NSLog(@"GoogleService-Info.plist found, setup: [FIRApp configureWithOptions]");
         // create firebase configure options passing .plist as content
         FIROptions *options = [[FIROptions alloc] initWithContentsOfFile:filePath];
-        
+
         // configure FIRApp with options
         [FIRApp configureWithOptions:options];
     }
-    
+
     // no .plist found, try default App
     if (![FIRApp defaultApp] && !filePath) {
         NSLog(@"GoogleService-Info.plist NOT FOUND, setup: [FIRApp defaultApp]");
@@ -180,7 +180,13 @@
     // Print full message.
     NSLog(@"%@", mutableUserInfo);
 
-    completionHandler(UNNotificationPresentationOptionAlert);
+    if ([self.applicationInBackground isEqualToNumber: @(YES)]
+        || [[FirebasePlugin.firebasePlugin foregroundEnabled] isEqualToNumber: @(YES)]) {
+      completionHandler(UNNotificationPresentationOptionAlert);
+    } else {
+      completionHandler(UNNotificationPresentationOptionNone);
+    }
+
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 

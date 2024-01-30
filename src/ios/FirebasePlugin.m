@@ -4,6 +4,7 @@
 #import "Firebase.h"
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
+#import <objc/runtime.h>
 @import FirebaseInstanceID;
 @import FirebaseMessaging;
 @import FirebaseAnalytics;
@@ -18,6 +19,8 @@
 #ifndef NSFoundationVersionNumber_iOS_9_x_Max
 #define NSFoundationVersionNumber_iOS_9_x_Max 1299
 #endif
+
+#define kForegoundEnabledKey @"foregroundEnabled"
 
 @implementation FirebasePlugin
 
@@ -36,6 +39,14 @@ static FirebasePlugin *firebasePlugin;
 - (void)pluginInitialize {
     NSLog(@"Starting Firebase plugin");
     firebasePlugin = self;
+}
+
+- (void)setForegroundEnabled:(NSNumber *)foregroundEnabled {
+    objc_setAssociatedObject(self, kForegoundEnabledKey, foregroundEnabled, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSNumber *)foregroundEnabled {
+    return objc_getAssociatedObject(self, kForegoundEnabledKey);
 }
 
 - (void)getId:(CDVInvokedUrlCommand *)command {
@@ -226,6 +237,13 @@ static FirebasePlugin *firebasePlugin;
         }
         [self.notificationStack removeAllObjects];
     }
+}
+
+- (void)enableForegroundNotifications:(CDVInvokedUrlCommand *)command {
+    self.foregroundEnabled = @(YES);
+
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)onTokenRefresh:(CDVInvokedUrlCommand *)command {
