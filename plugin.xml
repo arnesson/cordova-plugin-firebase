@@ -66,6 +66,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 		<hook type="after_plugin_install" src="scripts/ios/after_plugin_install.js" />
 		<hook type="before_plugin_uninstall" src="scripts/ios/before_plugin_uninstall.js" />
 
+		<preference name="IOS_HIDE_FOREGROUND_NOTIFICATION" default="false"/>
+
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
@@ -76,10 +78,13 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			</feature>
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Debug.plist">
-		    <string>development</string>
+			<string>development</string>
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Release.plist">
 			<string>production</string>
+		</config-file>
+		<config-file target="*-Info.plist" parent="IosHideForegroundNotification">
+			<string>$IOS_HIDE_FOREGROUND_NOTIFICATION</string>
 		</config-file>
 
 		<resource-file src="src/ios/GoogleService-Info.plist" />

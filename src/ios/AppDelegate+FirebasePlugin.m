@@ -176,11 +176,17 @@
     NSDictionary *mutableUserInfo = [notification.request.content.userInfo mutableCopy];
 
     [mutableUserInfo setValue:self.applicationInBackground forKey:@"tap"];
-
+    [mutableUserInfo setValue:@YES forKey:@"foreground"];
     // Print full message.
     NSLog(@"%@", mutableUserInfo);
 
-    completionHandler(UNNotificationPresentationOptionAlert);
+    NSString *iosHideForegroundNotification = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"IosHideForegroundNotification"];
+
+    if ([iosHideForegroundNotification isEqual:@"true"]) {
+        completionHandler(UNNotificationPresentationOptionNone);
+    } else {
+        completionHandler(UNNotificationPresentationOptionAlert);
+    }
     [FirebasePlugin.firebasePlugin sendNotification:mutableUserInfo];
 }
 

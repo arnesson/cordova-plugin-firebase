@@ -1,5 +1,18 @@
 # Notifications
 
+## Hide notifications when the app is in foreground
+
+Install the plugin by adding it to your project's config.xml:
+```
+<plugin name="cordova-plugin-firebase" spec="^2.0.0">
+    <variable name="IOS_HIDE_FOREGROUND_NOTIFICATION" value="true" />
+</plugin>
+```
+or by running:
+```
+cordova plugin add cordova-plugin-firebase --variable IOS_HIDE_FOREGROUND_NOTIFICATION="true" --save
+```
+
 Read below for details on configuring notification [icons](#changing-notification-icon) and [colors](#notification-colors).
 
 ## Changing Notification Icon

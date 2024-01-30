@@ -51,7 +51,7 @@ Checkout our [guide](docs/GOOGLE_TAG_MANAGER.md) for info on setting up Google T
 
 ## Configuring Notifications
 
-Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons and colors.
+Checkout our [guide](docs/NOTIFICATIONS.md) for info on configuring notification icons, colors and how to hide notifications when the app is in foreground for iOS.
 
 ## API
 
