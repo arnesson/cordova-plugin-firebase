@@ -14,6 +14,8 @@ I dedicate a considerable amount of my free time to developing and maintaining t
 To help ensure this plugin is kept updated, new features are added and bugfixes are implemented quickly, please donate a couple of dollars (or a little more if you can stretch) as this will help me to afford to dedicate time to its maintenance. Please consider donating if you're using this plugin in an app that makes you money, if you're being paid to make the app, if you're asking for new features or priority bug fixes.
 <!-- END DONATE -->
 
+**MAINTENANCE OF THIS PLUGIN:** Please note this plugin is maintained **only by me - one person** - in my spare time: I do not get paid for it. Therefore I will do my best to address bugs and issues as time permits but if you have an urgent requirement for a bug fix or missing feature, then I am available for paid contract work in order to expedite this - contact me for details. Otherwise I will get around to it when I have time. 
+
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
