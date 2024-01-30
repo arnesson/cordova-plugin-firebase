@@ -480,4 +480,25 @@ static FirebasePlugin *firebasePlugin;
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
+
+- (void)createChannel:(CDVInvokedUrlCommand *)command {
+	[self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)deleteChannel:(CDVInvokedUrlCommand *)command {
+	[self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)listChannels:(CDVInvokedUrlCommand *)command {
+	[self.commandDelegate runInBackground:^{
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
 @end

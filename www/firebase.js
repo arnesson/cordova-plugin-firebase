@@ -167,3 +167,15 @@ exports.verifyPhoneNumber = function (number, timeOutDuration, success, error) {
 exports.clearAllNotifications = function (success, error) {
   exec(success, error, "FirebasePlugin", "clearAllNotifications", []);
 };
+
+exports.createChannel = function (options, success, error) {
+  exec(success, error, "FirebasePlugin", "createChannel", [options]);
+};
+
+exports.deleteChannel = function (channelID, success, error) {
+  exec(success, error, "FirebasePlugin", "deleteChannel", [channelID]);
+};
+
+exports.listChannels = function (success, error) {
+  exec(success, error, "FirebasePlugin", "listChannels", []);
+};
